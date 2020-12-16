@@ -106,4 +106,12 @@ SOFTWARE.
         </pluginManagement>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/luhenry/vectorizedblas</url>
+        </repository>
+    </distributionManagement>
+
 </project>
