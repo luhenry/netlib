@@ -54,7 +54,7 @@ public class DsprBenchmark extends BLASBenchmark {
 
     @Benchmark
     public void vector(Blackhole bh) {
-        vectorBLAS.dspr("U", n, alpha, x, 1, a);
+        vectorizedBLAS.dspr("U", n, alpha, x, 1, a);
         bh.consume(a);
     }
 

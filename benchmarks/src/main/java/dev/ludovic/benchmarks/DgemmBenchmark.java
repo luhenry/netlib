@@ -70,7 +70,7 @@ public class DgemmBenchmark extends BLASBenchmark {
 
     @Benchmark
     public void vector(Blackhole bh) {
-        vectorBLAS.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("T") ? k : m, b, transb.equals("T") ? k : n, beta, c, m);
+        vectorizedBLAS.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("T") ? k : m, b, transb.equals("T") ? k : n, beta, c, m);
         bh.consume(c);
     }
 

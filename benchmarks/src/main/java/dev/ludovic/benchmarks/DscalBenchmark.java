@@ -52,7 +52,7 @@ public class DscalBenchmark extends BLASBenchmark {
 
     @Benchmark
     public void vector(Blackhole bh) {
-        vectorBLAS.dscal(n, alpha, x, 1);
+        vectorizedBLAS.dscal(n, alpha, x, 1);
         bh.consume(x);
     }
 

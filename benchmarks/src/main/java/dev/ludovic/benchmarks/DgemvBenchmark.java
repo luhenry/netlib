@@ -64,7 +64,7 @@ public class DgemvBenchmark extends BLASBenchmark {
 
     @Benchmark
     public void vector(Blackhole bh) {
-        vectorBLAS.dgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
+        vectorizedBLAS.dgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
         bh.consume(y);
     }
 

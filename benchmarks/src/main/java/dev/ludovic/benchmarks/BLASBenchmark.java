@@ -22,7 +22,7 @@
 
 package dev.ludovic.blas.benchmarks;
 
-import dev.ludovic.blas.VectorBLAS;
+import dev.ludovic.blas.VectorizedBLAS;
 
 import com.github.fommil.netlib.BLAS;
 import com.github.fommil.netlib.F2jBLAS;
@@ -33,7 +33,7 @@ abstract class BLASBenchmark {
 
     protected final BLAS nativeBLAS = BLAS.getInstance();
     protected final BLAS f2jBLAS = new F2jBLAS();
-    protected final BLAS vectorBLAS = new VectorBLAS();
+    protected final BLAS vectorizedBLAS = new VectorizedBLAS();
 
     private final Random rand = new Random(0);
 

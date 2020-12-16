@@ -58,7 +58,7 @@ public class DspmvBenchmark extends BLASBenchmark {
 
     @Benchmark
     public void vector(Blackhole bh) {
-        vectorBLAS.dspmv("U", n, alpha, a, x, 1, beta, y, 1);
+        vectorizedBLAS.dspmv("U", n, alpha, a, x, 1, beta, y, 1);
         bh.consume(y);
     }
 

@@ -20,7 +20,7 @@
 * SOFTWARE.
 */
 
-import dev.ludovic.blas.VectorBLAS;
+import dev.ludovic.blas.VectorizedBLAS;
 
 import com.github.fommil.netlib.BLAS;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ public class BLASTest {
 
     @BeforeEach
     void setup() {
-        blas = new VectorBLAS();
+        blas = new VectorizedBLAS();
         // blas = new com.github.fommil.netlib.F2jBLAS();
     }
 }
