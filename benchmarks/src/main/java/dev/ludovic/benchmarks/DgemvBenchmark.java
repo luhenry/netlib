@@ -35,10 +35,10 @@ public class DgemvBenchmark extends BLASBenchmark {
     @Param({"N", "T"})
     public String trans;
 
-    @Param({"100", "1000", "10000"})
+    @Param({"10", "10000"})
     public int m;
 
-    @Param({"100", "1000", "10000"})
+    @Param({"10", "10000"})
     public int n;
 
     public double alpha;
