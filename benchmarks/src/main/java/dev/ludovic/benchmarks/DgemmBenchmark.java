@@ -65,19 +65,19 @@ public class DgemmBenchmark extends BLASBenchmark {
 
     @Benchmark
     public void f2j(Blackhole bh) {
-        f2jBLAS.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("T") ? k : m, b, transb.equals("T") ? k : n, beta, c, m);
+        f2jBLAS.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, c, m);
         bh.consume(c);
     }
 
     @Benchmark
     public void vector(Blackhole bh) {
-        vectorizedBLAS.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("T") ? k : m, b, transb.equals("T") ? k : n, beta, c, m);
+        vectorizedBLAS.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, c, m);
         bh.consume(c);
     }
 
     @Benchmark
     public void blas(Blackhole bh) {
-        nativeBLAS.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("T") ? k : m, b, transb.equals("T") ? k : n, beta, c, m);
+        nativeBLAS.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, c, m);
         bh.consume(c);
     }
 }
