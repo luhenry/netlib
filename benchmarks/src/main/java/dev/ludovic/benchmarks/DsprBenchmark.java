@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
+@Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
 public class DsprBenchmark extends BLASBenchmark {
 
     @Param({"10", "1000"})
