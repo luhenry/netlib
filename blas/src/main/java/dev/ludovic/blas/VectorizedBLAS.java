@@ -129,7 +129,7 @@ public class VectorizedBLAS extends F2jBLAS {
     // printf("dspmv(uplo=%s, n=%s, alpha=%s, a=%s, x=%s, incx=%s, " + // scalastyle = ignore
     //              "beta=%s, y=%s, incy=%s)\n",
     //         uplo, n, alpha, a, x, incx, beta, y, incy)
-    if (uplo == "U" && incx == 1 && incy == 1) {
+    if (uplo.equals("U") && incx == 1 && incy == 1) {
       // y = beta * y
       dscal(n, beta, y, 1);
       // y += alpha * A * x
@@ -159,7 +159,7 @@ public class VectorizedBLAS extends F2jBLAS {
   public void dspr(String uplo, int n, double alpha, double[] x, int incx, double[] a) {
     // printf("dspr(uplo=%s, n=%s, alpha=%s, x=%s, incx=%s, a=%s)\n", // scalastyle = ignore
     //         uplo, n, alpha, x, incx, a)
-    if (uplo == "U" && incx == 1) {
+    if (uplo.equals("U") && incx == 1) {
       if (alpha != 0.) {
         for (int col = 0; col < n; col += 1) {
           int row = 0;
@@ -184,7 +184,7 @@ public class VectorizedBLAS extends F2jBLAS {
   public void dsyr(String uplo, int n, double alpha, double[] x, int incx, double[] a, int lda) {
     // printf("dsyr(uplo=%s, n=%s, alpha=%s, x=%s, incx=%s, a=%s, lda=%s)\n", // scalastyle = ignore
     //         uplo, n, alpha, x, incx, a, lda)
-    if (uplo == "U" && incx == 1) {
+    if (uplo.equals("U") && incx == 1) {
       if (alpha != 0.) {
         for (int col = 0; col < n; col += 1) {
           int row = 0;
@@ -210,7 +210,7 @@ public class VectorizedBLAS extends F2jBLAS {
     // printf("dgemv(trans=%s, m=%s, n=%s, alpha=%s, a=%s, lda=%s, x=%s, " + // scalastyle = ignore
     //              "incx=%s, beta=%s, y=%s, incy=%s)\n",
     //         trans, m, n, alpha, a, lda, x, incx, beta, y, incy)
-    if (trans == "T" && incx == 1 && incy == 1 && lda == m) {
+    if (trans.equals("T") && incx == 1 && incy == 1 && lda == m) {
       // y = beta * y
       dscal(n, beta, y, 1);
       // y += alpha * A * x
@@ -238,7 +238,7 @@ public class VectorizedBLAS extends F2jBLAS {
     //              "a=%s, lda=%s, b=%s, ldb=%s, beta=%s, c=%s, ldc=%s)\n",
     //         transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc)
     // val start = System.nanoTime()
-    if (transa == "T" && transb == "N" && lda == k && ldb == k && ldc == m) {
+    if (transa.equals("T") && transb.equals("N") && lda == k && ldb == k && ldc == m) {
       // C = beta * C
       dscal(m * n, beta, c, 1);
       // C += alpha * A * B
