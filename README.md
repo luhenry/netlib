@@ -7,7 +7,7 @@
 ## Commands
 
 ```
-$> JAVA_HOME=/usr/lib/jvm/jdk mvn clean package
+$> JAVA_HOME=/usr/lib/jvm/jdk-17+1 mvn clean package
 ```
 
 # Run
@@ -15,7 +15,7 @@ $> JAVA_HOME=/usr/lib/jvm/jdk mvn clean package
 You've a set of benchmarks in [benchmarks/src/main/java](https://github.com/luhenry/blas/tree/master/benchmarks/src/main/java/). You can run them with:
 
 ```
-$> /usr/lib/jvm/jdk/bin/java --add-modules jdk.incubator.vector -jar benchmarks/target/blas-benchmarks.jar
+$> /usr/lib/jvm/jdk/bin/java -jar benchmarks/target/blas-benchmarks.jar -f 3 -wi 4 -i 2 -rff jmh-results.csv
 ```
 
 # Contribution
