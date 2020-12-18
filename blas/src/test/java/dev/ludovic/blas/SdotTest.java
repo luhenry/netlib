@@ -27,12 +27,12 @@ public class SdotTest extends BLASTest {
 
     @Test
     void testSanity() {
-        int n = 3;
+        int n = 9;
         float[] x = new float[] {
-            1.0f, 0.0f, -2.0f };
+            1.0f, 0.0f, -2.0f, 1.0f, 0.0f, -2.0f, 1.0f, 0.0f, -2.0f };
         float[] y = new float[] {
-            2.0f, 1.0f, 0.0f };
+            2.0f, 1.0f, 0.0f, 2.0f, 1.0f, 0.0f, 2.0f, 1.0f, 0.0f };
 
-        assertEquals(2.0f, blas.sdot(n, x, 1, y, 1));
+        assertEquals(6.0f, blas.sdot(n, x, 1, y, 1));
     }
 }
