@@ -25,13 +25,13 @@ SOFTWARE.
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>dev.ludovic.blas</groupId>
+        <groupId>dev.ludovic</groupId>
         <artifactId>vectorizedblas</artifactId>
         <version>0.1.5</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>dev.ludovic.blas</groupId>
+    <groupId>dev.ludovic</groupId>
     <artifactId>vectorizedblas-benchmarks</artifactId>
     <version>0.1.5</version>
     <packaging>jar</packaging>
@@ -43,7 +43,7 @@ SOFTWARE.
 
     <dependencies>
         <dependency>
-            <groupId>dev.ludovic.blas</groupId>
+            <groupId>dev.ludovic</groupId>
             <artifactId>vectorizedblas-blas</artifactId>
             <version>0.1.5</version>
         </dependency>
