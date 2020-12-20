@@ -5,7 +5,7 @@ name: Publish
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   build:
@@ -15,15 +15,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up GitHub Packages Apache Maven
-      uses: actions/setup-java@v1
-      with:
-        java-version: 16-ea
-        gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-    - name: Publish to GitHub Packages Apache Maven
-      run: mvn --batch-mode -X deploy
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+    # - name: Set up GitHub Packages Apache Maven
+    #   uses: actions/setup-java@v1
+    #   with:
+    #     java-version: 16-ea
+    #     server-id: github
+    #     gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+    # - name: Publish to GitHub Packages Apache Maven
+    #   run: mvn --batch-mode -X deploy
+    #   env:
+    #     GITHUB_TOKEN: ${{ github.token }}
 
     - name: Set up Apache Maven Central
       uses: actions/setup-java@v1
