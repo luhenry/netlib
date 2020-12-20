@@ -19,6 +19,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 16-ea
+        gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
     - name: Publish to GitHub Packages Apache Maven
       run: mvn --batch-mode -X deploy
       env:
