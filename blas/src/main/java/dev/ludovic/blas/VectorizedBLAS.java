@@ -32,13 +32,10 @@ public class VectorizedBLAS extends F2jBLAS {
 
   private static final VectorSpecies<Float>  FMAX = FloatVector.SPECIES_MAX;
   private static final VectorSpecies<Double> DMAX = DoubleVector.SPECIES_MAX;
-  private static final VectorSpecies<Double> D128 = DoubleVector.SPECIES_128;
 
   // y += alpha * x
   @Override
   public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
-    // printf("daxpy(n=%s, alpha=%s, x=%s, incx=%s, y=%s, incy=%s)\n", // scalastyle = ignore
-    //         n, alpha, x, incx, y, incy)
     if (incx == 1 && incy == 1 && n <= x.length && n <= y.length) {
       if (alpha != 0.) {
         int i = 0;
@@ -60,8 +57,6 @@ public class VectorizedBLAS extends F2jBLAS {
   // sum(x * y)
   @Override
   public float sdot(int n, float[] x, int incx, float[] y, int incy) {
-    // printf("sdot(n=%s, x=%s, incx=%s, y=%s, incy=%s)\n", // scalastyle = ignore
-    //         n, x, incx, y, incy)
     if (incx == 1 && incy == 1) {
       float sum = 0.0f;
       int i = 0;
@@ -84,8 +79,6 @@ public class VectorizedBLAS extends F2jBLAS {
   // sum(x * y)
   @Override
   public double ddot(int n, double[] x, int incx, double[] y, int incy) {
-    // printf("ddot(n=%s, x=%s, incx=%s, y=%s, incy=%s)\n", // scalastyle = ignore
-    //         n, x, incx, y, incy)
     if (incx == 1 && incy == 1) {
       double sum = 0.;
       int i = 0;
@@ -108,8 +101,6 @@ public class VectorizedBLAS extends F2jBLAS {
   // x = alpha * x
   @Override
   public void dscal(int n, double alpha, double[] x, int incx) {
-    // printf("dscal(n=%s, alpha=%s, x=%s, incx=%s)\n", // scalastyle = ignore
-    //         n, alpha, x, incx)
     if (incx == 1) {
       if (alpha != 1.) {
         int i = 0;
@@ -130,9 +121,6 @@ public class VectorizedBLAS extends F2jBLAS {
   // y := alpha * a * x + beta * y
   @Override
   public void dspmv(String uplo, int n, double alpha, double[] a, double[] x, int incx, double beta, double[] y, int incy) {
-    // printf("dspmv(uplo=%s, n=%s, alpha=%s, a=%s, x=%s, incx=%s, " + // scalastyle = ignore
-    //              "beta=%s, y=%s, incy=%s)\n",
-    //         uplo, n, alpha, a, x, incx, beta, y, incy)
     if (uplo.equals("U") && incx == 1 && incy == 1) {
       // y = beta * y
       dscal(n, beta, y, 1);
@@ -163,8 +151,6 @@ public class VectorizedBLAS extends F2jBLAS {
   // a += alpha * x * x.t
   @Override
   public void dspr(String uplo, int n, double alpha, double[] x, int incx, double[] a) {
-    // printf("dspr(uplo=%s, n=%s, alpha=%s, x=%s, incx=%s, a=%s)\n", // scalastyle = ignore
-    //         uplo, n, alpha, x, incx, a)
     if (uplo.equals("U") && incx == 1) {
       if (alpha != 0.) {
         for (int row = 0; row < n; row += 1) {
@@ -188,8 +174,6 @@ public class VectorizedBLAS extends F2jBLAS {
   // a += alpha * x * x.t
   @Override
   public void dsyr(String uplo, int n, double alpha, double[] x, int incx, double[] a, int lda) {
-    // printf("dsyr(uplo=%s, n=%s, alpha=%s, x=%s, incx=%s, a=%s, lda=%s)\n", // scalastyle = ignore
-    //         uplo, n, alpha, x, incx, a, lda)
     if (uplo.equals("U") && incx == 1) {
       if (alpha != 0.) {
         for (int row = 0; row < n; row += 1) {
@@ -213,9 +197,6 @@ public class VectorizedBLAS extends F2jBLAS {
   // y = alpha * A * x + beta * y
   @Override
   public void dgemv(String trans, int m, int n, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    // printf("dgemv(trans=%s, m=%s, n=%s, alpha=%s, a=%s, lda=%s, x=%s, " + // scalastyle = ignore
-    //              "incx=%s, beta=%s, y=%s, incy=%s)\n",
-    //         trans, m, n, alpha, a, lda, x, incx, beta, y, incy)
     if (trans.equals("T") && incx == 1 && incy == 1 && lda == m) {
       // y = beta * y
       dscal(n, beta, y, 1);
@@ -240,10 +221,6 @@ public class VectorizedBLAS extends F2jBLAS {
 
   @Override
   public void dgemm(String transa, String transb, int m, int n, int k, double alpha, double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
-    // printf("dgemm(transa=%s, transb=%s, m=%s, n=%s, k=%s, alpha=%s, " + // scalastyle = ignore
-    //              "a=%s, lda=%s, b=%s, ldb=%s, beta=%s, c=%s, ldc=%s)\n",
-    //         transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc)
-    // val start = System.nanoTime()
     if (transa.equals("T") && transb.equals("N") && lda == k && ldb == k && ldc == m) {
       // C = beta * C
       dscal(m * n, beta, c, 1);
@@ -266,10 +243,5 @@ public class VectorizedBLAS extends F2jBLAS {
     } else {
       super.dgemm(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
     }
-    // printf("dgemm(transa=%s, transb=%s, m=%s, n=%s, k=%s, alpha=%s, " + // scalastyle = ignore
-    //               "a=%s, lda=%s, b=%s, ldb=%s, beta=%s, c=%s, ldc=%s) -> %dms\n",
-    //         transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc,
-    //         (System.nanoTime() - start) / 1000 / 1000)
   }
-
 }
