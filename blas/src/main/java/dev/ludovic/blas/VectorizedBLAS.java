@@ -38,8 +38,8 @@ public class VectorizedBLAS extends F2jBLAS {
   public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
     if (incx == 1 && incy == 1 && n <= x.length && n <= y.length) {
       if (alpha != 0.) {
-        int i = 0;
         DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+        int i = 0;
         for (; i < DMAX.loopBound(n); i += DMAX.length()) {
           DoubleVector vx = DoubleVector.fromArray(DMAX, x, i);
           DoubleVector vy = DoubleVector.fromArray(DMAX, y, i);
@@ -103,8 +103,8 @@ public class VectorizedBLAS extends F2jBLAS {
   public void dscal(int n, double alpha, double[] x, int incx) {
     if (incx == 1) {
       if (alpha != 1.) {
-        int i = 0;
         DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+        int i = 0;
         for (; i < DMAX.loopBound(n); i += DMAX.length()) {
           DoubleVector vx = DoubleVector.fromArray(DMAX, x, i);
           vx.mul(valpha).intoArray(x, i);
@@ -126,16 +126,19 @@ public class VectorizedBLAS extends F2jBLAS {
       dscal(n, beta, y, 1);
       // y += alpha * A * x
       if (alpha != 0.) {
+        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         for (int row = 0; row < n; row += 1) {
           int col = 0;
+          DoubleVector vyrowsum = DoubleVector.zero(DMAX);
           DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[row]);
           for (; col < DMAX.loopBound(row); col += DMAX.length()) {
             DoubleVector vx = DoubleVector.fromArray(DMAX, x, col);
             DoubleVector vy = DoubleVector.fromArray(DMAX, y, col);
             DoubleVector va = DoubleVector.fromArray(DMAX, a, col + row * (row + 1) / 2);
-            y[row] += alpha * vx.mul(va).reduceLanes(VectorOperators.ADD);
+            vyrowsum = valpha.mul(vx).fma(va, vyrowsum);
             valphaxrow.fma(va, vy).intoArray(y, col);
           }
+          y[row] += vyrowsum.reduceLanes(VectorOperators.ADD);
           for (; col < row; col += 1) {
             y[row] += alpha * x[col] * a[col + row * (row + 1) / 2];
             y[col] += alpha * x[row] * a[col + row * (row + 1) / 2];
@@ -155,11 +158,11 @@ public class VectorizedBLAS extends F2jBLAS {
       if (alpha != 0.) {
         for (int row = 0; row < n; row += 1) {
           int col = 0;
-          DoubleVector valphax = DoubleVector.broadcast(DMAX, alpha * x[row]);
+          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[row]);
           for (; col < DMAX.loopBound(row + 1); col += DMAX.length()) {
             DoubleVector vx = DoubleVector.fromArray(DMAX, x, col);
             DoubleVector va = DoubleVector.fromArray(DMAX, a, col + row * (row + 1) / 2);
-            vx.fma(valphax, va).intoArray(a, col + row * (row + 1) / 2);
+            vx.fma(valphaxrow, va).intoArray(a, col + row * (row + 1) / 2);
           }
           for (; col < row + 1; col += 1) {
             a[col + row * (row + 1) / 2] += alpha * x[row] * x[col];
@@ -178,11 +181,11 @@ public class VectorizedBLAS extends F2jBLAS {
       if (alpha != 0.) {
         for (int row = 0; row < n; row += 1) {
           int col = 0;
-          DoubleVector valphax = DoubleVector.broadcast(DMAX, alpha * x[row]);
+          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[row]);
           for (; col < DMAX.loopBound(row + 1); col += DMAX.length()) {
             DoubleVector vx = DoubleVector.fromArray(DMAX, x, col);
             DoubleVector va = DoubleVector.fromArray(DMAX, a, col + row * n);
-            vx.fma(valphax, va).intoArray(a, col + row * n);
+            vx.fma(valphaxrow, va).intoArray(a, col + row * n);
           }
           for (; col < row + 1; col += 1) {
             a[col + row * n] += alpha * x[row] * x[col];
@@ -202,14 +205,17 @@ public class VectorizedBLAS extends F2jBLAS {
       dscal(n, beta, y, 1);
       // y += alpha * A * x
       if (alpha != 0.) {
+        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         for (int col = 0; col < n; col += 1) {
           int row = 0;
-          for (; row < DMAX.loopBound(m); row += DMAX.length()){
+          DoubleVector vsum = DoubleVector.zero(DMAX);
+          for (; row < DMAX.loopBound(m); row += DMAX.length()) {
             DoubleVector vx = DoubleVector.fromArray(DMAX, x, row);
             DoubleVector va = DoubleVector.fromArray(DMAX, a, row + col * m);
-            y[col] += alpha * vx.mul(va).reduceLanes(VectorOperators.ADD);
+            vsum = valpha.mul(va).fma(vx, vsum);
           }
-          for (; row < m; row += 1){
+          y[col] += vsum.reduceLanes(VectorOperators.ADD);
+          for (; row < m; row += 1) {
             y[col] += alpha * x[row] * a[row + col * m];
           }
         }
@@ -226,14 +232,17 @@ public class VectorizedBLAS extends F2jBLAS {
       dscal(m * n, beta, c, 1);
       // C += alpha * A * B
       if (alpha != 0.) {
+        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         for (int col = 0; col < n; col += 1) {
           for (int row = 0; row < m; row += 1) {
             int i = 0;
+            DoubleVector vsum = DoubleVector.zero(DMAX);
             for (; i < DMAX.loopBound(k); i += DMAX.length()) {
               DoubleVector va = DoubleVector.fromArray(DMAX, a, i + row * k);
               DoubleVector vb = DoubleVector.fromArray(DMAX, b, i + col * k);
-              c[row + col * m] += alpha * va.mul(vb).reduceLanes(VectorOperators.ADD);
+              vsum = valpha.mul(va).fma(vb, vsum);
             }
+            c[row + col * m] += vsum.reduceLanes(VectorOperators.ADD);
             for (; i < k; i += 1) {
               c[row + col * m] += alpha * a[i + row * k] * b[i + col * k];
             }
