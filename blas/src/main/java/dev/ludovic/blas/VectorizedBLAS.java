@@ -320,7 +320,7 @@ public class VectorizedBLAS extends F2jBLAS {
             for (; row < DMAX.loopBound(m); row += DMAX.length()) {
               DoubleVector va = DoubleVector.fromArray(DMAX, a, i * m + row);
               DoubleVector vc = DoubleVector.fromArray(DMAX, c, col * m + row);
-              valpha.lanewise(VectorOperators.MUL, b[col * k + i]).fma(va, vc)
+              valpha.mul(b[col * k + i]).fma(va, vc)
                     .intoArray(c, col * m + row);
             }
             for (; row < m; row += 1) {
@@ -345,7 +345,7 @@ public class VectorizedBLAS extends F2jBLAS {
             for (; row < DMAX.loopBound(m); row += DMAX.length()) {
               DoubleVector va = DoubleVector.fromArray(DMAX, a, i * m + row);
               DoubleVector vc = DoubleVector.fromArray(DMAX, c, col * m + row);
-              valpha.lanewise(VectorOperators.MUL, b[col + i * n]).fma(va, vc)
+              valpha.mul(b[col + i * n]).fma(va, vc)
                     .intoArray(c, col * m + row);
             }
             for (; row < m; row += 1) {
