@@ -227,7 +227,49 @@ public class VectorizedBLAS extends F2jBLAS {
 
   @Override
   public void dgemm(String transa, String transb, int m, int n, int k, double alpha, double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
-    if (transa.equals("T") && transb.equals("N") && lda == k && ldb == k && ldc == m) {
+    if (transa.equals("N") && transb.equals("N") && lda == m && ldb == k && ldc == m) {
+      // C = beta * C
+      dscal(m * n, beta, c, 1);
+      // C += alpha * A * B
+      if (alpha != 0.) {
+        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+        for (int col = 0; col < n; col += 1) {
+          for (int i = 0; i < k; i += 1) {
+            int row = 0;
+            for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+              DoubleVector va = DoubleVector.fromArray(DMAX, a, i * m + row);
+              DoubleVector vc = DoubleVector.fromArray(DMAX, c, col * m + row);
+              valpha.lanewise(VectorOperators.MUL, b[col * k + i]).fma(va, vc)
+                    .intoArray(c, col * m + row);
+            }
+            for (; row < m; row += 1) {
+              c[col * m + row] += alpha * a[i * m + row] * b[col * k + i];
+            }
+          }
+        }
+      }
+    } else if (transa.equals("N") && transb.equals("T") && lda == m && ldb == n && ldc == m) {
+      // C = beta * C
+      dscal(m * n, beta, c, 1);
+      // C += alpha * A * B
+      if (alpha != 0.) {
+        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+        for (int i = 0; i < k; i += 1) {
+          for (int col = 0; col < n; col += 1) {
+            int row = 0;
+            for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+              DoubleVector va = DoubleVector.fromArray(DMAX, a, i * m + row);
+              DoubleVector vc = DoubleVector.fromArray(DMAX, c, col * m + row);
+              valpha.lanewise(VectorOperators.MUL, b[col + i * n]).fma(va, vc)
+                    .intoArray(c, col * m + row);
+            }
+            for (; row < m; row += 1) {
+              c[col * m + row] += alpha * a[i * m + row] * b[col + i * n];
+            }
+          }
+        }
+      }
+    } else if (transa.equals("T") && transb.equals("N") && lda == k && ldb == k && ldc == m) {
       // C = beta * C
       dscal(m * n, beta, c, 1);
       // C += alpha * A * B
@@ -239,12 +281,12 @@ public class VectorizedBLAS extends F2jBLAS {
             DoubleVector vsum = DoubleVector.zero(DMAX);
             for (; i < DMAX.loopBound(k); i += DMAX.length()) {
               DoubleVector va = DoubleVector.fromArray(DMAX, a, i + row * k);
-              DoubleVector vb = DoubleVector.fromArray(DMAX, b, i + col * k);
+              DoubleVector vb = DoubleVector.fromArray(DMAX, b, col * k + i);
               vsum = valpha.mul(va).fma(vb, vsum);
             }
-            c[row + col * m] += vsum.reduceLanes(VectorOperators.ADD);
+            c[col * m + row] += vsum.reduceLanes(VectorOperators.ADD);
             for (; i < k; i += 1) {
-              c[row + col * m] += alpha * a[i + row * k] * b[i + col * k];
+              c[col * m + row] += alpha * a[i + row * k] * b[col * k + i];
             }
           }
         }
