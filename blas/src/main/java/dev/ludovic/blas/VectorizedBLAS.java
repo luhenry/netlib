@@ -36,7 +36,9 @@ public class VectorizedBLAS extends F2jBLAS {
   // y += alpha * x
   @Override
   public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
-    if (incx == 1 && incy == 1 && n <= x.length && n <= y.length) {
+    if (n >= 0
+        && x != null && x.length >= n && incx == 1
+        && y != null && y.length >= n && incy == 1) {
       if (alpha != 0.) {
         DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         int i = 0;
@@ -57,7 +59,9 @@ public class VectorizedBLAS extends F2jBLAS {
   // sum(x * y)
   @Override
   public float sdot(int n, float[] x, int incx, float[] y, int incy) {
-    if (incx == 1 && incy == 1) {
+    if (n >= 0
+        && x != null && x.length >= n && incx == 1
+        && y != null && y.length >= n && incy == 1) {
       float sum = 0.0f;
       int i = 0;
       FloatVector vsum = FloatVector.zero(FMAX);
@@ -79,7 +83,9 @@ public class VectorizedBLAS extends F2jBLAS {
   // sum(x * y)
   @Override
   public double ddot(int n, double[] x, int incx, double[] y, int incy) {
-    if (incx == 1 && incy == 1) {
+    if (n >= 0
+        && x != null && x.length >= n && incx == 1
+        && y != null && y.length >= n && incy == 1) {
       double sum = 0.;
       int i = 0;
       DoubleVector vsum = DoubleVector.zero(DMAX);
@@ -101,7 +107,7 @@ public class VectorizedBLAS extends F2jBLAS {
   // x = alpha * x
   @Override
   public void dscal(int n, double alpha, double[] x, int incx) {
-    if (incx == 1) {
+    if (n >= 0 && x != null && x.length >= n && incx == 1) {
       if (alpha != 1.) {
         DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         int i = 0;
@@ -121,7 +127,7 @@ public class VectorizedBLAS extends F2jBLAS {
   // x = alpha * x
   @Override
   public void sscal(int n, float alpha, float[] x, int incx) {
-    if (incx == 1) {
+    if (n >= 0 && x != null && x.length >= n && incx == 1) {
       if (alpha != 1.) {
         FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
         int i = 0;
@@ -138,10 +144,15 @@ public class VectorizedBLAS extends F2jBLAS {
     }
   }
 
-  // y := alpha * a * x + beta * y
+  // y = alpha * a * x + beta * y
   @Override
-  public void dspmv(String uplo, int n, double alpha, double[] a, double[] x, int incx, double beta, double[] y, int incy) {
-    if ("U".equals(uplo) && incx == 1 && incy == 1) {
+  public void dspmv(String uplo, int n, double alpha, double[] a,
+      double[] x, int incx, double beta, double[] y, int incy) {
+    if ("U".equals(uplo)
+        && n >= 0
+        && a != null && a.length >= n * (n + 1) / 2
+        && x != null && x.length >= n && incx == 1
+        && y != null && y.length >= n && incy == 1) {
       // y = beta * y
       dscal(n, beta, y, 1);
       // y += alpha * A * x
@@ -174,7 +185,10 @@ public class VectorizedBLAS extends F2jBLAS {
   // a += alpha * x * x.t
   @Override
   public void dspr(String uplo, int n, double alpha, double[] x, int incx, double[] a) {
-    if ("U".equals(uplo) && incx == 1) {
+    if ("U".equals(uplo)
+        && n >= 0
+        && x != null && x.length >= n && incx == 1
+        && a != null && a.length >= n * (n + 1) / 2) {
       if (alpha != 0.) {
         for (int row = 0; row < n; row += 1) {
           int col = 0;
@@ -197,7 +211,10 @@ public class VectorizedBLAS extends F2jBLAS {
   // a += alpha * x * x.t
   @Override
   public void dsyr(String uplo, int n, double alpha, double[] x, int incx, double[] a, int lda) {
-    if ("U".equals(uplo) && incx == 1) {
+    if ("U".equals(uplo)
+        && n >= 0
+        && x != null && x.length >= n && incx == 1
+        && a != null && a.length >= n * n && lda == n) {
       if (alpha != 0.) {
         for (int row = 0; row < n; row += 1) {
           int col = 0;
@@ -219,8 +236,13 @@ public class VectorizedBLAS extends F2jBLAS {
 
   // y = alpha * A * x + beta * y
   @Override
-  public void dgemv(String trans, int m, int n, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    if ("T".equals(trans) && incx == 1 && incy == 1 && lda == m) {
+  public void dgemv(String trans, int m, int n, double alpha, double[] a, int lda,
+      double[] x, int incx, double beta, double[] y, int incy) {
+    if ("T".equals(trans)
+        && m >= 0 && n >= 0
+        && lda == m && a != null && a.length >= m * n
+        && x != null && x.length >= m && incx == 1
+        && y != null && y.length >= n && incy == 1) {
       // y = beta * y
       dscal(n, beta, y, 1);
       // y += alpha * A * x
@@ -247,8 +269,13 @@ public class VectorizedBLAS extends F2jBLAS {
 
   // y = alpha * A * x + beta * y
   @Override
-  public void sgemv(String trans, int m, int n, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy) {
-    if ("T".equals(trans) && incx == 1 && incy == 1 && lda == m) {
+  public void sgemv(String trans, int m, int n, float alpha, float[] a, int lda,
+      float[] x, int incx, float beta, float[] y, int incy) {
+    if ("T".equals(trans)
+        && m >= 0 && n >= 0
+        && a != null && a.length >= m * n && lda == m
+        && x != null && x.length >= m && incx == 1
+        && y != null && y.length >= n && incy == 1) {
       // y = beta * y
       sscal(n, beta, y, 1);
       // y += alpha * A * x
@@ -273,9 +300,17 @@ public class VectorizedBLAS extends F2jBLAS {
     }
   }
 
+  // c = alpha * a * b + beta * c
   @Override
-  public void dgemm(String transa, String transb, int m, int n, int k, double alpha, double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
-    if ("N".equals(transa) && "N".equals(transb) && lda == m && ldb == k && ldc == m) {
+  public void dgemm(String transa, String transb, int m, int n, int k, double alpha,
+      double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
+    // System.out.println(String.format("dgemm(transa=%s, transb=%s, m=%s, n=%s, k=%s, alpha=%s, a=%s, lda=%s, b=%s, ldb=%s, beta=%s, c=%s, ldc=%s)",
+    //     transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc));
+    if ("N".equals(transa) && "N".equals(transb)
+        && m >= 0 && n >= 0 && k >= 0
+        && a != null && a.length >= m * k && lda == m
+        && b != null && b.length >= k * n && ldb == k
+        && c != null && c.length >= m * n && ldc == m) {
       // C = beta * C
       dscal(m * n, beta, c, 1);
       // C += alpha * A * B
@@ -296,7 +331,11 @@ public class VectorizedBLAS extends F2jBLAS {
           }
         }
       }
-    } else if ("N".equals(transa) && "T".equals(transb) && lda == m && ldb == n && ldc == m) {
+    } else if ("N".equals(transa) && "T".equals(transb)
+        && m >= 0 && n >= 0 && k >= 0
+        && a != null && a.length >= m * k && lda == m
+        && b != null && b.length >= k * n && ldb == n
+        && c != null && c.length >= m * n && ldc == m) {
       // C = beta * C
       dscal(m * n, beta, c, 1);
       // C += alpha * A * B
@@ -317,7 +356,11 @@ public class VectorizedBLAS extends F2jBLAS {
           }
         }
       }
-    } else if ("T".equals(transa) && "N".equals(transb) && lda == k && ldb == k && ldc == m) {
+    } else if ("T".equals(transa) && "N".equals(transb)
+        && m >= 0 && n >= 0 && k >= 0
+        && a != null && a.length >= m * k && lda == k
+        && b != null && b.length >= k * n && ldb == k
+        && c != null && c.length >= m * n && ldc == m) {
       // C = beta * C
       dscal(m * n, beta, c, 1);
       // C += alpha * A * B
