@@ -22,7 +22,7 @@ jobs:
     #     server-id: github
     #     gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
     # - name: Publish to GitHub Packages Apache Maven
-    #   run: mvn --batch-mode -X deploy
+    #   run: mvn --batch-mode deploy
     #   env:
     #     GITHUB_TOKEN: ${{ github.token }}
 
@@ -35,7 +35,7 @@ jobs:
         server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
     - name: Publish to Apache Maven Central
-      run: mvn --batch-mode -X deploy
+      run: mvn --batch-mode deploy
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
