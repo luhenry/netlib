@@ -118,6 +118,26 @@ public class VectorizedBLAS extends F2jBLAS {
     }
   }
 
+  // x = alpha * x
+  @Override
+  public void sscal(int n, float alpha, float[] x, int incx) {
+    if (incx == 1) {
+      if (alpha != 1.) {
+        FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
+        int i = 0;
+        for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+          FloatVector vx = FloatVector.fromArray(FMAX, x, i);
+          vx.mul(valpha).intoArray(x, i);
+        }
+        for (; i < n; i += 1) {
+          x[i] *= alpha;
+        }
+      }
+    } else {
+      super.sscal(n, alpha, x, incx);
+    }
+  }
+
   // y := alpha * a * x + beta * y
   @Override
   public void dspmv(String uplo, int n, double alpha, double[] a, double[] x, int incx, double beta, double[] y, int incy) {
@@ -222,6 +242,34 @@ public class VectorizedBLAS extends F2jBLAS {
       }
     } else {
       super.dgemv(trans, m, n, alpha, a, lda, x, incx, beta, y, incy);
+    }
+  }
+
+  // y = alpha * A * x + beta * y
+  @Override
+  public void sgemv(String trans, int m, int n, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy) {
+    if (trans.equals("T") && incx == 1 && incy == 1 && lda == m) {
+      // y = beta * y
+      sscal(n, beta, y, 1);
+      // y += alpha * A * x
+      if (alpha != 0.) {
+        FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
+        for (int col = 0; col < n; col += 1) {
+          int row = 0;
+          FloatVector vsum = FloatVector.zero(FMAX);
+          for (; row < FMAX.loopBound(m); row += FMAX.length()) {
+            FloatVector vx = FloatVector.fromArray(FMAX, x, row);
+            FloatVector va = FloatVector.fromArray(FMAX, a, row + col * m);
+            vsum = valpha.mul(va).fma(vx, vsum);
+          }
+          y[col] += vsum.reduceLanes(VectorOperators.ADD);
+          for (; row < m; row += 1) {
+            y[col] += alpha * x[row] * a[row + col * m];
+          }
+        }
+      }
+    } else {
+      super.sgemv(trans, m, n, alpha, a, lda, x, incx, beta, y, incy);
     }
   }
 

@@ -22,42 +22,44 @@
 
 package dev.ludovic.blas.benchmarks;
 
-import dev.ludovic.blas.VectorizedBLAS;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
-import com.github.fommil.netlib.BLAS;
-import com.github.fommil.netlib.F2jBLAS;
+import java.util.concurrent.TimeUnit;
 
-import java.util.Random;
+@BenchmarkMode(Mode.Throughput)
+@OutputTimeUnit(TimeUnit.SECONDS)
+@State(Scope.Thread)
+@Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
+public class SscalBenchmark extends BLASBenchmark {
 
-abstract class BLASBenchmark {
+    @Param({"100", "10000000"})
+    public int n;
 
-    protected final BLAS nativeBLAS = BLAS.getInstance();
-    protected final BLAS f2jBLAS = new F2jBLAS();
-    protected final BLAS vectorizedBLAS = new VectorizedBLAS();
+    public float alpha;
+    public float[] x;
 
-    private final Random rand = new Random(0);
-
-    protected double randomDouble() {
-        return rand.nextDouble();
+    @Setup
+    public void setup() {
+        alpha = randomFloat();
+        x = randomFloatArray(n);
     }
 
-    protected double[] randomDoubleArray(int n) {
-        double[] res = new double[n];
-        for (int i = 0; i < n; i++) {
-            res[i] = rand.nextDouble();
-        }
-        return res;
+    @Benchmark
+    public void f2j(Blackhole bh) {
+        f2jBLAS.sscal(n, alpha, x, 1);
+        bh.consume(x);
     }
 
-    protected float randomFloat() {
-        return rand.nextFloat();
+    @Benchmark
+    public void vector(Blackhole bh) {
+        vectorizedBLAS.sscal(n, alpha, x, 1);
+        bh.consume(x);
     }
 
-    protected float[] randomFloatArray(int n) {
-        float[] res = new float[n];
-        for (int i = 0; i < n; i++) {
-            res[i] = rand.nextFloat();
-        }
-        return res;
+    @Benchmark
+    public void blas(Blackhole bh) {
+        nativeBLAS.sscal(n, alpha, x, 1);
+        bh.consume(x);
     }
 }
