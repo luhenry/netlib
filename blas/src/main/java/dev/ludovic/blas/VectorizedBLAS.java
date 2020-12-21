@@ -238,7 +238,30 @@ public class VectorizedBLAS extends F2jBLAS {
   @Override
   public void dgemv(String trans, int m, int n, double alpha, double[] a, int lda,
       double[] x, int incx, double beta, double[] y, int incy) {
-    if ("T".equals(trans)
+    if ("N".equals(trans)
+        && m >= 0 && n >= 0
+        && lda == m && a != null && a.length >= m * n
+        && x != null && x.length >= n && incx == 1
+        && y != null && y.length >= m && incy == 1) {
+      // y = beta * y
+      dscal(m, beta, y, 1);
+      // y += alpha * A * x
+      if (alpha != 0.) {
+        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+        for (int col = 0; col < n; col += 1) {
+          int row = 0;
+          for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+            DoubleVector va = DoubleVector.fromArray(DMAX, a, row + col * m);
+            DoubleVector vy = DoubleVector.fromArray(DMAX, y, row);
+            valpha.mul(x[col]).fma(va, vy)
+                  .intoArray(y, row);
+          }
+          for (; row < m; row += 1) {
+            y[row] += alpha * x[col] * a[row + col * m];
+          }
+        }
+      }
+    } else if ("T".equals(trans)
         && m >= 0 && n >= 0
         && lda == m && a != null && a.length >= m * n
         && x != null && x.length >= m && incx == 1
@@ -249,8 +272,8 @@ public class VectorizedBLAS extends F2jBLAS {
           int row = 0;
           DoubleVector vsum = DoubleVector.zero(DMAX);
           for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-            DoubleVector vx = DoubleVector.fromArray(DMAX, x, row);
             DoubleVector va = DoubleVector.fromArray(DMAX, a, row + col * m);
+            DoubleVector vx = DoubleVector.fromArray(DMAX, x, row);
             vsum = va.fma(vx, vsum);
           }
           sum += vsum.reduceLanes(VectorOperators.ADD);
@@ -269,7 +292,30 @@ public class VectorizedBLAS extends F2jBLAS {
   @Override
   public void sgemv(String trans, int m, int n, float alpha, float[] a, int lda,
       float[] x, int incx, float beta, float[] y, int incy) {
-    if ("T".equals(trans)
+    if ("N".equals(trans)
+        && m >= 0 && n >= 0
+        && lda == m && a != null && a.length >= m * n
+        && x != null && x.length >= n && incx == 1
+        && y != null && y.length >= m && incy == 1) {
+      // y = beta * y
+      sscal(m, beta, y, 1);
+      // y += alpha * A * x
+      if (alpha != 0.) {
+        FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
+        for (int col = 0; col < n; col += 1) {
+          int row = 0;
+          for (; row < FMAX.loopBound(m); row += FMAX.length()) {
+            FloatVector va = FloatVector.fromArray(FMAX, a, row + col * m);
+            FloatVector vy = FloatVector.fromArray(FMAX, y, row);
+            valpha.mul(x[col]).fma(va, vy)
+                  .intoArray(y, row);
+          }
+          for (; row < m; row += 1) {
+            y[row] += alpha * x[col] * a[row + col * m];
+          }
+        }
+      }
+    } else if ("T".equals(trans)
         && m >= 0 && n >= 0
         && a != null && a.length >= m * n && lda == m
         && x != null && x.length >= m && incx == 1
@@ -283,8 +329,8 @@ public class VectorizedBLAS extends F2jBLAS {
           int row = 0;
           FloatVector vsum = FloatVector.zero(FMAX);
           for (; row < FMAX.loopBound(m); row += FMAX.length()) {
-            FloatVector vx = FloatVector.fromArray(FMAX, x, row);
             FloatVector va = FloatVector.fromArray(FMAX, a, row + col * m);
+            FloatVector vx = FloatVector.fromArray(FMAX, x, row);
             vsum = valpha.mul(va).fma(vx, vsum);
           }
           y[col] += vsum.reduceLanes(VectorOperators.ADD);
