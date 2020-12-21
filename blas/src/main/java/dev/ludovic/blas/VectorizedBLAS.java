@@ -382,6 +382,27 @@ public class VectorizedBLAS extends F2jBLAS {
           }
         }
       }
+    } else if ("T".equals(transa) && "T".equals(transb)
+        && m >= 0 && n >= 0 && k >= 0
+        && a != null && a.length >= m * k && lda == k
+        && b != null && b.length >= k * n && ldb == n
+        && c != null && c.length >= m * n && ldc == m) {
+      if (alpha != 0. || beta != 1.) {
+        // FIXME: do block by block
+        for (int col = 0; col < n; col += 1) {
+          for (int row = 0; row < m; row += 1) {
+            double sum = 0.;
+            for (int i = 0; i < k; i += 1) {
+              sum += a[i + row * k] * b[col + i * n];
+            }
+            if (beta != 0.) {
+              c[col * m + row] = alpha * sum + beta * c[col * m + row];
+            } else {
+              c[col * m + row] = alpha * sum;
+            }
+          }
+        }
+      }
     } else {
       super.dgemm(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
     }
