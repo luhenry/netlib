@@ -243,23 +243,21 @@ public class VectorizedBLAS extends F2jBLAS {
         && lda == m && a != null && a.length >= m * n
         && x != null && x.length >= m && incx == 1
         && y != null && y.length >= n && incy == 1) {
-      // y = beta * y
-      dscal(n, beta, y, 1);
-      // y += alpha * A * x
-      if (alpha != 0.) {
-        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+      if (alpha != 0. || beta != 1.) {
         for (int col = 0; col < n; col += 1) {
+          double sum = 0.;
           int row = 0;
           DoubleVector vsum = DoubleVector.zero(DMAX);
           for (; row < DMAX.loopBound(m); row += DMAX.length()) {
             DoubleVector vx = DoubleVector.fromArray(DMAX, x, row);
             DoubleVector va = DoubleVector.fromArray(DMAX, a, row + col * m);
-            vsum = valpha.mul(va).fma(vx, vsum);
+            vsum = va.fma(vx, vsum);
           }
-          y[col] += vsum.reduceLanes(VectorOperators.ADD);
+          sum += vsum.reduceLanes(VectorOperators.ADD);
           for (; row < m; row += 1) {
-            y[col] += alpha * x[row] * a[row + col * m];
+            sum += x[row] * a[row + col * m];
           }
+          y[col] = alpha * sum + beta * y[col];
         }
       }
     } else {
@@ -361,23 +359,25 @@ public class VectorizedBLAS extends F2jBLAS {
         && a != null && a.length >= m * k && lda == k
         && b != null && b.length >= k * n && ldb == k
         && c != null && c.length >= m * n && ldc == m) {
-      // C = beta * C
-      dscal(m * n, beta, c, 1);
-      // C += alpha * A * B
-      if (alpha != 0.) {
-        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+      if (alpha != 0. || beta != 1.) {
         for (int col = 0; col < n; col += 1) {
           for (int row = 0; row < m; row += 1) {
+            double sum = 0.;
             int i = 0;
             DoubleVector vsum = DoubleVector.zero(DMAX);
             for (; i < DMAX.loopBound(k); i += DMAX.length()) {
               DoubleVector va = DoubleVector.fromArray(DMAX, a, i + row * k);
               DoubleVector vb = DoubleVector.fromArray(DMAX, b, col * k + i);
-              vsum = valpha.mul(va).fma(vb, vsum);
+              vsum = va.fma(vb, vsum);
             }
-            c[col * m + row] += vsum.reduceLanes(VectorOperators.ADD);
+            sum += vsum.reduceLanes(VectorOperators.ADD);
             for (; i < k; i += 1) {
-              c[col * m + row] += alpha * a[i + row * k] * b[col * k + i];
+              sum += a[i + row * k] * b[col * k + i];
+            }
+            if (beta != 0.) {
+              c[col * m + row] = alpha * sum + beta * c[col * m + row];
+            } else {
+              c[col * m + row] = alpha * sum;
             }
           }
         }
