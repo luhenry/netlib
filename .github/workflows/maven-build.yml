@@ -21,4 +21,4 @@ jobs:
       with:
         java-version: 16-ea
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn --batch-mode compile test
