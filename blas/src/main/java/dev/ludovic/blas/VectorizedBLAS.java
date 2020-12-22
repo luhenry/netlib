@@ -344,17 +344,24 @@ public class VectorizedBLAS extends F2jBLAS {
     }
   }
 
-  // c = alpha * a * b + beta * c
   @Override
   public void dgemm(String transa, String transb, int m, int n, int k, double alpha,
       double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
+    dgemm(transa, transb, m, n, k, alpha, a, 0, lda, b, 0, ldb, beta, c, ldc, 0);
+  }
+
+  // c = alpha * a * b + beta * c
+  @Override
+  public void dgemm(String transa, String transb, int m, int n, int k, double alpha,
+      double[] a, int aoffset, int lda, double[] b, int boffset, int ldb,
+      double beta, double[] c, int ldc, int coffset) {
     // System.out.println(String.format("dgemm(transa=%s, transb=%s, m=%s, n=%s, k=%s, alpha=%s, a=%s, lda=%s, b=%s, ldb=%s, beta=%s, c=%s, ldc=%s)",
     //     transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc));
     if ("N".equals(transa) && "N".equals(transb)
         && m >= 0 && n >= 0 && k >= 0
-        && a != null && a.length >= m * k && lda == m
-        && b != null && b.length >= k * n && ldb == k
-        && c != null && c.length >= m * n && ldc == m) {
+        && a != null && a.length >= aoffset + m * k && lda == m
+        && b != null && b.length >= boffset + k * n && ldb == k
+        && c != null && c.length >= coffset + m * n && ldc == m) {
       // C = beta * C
       dscal(m * n, beta, c, 1);
       // C += alpha * A * B
@@ -364,22 +371,22 @@ public class VectorizedBLAS extends F2jBLAS {
           for (int i = 0; i < k; i += 1) {
             int row = 0;
             for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-              DoubleVector va = DoubleVector.fromArray(DMAX, a, i * m + row);
-              DoubleVector vc = DoubleVector.fromArray(DMAX, c, col * m + row);
-              valpha.mul(b[col * k + i]).fma(va, vc)
+              DoubleVector va = DoubleVector.fromArray(DMAX, a, aoffset + i * m + row);
+              DoubleVector vc = DoubleVector.fromArray(DMAX, c, coffset + col * m + row);
+              valpha.mul(b[boffset + col * k + i]).fma(va, vc)
                     .intoArray(c, col * m + row);
             }
             for (; row < m; row += 1) {
-              c[col * m + row] += alpha * a[i * m + row] * b[col * k + i];
+              c[coffset + col * m + row] += alpha * a[aoffset + i * m + row] * b[boffset + col * k + i];
             }
           }
         }
       }
     } else if ("N".equals(transa) && "T".equals(transb)
         && m >= 0 && n >= 0 && k >= 0
-        && a != null && a.length >= m * k && lda == m
-        && b != null && b.length >= k * n && ldb == n
-        && c != null && c.length >= m * n && ldc == m) {
+        && a != null && a.length >= aoffset + m * k && lda == m
+        && b != null && b.length >= boffset + k * n && ldb == n
+        && c != null && c.length >= coffset + m * n && ldc == m) {
       // C = beta * C
       dscal(m * n, beta, c, 1);
       // C += alpha * A * B
@@ -389,22 +396,22 @@ public class VectorizedBLAS extends F2jBLAS {
           for (int col = 0; col < n; col += 1) {
             int row = 0;
             for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-              DoubleVector va = DoubleVector.fromArray(DMAX, a, i * m + row);
-              DoubleVector vc = DoubleVector.fromArray(DMAX, c, col * m + row);
-              valpha.mul(b[col + i * n]).fma(va, vc)
+              DoubleVector va = DoubleVector.fromArray(DMAX, a, aoffset + i * m + row);
+              DoubleVector vc = DoubleVector.fromArray(DMAX, c, coffset + col * m + row);
+              valpha.mul(b[boffset + col + i * n]).fma(va, vc)
                     .intoArray(c, col * m + row);
             }
             for (; row < m; row += 1) {
-              c[col * m + row] += alpha * a[i * m + row] * b[col + i * n];
+              c[coffset + col * m + row] += alpha * a[aoffset + i * m + row] * b[boffset + col + i * n];
             }
           }
         }
       }
     } else if ("T".equals(transa) && "N".equals(transb)
         && m >= 0 && n >= 0 && k >= 0
-        && a != null && a.length >= m * k && lda == k
-        && b != null && b.length >= k * n && ldb == k
-        && c != null && c.length >= m * n && ldc == m) {
+        && a != null && a.length >= aoffset + m * k && lda == k
+        && b != null && b.length >= boffset + k * n && ldb == k
+        && c != null && c.length >= coffset + m * n && ldc == m) {
       if (alpha != 0. || beta != 1.) {
         for (int col = 0; col < n; col += 1) {
           for (int row = 0; row < m; row += 1) {
@@ -412,39 +419,39 @@ public class VectorizedBLAS extends F2jBLAS {
             int i = 0;
             DoubleVector vsum = DoubleVector.zero(DMAX);
             for (; i < DMAX.loopBound(k); i += DMAX.length()) {
-              DoubleVector va = DoubleVector.fromArray(DMAX, a, i + row * k);
-              DoubleVector vb = DoubleVector.fromArray(DMAX, b, col * k + i);
+              DoubleVector va = DoubleVector.fromArray(DMAX, a, aoffset + i + row * k);
+              DoubleVector vb = DoubleVector.fromArray(DMAX, b, boffset + col * k + i);
               vsum = va.fma(vb, vsum);
             }
             sum += vsum.reduceLanes(VectorOperators.ADD);
             for (; i < k; i += 1) {
-              sum += a[i + row * k] * b[col * k + i];
+              sum += a[aoffset + i + row * k] * b[boffset + col * k + i];
             }
             if (beta != 0.) {
-              c[col * m + row] = alpha * sum + beta * c[col * m + row];
+              c[coffset + col * m + row] = alpha * sum + beta * c[coffset + col * m + row];
             } else {
-              c[col * m + row] = alpha * sum;
+              c[coffset + col * m + row] = alpha * sum;
             }
           }
         }
       }
     } else if ("T".equals(transa) && "T".equals(transb)
         && m >= 0 && n >= 0 && k >= 0
-        && a != null && a.length >= m * k && lda == k
-        && b != null && b.length >= k * n && ldb == n
-        && c != null && c.length >= m * n && ldc == m) {
+        && a != null && a.length >= aoffset + m * k && lda == k
+        && b != null && b.length >= boffset + k * n && ldb == n
+        && c != null && c.length >= coffset + m * n && ldc == m) {
       if (alpha != 0. || beta != 1.) {
         // FIXME: do block by block
         for (int col = 0; col < n; col += 1) {
           for (int row = 0; row < m; row += 1) {
             double sum = 0.;
             for (int i = 0; i < k; i += 1) {
-              sum += a[i + row * k] * b[col + i * n];
+              sum += a[aoffset + i + row * k] * b[boffset + col + i * n];
             }
             if (beta != 0.) {
-              c[col * m + row] = alpha * sum + beta * c[col * m + row];
+              c[coffset + col * m + row] = alpha * sum + beta * c[coffset + col * m + row];
             } else {
-              c[col * m + row] = alpha * sum;
+              c[coffset + col * m + row] = alpha * sum;
             }
           }
         }
