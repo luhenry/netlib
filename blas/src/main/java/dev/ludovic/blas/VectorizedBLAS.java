@@ -104,43 +104,53 @@ public class VectorizedBLAS extends F2jBLAS {
     }
   }
 
-  // x = alpha * x
   @Override
   public void dscal(int n, double alpha, double[] x, int incx) {
-    if (n >= 0 && x != null && x.length >= n && incx == 1) {
-      if (alpha != 1.) {
-        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
-        int i = 0;
-        for (; i < DMAX.loopBound(n); i += DMAX.length()) {
-          DoubleVector vx = DoubleVector.fromArray(DMAX, x, i);
-          vx.mul(valpha).intoArray(x, i);
-        }
-        for (; i < n; i += 1) {
-          x[i] *= alpha;
-        }
-      }
-    } else {
-      super.dscal(n, alpha, x, incx);
-    }
+    dscal(n, alpha, x, 0, incx);
   }
 
   // x = alpha * x
   @Override
+  public void dscal(int n, double alpha, double[] x, int offsetx, int incx) {
+    if (n >= 0 && x != null && x.length >= offsetx + n && incx == 1) {
+      if (alpha != 1.) {
+        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+        int i = 0;
+        for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+          DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + i);
+          vx.mul(valpha).intoArray(x, offsetx + i);
+        }
+        for (; i < n; i += 1) {
+          x[offsetx + i] *= alpha;
+        }
+      }
+    } else {
+      super.dscal(n, alpha, x, offsetx, incx);
+    }
+  }
+
+  @Override
   public void sscal(int n, float alpha, float[] x, int incx) {
-    if (n >= 0 && x != null && x.length >= n && incx == 1) {
+    sscal(n, alpha, x, 0, incx);
+  }
+
+  // x = alpha * x
+  @Override
+  public void sscal(int n, float alpha, float[] x, int offsetx, int incx) {
+    if (n >= 0 && x != null && x.length >= offsetx + n && incx == 1) {
       if (alpha != 1.) {
         FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
         int i = 0;
         for (; i < FMAX.loopBound(n); i += FMAX.length()) {
-          FloatVector vx = FloatVector.fromArray(FMAX, x, i);
-          vx.mul(valpha).intoArray(x, i);
+          FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + i);
+          vx.mul(valpha).intoArray(x, offsetx + i);
         }
         for (; i < n; i += 1) {
-          x[i] *= alpha;
+          x[offsetx + i] *= alpha;
         }
       }
     } else {
-      super.sscal(n, alpha, x, incx);
+      super.sscal(n, alpha, x, offsetx, incx);
     }
   }
 
@@ -234,136 +244,151 @@ public class VectorizedBLAS extends F2jBLAS {
     }
   }
 
+  @Override
+  public void dgemv(String trans, int m, int n,
+      double alpha, double[] a, int lda, double[] x, int incx,
+      double beta, double[] y, int incy) {
+    dgemv(trans, m, n, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
+  }
+
   // y = alpha * A * x + beta * y
   @Override
-  public void dgemv(String trans, int m, int n, double alpha, double[] a, int lda,
-      double[] x, int incx, double beta, double[] y, int incy) {
+  public void dgemv(String trans, int m, int n,
+      double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx,
+      double beta, double[] y, int offsety, int incy) {
     if ("N".equals(trans)
         && m >= 0 && n >= 0
-        && lda == m && a != null && a.length >= m * n
-        && x != null && x.length >= n && incx == 1
-        && y != null && y.length >= m && incy == 1) {
+        && a != null && a.length >= offseta + m * n && lda == m
+        && x != null && x.length >= offsetx + n && incx == 1
+        && y != null && y.length >= offsety + m && incy == 1) {
       // y = beta * y
-      dscal(m, beta, y, 1);
+      dscal(m, beta, y, offsety, 1);
       // y += alpha * A * x
       if (alpha != 0.) {
         DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         for (int col = 0; col < n; col += 1) {
           int row = 0;
           for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-            DoubleVector va = DoubleVector.fromArray(DMAX, a, row + col * m);
-            DoubleVector vy = DoubleVector.fromArray(DMAX, y, row);
-            valpha.mul(x[col]).fma(va, vy)
-                  .intoArray(y, row);
+            DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + row + col * m);
+            DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + row);
+            valpha.mul(x[offsetx + col]).fma(va, vy)
+                  .intoArray(y, offsety + row);
           }
           for (; row < m; row += 1) {
-            y[row] += alpha * x[col] * a[row + col * m];
+            y[offsety + row] += alpha * x[offsetx + col] * a[offseta + row + col * m];
           }
         }
       }
     } else if ("T".equals(trans)
         && m >= 0 && n >= 0
-        && lda == m && a != null && a.length >= m * n
-        && x != null && x.length >= m && incx == 1
-        && y != null && y.length >= n && incy == 1) {
+        && a != null && a.length >= offseta + m * n && lda == m
+        && x != null && x.length >= offsetx + m && incx == 1
+        && y != null && y.length >= offsety + n && incy == 1) {
       if (alpha != 0. || beta != 1.) {
         for (int col = 0; col < n; col += 1) {
           double sum = 0.;
           int row = 0;
           DoubleVector vsum = DoubleVector.zero(DMAX);
           for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-            DoubleVector va = DoubleVector.fromArray(DMAX, a, row + col * m);
-            DoubleVector vx = DoubleVector.fromArray(DMAX, x, row);
+            DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + row + col * m);
+            DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + row);
             vsum = va.fma(vx, vsum);
           }
           sum += vsum.reduceLanes(VectorOperators.ADD);
           for (; row < m; row += 1) {
-            sum += x[row] * a[row + col * m];
+            sum += x[offsetx + row] * a[offseta + row + col * m];
           }
-          y[col] = alpha * sum + beta * y[col];
+          y[offsety + col] = alpha * sum + beta * y[offsety + col];
         }
       }
     } else {
-      super.dgemv(trans, m, n, alpha, a, lda, x, incx, beta, y, incy);
+      super.dgemv(trans, m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     }
+  }
+
+  @Override
+  public void sgemv(String trans, int m, int n,
+      float alpha, float[] a, int lda, float[] x, int incx,
+      float beta, float[] y, int incy) {
+    sgemv(trans, m, n, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
   }
 
   // y = alpha * A * x + beta * y
   @Override
-  public void sgemv(String trans, int m, int n, float alpha, float[] a, int lda,
-      float[] x, int incx, float beta, float[] y, int incy) {
+  public void sgemv(String trans, int m, int n,
+      float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx,
+      float beta, float[] y, int offsety, int incy) {
     if ("N".equals(trans)
         && m >= 0 && n >= 0
-        && lda == m && a != null && a.length >= m * n
-        && x != null && x.length >= n && incx == 1
-        && y != null && y.length >= m && incy == 1) {
+        && a != null && a.length >= offseta + m * n && lda == m
+        && x != null && x.length >= offsetx + n && incx == 1
+        && y != null && y.length >= offsety + m && incy == 1) {
       // y = beta * y
-      sscal(m, beta, y, 1);
+      sscal(m, beta, y, offsety, 1);
       // y += alpha * A * x
-      if (alpha != 0.) {
+      if (alpha != 0.f) {
         FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
         for (int col = 0; col < n; col += 1) {
           int row = 0;
           for (; row < FMAX.loopBound(m); row += FMAX.length()) {
-            FloatVector va = FloatVector.fromArray(FMAX, a, row + col * m);
-            FloatVector vy = FloatVector.fromArray(FMAX, y, row);
-            valpha.mul(x[col]).fma(va, vy)
-                  .intoArray(y, row);
+            FloatVector va = FloatVector.fromArray(FMAX, a, offseta + row + col * m);
+            FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + row);
+            valpha.mul(x[offsetx + col]).fma(va, vy)
+                  .intoArray(y, offsety + row);
           }
           for (; row < m; row += 1) {
-            y[row] += alpha * x[col] * a[row + col * m];
+            y[offsety + row] += alpha * x[offsetx + col] * a[offseta + row + col * m];
           }
         }
       }
     } else if ("T".equals(trans)
         && m >= 0 && n >= 0
-        && a != null && a.length >= m * n && lda == m
-        && x != null && x.length >= m && incx == 1
-        && y != null && y.length >= n && incy == 1) {
-      // y = beta * y
-      sscal(n, beta, y, 1);
-      // y += alpha * A * x
-      if (alpha != 0.) {
-        FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
+        && a != null && a.length >= offseta + m * n && lda == m
+        && x != null && x.length >= offsetx + m && incx == 1
+        && y != null && y.length >= offsety + n && incy == 1) {
+      if (alpha != 0. || beta != 1.) {
         for (int col = 0; col < n; col += 1) {
+          float sum = 0.f;
           int row = 0;
           FloatVector vsum = FloatVector.zero(FMAX);
           for (; row < FMAX.loopBound(m); row += FMAX.length()) {
-            FloatVector va = FloatVector.fromArray(FMAX, a, row + col * m);
-            FloatVector vx = FloatVector.fromArray(FMAX, x, row);
-            vsum = valpha.mul(va).fma(vx, vsum);
+            FloatVector va = FloatVector.fromArray(FMAX, a, offseta + row + col * m);
+            FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + row);
+            vsum = va.fma(vx, vsum);
           }
-          y[col] += vsum.reduceLanes(VectorOperators.ADD);
+          sum += vsum.reduceLanes(VectorOperators.ADD);
           for (; row < m; row += 1) {
-            y[col] += alpha * x[row] * a[row + col * m];
+            sum += x[offsetx + row] * a[offseta + row + col * m];
           }
+          y[offsety + col] = alpha * sum + beta * y[offsety + col];
         }
       }
     } else {
-      super.sgemv(trans, m, n, alpha, a, lda, x, incx, beta, y, incy);
+      super.sgemv(trans, m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     }
   }
 
   @Override
-  public void dgemm(String transa, String transb, int m, int n, int k, double alpha,
-      double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
+  public void dgemm(String transa, String transb, int m, int n, int k,
+      double alpha, double[] a, int lda, double[] b, int ldb,
+      double beta, double[] c, int ldc) {
     dgemm(transa, transb, m, n, k, alpha, a, 0, lda, b, 0, ldb, beta, c, ldc, 0);
   }
 
   // c = alpha * a * b + beta * c
   @Override
-  public void dgemm(String transa, String transb, int m, int n, int k, double alpha,
-      double[] a, int aoffset, int lda, double[] b, int boffset, int ldb,
-      double beta, double[] c, int ldc, int coffset) {
+  public void dgemm(String transa, String transb, int m, int n, int k,
+      double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb,
+      double beta, double[] c, int ldc, int offsetc) {
     // System.out.println(String.format("dgemm(transa=%s, transb=%s, m=%s, n=%s, k=%s, alpha=%s, a=%s, lda=%s, b=%s, ldb=%s, beta=%s, c=%s, ldc=%s)",
     //     transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc));
     if ("N".equals(transa) && "N".equals(transb)
         && m >= 0 && n >= 0 && k >= 0
-        && a != null && a.length >= aoffset + m * k && lda == m
-        && b != null && b.length >= boffset + k * n && ldb == k
-        && c != null && c.length >= coffset + m * n && ldc == m) {
+        && a != null && a.length >= offseta + m * k && lda == m
+        && b != null && b.length >= offsetb + k * n && ldb == k
+        && c != null && c.length >= offsetc + m * n && ldc == m) {
       // C = beta * C
-      dscal(m * n, beta, c, 1);
+      dscal(m * n, beta, c, offsetc, 1);
       // C += alpha * A * B
       if (alpha != 0.) {
         DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
@@ -371,24 +396,24 @@ public class VectorizedBLAS extends F2jBLAS {
           for (int i = 0; i < k; i += 1) {
             int row = 0;
             for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-              DoubleVector va = DoubleVector.fromArray(DMAX, a, aoffset + i * m + row);
-              DoubleVector vc = DoubleVector.fromArray(DMAX, c, coffset + col * m + row);
-              valpha.mul(b[boffset + col * k + i]).fma(va, vc)
-                    .intoArray(c, col * m + row);
+              DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + i * m + row);
+              DoubleVector vc = DoubleVector.fromArray(DMAX, c, offsetc + col * m + row);
+              valpha.mul(b[offsetb + col * k + i]).fma(va, vc)
+                    .intoArray(c, offsetc + col * m + row);
             }
             for (; row < m; row += 1) {
-              c[coffset + col * m + row] += alpha * a[aoffset + i * m + row] * b[boffset + col * k + i];
+              c[offsetc + col * m + row] += alpha * a[offseta + i * m + row] * b[offsetb + col * k + i];
             }
           }
         }
       }
     } else if ("N".equals(transa) && "T".equals(transb)
         && m >= 0 && n >= 0 && k >= 0
-        && a != null && a.length >= aoffset + m * k && lda == m
-        && b != null && b.length >= boffset + k * n && ldb == n
-        && c != null && c.length >= coffset + m * n && ldc == m) {
+        && a != null && a.length >= offseta + m * k && lda == m
+        && b != null && b.length >= offsetb + k * n && ldb == n
+        && c != null && c.length >= offsetc + m * n && ldc == m) {
       // C = beta * C
-      dscal(m * n, beta, c, 1);
+      dscal(m * n, beta, c, offsetc, 1);
       // C += alpha * A * B
       if (alpha != 0.) {
         DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
@@ -396,22 +421,22 @@ public class VectorizedBLAS extends F2jBLAS {
           for (int col = 0; col < n; col += 1) {
             int row = 0;
             for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-              DoubleVector va = DoubleVector.fromArray(DMAX, a, aoffset + i * m + row);
-              DoubleVector vc = DoubleVector.fromArray(DMAX, c, coffset + col * m + row);
-              valpha.mul(b[boffset + col + i * n]).fma(va, vc)
-                    .intoArray(c, col * m + row);
+              DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + i * m + row);
+              DoubleVector vc = DoubleVector.fromArray(DMAX, c, offsetc + col * m + row);
+              valpha.mul(b[offsetb + col + i * n]).fma(va, vc)
+                    .intoArray(c, offsetc + col * m + row);
             }
             for (; row < m; row += 1) {
-              c[coffset + col * m + row] += alpha * a[aoffset + i * m + row] * b[boffset + col + i * n];
+              c[offsetc + col * m + row] += alpha * a[offseta + i * m + row] * b[offsetb + col + i * n];
             }
           }
         }
       }
     } else if ("T".equals(transa) && "N".equals(transb)
         && m >= 0 && n >= 0 && k >= 0
-        && a != null && a.length >= aoffset + m * k && lda == k
-        && b != null && b.length >= boffset + k * n && ldb == k
-        && c != null && c.length >= coffset + m * n && ldc == m) {
+        && a != null && a.length >= offseta + m * k && lda == k
+        && b != null && b.length >= offsetb + k * n && ldb == k
+        && c != null && c.length >= offsetc + m * n && ldc == m) {
       if (alpha != 0. || beta != 1.) {
         for (int col = 0; col < n; col += 1) {
           for (int row = 0; row < m; row += 1) {
@@ -419,45 +444,47 @@ public class VectorizedBLAS extends F2jBLAS {
             int i = 0;
             DoubleVector vsum = DoubleVector.zero(DMAX);
             for (; i < DMAX.loopBound(k); i += DMAX.length()) {
-              DoubleVector va = DoubleVector.fromArray(DMAX, a, aoffset + i + row * k);
-              DoubleVector vb = DoubleVector.fromArray(DMAX, b, boffset + col * k + i);
+              DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + i + row * k);
+              DoubleVector vb = DoubleVector.fromArray(DMAX, b, offsetb + col * k + i);
               vsum = va.fma(vb, vsum);
             }
             sum += vsum.reduceLanes(VectorOperators.ADD);
             for (; i < k; i += 1) {
-              sum += a[aoffset + i + row * k] * b[boffset + col * k + i];
+              sum += a[offseta + i + row * k] * b[offsetb + col * k + i];
             }
             if (beta != 0.) {
-              c[coffset + col * m + row] = alpha * sum + beta * c[coffset + col * m + row];
+              c[offsetc + col * m + row] = alpha * sum + beta * c[offsetc + col * m + row];
             } else {
-              c[coffset + col * m + row] = alpha * sum;
+              c[offsetc + col * m + row] = alpha * sum;
             }
           }
         }
       }
     } else if ("T".equals(transa) && "T".equals(transb)
         && m >= 0 && n >= 0 && k >= 0
-        && a != null && a.length >= aoffset + m * k && lda == k
-        && b != null && b.length >= boffset + k * n && ldb == n
-        && c != null && c.length >= coffset + m * n && ldc == m) {
+        && a != null && a.length >= offseta + m * k && lda == k
+        && b != null && b.length >= offsetb + k * n && ldb == n
+        && c != null && c.length >= offsetc + m * n && ldc == m) {
       if (alpha != 0. || beta != 1.) {
         // FIXME: do block by block
         for (int col = 0; col < n; col += 1) {
           for (int row = 0; row < m; row += 1) {
             double sum = 0.;
             for (int i = 0; i < k; i += 1) {
-              sum += a[aoffset + i + row * k] * b[boffset + col + i * n];
+              sum += a[offseta + i + row * k] * b[offsetb + col + i * n];
             }
             if (beta != 0.) {
-              c[coffset + col * m + row] = alpha * sum + beta * c[coffset + col * m + row];
+              c[offsetc + col * m + row] = alpha * sum + beta * c[offsetc + col * m + row];
             } else {
-              c[coffset + col * m + row] = alpha * sum;
+              c[offsetc + col * m + row] = alpha * sum;
             }
           }
         }
       }
     } else {
-      super.dgemm(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
+      super.dgemm(transa, transb, m, n, k,
+                  alpha, a, offseta, lda, b, offsetb, ldb,
+                  beta, c, offsetc, ldc);
     }
   }
 }
