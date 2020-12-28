@@ -425,11 +425,49 @@ public class JavaBLAS implements BLAS {
   }
 
   public void drotg(org.netlib.util.doubleW da, org.netlib.util.doubleW db, org.netlib.util.doubleW c, org.netlib.util.doubleW s) {
-    f2j.drotg(da, db, c, s);
+    double scale = Math.abs(da.val) + Math.abs(db.val);
+    if (scale == 0.0) {
+      c.val = 1.0;
+      s.val = 0.0;
+      da.val = 0.0;
+      db.val = 0.0;
+    } else {
+      double r = scale * Math.sqrt(Math.pow(da.val / scale, 2) + Math.pow(db.val / scale, 2))
+                      * ((Math.abs(da.val) > Math.abs(db.val) ? da.val : db.val) >= 0.0 ? 1.0 : -1.0);
+      c.val = da.val / r;
+      s.val = db.val / r;
+      double z = 1.0;
+      if (Math.abs(da.val) > Math.abs(db.val)) {
+        z = s.val;
+      } else if (c.val != 0.0) {
+        z = 1.0 / c.val;
+      }
+      da.val = r;
+      db.val = z;
+    }
   }
 
   public void srotg(org.netlib.util.floatW sa, org.netlib.util.floatW sb, org.netlib.util.floatW c, org.netlib.util.floatW s) {
-    f2j.srotg(sa, sb, c, s);
+    float scale = Math.abs(sa.val) + Math.abs(sb.val);
+    if (scale == 0.0f) {
+      c.val = 1.0f;
+      s.val = 0.0f;
+      sa.val = 0.0f;
+      sb.val = 0.0f;
+    } else {
+      float r = (float)(scale * Math.sqrt(Math.pow(sa.val / scale, 2) + Math.pow(sb.val / scale, 2))
+                              * ((Math.abs(sa.val) > Math.abs(sb.val) ? sa.val : sb.val) >= 0.0f ? 1.0 : -1.0));
+      c.val = sa.val / r;
+      s.val = sb.val / r;
+      float z = 1.0f;
+      if (Math.abs(sa.val) > Math.abs(sb.val)) {
+        z = s.val;
+      } else if (c.val != 0.0f) {
+        z = 1.0f / c.val;
+      }
+      sa.val = r;
+      sb.val = z;
+    }
   }
 
   public void drotm(int n, double[] x, int incx, double[] y, int incy, double[] param) {
