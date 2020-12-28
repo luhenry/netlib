@@ -171,7 +171,7 @@ public class JavaBLAS implements BLAS {
       return 0.0;
     }
 
-    double sum = 0.;
+    double sum = 0.0;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
          (incx < 0 ? ix >= 0 : ix < n * incx)
@@ -192,7 +192,7 @@ public class JavaBLAS implements BLAS {
       return 0.0f;
     }
 
-    float sum = 0.f;
+    float sum = 0.0f;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
          (incx < 0 ? ix >= 0 : ix < n * incx)
