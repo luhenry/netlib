@@ -262,14 +262,29 @@ public class JavaBLAS implements BLAS {
 
   // y = alpha * A * x + beta * y
   public void dgemv(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    if (m <= 0 || n <= 0) {
+    if (!lsame("N", trans) && !lsame("T", trans) && !lsame("C", trans)) {
+      throw illegalArgument("DGEMV", 1);
+    }
+    if (m < 0) {
+      throw illegalArgument("DGEMV", 2);
+    }
+    if (n < 0) {
+      throw illegalArgument("DGEMV", 3);
+    }
+    if (lda < Math.max(1, m)) {
+      throw illegalArgument("DGEMV", 6);
+    }
+    if (incx == 0) {
+      throw illegalArgument("DGEMV", 8);
+    }
+    if (incy == 0) {
+      throw illegalArgument("DGEMV", 11);
+    }
+    if (m == 0 || n == 0) {
       return;
     }
     if (alpha == 0.0 && beta == 1.0) {
       return;
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("DGEMV", 6);
     }
     if (lsame("N", trans)) {
       // y = beta * y
@@ -308,14 +323,29 @@ public class JavaBLAS implements BLAS {
 
   // y = alpha * A * x + beta * y
   public void sgemv(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    if (m <= 0 || n <= 0) {
+    if (!lsame("N", trans) && !lsame("T", trans) && !lsame("C", trans)) {
+      throw illegalArgument("SGEMV", 1);
+    }
+    if (m < 0) {
+      throw illegalArgument("SGEMV", 2);
+    }
+    if (n < 0) {
+      throw illegalArgument("SGEMV", 3);
+    }
+    if (lda < Math.max(1, m)) {
+      throw illegalArgument("SGEMV", 6);
+    }
+    if (incx == 0) {
+      throw illegalArgument("SGEMV", 8);
+    }
+    if (incy == 0) {
+      throw illegalArgument("SGEMV", 11);
+    }
+    if (m == 0 || n == 0) {
       return;
     }
     if (alpha == 0.0 && beta == 1.0) {
       return;
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("SGEMV", 6);
     }
     if (lsame("N", trans)) {
       // y = beta * y
