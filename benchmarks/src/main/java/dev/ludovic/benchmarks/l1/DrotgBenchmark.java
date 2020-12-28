@@ -20,10 +20,14 @@
  * SOFTWARE.
  */
 
-package dev.ludovic.blas.benchmarks;
+package dev.ludovic.blas.benchmarks.l1;
+
+import dev.ludovic.blas.benchmarks.BLASBenchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
+
+import org.netlib.util.doubleW;
 
 import java.util.concurrent.TimeUnit;
 
@@ -31,20 +35,27 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
-public class SasumBenchmark extends BLASBenchmark {
+public class DrotgBenchmark extends BLASBenchmark {
 
-    @Param({"100", "10000000"})
-    public int n;
-
-    public float[] x;
+    public doubleW sa;
+    public doubleW sb;
+    public doubleW c;
+    public doubleW s;
 
     @Setup
     public void setup() {
-        x = randomFloatArray(n);
+        sa = new doubleW(randomDouble());
+        sb = new doubleW(randomDouble());
+        c = new doubleW(randomDouble());
+        s = new doubleW(randomDouble());
     }
 
     @Benchmark
     public void blas(Blackhole bh) {
-        bh.consume(blas.sasum(n, x, 1));
+        blas.drotg(sa, sb, c, s);
+        bh.consume(sa);
+        bh.consume(sb);
+        bh.consume(c);
+        bh.consume(s);
     }
 }

@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
-package dev.ludovic.blas.benchmarks;
+package dev.ludovic.blas.benchmarks.l2;
+
+import dev.ludovic.blas.benchmarks.BLASBenchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -31,22 +33,35 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
-public class DdotBenchmark extends BLASBenchmark {
+public class DgemvBenchmark extends BLASBenchmark {
 
-    @Param({"100", "10000000"})
+    @Param({"N", "T"})
+    public String trans;
+
+    @Param({"10", "10000"})
+    public int m;
+
+    @Param({"10", "10000"})
     public int n;
 
+    public double alpha;
+    public double[] a;
     public double[] x;
+    public double beta;
     public double[] y;
 
     @Setup
     public void setup() {
-        x = randomDoubleArray(n);
-        y = randomDoubleArray(n);
+        alpha = randomDouble();
+        a = randomDoubleArray(m * n);
+        x = randomDoubleArray(trans.equals("T") ? m : n);
+        beta = randomDouble();
+        y = randomDoubleArray(trans.equals("T") ? n : m);
     }
 
     @Benchmark
     public void blas(Blackhole bh) {
-        bh.consume(blas.ddot(n, x, -1, y, -1));
+        blas.dgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
+        bh.consume(y);
     }
 }

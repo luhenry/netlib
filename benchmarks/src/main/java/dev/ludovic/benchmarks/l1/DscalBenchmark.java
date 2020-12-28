@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
-package dev.ludovic.blas.benchmarks;
+package dev.ludovic.blas.benchmarks.l1;
+
+import dev.ludovic.blas.benchmarks.BLASBenchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -31,24 +33,23 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
-public class DswapBenchmark extends BLASBenchmark {
+public class DscalBenchmark extends BLASBenchmark {
 
     @Param({"100", "10000000"})
     public int n;
 
+    public double alpha;
     public double[] x;
-    public double[] y;
 
     @Setup
     public void setup() {
+        alpha = randomDouble();
         x = randomDoubleArray(n);
-        y = randomDoubleArray(n);
     }
 
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dswap(n, x, 1, y, 1);
+        blas.dscal(n, alpha, x, 1);
         bh.consume(x);
-        bh.consume(y);
     }
 }

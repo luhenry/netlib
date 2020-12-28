@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
-package dev.ludovic.blas.benchmarks;
+package dev.ludovic.blas.benchmarks.l2;
+
+import dev.ludovic.blas.benchmarks.BLASBenchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -31,29 +33,35 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
-public class DspmvBenchmark extends BLASBenchmark {
+public class SgemvBenchmark extends BLASBenchmark {
 
-    @Param({"10", "1000"})
+    @Param({"N", "T"})
+    public String trans;
+
+    @Param({"10", "10000"})
+    public int m;
+
+    @Param({"10", "10000"})
     public int n;
 
-    public double alpha;
-    public double[] a;
-    public double[] x;
-    public double beta;
-    public double[] y;
+    public float alpha;
+    public float[] a;
+    public float[] x;
+    public float beta;
+    public float[] y;
 
     @Setup
     public void setup() {
-        alpha = randomDouble();
-        a = randomDoubleArray(n * (n + 1) / 2);
-        x = randomDoubleArray(n);
-        beta = randomDouble();
-        y = randomDoubleArray(n);
+        alpha = randomFloat();
+        a = randomFloatArray(m * n);
+        x = randomFloatArray(trans.equals("T") ? m : n);
+        beta = randomFloat();
+        y = randomFloatArray(trans.equals("T") ? n : m);
     }
 
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dspmv("U", n, alpha, a, x, 1, beta, y, 1);
+        blas.sgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
         bh.consume(y);
     }
 }

@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
-package dev.ludovic.blas.benchmarks;
+package dev.ludovic.blas.benchmarks.l2;
+
+import dev.ludovic.blas.benchmarks.BLASBenchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
-
-import org.netlib.util.floatW;
 
 import java.util.concurrent.TimeUnit;
 
@@ -33,27 +33,25 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
-public class SrotgBenchmark extends BLASBenchmark {
+public class DsyrBenchmark extends BLASBenchmark {
 
-    public floatW sa;
-    public floatW sb;
-    public floatW c;
-    public floatW s;
+    @Param({"10", "1000"})
+    public int n;
+
+    public double alpha;
+    public double[] a;
+    public double[] x;
 
     @Setup
     public void setup() {
-        sa = new floatW(randomFloat());
-        sb = new floatW(randomFloat());
-        c = new floatW(randomFloat());
-        s = new floatW(randomFloat());
+        alpha = randomDouble();
+        a = randomDoubleArray(n * n);
+        x = randomDoubleArray(n);
     }
 
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.srotg(sa, sb, c, s);
-        bh.consume(sa);
-        bh.consume(sb);
-        bh.consume(c);
-        bh.consume(s);
+        blas.dsyr("U", n, alpha, x, 1, a, n);
+        bh.consume(a);
     }
 }

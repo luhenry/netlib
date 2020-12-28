@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
-package dev.ludovic.blas.benchmarks;
+package dev.ludovic.blas.benchmarks.l3;
+
+import dev.ludovic.blas.benchmarks.BLASBenchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -31,19 +33,41 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
-public class Snrm2Benchmark extends BLASBenchmark {
+public class DgemmBenchmark extends BLASBenchmark {
 
-    @Param({"100", "10000000"})
+    @Param({"N", "T"})
+    public String transa;
+    @Param({"N", "T"})
+    public String transb;
+
+    @Param({"10", "1000"})
+    public int m;
+    @Param({"10", "1000"})
     public int n;
+    @Param({"10", "1000"})
+    public int k;
 
-    public float[] x;
+    public double alpha;
+    public double[] a;
+    public int lda;
+    public double[] b;
+    public int ldb;
+    public double beta;
+    public double[] c;
+    public int ldc;
+
     @Setup
     public void setup() {
-        x = randomFloatArray(n);
+        alpha = randomDouble();
+        a = randomDoubleArray(k * m);
+        b = randomDoubleArray(k * n);
+        beta = randomDouble();
+        c = randomDoubleArray(m * n);
     }
 
     @Benchmark
     public void blas(Blackhole bh) {
-        bh.consume(blas.snrm2(n, x, -1));
+        blas.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, c, m);
+        bh.consume(c);
     }
 }

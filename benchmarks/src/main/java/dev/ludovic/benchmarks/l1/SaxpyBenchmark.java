@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
-package dev.ludovic.blas.benchmarks;
+package dev.ludovic.blas.benchmarks.l1;
+
+import dev.ludovic.blas.benchmarks.BLASBenchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
-
-import org.netlib.util.doubleW;
 
 import java.util.concurrent.TimeUnit;
 
@@ -33,27 +33,25 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
-public class DrotgBenchmark extends BLASBenchmark {
+public class SaxpyBenchmark extends BLASBenchmark {
 
-    public doubleW sa;
-    public doubleW sb;
-    public doubleW c;
-    public doubleW s;
+    @Param({"100", "10000000"})
+    public int n;
+
+    public float alpha;
+    public float[] x;
+    public float[] y;
 
     @Setup
     public void setup() {
-        sa = new doubleW(randomDouble());
-        sb = new doubleW(randomDouble());
-        c = new doubleW(randomDouble());
-        s = new doubleW(randomDouble());
+        alpha = randomFloat();
+        x = randomFloatArray(n);
+        y = randomFloatArray(n);
     }
 
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.drotg(sa, sb, c, s);
-        bh.consume(sa);
-        bh.consume(sb);
-        bh.consume(c);
-        bh.consume(s);
+        blas.saxpy(n, alpha, x, 1, y, 1);
+        bh.consume(y);
     }
 }
