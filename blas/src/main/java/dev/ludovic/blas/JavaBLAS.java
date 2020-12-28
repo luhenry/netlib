@@ -389,7 +389,19 @@ public class JavaBLAS implements BLAS {
   }
 
   public void drot(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double c, double s) {
-    f2j.drot(n, x, offsetx, incx, y, offsety, incy, c, s);
+    if (n <= 0) {
+      return;
+    }
+
+    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+             iy = incy < 0 ? (n - 1) * -incy : 0;
+         (incx < 0 ? ix >= 0 : ix < n * incx)
+          && (incy < 0 ? iy >= 0 : iy < n * incy);
+         ix += incx, iy += incy) {
+      double tmp = c * x[offsetx + ix] + s * y[offsety + iy];
+      y[offsety + iy] = c * y[offsety + iy] - s * x[offsetx + ix];
+      x[offsetx + ix] = tmp;
+    }
   }
 
   public void srot(int n, float[] x, int incx, float[] y, int incy, float c, float s) {
@@ -397,7 +409,19 @@ public class JavaBLAS implements BLAS {
   }
 
   public void srot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float c, float s) {
-    f2j.srot(n, x, offsetx, incx, y, offsety, incy, c, s);
+    if (n <= 0) {
+      return;
+    }
+
+    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+             iy = incy < 0 ? (n - 1) * -incy : 0;
+         (incx < 0 ? ix >= 0 : ix < n * incx)
+          && (incy < 0 ? iy >= 0 : iy < n * incy);
+         ix += incx, iy += incy) {
+      float tmp = c * x[offsetx + ix] + s * y[offsety + iy];
+      y[offsety + iy] = c * y[offsety + iy] - s * x[offsetx + ix];
+      x[offsetx + ix] = tmp;
+    }
   }
 
   public void drotg(org.netlib.util.doubleW da, org.netlib.util.doubleW db, org.netlib.util.doubleW c, org.netlib.util.doubleW s) {
