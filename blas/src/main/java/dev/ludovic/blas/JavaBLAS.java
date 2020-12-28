@@ -208,7 +208,19 @@ public class JavaBLAS implements BLAS {
   }
 
   public float sdsdot(int n, float sb, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    return f2j.sdsdot(n, sb, x, offsetx, incx, y, offsety, incy);
+    if (n <= 0) {
+      return 0.0f;
+    }
+
+    double sum = sb;
+    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+             iy = incy < 0 ? (n - 1) * -incy : 0;
+         (incx < 0 ? ix >= 0 : ix < n * incx)
+          && (incy < 0 ? iy >= 0 : iy < n * incy);
+         ix += incx, iy += incy) {
+      sum += (double)(x[offsetx + ix]) * (double)(y[offsety + iy]);
+    }
+    return (float)sum;
   }
 
   public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy) {
