@@ -403,7 +403,21 @@ public class JavaBLAS implements BLAS {
   }
 
   public double dnrm2(int n, double[] x, int offsetx, int incx) {
-    return f2j.dnrm2(n, x, offsetx, incx);
+    if (n <= 0) {
+      return 0.0;
+    }
+    if (incx <= 0) {
+      return 0.0;
+    }
+    if (n == 1) {
+      return Math.abs(x[offsetx + 0]);
+    }
+
+    double sum = 0.0;
+    for (int ix = 0; ix < n * incx; ix += incx) {
+      sum += Math.pow(x[offsetx + ix], 2);
+    }
+    return Math.sqrt(sum);
   }
 
   public float snrm2(int n, float[] x, int incx) {
@@ -411,7 +425,21 @@ public class JavaBLAS implements BLAS {
   }
 
   public float snrm2(int n, float[] x, int offsetx, int incx) {
-    return f2j.snrm2(n, x, offsetx, incx);
+    if (n <= 0) {
+      return 0.0f;
+    }
+    if (incx <= 0) {
+      return 0.0f;
+    }
+    if (n == 1) {
+      return Math.abs(x[offsetx + 0]);
+    }
+
+    float sum = 0.0f;
+    for (int ix = 0; ix < n * incx; ix += incx) {
+      sum += (float)Math.pow(x[offsetx + ix], 2);
+    }
+    return (float)Math.sqrt(sum);
   }
 
   public void drot(int n, double[] x, int incx, double[] y, int incy, double c, double s) {
