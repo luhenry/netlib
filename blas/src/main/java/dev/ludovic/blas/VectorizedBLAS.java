@@ -47,8 +47,8 @@ public class VectorizedBLAS extends JavaBLAS {
         && x != null && x.length >= offsetx + n && incx == 1
         && y != null && y.length >= offsety + n && incy == 1) {
       if (alpha != 0.) {
-        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         int i = 0;
+        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         for (; i < DMAX.loopBound(n); i += DMAX.length()) {
           DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + i);
           DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + i);
@@ -93,7 +93,7 @@ public class VectorizedBLAS extends JavaBLAS {
     if (n > 0
         && x != null && x.length >= offsetx + n && incx == 1
         && y != null && y.length >= offsety + n && incy == 1) {
-      float sum = 0.0f;
+      float sum = 0.f;
       int i = 0;
       FloatVector vsum = FloatVector.zero(FMAX);
       for (; i < FMAX.loopBound(n); i += FMAX.length()) {
@@ -174,22 +174,21 @@ public class VectorizedBLAS extends JavaBLAS {
       if (alpha != 0. || beta != 1.) {
         for (int col = 0; col < n; col += 1) {
           for (int row = 0; row < m; row += 1) {
-            double sum = 0.;
-            int i = 0;
-            DoubleVector vsum = DoubleVector.zero(DMAX);
-            for (; i < DMAX.loopBound(k); i += DMAX.length()) {
-              DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + i + row * k);
-              DoubleVector vb = DoubleVector.fromArray(DMAX, b, offsetb + col * k + i);
-              vsum = va.fma(vb, vsum);
-            }
-            sum += vsum.reduceLanes(VectorOperators.ADD);
-            for (; i < k; i += 1) {
-              sum += a[offseta + i + row * k] * b[offsetb + col * k + i];
-            }
-            if (beta != 0.) {
-              c[offsetc + col * m + row] = alpha * sum + beta * c[offsetc + col * m + row];
-            } else {
-              c[offsetc + col * m + row] = alpha * sum;
+            // C = beta * C
+            c[offsetc + col * m + row] = beta * c[offsetc + col * m + row];
+            // C += alpha * A * B
+            if (alpha != 0.) {
+              int i = 0;
+              DoubleVector vsum = DoubleVector.zero(DMAX);
+              for (; i < DMAX.loopBound(k); i += DMAX.length()) {
+                DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + i + row * k);
+                DoubleVector vb = DoubleVector.fromArray(DMAX, b, offsetb + col * k + i);
+                vsum = va.fma(vb, vsum);
+              }
+              c[offsetc + col * m + row] += alpha * vsum.reduceLanes(VectorOperators.ADD);
+              for (; i < k; i += 1) {
+                c[offsetc + col * m + row] += alpha * a[offseta + i + row * k] * b[offsetb + col * k + i];
+              }
             }
           }
         }
@@ -203,14 +202,11 @@ public class VectorizedBLAS extends JavaBLAS {
         // FIXME: do block by block
         for (int col = 0; col < n; col += 1) {
           for (int row = 0; row < m; row += 1) {
-            double sum = 0.;
+            // C = beta * C
+            c[offsetc + col * m + row] = beta * c[offsetc + col * m + row];
+            // C += alpha * A * B
             for (int i = 0; i < k; i += 1) {
-              sum += a[offseta + i + row * k] * b[offsetb + col + i * n];
-            }
-            if (beta != 0.) {
-              c[offsetc + col * m + row] = alpha * sum + beta * c[offsetc + col * m + row];
-            } else {
-              c[offsetc + col * m + row] = alpha * sum;
+              c[offsetc + col * m + row] += alpha * a[offseta + i + row * k] * b[offsetb + col + i * n];
             }
           }
         }
@@ -251,9 +247,11 @@ public class VectorizedBLAS extends JavaBLAS {
         && a != null && a.length >= offseta + m * n && lda == m
         && x != null && x.length >= offsetx + m && incx == 1
         && y != null && y.length >= offsety + n && incy == 1) {
-      if (alpha != 0. || beta != 1.) {
-        for (int col = 0; col < n; col += 1) {
-          double sum = 0.;
+      for (int col = 0; col < n; col += 1) {
+        // y = beta * y
+        y[offsety + col] = beta * y[offsety + col];
+        // y += alpha * A * x
+        if (alpha != 0.) {
           int row = 0;
           DoubleVector vsum = DoubleVector.zero(DMAX);
           for (; row < DMAX.loopBound(m); row += DMAX.length()) {
@@ -261,11 +259,10 @@ public class VectorizedBLAS extends JavaBLAS {
             DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + row);
             vsum = va.fma(vx, vsum);
           }
-          sum += vsum.reduceLanes(VectorOperators.ADD);
+          y[offsety + col] += alpha * vsum.reduceLanes(VectorOperators.ADD);
           for (; row < m; row += 1) {
-            sum += x[offsetx + row] * a[offseta + row + col * m];
+            y[offsety + col] += alpha * x[offsetx + row] * a[offseta + row + col * m];
           }
-          y[offsety + col] = alpha * sum + beta * y[offsety + col];
         }
       }
     } else {
@@ -304,9 +301,11 @@ public class VectorizedBLAS extends JavaBLAS {
         && a != null && a.length >= offseta + m * n && lda == m
         && x != null && x.length >= offsetx + m && incx == 1
         && y != null && y.length >= offsety + n && incy == 1) {
-      if (alpha != 0. || beta != 1.) {
-        for (int col = 0; col < n; col += 1) {
-          float sum = 0.f;
+      for (int col = 0; col < n; col += 1) {
+        // y = beta * y
+        y[offsety + col] = beta * y[offsety + col];
+        // y += alpha * A * x
+        if (alpha != 0.f) {
           int row = 0;
           FloatVector vsum = FloatVector.zero(FMAX);
           for (; row < FMAX.loopBound(m); row += FMAX.length()) {
@@ -314,11 +313,10 @@ public class VectorizedBLAS extends JavaBLAS {
             FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + row);
             vsum = va.fma(vx, vsum);
           }
-          sum += vsum.reduceLanes(VectorOperators.ADD);
+          y[offsety + col] += alpha * vsum.reduceLanes(VectorOperators.ADD);
           for (; row < m; row += 1) {
-            sum += x[offsetx + row] * a[offseta + row + col * m];
+            y[offsety + col] += alpha * x[offsetx + row] * a[offseta + row + col * m];
           }
-          y[offsety + col] = alpha * sum + beta * y[offsety + col];
         }
       }
     } else {
@@ -331,8 +329,8 @@ public class VectorizedBLAS extends JavaBLAS {
   public void dscal(int n, double alpha, double[] x, int offsetx, int incx) {
     if (n > 0 && x != null && x.length >= offsetx + n && incx == 1) {
       if (alpha != 1.) {
-        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         int i = 0;
+        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         for (; i < DMAX.loopBound(n); i += DMAX.length()) {
           DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + i);
           vx.mul(valpha).intoArray(x, offsetx + i);
@@ -350,9 +348,9 @@ public class VectorizedBLAS extends JavaBLAS {
   @Override
   public void sscal(int n, float alpha, float[] x, int offsetx, int incx) {
     if (n > 0 && x != null && x.length >= offsetx + n && incx == 1) {
-      if (alpha != 1.) {
-        FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
+      if (alpha != 1.f) {
         int i = 0;
+        FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
         for (; i < FMAX.loopBound(n); i += FMAX.length()) {
           FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + i);
           vx.mul(valpha).intoArray(x, offsetx + i);
