@@ -63,6 +63,28 @@ public class VectorizedBLAS extends JavaBLAS {
     }
   }
 
+  @Override
+  public void saxpy(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
+    if (n > 0
+        && x != null && x.length >= offsetx + n && incx == 1
+        && y != null && y.length >= offsety + n && incy == 1) {
+      if (alpha != 0.f) {
+        int i = 0;
+        FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
+        for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+          FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + i);
+          FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + i);
+          vx.fma(valpha, vy).intoArray(y, offsety + i);
+        }
+        for (; i < n; i += 1) {
+          y[offsety + i] += alpha * x[offsetx + i];
+        }
+      }
+    } else {
+      super.saxpy(n, alpha, x, offsetx, incx, y, offsety, incy);
+    }
+  }
+
   // sum(x * y)
   @Override
   public double ddot(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
