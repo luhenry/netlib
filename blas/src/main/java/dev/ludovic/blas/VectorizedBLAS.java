@@ -76,57 +76,63 @@ public class VectorizedBLAS extends F2jBLAS {
   // abstract public void scopy(int n, float[] sx, int incx, float[] sy, int incy);
   // abstract public void scopy(int n, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy);
 
-  // sum(x * y)
   @Override
   public double ddot(int n, double[] x, int incx, double[] y, int incy) {
+    return ddot(n, x, 0, incx, y, 0, incy);
+  }
+
+  // sum(x * y)
+  @Override
+  public double ddot(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     if (n >= 0
-        && x != null && x.length >= n && incx == 1
-        && y != null && y.length >= n && incy == 1) {
+        && x != null && x.length >= offsetx + n && incx == 1
+        && y != null && y.length >= offsety + n && incy == 1) {
       double sum = 0.;
       int i = 0;
       DoubleVector vsum = DoubleVector.zero(DMAX);
       for (; i < DMAX.loopBound(n); i += DMAX.length()) {
-        DoubleVector vx = DoubleVector.fromArray(DMAX, x, i);
-        DoubleVector vy = DoubleVector.fromArray(DMAX, y, i);
+        DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + i);
+        DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + i);
         vsum = vx.fma(vy, vsum);
       }
       sum += vsum.reduceLanes(VectorOperators.ADD);
       for (; i < n; i += 1) {
-        sum += x[i] * y[i];
+        sum += x[offsetx + i] * y[offsety + i];
       }
       return sum;
     } else {
-      return super.ddot(n, x, incx, y, incy);
+      return super.ddot(n, x, offsetx, incx, y, offsety, incy);
     }
   }
 
-  // abstract public double ddot(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy);
+  @Override
+  public float sdot(int n, float[] x, int incx, float[] y, int incy) {
+    return sdot(n, x, 0, incx, y, 0, incy);
+  }
 
   // sum(x * y)
   @Override
-  public float sdot(int n, float[] x, int incx, float[] y, int incy) {
+  public float sdot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (n >= 0
-        && x != null && x.length >= n && incx == 1
-        && y != null && y.length >= n && incy == 1) {
+        && x != null && x.length >= offsetx + n && incx == 1
+        && y != null && y.length >= offsety + n && incy == 1) {
       float sum = 0.0f;
       int i = 0;
       FloatVector vsum = FloatVector.zero(FMAX);
       for (; i < FMAX.loopBound(n); i += FMAX.length()) {
-        FloatVector vx = FloatVector.fromArray(FMAX, x, i);
-        FloatVector vy = FloatVector.fromArray(FMAX, y, i);
+        FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + i);
+        FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + i);
         vsum = vx.fma(vy, vsum);
       }
       sum += vsum.reduceLanes(VectorOperators.ADD);
       for (; i < n; i += 1) {
-        sum += x[i] * y[i];
+        sum += x[offsetx + i] * y[offsety + i];
       }
       return sum;
     } else {
-      return super.sdot(n, x, incx, y, incy);
+      return super.sdot(n, x, offsetx, incx, y, offsety, incy);
     }
   }
-
-  // abstract public float sdot(int n, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy);
 
   // abstract public float sdsdot(int n, float sb, float[] sx, int incx, float[] sy, int incy);
   // abstract public float sdsdot(int n, float sb, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy);
@@ -472,72 +478,82 @@ public class VectorizedBLAS extends F2jBLAS {
     }
   }
 
-  // y = alpha * a * x + beta * y
   @Override
   public void dspmv(String uplo, int n, double alpha, double[] a,
       double[] x, int incx, double beta, double[] y, int incy) {
+    dspmv(uplo, n, alpha, a, 0, x, 0, incx, beta, y, 0, incy);
+  }
+
+  // y = alpha * a * x + beta * y
+  @Override
+  public void dspmv(String uplo, int n, double alpha, double[] a, int offseta,
+      double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if ("U".equals(uplo)
         && n >= 0
-        && a != null && a.length >= n * (n + 1) / 2
-        && x != null && x.length >= n && incx == 1
-        && y != null && y.length >= n && incy == 1) {
+        && a != null && a.length >= offseta + n * (n + 1) / 2
+        && x != null && x.length >= offsetx + n && incx == 1
+        && y != null && y.length >= offsety + n && incy == 1) {
       // y = beta * y
-      dscal(n, beta, y, 1);
+      dscal(n, beta, y, offsety, 1);
       // y += alpha * A * x
       if (alpha != 0.) {
         DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
         for (int row = 0; row < n; row += 1) {
           int col = 0;
           DoubleVector vyrowsum = DoubleVector.zero(DMAX);
-          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[row]);
+          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[offsetx + row]);
           for (; col < DMAX.loopBound(row); col += DMAX.length()) {
-            DoubleVector vx = DoubleVector.fromArray(DMAX, x, col);
-            DoubleVector vy = DoubleVector.fromArray(DMAX, y, col);
-            DoubleVector va = DoubleVector.fromArray(DMAX, a, col + row * (row + 1) / 2);
+            DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + col);
+            DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + col);
+            DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + col + row * (row + 1) / 2);
             vyrowsum = valpha.mul(vx).fma(va, vyrowsum);
-            valphaxrow.fma(va, vy).intoArray(y, col);
+            valphaxrow.fma(va, vy).intoArray(y, offsety + col);
           }
-          y[row] += vyrowsum.reduceLanes(VectorOperators.ADD);
+          y[offsety + row] += vyrowsum.reduceLanes(VectorOperators.ADD);
           for (; col < row; col += 1) {
-            y[row] += alpha * x[col] * a[col + row * (row + 1) / 2];
-            y[col] += alpha * x[row] * a[col + row * (row + 1) / 2];
+            y[offsety + row] += alpha * x[offsetx + col] * a[offseta + col + row * (row + 1) / 2];
+            y[offsety + col] += alpha * x[offsetx + row] * a[offseta + col + row * (row + 1) / 2];
           }
-          y[row] += alpha * x[col] * a[col + row * (row + 1) / 2];
+          y[offsety + row] += alpha * x[offsetx + col] * a[offseta + col + row * (row + 1) / 2];
         }
       }
     } else {
-      super.dspmv(uplo, n, alpha, a, x, incx, beta, y, incy);
+      super.dspmv(uplo, n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
     }
   }
-
-  // abstract public void dspmv(String uplo, int n, double alpha, double[] ap, int offsetap, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
 
   // abstract public void sspmv(String uplo, int n, float alpha, float[] ap, float[] x, int incx, float beta, float[] y, int incy);
   // abstract public void sspmv(String uplo, int n, float alpha, float[] ap, int offsetap, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
 
-  // a += alpha * x * x.t
   @Override
   public void dspr(String uplo, int n, double alpha, double[] x, int incx, double[] a) {
+    dspr(uplo, n, alpha, x, 0, incx, a, 0);
+  }
+
+  // a += alpha * x * x.t
+  @Override
+  public void dspr(String uplo, int n, double alpha,
+      double[] x, int offsetx, int incx, double[] a, int offseta) {
     if ("U".equals(uplo)
         && n >= 0
-        && x != null && x.length >= n && incx == 1
-        && a != null && a.length >= n * (n + 1) / 2) {
+        && x != null && x.length >= offsetx + n && incx == 1
+        && a != null && a.length >= offseta + n * (n + 1) / 2) {
       if (alpha != 0.) {
         for (int row = 0; row < n; row += 1) {
           int col = 0;
-          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[row]);
+          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[offsetx + row]);
           for (; col < DMAX.loopBound(row + 1); col += DMAX.length()) {
-            DoubleVector vx = DoubleVector.fromArray(DMAX, x, col);
-            DoubleVector va = DoubleVector.fromArray(DMAX, a, col + row * (row + 1) / 2);
-            vx.fma(valphaxrow, va).intoArray(a, col + row * (row + 1) / 2);
+            DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + col);
+            DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + col + row * (row + 1) / 2);
+            vx.fma(valphaxrow, va).intoArray(a, offseta + col + row * (row + 1) / 2);
           }
           for (; col < row + 1; col += 1) {
-            a[col + row * (row + 1) / 2] += alpha * x[row] * x[col];
+            a[offseta + col + row * (row + 1) / 2] += alpha * x[offsetx + row] * x[offsetx + col];
           }
         }
       }
     } else {
-      super.dspr(uplo, n, alpha, x, incx, a);
+      super.dspr(uplo, n, alpha, x, offsetx, incx, a, offseta);
     }
   }
 
@@ -570,33 +586,37 @@ public class VectorizedBLAS extends F2jBLAS {
   // abstract public void ssymv(String uplo, int n, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy);
   // abstract public void ssymv(String uplo, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
 
-  // a += alpha * x * x.t
   @Override
   public void dsyr(String uplo, int n, double alpha, double[] x, int incx, double[] a, int lda) {
+    dsyr(uplo, n, alpha, x, 0, incx, a, 0, lda);
+  }
+
+  // a += alpha * x * x.t
+  @Override
+  public void dsyr(String uplo, int n, double alpha,
+      double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
     if ("U".equals(uplo)
         && n >= 0
-        && x != null && x.length >= n && incx == 1
-        && a != null && a.length >= n * n && lda == n) {
+        && x != null && x.length >= offsetx + n && incx == 1
+        && a != null && a.length >= offseta + n * n && lda == n) {
       if (alpha != 0.) {
         for (int row = 0; row < n; row += 1) {
           int col = 0;
-          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[row]);
+          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[offsetx + row]);
           for (; col < DMAX.loopBound(row + 1); col += DMAX.length()) {
-            DoubleVector vx = DoubleVector.fromArray(DMAX, x, col);
-            DoubleVector va = DoubleVector.fromArray(DMAX, a, col + row * n);
-            vx.fma(valphaxrow, va).intoArray(a, col + row * n);
+            DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + col);
+            DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + col + row * n);
+            vx.fma(valphaxrow, va).intoArray(a, offseta + col + row * n);
           }
           for (; col < row + 1; col += 1) {
-            a[col + row * n] += alpha * x[row] * x[col];
+            a[offseta + col + row * n] += alpha * x[offsetx + row] * x[offsetx + col];
           }
         }
       }
     } else {
-      super.dsyr(uplo, n, alpha, x, incx, a, lda);
+      super.dsyr(uplo, n, alpha, x, offsetx, incx, a, offseta, lda);
     }
   }
-
-  // abstract public void dsyr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda);
 
   // abstract public void ssyr(String uplo, int n, float alpha, float[] x, int incx, float[] a, int lda);
   // abstract public void ssyr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda);
