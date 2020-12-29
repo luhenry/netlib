@@ -62,7 +62,7 @@ SOFTWARE.
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javac.target>16</javac.target>
+        <javac.target>11</javac.target>
         <jvm.options>--add-modules=jdk.incubator.vector</jvm.options>
     </properties>
 
