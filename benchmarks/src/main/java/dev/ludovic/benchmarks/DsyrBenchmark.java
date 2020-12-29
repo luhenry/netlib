@@ -48,20 +48,8 @@ public class DsyrBenchmark extends BLASBenchmark {
     }
 
     @Benchmark
-    public void f2j(Blackhole bh) {
-        f2jBLAS.dsyr("U", n, alpha, x, 1, a, n);
-        bh.consume(a);
-    }
-
-    @Benchmark
-    public void vector(Blackhole bh) {
-        vectorizedBLAS.dsyr("U", n, alpha, x, 1, a, n);
-        bh.consume(a);
-    }
-
-    @Benchmark
     public void blas(Blackhole bh) {
-        nativeBLAS.dsyr("U", n, alpha, x, 1, a, n);
+        blas.dsyr("U", n, alpha, x, 1, a, n);
         bh.consume(a);
     }
 }

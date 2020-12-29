@@ -46,20 +46,8 @@ public class SscalBenchmark extends BLASBenchmark {
     }
 
     @Benchmark
-    public void f2j(Blackhole bh) {
-        f2jBLAS.sscal(n, alpha, x, 1);
-        bh.consume(x);
-    }
-
-    @Benchmark
-    public void vector(Blackhole bh) {
-        vectorizedBLAS.sscal(n, alpha, x, 1);
-        bh.consume(x);
-    }
-
-    @Benchmark
     public void blas(Blackhole bh) {
-        nativeBLAS.sscal(n, alpha, x, 1);
+        blas.sscal(n, alpha, x, 1);
         bh.consume(x);
     }
 }

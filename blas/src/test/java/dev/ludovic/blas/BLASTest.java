@@ -22,16 +22,17 @@
 
 import dev.ludovic.blas.VectorizedBLAS;
 
-import com.github.fommil.netlib.BLAS;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.provider.Arguments;
 
 public class BLASTest {
 
-    protected BLAS blas;
-
-    @BeforeEach
-    void setup() {
-        blas = new VectorizedBLAS();
-        // blas = new com.github.fommil.netlib.F2jBLAS();
+    private static Stream<Arguments> BLASImplementations() {
+        return Stream.of(
+            Arguments.of(dev.ludovic.blas.NetlibWrapperBLAS.getInstance(new com.github.fommil.netlib.F2jBLAS())),
+            Arguments.of(dev.ludovic.blas.VectorizedBLAS.getInstance())
+        );
     }
 }

@@ -46,17 +46,7 @@ public class DdotBenchmark extends BLASBenchmark {
     }
 
     @Benchmark
-    public void f2j(Blackhole bh) {
-        bh.consume(f2jBLAS.ddot(n, x, 1, y, 1));
-    }
-
-    @Benchmark
-    public void vector(Blackhole bh) {
-        bh.consume(vectorizedBLAS.ddot(n, x, 1, y, 1));
-    }
-
-    @Benchmark
     public void blas(Blackhole bh) {
-        bh.consume(nativeBLAS.ddot(n, x, 1, y, 1));
+        bh.consume(blas.ddot(n, x, -1, y, -1));
     }
 }

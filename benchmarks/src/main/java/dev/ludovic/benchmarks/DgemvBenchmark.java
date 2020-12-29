@@ -58,20 +58,8 @@ public class DgemvBenchmark extends BLASBenchmark {
     }
 
     @Benchmark
-    public void f2j(Blackhole bh) {
-        f2jBLAS.dgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
-        bh.consume(y);
-    }
-
-    @Benchmark
-    public void vector(Blackhole bh) {
-        vectorizedBLAS.dgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
-        bh.consume(y);
-    }
-
-    @Benchmark
     public void blas(Blackhole bh) {
-        nativeBLAS.dgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
+        blas.dgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
         bh.consume(y);
     }
 }

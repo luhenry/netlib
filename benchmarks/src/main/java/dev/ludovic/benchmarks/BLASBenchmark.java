@@ -22,18 +22,35 @@
 
 package dev.ludovic.blas.benchmarks;
 
-import dev.ludovic.blas.VectorizedBLAS;
+import dev.ludovic.blas.BLAS;
 
-import com.github.fommil.netlib.BLAS;
-import com.github.fommil.netlib.F2jBLAS;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
 
-abstract class BLASBenchmark {
+@State(Scope.Thread)
+public abstract class BLASBenchmark {
 
-    protected final BLAS nativeBLAS = BLAS.getInstance();
-    protected final BLAS f2jBLAS = new F2jBLAS();
-    protected final BLAS vectorizedBLAS = new VectorizedBLAS();
+    public BLAS blas;
+
+    @Param({"f2j", "native", "vector"})
+    public String implementation;
+
+    @Setup
+    public void setupImplementation() {
+        switch (implementation) {
+        case "f2j":
+            blas = dev.ludovic.blas.NetlibWrapperBLAS.getInstance(new com.github.fommil.netlib.F2jBLAS());
+            break;
+        case "native":
+            blas = dev.ludovic.blas.NetlibWrapperBLAS.getInstance(com.github.fommil.netlib.BLAS.getInstance());
+            break;
+        case "vector":
+            blas = dev.ludovic.blas.VectorizedBLAS.getInstance();
+            break;
+        default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
+        }
+    }
 
     private final Random rand = new Random(0);
 

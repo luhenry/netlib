@@ -52,20 +52,8 @@ public class DspmvBenchmark extends BLASBenchmark {
     }
 
     @Benchmark
-    public void f2j(Blackhole bh) {
-        f2jBLAS.dspmv("U", n, alpha, a, x, 1, beta, y, 1);
-        bh.consume(y);
-    }
-
-    @Benchmark
-    public void vector(Blackhole bh) {
-        vectorizedBLAS.dspmv("U", n, alpha, a, x, 1, beta, y, 1);
-        bh.consume(y);
-    }
-
-    @Benchmark
     public void blas(Blackhole bh) {
-        nativeBLAS.dspmv("U", n, alpha, a, x, 1, beta, y, 1);
+        blas.dspmv("U", n, alpha, a, x, 1, beta, y, 1);
         bh.consume(y);
     }
 }

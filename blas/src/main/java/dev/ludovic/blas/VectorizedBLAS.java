@@ -28,16 +28,26 @@ import jdk.incubator.vector.FloatVector;
 import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.VectorSpecies;
 
-public class VectorizedBLAS extends F2jBLAS {
+public class VectorizedBLAS extends NetlibWrapperBLAS {
 
   private static final VectorSpecies<Float>  FMAX = FloatVector.SPECIES_MAX;
   private static final VectorSpecies<Double> DMAX = DoubleVector.SPECIES_MAX;
+
+  private static final VectorizedBLAS instance = new VectorizedBLAS();
 
   // abstract public double dasum(int n, double[] x, int incx);
   // abstract public double dasum(int n, double[] x, int offsetx, int incx);
 
   // abstract public float sasum(int n, float[] x, int incx);
   // abstract public float sasum(int n, float[] x, int _x_offset, int incx);
+
+  protected VectorizedBLAS() {
+    super(new com.github.fommil.netlib.F2jBLAS());
+  }
+
+  public static BLAS getInstance() {
+    return instance;
+  }
 
   @Override
   public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
@@ -687,11 +697,13 @@ public class VectorizedBLAS extends F2jBLAS {
   // abstract public void strsv(String uplo, String trans, String diag, int n, float[] a, int lda, float[] x, int incx);
   // abstract public void strsv(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx);
 
-  // abstract public int idamax(int n, double[] dx, int incx);
-  // abstract public int idamax(int n, double[] dx, int offsetdx, int incx);
+  // abstract public int idamax(int n, double[] x, int incx);
+  // abstract public int idamax(int n, double[] x, int offsetx, int incx);
+
   // abstract public int isamax(int n, float[] sx, int incx);
   // abstract public int isamax(int n, float[] sx, int _sx_offset, int incx);
 
+  @Override
   public boolean lsame(String ca, String cb) {
     return ca != null && ca.length() == 1 && ca.equalsIgnoreCase(cb);
   }

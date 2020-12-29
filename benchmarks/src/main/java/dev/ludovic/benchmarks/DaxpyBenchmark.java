@@ -48,20 +48,8 @@ public class DaxpyBenchmark extends BLASBenchmark {
     }
 
     @Benchmark
-    public void f2j(Blackhole bh) {
-        f2jBLAS.daxpy(n, alpha, x, 1, y, 1);
-        bh.consume(y);
-    }
-
-    @Benchmark
-    public void vector(Blackhole bh) {
-        vectorizedBLAS.daxpy(n, alpha, x, 1, y, 1);
-        bh.consume(y);
-    }
-
-    @Benchmark
     public void blas(Blackhole bh) {
-        nativeBLAS.daxpy(n, alpha, x, 1, y, 1);
+        blas.daxpy(n, alpha, x, 1, y, 1);
         bh.consume(y);
     }
 }
