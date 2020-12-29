@@ -947,7 +947,25 @@ public class JavaBLAS implements BLAS {
   }
 
   public int idamax(int n, double[] x, int offsetx, int incx) {
-    return f2j.idamax(n, x, offsetx, incx);
+    if (n <= 0) {
+      return -1;
+    }
+    if (incx <= 0) {
+      return -1;
+    }
+    if (n == 1) {
+      return 0;
+    }
+    int imax = 0;
+    double max = x[offsetx];
+    for (int i = 1, ix = incx; ix < n * incx; i += 1, ix += incx) {
+      double val = Math.abs(x[offsetx + ix]);
+      if (val > max) {
+        imax = i;
+        max = val;
+      }
+    }
+    return imax + 1; // +1 because Fortran arrays are 1-indexed
   }
 
   public int isamax(int n, float[] x, int incx) {
@@ -955,7 +973,25 @@ public class JavaBLAS implements BLAS {
   }
 
   public int isamax(int n, float[] x, int offsetx, int incx) {
-    return f2j.isamax(n, x, offsetx, incx);
+    if (n <= 0) {
+      return -1;
+    }
+    if (incx <= 0) {
+      return -1;
+    }
+    if (n == 1) {
+      return 0;
+    }
+    int imax = 0;
+    float max = x[offsetx];
+    for (int i = 1, ix = incx; ix < n * incx; i += 1, ix += incx) {
+      float val = Math.abs(x[offsetx + ix]);
+      if (val > max) {
+        imax = i;
+        max = val;
+      }
+    }
+    return imax + 1; // +1 because Fortran arrays are 1-indexed
   }
 
   public boolean lsame(String ca, String cb) {
