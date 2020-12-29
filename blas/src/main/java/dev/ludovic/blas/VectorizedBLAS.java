@@ -449,6 +449,48 @@ public class VectorizedBLAS extends JavaBLAS {
     }
   }
 
+  @Override
+  public void dswap(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
+    if (n > 0
+        && x != null && x.length >= offsetx + n && incx == 1
+        && y != null && y.length >= offsety + n && incy == 1) {
+      int i = 0;
+      for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+        DoubleVector vtmp = DoubleVector.fromArray(DMAX, y, offsety + i);
+        DoubleVector.fromArray(DMAX, x, offsetx + i).intoArray(y, offsety + i);
+        vtmp.intoArray(x, offsetx + i);
+      }
+      for (; i < n; i += 1) {
+        double tmp = y[offsety + i];
+        y[offsety + i] = x[offsetx + i];
+        x[offsetx + i] = tmp;
+      }
+    } else {
+      super.dswap(n, x, offsetx, incx, y, offsety, incy);
+    }
+  }
+
+  @Override
+  public void sswap(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
+    if (n > 0
+        && x != null && x.length >= offsetx + n && incx == 1
+        && y != null && y.length >= offsety + n && incy == 1) {
+      int i = 0;
+      for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+        FloatVector vtmp = FloatVector.fromArray(FMAX, y, offsety + i);
+        FloatVector.fromArray(FMAX, x, offsetx + i).intoArray(y, offsety + i);
+        vtmp.intoArray(x, offsetx + i);
+      }
+      for (; i < n; i += 1) {
+        float tmp = y[offsety + i];
+        y[offsety + i] = x[offsetx + i];
+        x[offsetx + i] = tmp;
+      }
+    } else {
+      super.sswap(n, x, offsetx, incx, y, offsety, incy);
+    }
+  }
+
   // a += alpha * x * x.t
   @Override
   public void dsyr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
