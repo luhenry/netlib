@@ -33,7 +33,7 @@ public abstract class BLASBenchmark {
 
     public BLAS blas;
 
-    @Param({"f2j", "native", "vector"})
+    @Param({"f2j", "native", "java", "vector"})
     public String implementation;
 
     @Setup
@@ -44,6 +44,9 @@ public abstract class BLASBenchmark {
             break;
         case "native":
             blas = dev.ludovic.blas.NetlibWrapperBLAS.getInstance(com.github.fommil.netlib.BLAS.getInstance());
+            break;
+        case "java":
+            blas = dev.ludovic.blas.JavaBLAS.getInstance();
             break;
         case "vector":
             blas = dev.ludovic.blas.VectorizedBLAS.getInstance();
