@@ -22,36 +22,22 @@
 
 package dev.ludovic.blas;
 
-import com.github.fommil.netlib.F2jBLAS;
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.FloatVector;
 import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.VectorSpecies;
 
-public class VectorizedBLAS extends NetlibWrapperBLAS {
+public class VectorizedBLAS extends JavaBLAS {
 
   private static final VectorSpecies<Float>  FMAX = FloatVector.SPECIES_MAX;
   private static final VectorSpecies<Double> DMAX = DoubleVector.SPECIES_MAX;
 
   private static final VectorizedBLAS instance = new VectorizedBLAS();
 
-  // abstract public double dasum(int n, double[] x, int incx);
-  // abstract public double dasum(int n, double[] x, int offsetx, int incx);
-
-  // abstract public float sasum(int n, float[] x, int incx);
-  // abstract public float sasum(int n, float[] x, int _x_offset, int incx);
-
-  protected VectorizedBLAS() {
-    super(new com.github.fommil.netlib.F2jBLAS());
-  }
+  protected VectorizedBLAS() {}
 
   public static BLAS getInstance() {
     return instance;
-  }
-
-  @Override
-  public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
-    daxpy(n, alpha, x, 0, incx, y, 0, incy);
   }
 
   // y += alpha * x
@@ -75,20 +61,6 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     } else {
       super.daxpy(n, alpha, x, offsetx, incx, y, offsety, incy);
     }
-  }
-
-  // abstract public void saxpy(int n, float sa, float[] sx, int incx, float[] sy, int incy);
-  // abstract public void saxpy(int n, float sa, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy);
-
-  // abstract public void dcopy(int n, double[] dx, int incx, double[] dy, int incy);
-  // abstract public void dcopy(int n, double[] dx, int offsetdx, int incx, double[] dy, int offsetdy, int incy);
-
-  // abstract public void scopy(int n, float[] sx, int incx, float[] sy, int incy);
-  // abstract public void scopy(int n, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy);
-
-  @Override
-  public double ddot(int n, double[] x, int incx, double[] y, int incy) {
-    return ddot(n, x, 0, incx, y, 0, incy);
   }
 
   // sum(x * y)
@@ -115,11 +87,6 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     }
   }
 
-  @Override
-  public float sdot(int n, float[] x, int incx, float[] y, int incy) {
-    return sdot(n, x, 0, incx, y, 0, incy);
-  }
-
   // sum(x * y)
   @Override
   public float sdot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
@@ -142,22 +109,6 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     } else {
       return super.sdot(n, x, offsetx, incx, y, offsety, incy);
     }
-  }
-
-  // abstract public float sdsdot(int n, float sb, float[] sx, int incx, float[] sy, int incy);
-  // abstract public float sdsdot(int n, float sb, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy);
-
-  // abstract public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy);
-  // abstract public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
-
-  // abstract public void sgbmv(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy);
-  // abstract public void sgbmv(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
-
-  @Override
-  public void dgemm(String transa, String transb, int m, int n, int k,
-      double alpha, double[] a, int lda, double[] b, int ldb,
-      double beta, double[] c, int ldc) {
-    dgemm(transa, transb, m, n, k, alpha, a, 0, lda, b, 0, ldb, beta, c, 0, ldc);
   }
 
   // c = alpha * a * b + beta * c
@@ -265,27 +216,13 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
         }
       }
     } else {
-      super.dgemm(transa, transb, m, n, k,
-                  alpha, a, offseta, lda, b, offsetb, ldb,
-                  beta, c, offsetc, ldc);
+      super.dgemm(transa, transb, m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
     }
-  }
-
-  // abstract public void sgemm(String transa, String transb, int m, int n, int k, float alpha, float[] a, int lda, float[] b, int ldb, float beta, float[] c, int Ldc);
-  // abstract public void sgemm(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int Ldc);
-
-  @Override
-  public void dgemv(String trans, int m, int n,
-      double alpha, double[] a, int lda, double[] x, int incx,
-      double beta, double[] y, int incy) {
-    dgemv(trans, m, n, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
   }
 
   // y = alpha * A * x + beta * y
   @Override
-  public void dgemv(String trans, int m, int n,
-      double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx,
-      double beta, double[] y, int offsety, int incy) {
+  public void dgemv(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (lsame("N", trans)
         && m >= 0 && n >= 0
         && a != null && a.length >= offseta + m * n && lda == m
@@ -336,18 +273,9 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     }
   }
 
-  @Override
-  public void sgemv(String trans, int m, int n,
-      float alpha, float[] a, int lda, float[] x, int incx,
-      float beta, float[] y, int incy) {
-    sgemv(trans, m, n, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }
-
   // y = alpha * A * x + beta * y
   @Override
-  public void sgemv(String trans, int m, int n,
-      float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx,
-      float beta, float[] y, int offsety, int incy) {
+  public void sgemv(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (lsame("N", trans)
         && m >= 0 && n >= 0
         && a != null && a.length >= offseta + m * n && lda == m
@@ -398,51 +326,6 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     }
   }
 
-  // abstract public void dger(int m, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] a, int lda);
-  // abstract public void dger(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda);
-
-  // abstract public void sger(int m, int n, float alpha, float[] x, int incx, float[] y, int incy, float[] a, int lda);
-  // abstract public void sger(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda);
-
-  // abstract public double dnrm2(int n, double[] x, int incx);
-  // abstract public double dnrm2(int n, double[] x, int offsetx, int incx);
-
-  // abstract public float snrm2(int n, float[] x, int incx);
-  // abstract public float snrm2(int n, float[] x, int offsetx, int incx);
-
-  // abstract public void drot(int n, double[] dx, int incx, double[] dy, int incy, double c, double s);
-  // abstract public void drot(int n, double[] dx, int offsetdx, int incx, double[] dy, int offsetdy, int incy, double c, double s);
-
-  // abstract public void srot(int n, float[] sx, int incx, float[] sy, int incy, float c, float s);
-  // abstract public void srot(int n, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy, float c, float s);
-
-  // abstract public void drotg(org.netlib.util.doubleW da, org.netlib.util.doubleW db, org.netlib.util.doubleW c, org.netlib.util.doubleW s);
-
-  // abstract public void srotg(org.netlib.util.floatW sa, org.netlib.util.floatW sb, org.netlib.util.floatW c, org.netlib.util.floatW s);
-
-  // abstract public void drotm(int n, double[] dx, int incx, double[] dy, int incy, double[] dparam);
-  // abstract public void drotm(int n, double[] dx, int offsetdx, int incx, double[] dy, int offsetdy, int incy, double[] dparam, int _dparam_offset);
-
-  // abstract public void srotm(int n, float[] sx, int incx, float[] sy, int incy, float[] sparam);
-  // abstract public void srotm(int n, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy, float[] sparam, int _sparam_offset);
-
-  // abstract public void drotmg(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] dparam);
-  // abstract public void drotmg(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] dparam, int _dparam_offset);
-
-  // abstract public void srotmg(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] sparam);
-  // abstract public void srotmg(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] sparam, int _sparam_offset);
-
-  // abstract public void dsbmv(String uplo, int n, int k, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy);
-  // abstract public void dsbmv(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
-
-  // abstract public void ssbmv(String uplo, int n, int k, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy);
-  // abstract public void ssbmv(String uplo, int n, int k, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
-
-  @Override
-  public void dscal(int n, double alpha, double[] x, int incx) {
-    dscal(n, alpha, x, 0, incx);
-  }
-
   // x = alpha * x
   @Override
   public void dscal(int n, double alpha, double[] x, int offsetx, int incx) {
@@ -461,11 +344,6 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     } else {
       super.dscal(n, alpha, x, offsetx, incx);
     }
-  }
-
-  @Override
-  public void sscal(int n, float alpha, float[] x, int incx) {
-    sscal(n, alpha, x, 0, incx);
   }
 
   // x = alpha * x
@@ -488,16 +366,9 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     }
   }
 
-  @Override
-  public void dspmv(String uplo, int n, double alpha, double[] a,
-      double[] x, int incx, double beta, double[] y, int incy) {
-    dspmv(uplo, n, alpha, a, 0, x, 0, incx, beta, y, 0, incy);
-  }
-
   // y = alpha * a * x + beta * y
   @Override
-  public void dspmv(String uplo, int n, double alpha, double[] a, int offseta,
-      double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+  public void dspmv(String uplo, int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (lsame("U", uplo)
         && n >= 0
         && a != null && a.length >= offseta + n * (n + 1) / 2
@@ -532,18 +403,9 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     }
   }
 
-  // abstract public void sspmv(String uplo, int n, float alpha, float[] ap, float[] x, int incx, float beta, float[] y, int incy);
-  // abstract public void sspmv(String uplo, int n, float alpha, float[] ap, int offsetap, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
-
-  @Override
-  public void dspr(String uplo, int n, double alpha, double[] x, int incx, double[] a) {
-    dspr(uplo, n, alpha, x, 0, incx, a, 0);
-  }
-
   // a += alpha * x * x.t
   @Override
-  public void dspr(String uplo, int n, double alpha,
-      double[] x, int offsetx, int incx, double[] a, int offseta) {
+  public void dspr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
     if (lsame("U", uplo)
         && n >= 0
         && x != null && x.length >= offsetx + n && incx == 1
@@ -567,44 +429,9 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     }
   }
 
-  // abstract public void dspr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] ap, int offsetap);
-
-  // abstract public void sspr(String uplo, int n, float alpha, float[] x, int incx, float[] ap);
-  // abstract public void sspr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] ap, int offsetap);
-
-  // abstract public void dspr2(String uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] ap);
-  // abstract public void dspr2(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] ap, int offsetap);
-
-  // abstract public void sspr2(String uplo, int n, float alpha, float[] x, int incx, float[] y, int incy, float[] ap);
-  // abstract public void sspr2(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] ap, int offsetap);
-
-  // abstract public void dswap(int n, double[] dx, int incx, double[] dy, int incy);
-  // abstract public void dswap(int n, double[] dx, int offsetdx, int incx, double[] dy, int offsetdy, int incy);
-
-  // abstract public void sswap(int n, float[] sx, int incx, float[] sy, int incy);
-  // abstract public void sswap(int n, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy);
-
-  // abstract public void dsymm(String side, String uplo, int m, int n, double alpha, double[] a, int lda, double[] b, int ldb, double beta, double[] c, int Ldc);
-  // abstract public void dsymm(String side, String uplo, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int Ldc);
-
-  // abstract public void ssymm(String side, String uplo, int m, int n, float alpha, float[] a, int lda, float[] b, int ldb, float beta, float[] c, int Ldc);
-  // abstract public void ssymm(String side, String uplo, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int Ldc);
-
-  // abstract public void dsymv(String uplo, int n, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy);
-  // abstract public void dsymv(String uplo, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
-
-  // abstract public void ssymv(String uplo, int n, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy);
-  // abstract public void ssymv(String uplo, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
-
-  @Override
-  public void dsyr(String uplo, int n, double alpha, double[] x, int incx, double[] a, int lda) {
-    dsyr(uplo, n, alpha, x, 0, incx, a, 0, lda);
-  }
-
   // a += alpha * x * x.t
   @Override
-  public void dsyr(String uplo, int n, double alpha,
-      double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
+  public void dsyr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
     if (lsame("U", uplo)
         && n >= 0
         && x != null && x.length >= offsetx + n && incx == 1
@@ -626,85 +453,5 @@ public class VectorizedBLAS extends NetlibWrapperBLAS {
     } else {
       super.dsyr(uplo, n, alpha, x, offsetx, incx, a, offseta, lda);
     }
-  }
-
-  // abstract public void ssyr(String uplo, int n, float alpha, float[] x, int incx, float[] a, int lda);
-  // abstract public void ssyr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda);
-
-  // abstract public void dsyr2(String uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] a, int lda);
-  // abstract public void dsyr2(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda);
-
-  // abstract public void ssyr2(String uplo, int n, float alpha, float[] x, int incx, float[] y, int incy, float[] a, int lda);
-  // abstract public void ssyr2(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda);
-
-  // abstract public void dsyr2k(String uplo, String trans, int n, int k, double alpha, double[] a, int lda, double[] b, int ldb, double beta, double[] c, int Ldc);
-  // abstract public void dsyr2k(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int Ldc);
-
-  // abstract public void ssyr2k(String uplo, String trans, int n, int k, float alpha, float[] a, int lda, float[] b, int ldb, float beta, float[] c, int Ldc);
-  // abstract public void ssyr2k(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int Ldc);
-
-  // abstract public void dsyrk(String uplo, String trans, int n, int k, double alpha, double[] a, int lda, double beta, double[] c, int Ldc);
-  // abstract public void dsyrk(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double beta, double[] c, int offsetc, int Ldc);
-
-  // abstract public void ssyrk(String uplo, String trans, int n, int k, float alpha, float[] a, int lda, float beta, float[] c, int Ldc);
-  // abstract public void ssyrk(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float beta, float[] c, int offsetc, int Ldc);
-
-  // abstract public void dtbmv(String uplo, String trans, String diag, int n, int k, double[] a, int lda, double[] x, int incx);
-  // abstract public void dtbmv(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx);
-
-  // abstract public void stbmv(String uplo, String trans, String diag, int n, int k, float[] a, int lda, float[] x, int incx);
-  // abstract public void stbmv(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx);
-
-  // abstract public void dtbsv(String uplo, String trans, String diag, int n, int k, double[] a, int lda, double[] x, int incx);
-  // abstract public void dtbsv(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx);
-
-  // abstract public void stbsv(String uplo, String trans, String diag, int n, int k, float[] a, int lda, float[] x, int incx);
-  // abstract public void stbsv(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx);
-
-  // abstract public void dtpmv(String uplo, String trans, String diag, int n, double[] ap, double[] x, int incx);
-  // abstract public void dtpmv(String uplo, String trans, String diag, int n, double[] ap, int offsetap, double[] x, int offsetx, int incx);
-
-  // abstract public void stpmv(String uplo, String trans, String diag, int n, float[] ap, float[] x, int incx);
-  // abstract public void stpmv(String uplo, String trans, String diag, int n, float[] ap, int offsetap, float[] x, int offsetx, int incx);
-
-  // abstract public void dtpsv(String uplo, String trans, String diag, int n, double[] ap, double[] x, int incx);
-  // abstract public void dtpsv(String uplo, String trans, String diag, int n, double[] ap, int offsetap, double[] x, int offsetx, int incx);
-
-  // abstract public void stpsv(String uplo, String trans, String diag, int n, float[] ap, float[] x, int incx);
-  // abstract public void stpsv(String uplo, String trans, String diag, int n, float[] ap, int offsetap, float[] x, int offsetx, int incx);
-
-  // abstract public void dtrmm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int lda, double[] b, int ldb);
-  // abstract public void dtrmm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb);
-
-  // abstract public void strmm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int lda, float[] b, int ldb);
-  // abstract public void strmm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb);
-
-  // abstract public void dtrmv(String uplo, String trans, String diag, int n, double[] a, int lda, double[] x, int incx);
-  // abstract public void dtrmv(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx);
-
-  // abstract public void strmv(String uplo, String trans, String diag, int n, float[] a, int lda, float[] x, int incx);
-  // abstract public void strmv(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx);
-
-  // abstract public void dtrsm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int lda, double[] b, int ldb);
-  // abstract public void dtrsm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb);
-
-  // abstract public void strsm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int lda, float[] b, int ldb);
-  // abstract public void strsm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb);
-
-  // abstract public void dtrsv(String uplo, String trans, String diag, int n, double[] a, int lda, double[] x, int incx);
-  // abstract public void dtrsv(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx);
-
-  // abstract public void strsv(String uplo, String trans, String diag, int n, float[] a, int lda, float[] x, int incx);
-  // abstract public void strsv(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx);
-
-  // abstract public int idamax(int n, double[] x, int incx);
-  // abstract public int idamax(int n, double[] x, int offsetx, int incx);
-
-  // abstract public int isamax(int n, float[] sx, int incx);
-  // abstract public int isamax(int n, float[] sx, int _sx_offset, int incx);
-
-  @Override
-  public boolean lsame(String ca, String cb) {
-    return ca != null && ca.length() == 1 && ca.equalsIgnoreCase(cb);
   }
 }
