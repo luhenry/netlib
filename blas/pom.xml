@@ -26,13 +26,13 @@ SOFTWARE.
 
     <parent>
         <groupId>dev.ludovic</groupId>
-        <artifactId>vectorizedblas</artifactId>
+        <artifactId>blas-parent</artifactId>
         <version>0.1.11</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>dev.ludovic</groupId>
-    <artifactId>vectorizedblas-blas</artifactId>
+    <artifactId>blas</artifactId>
     <version>0.1.11</version>
     <packaging>jar</packaging>
 
