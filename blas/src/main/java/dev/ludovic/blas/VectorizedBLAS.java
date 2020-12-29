@@ -155,7 +155,7 @@ public class VectorizedBLAS extends F2jBLAS {
   public void dgemm(String transa, String transb, int m, int n, int k,
       double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb,
       double beta, double[] c, int offsetc, int ldc) {
-    if ("N".equals(transa) && "N".equals(transb)
+    if (lsame("N", transa) && lsame("N", transb)
         && m >= 0 && n >= 0 && k >= 0
         && a != null && a.length >= offseta + m * k && lda == m
         && b != null && b.length >= offsetb + k * n && ldb == k
@@ -180,7 +180,7 @@ public class VectorizedBLAS extends F2jBLAS {
           }
         }
       }
-    } else if ("N".equals(transa) && "T".equals(transb)
+    } else if (lsame("N", transa) && lsame("T", transb)
         && m >= 0 && n >= 0 && k >= 0
         && a != null && a.length >= offseta + m * k && lda == m
         && b != null && b.length >= offsetb + k * n && ldb == n
@@ -205,7 +205,7 @@ public class VectorizedBLAS extends F2jBLAS {
           }
         }
       }
-    } else if ("T".equals(transa) && "N".equals(transb)
+    } else if (lsame("T", transa) && lsame("N", transb)
         && m >= 0 && n >= 0 && k >= 0
         && a != null && a.length >= offseta + m * k && lda == k
         && b != null && b.length >= offsetb + k * n && ldb == k
@@ -233,7 +233,7 @@ public class VectorizedBLAS extends F2jBLAS {
           }
         }
       }
-    } else if ("T".equals(transa) && "T".equals(transb)
+    } else if (lsame("T", transa) && lsame("T", transb)
         && m >= 0 && n >= 0 && k >= 0
         && a != null && a.length >= offseta + m * k && lda == k
         && b != null && b.length >= offsetb + k * n && ldb == n
@@ -276,7 +276,7 @@ public class VectorizedBLAS extends F2jBLAS {
   public void dgemv(String trans, int m, int n,
       double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx,
       double beta, double[] y, int offsety, int incy) {
-    if ("N".equals(trans)
+    if (lsame("N", trans)
         && m >= 0 && n >= 0
         && a != null && a.length >= offseta + m * n && lda == m
         && x != null && x.length >= offsetx + n && incx == 1
@@ -299,7 +299,7 @@ public class VectorizedBLAS extends F2jBLAS {
           }
         }
       }
-    } else if ("T".equals(trans)
+    } else if (lsame("T", trans)
         && m >= 0 && n >= 0
         && a != null && a.length >= offseta + m * n && lda == m
         && x != null && x.length >= offsetx + m && incx == 1
@@ -338,7 +338,7 @@ public class VectorizedBLAS extends F2jBLAS {
   public void sgemv(String trans, int m, int n,
       float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx,
       float beta, float[] y, int offsety, int incy) {
-    if ("N".equals(trans)
+    if (lsame("N", trans)
         && m >= 0 && n >= 0
         && a != null && a.length >= offseta + m * n && lda == m
         && x != null && x.length >= offsetx + n && incx == 1
@@ -361,7 +361,7 @@ public class VectorizedBLAS extends F2jBLAS {
           }
         }
       }
-    } else if ("T".equals(trans)
+    } else if (lsame("T", trans)
         && m >= 0 && n >= 0
         && a != null && a.length >= offseta + m * n && lda == m
         && x != null && x.length >= offsetx + m && incx == 1
@@ -488,7 +488,7 @@ public class VectorizedBLAS extends F2jBLAS {
   @Override
   public void dspmv(String uplo, int n, double alpha, double[] a, int offseta,
       double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    if ("U".equals(uplo)
+    if (lsame("U", uplo)
         && n >= 0
         && a != null && a.length >= offseta + n * (n + 1) / 2
         && x != null && x.length >= offsetx + n && incx == 1
@@ -534,7 +534,7 @@ public class VectorizedBLAS extends F2jBLAS {
   @Override
   public void dspr(String uplo, int n, double alpha,
       double[] x, int offsetx, int incx, double[] a, int offseta) {
-    if ("U".equals(uplo)
+    if (lsame("U", uplo)
         && n >= 0
         && x != null && x.length >= offsetx + n && incx == 1
         && a != null && a.length >= offseta + n * (n + 1) / 2) {
@@ -595,7 +595,7 @@ public class VectorizedBLAS extends F2jBLAS {
   @Override
   public void dsyr(String uplo, int n, double alpha,
       double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
-    if ("U".equals(uplo)
+    if (lsame("U", uplo)
         && n >= 0
         && x != null && x.length >= offsetx + n && incx == 1
         && a != null && a.length >= offseta + n * n && lda == n) {
@@ -692,5 +692,7 @@ public class VectorizedBLAS extends F2jBLAS {
   // abstract public int isamax(int n, float[] sx, int incx);
   // abstract public int isamax(int n, float[] sx, int _sx_offset, int incx);
 
-  // abstract public boolean lsame(String ca, String cb);
+  public boolean lsame(String ca, String cb) {
+    return ca != null && ca.length() == 1 && ca.equalsIgnoreCase(cb);
+  }
 }
