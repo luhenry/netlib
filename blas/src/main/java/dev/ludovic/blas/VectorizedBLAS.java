@@ -40,6 +40,46 @@ public class VectorizedBLAS extends JavaBLAS {
     return instance;
   }
 
+  @Override
+  public double dasum(int n, double[] x, int offsetx, int incx) {
+    if (n > 0 && x != null && x.length >= offsetx + n && incx == 1) {
+      double sum = 0.;
+      int i = 0;
+      DoubleVector vsum = DoubleVector.zero(DMAX);
+      for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+        DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + i);
+        vsum = vx.abs().add(vsum);
+      }
+      sum += vsum.reduceLanes(VectorOperators.ADD);
+      for (; i < n; i += 1) {
+        sum += Math.abs(x[offsetx + i]);
+      }
+      return sum;
+    } else {
+      return super.dasum(n, x, offsetx, incx);
+    }
+  }
+
+  @Override
+  public float sasum(int n, float[] x, int offsetx, int incx) {
+    if (n > 0 && x != null && x.length >= offsetx + n && incx == 1) {
+      float sum = 0.f;
+      int i = 0;
+      FloatVector vsum = FloatVector.zero(FMAX);
+      for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+        FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + i);
+        vsum = vx.abs().add(vsum);
+      }
+      sum += vsum.reduceLanes(VectorOperators.ADD);
+      for (; i < n; i += 1) {
+        sum += Math.abs(x[offsetx + i]);
+      }
+      return sum;
+    } else {
+      return super.sasum(n, x, offsetx, incx);
+    }
+  }
+
   // y += alpha * x
   @Override
   public void daxpy(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
