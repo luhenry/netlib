@@ -456,9 +456,10 @@ public class JavaBLAS implements BLAS {
          (incx < 0 ? ix >= 0 : ix < n * incx)
           && (incy < 0 ? iy >= 0 : iy < n * incy);
          ix += incx, iy += incy) {
-      double tmp = c * x[offsetx + ix] + s * y[offsety + iy];
-      y[offsety + iy] = c * y[offsety + iy] - s * x[offsetx + ix];
-      x[offsetx + ix] = tmp;
+      double xnew = c * x[offsetx + ix] + s * y[offsety + iy];
+      double ynew = c * y[offsety + iy] - s * x[offsetx + ix];
+      x[offsetx + ix] = xnew;
+      y[offsety + iy] = ynew;
     }
   }
 
@@ -476,9 +477,10 @@ public class JavaBLAS implements BLAS {
          (incx < 0 ? ix >= 0 : ix < n * incx)
           && (incy < 0 ? iy >= 0 : iy < n * incy);
          ix += incx, iy += incy) {
-      float tmp = c * x[offsetx + ix] + s * y[offsety + iy];
-      y[offsety + iy] = c * y[offsety + iy] - s * x[offsetx + ix];
-      x[offsetx + ix] = tmp;
+      float xnew = c * x[offsetx + ix] + s * y[offsety + iy];
+      float ynew = c * y[offsety + iy] - s * x[offsetx + ix];
+      x[offsetx + ix] = xnew;
+      y[offsety + iy] = ynew;
     }
   }
 
