@@ -35,6 +35,11 @@ public class JavaBLAS implements BLAS {
     return instance;
   }
 
+  private int loopBound(int index, int size) {
+    assert (size & (size - 1)) == 0;
+    return index & ~(size - 1);
+  }
+
   protected IllegalArgumentException illegalArgument(String method, int arg) {
     return new IllegalArgumentException(String.format("** On entry to '%s' parameter number %d had an illegal value", method, arg));
   }
@@ -283,35 +288,56 @@ public class JavaBLAS implements BLAS {
     if (m == 0 || n == 0) {
       return;
     }
-    if (alpha == 0.0 && beta == 1.0) {
-      return;
+    // y = beta * y
+    if (beta != 1.0) {
+      dscal(lsame("N", trans) ? m : n, beta, y, offsety, incy);
     }
-    if (lsame("N", trans)) {
-      // y = beta * y
-      dscal(m, beta, y, offsety, incy);
-      // y += alpha * A * x
-      for (int ix = incx < 0 ? (n - 1) * -incx : 0, col = 0;
-           (incx < 0 ? ix >= 0 : ix < n * incx) && col < n;
-           ix += incx, col += 1) {
-        for (int iy = incy < 0 ? (m - 1) * -incy : 0, row = 0;
-             (incy < 0 ? iy >= 0 : iy < m * incy) && row < m;
-             iy += incy, row += 1) {
-          y[offsety + iy] += alpha * x[offsetx + ix] * a[offseta + row + col * m];
+    // y += alpha * A * x
+    if (alpha != 0.0) {
+      if (lsame("N", trans)) {
+        int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
+        for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
+          double alphax0 = alpha * x[offsetx + ix + incx * 0];
+          double alphax1 = alpha * x[offsetx + ix + incx * 1];
+          double alphax2 = alpha * x[offsetx + ix + incx * 2];
+          double alphax3 = alpha * x[offsetx + ix + incx * 3];
+          for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+            y[offsety + iy] += alphax0 * a[offseta + row + (col + 0) * m]
+                            +  alphax1 * a[offseta + row + (col + 1) * m]
+                            +  alphax2 * a[offseta + row + (col + 2) * m]
+                            +  alphax3 * a[offseta + row + (col + 3) * m];
+          }
         }
-      }
-    } else if (lsame("T", trans)) {
-      for (int iy = incy < 0 ? (n - 1) * -incy : 0,
-               col = 0;
-           (incy < 0 ? iy >= 0 : iy < n * incy)
-            && col < n;
-           iy += incy, col += 1) {
-        y[offsety + iy] = beta * y[offsety + iy];
-        for (int ix = incx < 0 ? (m - 1) * -incx : 0,
-                 row = 0;
-             (incx < 0 ? ix >= 0 : ix < m * incx)
-              && row < m;
-             ix += incx, row += 1) {
-          y[offsety + iy] += alpha * x[offsetx + ix] * a[offseta + row + col * m];
+        for (; col < n; col += 1, ix += incx) {
+          double alphax = alpha * x[offsetx + ix];
+          for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+            y[offsety + iy] += alphax * a[offseta + row + col * m];
+          }
+        }
+      } else {
+        int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+        for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
+          double sum0 = 0.0;
+          double sum1 = 0.0;
+          double sum2 = 0.0;
+          double sum3 = 0.0;
+          for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
+            sum0 += x[offsetx + ix] * a[offseta + row + (col + 0) * m];
+            sum1 += x[offsetx + ix] * a[offseta + row + (col + 1) * m];
+            sum2 += x[offsetx + ix] * a[offseta + row + (col + 2) * m];
+            sum3 += x[offsetx + ix] * a[offseta + row + (col + 3) * m];
+          }
+          y[offsety + iy + incy * 0] += alpha * sum0;
+          y[offsety + iy + incy * 1] += alpha * sum1;
+          y[offsety + iy + incy * 2] += alpha * sum2;
+          y[offsety + iy + incy * 3] += alpha * sum3;
+        }
+        for (; col < n; col += 1, iy += incy) {
+          double sum = 0.0;
+          for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
+            sum += x[offsetx + ix] * a[offseta + row + col * m];
+          }
+          y[offsety + iy] += alpha * sum;
         }
       }
     }
@@ -344,39 +370,76 @@ public class JavaBLAS implements BLAS {
     if (m == 0 || n == 0) {
       return;
     }
-    if (alpha == 0.0 && beta == 1.0) {
-      return;
+    // y = beta * y
+    if (beta != 1.0f) {
+      sscal(lsame("N", trans) ? m : n, beta, y, offsety, incy);
     }
-    if (lsame("N", trans)) {
-      // y = beta * y
-      sscal(m, beta, y, offsety, incy);
-      // y += alpha * A * x
-      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-               col = 0;
-           (incx < 0 ? ix >= 0 : ix < n * incx)
-            && col < n;
-           ix += incx, col += 1) {
-        for (int iy = incy < 0 ? (m - 1) * -incy : 0,
-                 row = 0;
-              (incy < 0 ? iy >= 0 : iy < m * incy)
-               && row < m;
-              iy += incy, row += 1) {
-          y[offsety + iy] += alpha * x[offsetx + ix] * a[offseta + row + col * m];
+    // y += alpha * A * x
+    if (alpha != 0.0f) {
+      if (lsame("N", trans)) {
+        int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
+        for (; col < loopBound(n, 8); col += 8, ix += incx * 8) {
+          float alphax0 = alpha * x[offsetx + ix + incx * 0];
+          float alphax1 = alpha * x[offsetx + ix + incx * 1];
+          float alphax2 = alpha * x[offsetx + ix + incx * 2];
+          float alphax3 = alpha * x[offsetx + ix + incx * 3];
+          float alphax4 = alpha * x[offsetx + ix + incx * 4];
+          float alphax5 = alpha * x[offsetx + ix + incx * 5];
+          float alphax6 = alpha * x[offsetx + ix + incx * 6];
+          float alphax7 = alpha * x[offsetx + ix + incx * 7];
+          for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+            y[offsety + iy] += alphax0 * a[offseta + row + (col + 0) * m]
+                            +  alphax1 * a[offseta + row + (col + 1) * m]
+                            +  alphax2 * a[offseta + row + (col + 2) * m]
+                            +  alphax3 * a[offseta + row + (col + 3) * m]
+                            +  alphax4 * a[offseta + row + (col + 4) * m]
+                            +  alphax5 * a[offseta + row + (col + 5) * m]
+                            +  alphax6 * a[offseta + row + (col + 6) * m]
+                            +  alphax7 * a[offseta + row + (col + 7) * m];
+          }
         }
-      }
-    } else if (lsame("T", trans)) {
-      for (int iy = incy < 0 ? (n - 1) * -incy : 0,
-               col = 0;
-           (incy < 0 ? iy >= 0 : iy < n * incy)
-            && col < n;
-           iy += incy, col += 1) {
-        y[offsety + iy] = beta * y[offsety + iy];
-        for (int ix = incx < 0 ? (m - 1) * -incx : 0,
-                 row = 0;
-             (incx < 0 ? ix >= 0 : ix < m * incx)
-              && row < m;
-             ix += incx, row += 1) {
-          y[offsety + iy] += alpha * x[offsetx + ix] * a[offseta + row + col * m];
+        for (; col < n; col += 1, ix += incx) {
+          float alphax = alpha * x[offsetx + ix];
+          for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+            y[offsety + iy] += alphax * a[offseta + row + col * m];
+          }
+        }
+      } else {
+        int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+        for (; col < loopBound(n, 8); col += 8, iy += incy * 8) {
+          float sum0 = 0.0f;
+          float sum1 = 0.0f;
+          float sum2 = 0.0f;
+          float sum3 = 0.0f;
+          float sum4 = 0.0f;
+          float sum5 = 0.0f;
+          float sum6 = 0.0f;
+          float sum7 = 0.0f;
+          for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
+            sum0 += x[offsetx + ix] * a[offseta + row + (col + 0) * m];
+            sum1 += x[offsetx + ix] * a[offseta + row + (col + 1) * m];
+            sum2 += x[offsetx + ix] * a[offseta + row + (col + 2) * m];
+            sum3 += x[offsetx + ix] * a[offseta + row + (col + 3) * m];
+            sum4 += x[offsetx + ix] * a[offseta + row + (col + 4) * m];
+            sum5 += x[offsetx + ix] * a[offseta + row + (col + 5) * m];
+            sum6 += x[offsetx + ix] * a[offseta + row + (col + 6) * m];
+            sum7 += x[offsetx + ix] * a[offseta + row + (col + 7) * m];
+          }
+          y[offsety + iy + incy * 0] += alpha * sum0;
+          y[offsety + iy + incy * 1] += alpha * sum1;
+          y[offsety + iy + incy * 2] += alpha * sum2;
+          y[offsety + iy + incy * 3] += alpha * sum3;
+          y[offsety + iy + incy * 4] += alpha * sum4;
+          y[offsety + iy + incy * 5] += alpha * sum5;
+          y[offsety + iy + incy * 6] += alpha * sum6;
+          y[offsety + iy + incy * 7] += alpha * sum7;
+        }
+        for (; col < n; col += 1, iy += incy) {
+          float sum = 0.0f;
+          for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
+            sum += x[offsetx + ix] * a[offseta + row + col * m];
+          }
+          y[offsety + iy] += alpha * sum;
         }
       }
     }
