@@ -302,16 +302,16 @@ public class JavaBLAS implements BLAS {
           double alphax2 = alpha * x[offsetx + ix + incx * 2];
           double alphax3 = alpha * x[offsetx + ix + incx * 3];
           for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
-            y[offsety + iy] += alphax0 * a[offseta + row + (col + 0) * m]
-                            +  alphax1 * a[offseta + row + (col + 1) * m]
-                            +  alphax2 * a[offseta + row + (col + 2) * m]
-                            +  alphax3 * a[offseta + row + (col + 3) * m];
+            y[offsety + iy] += alphax0 * a[offseta + row + (col + 0) * lda]
+                            +  alphax1 * a[offseta + row + (col + 1) * lda]
+                            +  alphax2 * a[offseta + row + (col + 2) * lda]
+                            +  alphax3 * a[offseta + row + (col + 3) * lda];
           }
         }
         for (; col < n; col += 1, ix += incx) {
           double alphax = alpha * x[offsetx + ix];
           for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
-            y[offsety + iy] += alphax * a[offseta + row + col * m];
+            y[offsety + iy] += alphax * a[offseta + row + col * lda];
           }
         }
       } else {
@@ -322,10 +322,10 @@ public class JavaBLAS implements BLAS {
           double sum2 = 0.0;
           double sum3 = 0.0;
           for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
-            sum0 += x[offsetx + ix] * a[offseta + row + (col + 0) * m];
-            sum1 += x[offsetx + ix] * a[offseta + row + (col + 1) * m];
-            sum2 += x[offsetx + ix] * a[offseta + row + (col + 2) * m];
-            sum3 += x[offsetx + ix] * a[offseta + row + (col + 3) * m];
+            sum0 += x[offsetx + ix] * a[offseta + row + (col + 0) * lda];
+            sum1 += x[offsetx + ix] * a[offseta + row + (col + 1) * lda];
+            sum2 += x[offsetx + ix] * a[offseta + row + (col + 2) * lda];
+            sum3 += x[offsetx + ix] * a[offseta + row + (col + 3) * lda];
           }
           y[offsety + iy + incy * 0] += alpha * sum0;
           y[offsety + iy + incy * 1] += alpha * sum1;
@@ -335,7 +335,7 @@ public class JavaBLAS implements BLAS {
         for (; col < n; col += 1, iy += incy) {
           double sum = 0.0;
           for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
-            sum += x[offsetx + ix] * a[offseta + row + col * m];
+            sum += x[offsetx + ix] * a[offseta + row + col * lda];
           }
           y[offsety + iy] += alpha * sum;
         }
@@ -388,20 +388,20 @@ public class JavaBLAS implements BLAS {
           float alphax6 = alpha * x[offsetx + ix + incx * 6];
           float alphax7 = alpha * x[offsetx + ix + incx * 7];
           for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
-            y[offsety + iy] += alphax0 * a[offseta + row + (col + 0) * m]
-                            +  alphax1 * a[offseta + row + (col + 1) * m]
-                            +  alphax2 * a[offseta + row + (col + 2) * m]
-                            +  alphax3 * a[offseta + row + (col + 3) * m]
-                            +  alphax4 * a[offseta + row + (col + 4) * m]
-                            +  alphax5 * a[offseta + row + (col + 5) * m]
-                            +  alphax6 * a[offseta + row + (col + 6) * m]
-                            +  alphax7 * a[offseta + row + (col + 7) * m];
+            y[offsety + iy] += alphax0 * a[offseta + row + (col + 0) * lda]
+                            +  alphax1 * a[offseta + row + (col + 1) * lda]
+                            +  alphax2 * a[offseta + row + (col + 2) * lda]
+                            +  alphax3 * a[offseta + row + (col + 3) * lda]
+                            +  alphax4 * a[offseta + row + (col + 4) * lda]
+                            +  alphax5 * a[offseta + row + (col + 5) * lda]
+                            +  alphax6 * a[offseta + row + (col + 6) * lda]
+                            +  alphax7 * a[offseta + row + (col + 7) * lda];
           }
         }
         for (; col < n; col += 1, ix += incx) {
           float alphax = alpha * x[offsetx + ix];
           for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
-            y[offsety + iy] += alphax * a[offseta + row + col * m];
+            y[offsety + iy] += alphax * a[offseta + row + col * lda];
           }
         }
       } else {
@@ -416,14 +416,14 @@ public class JavaBLAS implements BLAS {
           float sum6 = 0.0f;
           float sum7 = 0.0f;
           for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
-            sum0 += x[offsetx + ix] * a[offseta + row + (col + 0) * m];
-            sum1 += x[offsetx + ix] * a[offseta + row + (col + 1) * m];
-            sum2 += x[offsetx + ix] * a[offseta + row + (col + 2) * m];
-            sum3 += x[offsetx + ix] * a[offseta + row + (col + 3) * m];
-            sum4 += x[offsetx + ix] * a[offseta + row + (col + 4) * m];
-            sum5 += x[offsetx + ix] * a[offseta + row + (col + 5) * m];
-            sum6 += x[offsetx + ix] * a[offseta + row + (col + 6) * m];
-            sum7 += x[offsetx + ix] * a[offseta + row + (col + 7) * m];
+            sum0 += x[offsetx + ix] * a[offseta + row + (col + 0) * lda];
+            sum1 += x[offsetx + ix] * a[offseta + row + (col + 1) * lda];
+            sum2 += x[offsetx + ix] * a[offseta + row + (col + 2) * lda];
+            sum3 += x[offsetx + ix] * a[offseta + row + (col + 3) * lda];
+            sum4 += x[offsetx + ix] * a[offseta + row + (col + 4) * lda];
+            sum5 += x[offsetx + ix] * a[offseta + row + (col + 5) * lda];
+            sum6 += x[offsetx + ix] * a[offseta + row + (col + 6) * lda];
+            sum7 += x[offsetx + ix] * a[offseta + row + (col + 7) * lda];
           }
           y[offsety + iy + incy * 0] += alpha * sum0;
           y[offsety + iy + incy * 1] += alpha * sum1;
@@ -437,7 +437,7 @@ public class JavaBLAS implements BLAS {
         for (; col < n; col += 1, iy += incy) {
           float sum = 0.0f;
           for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
-            sum += x[offsetx + ix] * a[offseta + row + col * m];
+            sum += x[offsetx + ix] * a[offseta + row + col * lda];
           }
           y[offsety + iy] += alpha * sum;
         }
