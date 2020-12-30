@@ -856,15 +856,113 @@ public class JavaBLAS implements BLAS {
 
   // a += alpha * x * x.t
   public void dspr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
-    f2j.dspr(uplo, n, alpha, x, offsetx, incx, a, offseta);
+    if (!lsame("U", uplo) && !lsame("L", uplo)) {
+      throw illegalArgument("DSPR", 1);
+    }
+    if (n < 0) {
+      throw illegalArgument("DSPR", 2);
+    }
+    if (incx == 0) {
+      throw illegalArgument("DSPR", 5);
+    }
+    if (n == 0) {
+      return;
+    }
+    // y += alpha * x * x.t
+    if (alpha != 0.0) {
+      if (lsame("U", uplo)) {
+        int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
+        for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
+          double alphaix0 = alpha * x[offsetx + ix + incx * 0];
+          double alphaix1 = alpha * x[offsetx + ix + incx * 1];
+          double alphaix2 = alpha * x[offsetx + ix + incx * 2];
+          double alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          int row = 0, jx = incx < 0 ? col * -incx : 0;
+          for (; row < col + 1; row += 1, jx += incx) {
+            double xjx = x[offsetx + jx];
+            a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphaix0 * xjx;
+            a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphaix1 * xjx;
+            a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx;
+            a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx;
+          }
+          double xjx0 = x[offsetx + jx + incx * 0];
+          a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphaix1 * xjx0;
+          a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx0;
+          a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx0;
+          double xjx1 = x[offsetx + jx + incx * 1];
+          a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx1;
+          a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx1;
+          double xjx2 = x[offsetx + jx + incx * 2];
+          a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx2;
+        }
+        for (; col < n; col += 1, ix += incx) {
+          double alphaix = alpha * x[offsetx + ix];
+          int row = 0, jx = incx < 0 ? col * -incx : 0;
+          for (; row < col + 1; row += 1, jx += incx) {
+            a[offseta + row + col * (col + 1) / 2] += alphaix * x[offsetx + jx];
+          }
+        }
+      } else {
+        f2j.dspr(uplo, n, alpha, x, offsetx, incx, a, offseta);
+      }
+    }
   }
 
-  public void sspr(String uplo, int n, float alpha, float[] x, int incx, float[] ap) {
-    sspr(uplo, n, alpha, x, 0, incx, ap, 0);
+  public void sspr(String uplo, int n, float alpha, float[] x, int incx, float[] a) {
+    sspr(uplo, n, alpha, x, 0, incx, a, 0);
   }
 
-  public void sspr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] ap, int offsetap) {
-    f2j.sspr(uplo, n, alpha, x, offsetx, incx, ap, offsetap);
+  public void sspr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
+    if (!lsame("U", uplo) && !lsame("L", uplo)) {
+      throw illegalArgument("SSPR", 1);
+    }
+    if (n < 0) {
+      throw illegalArgument("SSPR", 2);
+    }
+    if (incx == 0) {
+      throw illegalArgument("SSPR", 5);
+    }
+    if (n == 0) {
+      return;
+    }
+    // y += alpha * x * x.t
+    if (alpha != 0.0) {
+      if (lsame("U", uplo)) {
+        int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
+        for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
+          float alphaix0 = alpha * x[offsetx + ix + incx * 0];
+          float alphaix1 = alpha * x[offsetx + ix + incx * 1];
+          float alphaix2 = alpha * x[offsetx + ix + incx * 2];
+          float alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          int row = 0, jx = incx < 0 ? col * -incx : 0;
+          for (; row < col + 1; row += 1, jx += incx) {
+            float xjx = x[offsetx + jx];
+            a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphaix0 * xjx;
+            a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphaix1 * xjx;
+            a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx;
+            a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx;
+          }
+          float xjx0 = x[offsetx + jx + incx * 0];
+          a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphaix1 * xjx0;
+          a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx0;
+          a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx0;
+          float xjx1 = x[offsetx + jx + incx * 1];
+          a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx1;
+          a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx1;
+          float xjx2 = x[offsetx + jx + incx * 2];
+          a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx2;
+        }
+        for (; col < n; col += 1, ix += incx) {
+          float alphaix = alpha * x[offsetx + ix];
+          int row = 0, jx = incx < 0 ? col * -incx : 0;
+          for (; row < col + 1; row += 1, jx += incx) {
+            a[offseta + row + col * (col + 1) / 2] += alphaix * x[offsetx + jx];
+          }
+        }
+      } else {
+        f2j.sspr(uplo, n, alpha, x, offsetx, incx, a, offseta);
+      }
+    }
   }
 
   public void dspr2(String uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] ap) {

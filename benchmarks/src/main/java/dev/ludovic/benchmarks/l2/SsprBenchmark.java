@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
-public class DsprBenchmark extends BLASBenchmark {
+public class SsprBenchmark extends BLASBenchmark {
 
     @Param({"U", "L"})
     public String uplo;
@@ -41,20 +41,20 @@ public class DsprBenchmark extends BLASBenchmark {
     @Param({"10", "10000"})
     public int n;
 
-    public double alpha;
-    public double[] a;
-    public double[] x;
+    public float alpha;
+    public float[] a;
+    public float[] x;
 
     @Setup
     public void setup() {
-        alpha = randomDouble();
-        a = randomDoubleArray(n * (n + 1) / 2);
-        x = randomDoubleArray(n);
+        alpha = randomFloat();
+        a = randomFloatArray(n * (n + 1) / 2);
+        x = randomFloatArray(n);
     }
 
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dspr("U", n, alpha, x, 1, a);
+        blas.sspr("U", n, alpha, x, 1, a);
         bh.consume(a);
     }
 }
