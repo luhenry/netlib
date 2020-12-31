@@ -20,23 +20,37 @@
 * SOFTWARE.
 */
 
-import dev.ludovic.blas.VectorizedBLAS;
+import dev.ludovic.blas.BLAS;
 
-import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.provider.Arguments;
+public class Sspr2Test extends BLASTest {
 
-public class BLASTest {
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testSanity(BLAS blas) {
+        int n = 4;
+        float alpha = 0.1f;
+        float[] x = new float[] {
+            1.0f, 2.0f, 2.1f,  4.0f };
+        float[] y = new float[] {
+            3.0f, 4.0f, 5.1f, -1.0f };
+        float[] a = new float[] {
+            1.0f,
+            2.0f, 2.0f,
+            3.0f, 3.0f, 3.0f,
+            4.0f, 4.0f, 4.0f, 4.0f };
+        float[] expected = new float[] {
+             1.6f,
+             3.0f,  3.6f,
+            4.14f, 4.86f, 5.142f,
+             5.1f,  5.4f,  5.83f, 3.2f };
 
-    final static double depsilon = 1e-15d;
-    final static float sepsilon = 1e-6f;
-
-    private static Stream<Arguments> BLASImplementations() {
-        return Stream.of(
-            Arguments.of(dev.ludovic.blas.NetlibWrapperBLAS.getInstance(new com.github.fommil.netlib.F2jBLAS())),
-            Arguments.of(dev.ludovic.blas.JavaBLAS.getInstance()),
-            Arguments.of(dev.ludovic.blas.VectorizedBLAS.getInstance())
-        );
+        float[] a1 = a.clone();
+        blas.sspr2("U", n, alpha, x, 1, y, 1, a1);
+        assertArrayEquals(expected, a1, sepsilon);
     }
 }
