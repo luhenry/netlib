@@ -66,50 +66,50 @@ public class DgemmTest extends BLASTest {
 
         double[] c1 = c.clone();
         blas.dgemm("N", "N", m, n, k, 1.0, a, m, b, k, 2.0, c1, m);
-        assertArrayEquals(expected1, c1);
+        assertArrayEquals(expected1, c1, depsilon);
 
         double[] c2 = c.clone();
         blas.dgemm("N", "T", m, n, k, 1.0, a, m, bT, n, 2.0, c2, m);
-        assertArrayEquals(expected1, c2);
+        assertArrayEquals(expected1, c2, depsilon);
 
         double[] c3 = c.clone();
         blas.dgemm("T", "N", m, n, k, 1.0, aT, k, b, k, 2.0, c3, m);
-        assertArrayEquals(expected1, c3);
+        assertArrayEquals(expected1, c3, depsilon);
 
         double[] c4 = c.clone();
         blas.dgemm("T", "T", m, n, k, 1.0, aT, k, bT, n, 2.0, c4, m);
-        assertArrayEquals(expected1, c4);
+        assertArrayEquals(expected1, c4, depsilon);
 
         double[] c5 = c.clone();
         blas.dgemm("N", "N", m, n, k, 1.0, a, m, b, k, 0.0, c5, m);
-        assertArrayEquals(expected2, c5);
+        assertArrayEquals(expected2, c5, depsilon);
 
         double[] c6 = c.clone();
         blas.dgemm("N", "T", m, n, k, 1.0, a, m, bT, n, 0.0, c6, m);
-        assertArrayEquals(expected2, c6);
+        assertArrayEquals(expected2, c6, depsilon);
 
         double[] c7 = c.clone();
         blas.dgemm("T", "N", m, n, k, 1.0, aT, k, b, k, 0.0, c7, m);
-        assertArrayEquals(expected2, c7);
+        assertArrayEquals(expected2, c7, depsilon);
 
         double[] c8 = c.clone();
         blas.dgemm("T", "T", m, n, k, 1.0, aT, k, bT, n, 0.0, c8, m);
-        assertArrayEquals(expected2, c8);
+        assertArrayEquals(expected2, c8, depsilon);
 
         double[] c9 = c.clone();
         blas.dgemm("N", "N", m, n, k, 0.0, a, m, b, k, 1.0, c9, m);
-        assertArrayEquals(expected3, c9);
+        assertArrayEquals(expected3, c9, depsilon);
 
         double[] c10 = c.clone();
         blas.dgemm("N", "T", m, n, k, 0.0, a, m, bT, n, 1.0, c10, m);
-        assertArrayEquals(expected3, c10);
+        assertArrayEquals(expected3, c10, depsilon);
 
         double[] c11 = c.clone();
         blas.dgemm("T", "N", m, n, k, 0.0, aT, k, b, k, 1.0, c11, m);
-        assertArrayEquals(expected3, c11);
+        assertArrayEquals(expected3, c11, depsilon);
 
         double[] c12 = c.clone();
         blas.dgemm("T", "T", m, n, k, 0.0, aT, k, bT, n, 1.0, c12, m);
-        assertArrayEquals(expected3, c12);
+        assertArrayEquals(expected3, c12, depsilon);
     }
 }

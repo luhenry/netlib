@@ -49,6 +49,6 @@ public class DsyrTest extends BLASTest {
 
         double[] a1 = a.clone();
         blas.dsyr("U", n, alpha, x, 1, a1, n);
-        assertArrayEquals(expected, a1);
+        assertArrayEquals(expected, a1, depsilon);
     }
 }

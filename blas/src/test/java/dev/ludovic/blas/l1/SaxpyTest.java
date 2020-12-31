@@ -43,6 +43,6 @@ public class SaxpyTest extends BLASTest {
 
         float[] y1 = y.clone();
         blas.saxpy(n, alpha, x, 1, y1, 1);
-        assertArrayEquals(expected, y1);
+        assertArrayEquals(expected, y1, sepsilon);
     }
 }

@@ -41,7 +41,7 @@ public class SswapTest extends BLASTest {
         float[] x1 = x.clone();
         float[] y1 = y.clone();
         blas.sswap(n, x1, 1, y1, 1);
-        assertArrayEquals(x, y1);
-        assertArrayEquals(y, x1);
+        assertArrayEquals(x, y1, sepsilon);
+        assertArrayEquals(y, x1, sepsilon);
     }
 }

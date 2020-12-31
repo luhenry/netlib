@@ -49,6 +49,6 @@ public class SsyrTest extends BLASTest {
 
         float[] a1 = a.clone();
         blas.ssyr("U", n, alpha, x, 1, a1, n);
-        assertArrayEquals(expected, a1);
+        assertArrayEquals(expected, a1, sepsilon);
     }
 }

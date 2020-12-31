@@ -59,30 +59,30 @@ public class SspmvTest extends BLASTest {
 
         float[] y1 = y.clone();
         blas.sspmv("U", n,  1.0f, a, x, 1,  1.0f, y1, 1);
-        assertArrayEquals(expected1, y1);
+        assertArrayEquals(expected1, y1, sepsilon);
 
         float[] y2 = y.clone();
         blas.sspmv("U", n,  0.5f, a, x, 1,  1.0f, y2, 1);
-        assertArrayEquals(expected2, y2);
+        assertArrayEquals(expected2, y2, sepsilon);
 
         float[] y3 = y.clone();
         blas.sspmv("U", n, -0.5f, a, x, 1,  1.0f, y3, 1);
-        assertArrayEquals(expected3, y3);
+        assertArrayEquals(expected3, y3, sepsilon);
 
         float[] y4 = y.clone();
         blas.sspmv("U", n,  0.0f, a, x, 1,  1.0f, y4, 1);
-        assertArrayEquals(expected4, y4);
+        assertArrayEquals(expected4, y4, sepsilon);
 
         float[] y5 = y.clone();
         blas.sspmv("U", n,  1.0f, a, x, 1,  0.5f, y5, 1);
-        assertArrayEquals(expected5, y5);
+        assertArrayEquals(expected5, y5, sepsilon);
 
         float[] y6 = y.clone();
         blas.sspmv("U", n,  1.0f, a, x, 1, -0.5f, y6, 1);
-        assertArrayEquals(expected6, y6);
+        assertArrayEquals(expected6, y6, sepsilon);
 
         float[] y7 = y.clone();
         blas.sspmv("U", n,  1.0f, a, x, 1,  0.0f, y7, 1);
-        assertArrayEquals(expected7, y7);
+        assertArrayEquals(expected7, y7, sepsilon);
     }
 }

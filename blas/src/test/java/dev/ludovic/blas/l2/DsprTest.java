@@ -49,6 +49,6 @@ public class DsprTest extends BLASTest {
 
         double[] a1 = a.clone();
         blas.dspr("U", n, alpha, x, 1, a1);
-        assertArrayEquals(expected, a1);
+        assertArrayEquals(expected, a1, depsilon);
     }
 }

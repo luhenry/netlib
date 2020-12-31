@@ -56,18 +56,18 @@ public class SgemvTest extends BLASTest {
 
         float[] y1 = y.clone();
         blas.sgemv("N", m, n, 1.0f, a, m, x, 1, 2.0f, y1, 1);
-        assertArrayEquals(expected2, y1);
+        assertArrayEquals(expected2, y1, sepsilon);
 
         float[] y2 = y.clone();
         blas.sgemv("T", n, m, 1.0f, aT, n, x, 1, 2.0f, y2, 1);
-        assertArrayEquals(expected2, y2);
+        assertArrayEquals(expected2, y2, sepsilon);
 
         float[] y3 = y.clone();
         blas.sgemv("N", m, n, 2.0f, a, m, x, 1, 2.0f, y3, 1);
-        assertArrayEquals(expected3, y3);
+        assertArrayEquals(expected3, y3, sepsilon);
 
         float[] y4 = y.clone();
         blas.sgemv("T", n, m, 2.0f, aT, n, x, 1, 2.0f, y4, 1);
-        assertArrayEquals(expected3, y4);
+        assertArrayEquals(expected3, y4, sepsilon);
     }
 }

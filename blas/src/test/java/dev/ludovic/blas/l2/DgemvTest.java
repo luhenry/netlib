@@ -56,18 +56,18 @@ public class DgemvTest extends BLASTest {
 
         double[] y1 = y.clone();
         blas.dgemv("N", m, n, 1.0, a, m, x, 1, 2.0, y1, 1);
-        assertArrayEquals(expected2, y1);
+        assertArrayEquals(expected2, y1, depsilon);
 
         double[] y2 = y.clone();
         blas.dgemv("T", n, m, 1.0, aT, n, x, 1, 2.0, y2, 1);
-        assertArrayEquals(expected2, y2);
+        assertArrayEquals(expected2, y2, depsilon);
 
         double[] y3 = y.clone();
         blas.dgemv("N", m, n, 2.0, a, m, x, 1, 2.0, y3, 1);
-        assertArrayEquals(expected3, y3);
+        assertArrayEquals(expected3, y3, depsilon);
 
         double[] y4 = y.clone();
         blas.dgemv("T", n, m, 2.0, aT, n, x, 1, 2.0, y4, 1);
-        assertArrayEquals(expected3, y4);
+        assertArrayEquals(expected3, y4, depsilon);
     }
 }

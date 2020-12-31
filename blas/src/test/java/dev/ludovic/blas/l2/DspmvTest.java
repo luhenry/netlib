@@ -59,30 +59,30 @@ public class DspmvTest extends BLASTest {
 
         double[] y1 = y.clone();
         blas.dspmv("U", n,  1.0, a, x, 1,  1.0, y1, 1);
-        assertArrayEquals(expected1, y1);
+        assertArrayEquals(expected1, y1, depsilon);
 
         double[] y2 = y.clone();
         blas.dspmv("U", n,  0.5, a, x, 1,  1.0, y2, 1);
-        assertArrayEquals(expected2, y2);
+        assertArrayEquals(expected2, y2, depsilon);
 
         double[] y3 = y.clone();
         blas.dspmv("U", n, -0.5, a, x, 1,  1.0, y3, 1);
-        assertArrayEquals(expected3, y3);
+        assertArrayEquals(expected3, y3, depsilon);
 
         double[] y4 = y.clone();
         blas.dspmv("U", n,  0.0, a, x, 1,  1.0, y4, 1);
-        assertArrayEquals(expected4, y4);
+        assertArrayEquals(expected4, y4, depsilon);
 
         double[] y5 = y.clone();
         blas.dspmv("U", n,  1.0, a, x, 1,  0.5, y5, 1);
-        assertArrayEquals(expected5, y5);
+        assertArrayEquals(expected5, y5, depsilon);
 
         double[] y6 = y.clone();
         blas.dspmv("U", n,  1.0, a, x, 1, -0.5, y6, 1);
-        assertArrayEquals(expected6, y6);
+        assertArrayEquals(expected6, y6, depsilon);
 
         double[] y7 = y.clone();
         blas.dspmv("U", n,  1.0, a, x, 1,  0.0, y7, 1);
-        assertArrayEquals(expected7, y7);
+        assertArrayEquals(expected7, y7, depsilon);
     }
 }

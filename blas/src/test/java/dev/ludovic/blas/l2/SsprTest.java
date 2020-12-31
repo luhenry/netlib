@@ -49,6 +49,6 @@ public class SsprTest extends BLASTest {
 
         float[] a1 = a.clone();
         blas.sspr("U", n, alpha, x, 1, a1);
-        assertArrayEquals(expected, a1);
+        assertArrayEquals(expected, a1, sepsilon);
     }
 }

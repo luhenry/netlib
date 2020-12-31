@@ -48,7 +48,7 @@ public class SrotTest extends BLASTest {
         float[] x1 = x.clone();
         float[] y1 = y.clone();
         blas.srot(n, x1, 1, y1, 1, c, s);
-        assertArrayEquals(xexpected, x1);
-        assertArrayEquals(yexpected, y1);
+        assertArrayEquals(xexpected, x1, sepsilon);
+        assertArrayEquals(yexpected, y1, sepsilon);
     }
 }

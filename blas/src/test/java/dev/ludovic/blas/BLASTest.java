@@ -29,6 +29,9 @@ import org.junit.jupiter.params.provider.Arguments;
 
 public class BLASTest {
 
+    final static double depsilon = 1e-15d;
+    final static float sepsilon = 1e-15f;
+
     private static Stream<Arguments> BLASImplementations() {
         return Stream.of(
             Arguments.of(dev.ludovic.blas.NetlibWrapperBLAS.getInstance(new com.github.fommil.netlib.F2jBLAS())),

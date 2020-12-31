@@ -41,6 +41,6 @@ public class SscalTest extends BLASTest {
 
         float[] x1 = x.clone();
         blas.sscal(n, alpha, x1, 1);
-        assertArrayEquals(expected, x1);
+        assertArrayEquals(expected, x1, sepsilon);
     }
 }

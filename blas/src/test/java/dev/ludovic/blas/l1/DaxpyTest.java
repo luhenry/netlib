@@ -43,6 +43,6 @@ public class DaxpyTest extends BLASTest {
 
         double[] y1 = y.clone();
         blas.daxpy(n, alpha, x, 1, y1, 1);
-        assertArrayEquals(expected, y1);
+        assertArrayEquals(expected, y1, depsilon);
     }
 }

@@ -48,7 +48,7 @@ public class DrotTest extends BLASTest {
         double[] x1 = x.clone();
         double[] y1 = y.clone();
         blas.drot(n, x1, 1, y1, 1, c, s);
-        assertArrayEquals(xexpected, x1);
-        assertArrayEquals(yexpected, y1);
+        assertArrayEquals(xexpected, x1, depsilon);
+        assertArrayEquals(yexpected, y1, depsilon);
     }
 }
