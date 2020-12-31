@@ -48,9 +48,9 @@ public class SgemvBenchmark extends BLASBenchmark {
     public float[] a;
     public float[] x;
     public float beta;
-    public float[] y;
+    public float[] y, yclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomFloat();
         a = randomFloatArray(m * n);
@@ -59,9 +59,14 @@ public class SgemvBenchmark extends BLASBenchmark {
         y = randomFloatArray(trans.equals("T") ? n : m);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        yclone = y.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.sgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
-        bh.consume(y);
+        blas.sgemv(trans, m, n, alpha, a, m, x, 1, beta, yclone, 1);
+        bh.consume(yclone);
     }
 }

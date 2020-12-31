@@ -35,23 +35,31 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
 public class SsyrBenchmark extends BLASBenchmark {
 
+    @Param({"U", "L"})
+    public String uplo;
+
     @Param({"10", "10000"})
     public int n;
 
     public float alpha;
-    public float[] a;
+    public float[] a, aclone;
     public float[] x;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomFloat();
         a = randomFloatArray(n * n);
         x = randomFloatArray(n);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        aclone = a.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.ssyr("U", n, alpha, x, 1, a, n);
-        bh.consume(a);
+        blas.ssyr(uplo, n, alpha, x, 1, aclone, n);
+        bh.consume(aclone);
     }
 }

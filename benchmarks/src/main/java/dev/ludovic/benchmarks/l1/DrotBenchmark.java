@@ -38,12 +38,12 @@ public class DrotBenchmark extends BLASBenchmark {
     @Param({"100", "10000000"})
     public int n;
 
-    public double[] x;
-    public double[] y;
+    public double[] x, xclone;
+    public double[] y, yclone;
     public double c;
     public double s;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         x = randomDoubleArray(n);
         y = randomDoubleArray(n);
@@ -51,10 +51,16 @@ public class DrotBenchmark extends BLASBenchmark {
         s = randomDouble();
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        xclone = x.clone();
+        yclone = y.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.drot(n, x, 1, y, 1, c, s);
-        bh.consume(x);
-        bh.consume(y);
+        blas.drot(n, xclone, 1, yclone, 1, c, s);
+        bh.consume(xclone);
+        bh.consume(yclone);
     }
 }

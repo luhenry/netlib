@@ -37,12 +37,12 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
 public class DrotgBenchmark extends BLASBenchmark {
 
-    public doubleW sa;
-    public doubleW sb;
-    public doubleW c;
-    public doubleW s;
+    public doubleW sa, saclone;
+    public doubleW sb, sbclone;
+    public doubleW c, cclone;
+    public doubleW s, sclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         sa = new doubleW(randomDouble());
         sb = new doubleW(randomDouble());
@@ -50,12 +50,20 @@ public class DrotgBenchmark extends BLASBenchmark {
         s = new doubleW(randomDouble());
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        saclone = new doubleW(sa.val);
+        sbclone = new doubleW(sb.val);
+        cclone = new doubleW(c.val);
+        sclone = new doubleW(s.val);
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.drotg(sa, sb, c, s);
-        bh.consume(sa);
-        bh.consume(sb);
-        bh.consume(c);
-        bh.consume(s);
+        blas.drotg(saclone, sbclone, cclone, sclone);
+        bh.consume(saclone);
+        bh.consume(sbclone);
+        bh.consume(cclone);
+        bh.consume(sclone);
     }
 }

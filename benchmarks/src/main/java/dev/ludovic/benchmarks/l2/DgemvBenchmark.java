@@ -48,9 +48,9 @@ public class DgemvBenchmark extends BLASBenchmark {
     public double[] a;
     public double[] x;
     public double beta;
-    public double[] y;
+    public double[] y, yclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomDouble();
         a = randomDoubleArray(m * n);
@@ -59,9 +59,14 @@ public class DgemvBenchmark extends BLASBenchmark {
         y = randomDoubleArray(trans.equals("T") ? n : m);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        yclone = y.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dgemv(trans, m, n, alpha, a, m, x, 1, beta, y, 1);
-        bh.consume(y);
+        blas.dgemv(trans, m, n, alpha, a, m, x, 1, beta, yclone, 1);
+        bh.consume(yclone);
     }
 }

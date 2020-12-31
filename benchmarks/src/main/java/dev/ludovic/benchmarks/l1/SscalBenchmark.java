@@ -39,17 +39,22 @@ public class SscalBenchmark extends BLASBenchmark {
     public int n;
 
     public float alpha;
-    public float[] x;
+    public float[] x, xclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomFloat();
         x = randomFloatArray(n);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        xclone = x.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.sscal(n, alpha, x, 1);
-        bh.consume(x);
+        blas.sscal(n, alpha, xclone, 1);
+        bh.consume(xclone);
     }
 }

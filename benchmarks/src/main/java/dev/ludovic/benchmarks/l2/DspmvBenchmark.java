@@ -45,9 +45,9 @@ public class DspmvBenchmark extends BLASBenchmark {
     public double[] a;
     public double[] x;
     public double beta;
-    public double[] y;
+    public double[] y, yclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomDouble();
         a = randomDoubleArray(n * (n + 1) / 2);
@@ -56,9 +56,14 @@ public class DspmvBenchmark extends BLASBenchmark {
         y = randomDoubleArray(n);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        yclone = y.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dspmv(uplo, n, alpha, a, x, 1, beta, y, 1);
-        bh.consume(y);
+        blas.dspmv(uplo, n, alpha, a, x, 1, beta, yclone, 1);
+        bh.consume(yclone);
     }
 }

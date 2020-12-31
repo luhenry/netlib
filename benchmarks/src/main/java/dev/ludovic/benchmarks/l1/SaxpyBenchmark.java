@@ -40,18 +40,23 @@ public class SaxpyBenchmark extends BLASBenchmark {
 
     public float alpha;
     public float[] x;
-    public float[] y;
+    public float[] y, yclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomFloat();
         x = randomFloatArray(n);
         y = randomFloatArray(n);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        yclone = y.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.saxpy(n, alpha, x, 1, y, 1);
-        bh.consume(y);
+        blas.saxpy(n, alpha, x, 1, yclone, 1);
+        bh.consume(yclone);
     }
 }

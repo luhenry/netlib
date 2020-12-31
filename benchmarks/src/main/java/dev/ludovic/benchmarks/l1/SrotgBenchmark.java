@@ -37,12 +37,12 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
 public class SrotgBenchmark extends BLASBenchmark {
 
-    public floatW sa;
-    public floatW sb;
-    public floatW c;
-    public floatW s;
+    public floatW sa, saclone;
+    public floatW sb, sbclone;
+    public floatW c, cclone;
+    public floatW s, sclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         sa = new floatW(randomFloat());
         sb = new floatW(randomFloat());
@@ -50,12 +50,20 @@ public class SrotgBenchmark extends BLASBenchmark {
         s = new floatW(randomFloat());
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        saclone = new floatW(sa.val);
+        sbclone = new floatW(sb.val);
+        cclone = new floatW(c.val);
+        sclone = new floatW(s.val);
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.srotg(sa, sb, c, s);
-        bh.consume(sa);
-        bh.consume(sb);
-        bh.consume(c);
-        bh.consume(s);
+        blas.srotg(saclone, sbclone, cclone, sclone);
+        bh.consume(saclone);
+        bh.consume(sbclone);
+        bh.consume(cclone);
+        bh.consume(sclone);
     }
 }

@@ -40,18 +40,23 @@ public class DaxpyBenchmark extends BLASBenchmark {
 
     public double alpha;
     public double[] x;
-    public double[] y;
+    public double[] y, yclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomDouble();
         x = randomDoubleArray(n);
         y = randomDoubleArray(n);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        yclone = y.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.daxpy(n, alpha, x, 1, y, 1);
-        bh.consume(y);
+        blas.daxpy(n, alpha, x, 1, yclone, 1);
+        bh.consume(yclone);
     }
 }

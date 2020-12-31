@@ -53,10 +53,10 @@ public class DgemmBenchmark extends BLASBenchmark {
     public double[] b;
     public int ldb;
     public double beta;
-    public double[] c;
+    public double[] c, cclone;
     public int ldc;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomDouble();
         a = randomDoubleArray(k * m);
@@ -65,9 +65,14 @@ public class DgemmBenchmark extends BLASBenchmark {
         c = randomDoubleArray(m * n);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        cclone = c.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, c, m);
-        bh.consume(c);
+        blas.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, cclone, m);
+        bh.consume(cclone);
     }
 }

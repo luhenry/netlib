@@ -38,12 +38,12 @@ public class SrotBenchmark extends BLASBenchmark {
     @Param({"100", "10000000"})
     public int n;
 
-    public float[] x;
-    public float[] y;
+    public float[] x, xclone;
+    public float[] y, yclone;
     public float c;
     public float s;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         x = randomFloatArray(n);
         y = randomFloatArray(n);
@@ -51,10 +51,16 @@ public class SrotBenchmark extends BLASBenchmark {
         s = randomFloat();
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        xclone = x.clone();
+        yclone = y.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.srot(n, x, 1, y, 1, c, s);
-        bh.consume(x);
-        bh.consume(y);
+        blas.srot(n, xclone, 1, yclone, 1, c, s);
+        bh.consume(xclone);
+        bh.consume(yclone);
     }
 }

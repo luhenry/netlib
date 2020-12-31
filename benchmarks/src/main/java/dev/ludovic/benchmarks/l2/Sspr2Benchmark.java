@@ -42,11 +42,11 @@ public class Sspr2Benchmark extends BLASBenchmark {
     public int n;
 
     public float alpha;
-    public float[] a;
+    public float[] a, aclone;
     public float[] x;
     public float[] y;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomFloat();
         a = randomFloatArray(n * (n + 1) / 2);
@@ -54,9 +54,14 @@ public class Sspr2Benchmark extends BLASBenchmark {
         y = randomFloatArray(n);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        aclone = a.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.sspr2(uplo, n, alpha, x, 1, y, 1, a);
-        bh.consume(a);
+        blas.sspr2(uplo, n, alpha, x, 1, y, 1, aclone);
+        bh.consume(aclone);
     }
 }

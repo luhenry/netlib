@@ -45,9 +45,9 @@ public class SsymvBenchmark extends BLASBenchmark {
     public float[] a;
     public float[] x;
     public float beta;
-    public float[] y;
+    public float[] y, yclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         alpha = randomFloat();
         a = randomFloatArray(n * n);
@@ -56,9 +56,14 @@ public class SsymvBenchmark extends BLASBenchmark {
         y = randomFloatArray(n);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        yclone = y.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.ssymv(uplo, n, alpha, a, n, x, 1, beta, y, 1);
-        bh.consume(y);
+        blas.ssymv(uplo, n, alpha, a, n, x, 1, beta, yclone, 1);
+        bh.consume(yclone);
     }
 }

@@ -38,19 +38,25 @@ public class DswapBenchmark extends BLASBenchmark {
     @Param({"100", "10000000"})
     public int n;
 
-    public double[] x;
-    public double[] y;
+    public double[] x, xclone;
+    public double[] y, yclone;
 
-    @Setup
+    @Setup(Level.Trial)
     public void setup() {
         x = randomDoubleArray(n);
         y = randomDoubleArray(n);
     }
 
+    @Setup(Level.Invocation)
+    public void setupIteration() {
+        xclone = x.clone();
+        yclone = y.clone();
+    }
+
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dswap(n, x, 1, y, 1);
-        bh.consume(x);
-        bh.consume(y);
+        blas.dswap(n, xclone, 1, yclone, 1);
+        bh.consume(xclone);
+        bh.consume(yclone);
     }
 }
