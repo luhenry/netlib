@@ -442,12 +442,54 @@ public class JavaBLAS implements BLAS {
     }
   }
 
+  // A += alpha * x * y.t
   public void dger(int m, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] a, int lda) {
     dger(m, n, alpha, x, 0, incx, y, 0, incy, a, 0, lda);
   }
 
   public void dger(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
-    f2j.dger(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    if (m < 0) {
+      throw illegalArgument("DGER", 1);
+    }
+    if (n < 0) {
+      throw illegalArgument("DGER", 2);
+    }
+    if (incx == 0) {
+      throw illegalArgument("DGER", 5);
+    }
+    if (incy == 0) {
+      throw illegalArgument("DGER", 7);
+    }
+    if (lda < Math.max(1, m)) {
+      throw illegalArgument("DGER", 9);
+    }
+    if (m == 0 || n == 0) {
+      return;
+    }
+    if (alpha != 0.0) {
+      int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+      for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
+        double alphayiy0 = alpha * y[offsety + iy + incy * 0];
+        double alphayiy1 = alpha * y[offsety + iy + incy * 1];
+        double alphayiy2 = alpha * y[offsety + iy + incy * 2];
+        double alphayiy3 = alpha * y[offsety + iy + incy * 3];
+        int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (; row < m; row += 1, jx += incx) {
+          double xjx = x[offsetx + jx];
+          a[offseta + row + (col + 0) * lda] += alphayiy0 * xjx;
+          a[offseta + row + (col + 1) * lda] += alphayiy1 * xjx;
+          a[offseta + row + (col + 2) * lda] += alphayiy2 * xjx;
+          a[offseta + row + (col + 3) * lda] += alphayiy3 * xjx;
+        }
+      }
+      for (; col < n; col += 1, iy += incy) {
+        double alphayiy = alpha * y[offsety + iy];
+        int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (; row < m; row += 1, jx += incx) {
+          a[offseta + row + col * lda] += alphayiy * x[offsetx + jx];
+        }
+      }
+    }
   }
 
   public void sger(int m, int n, float alpha, float[] x, int incx, float[] y, int incy, float[] a, int lda) {
@@ -455,7 +497,48 @@ public class JavaBLAS implements BLAS {
   }
 
   public void sger(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
-    f2j.sger(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    if (m < 0) {
+      throw illegalArgument("SGER", 1);
+    }
+    if (n < 0) {
+      throw illegalArgument("SGER", 2);
+    }
+    if (incx == 0) {
+      throw illegalArgument("SGER", 5);
+    }
+    if (incy == 0) {
+      throw illegalArgument("SGER", 7);
+    }
+    if (lda < Math.max(1, m)) {
+      throw illegalArgument("SGER", 9);
+    }
+    if (m == 0 || n == 0) {
+      return;
+    }
+    if (alpha != 0.0) {
+      int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+      for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
+        float alphayiy0 = alpha * y[offsety + iy + incy * 0];
+        float alphayiy1 = alpha * y[offsety + iy + incy * 1];
+        float alphayiy2 = alpha * y[offsety + iy + incy * 2];
+        float alphayiy3 = alpha * y[offsety + iy + incy * 3];
+        int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (; row < m; row += 1, jx += incx) {
+          float xjx = x[offsetx + jx];
+          a[offseta + row + (col + 0) * lda] += alphayiy0 * xjx;
+          a[offseta + row + (col + 1) * lda] += alphayiy1 * xjx;
+          a[offseta + row + (col + 2) * lda] += alphayiy2 * xjx;
+          a[offseta + row + (col + 3) * lda] += alphayiy3 * xjx;
+        }
+      }
+      for (; col < n; col += 1, iy += incy) {
+        float alphayiy = alpha * y[offsety + iy];
+        int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (; row < m; row += 1, jx += incx) {
+          a[offseta + row + col * lda] += alphayiy * x[offsetx + jx];
+        }
+      }
+    }
   }
 
   public double dnrm2(int n, double[] x, int incx) {
