@@ -647,6 +647,9 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return;
     }
+    if (incx <= 0) {
+      return;
+    }
     if (alpha == 1.0) {
       return;
     }
@@ -662,6 +665,9 @@ public class JavaBLAS implements BLAS {
   // x = alpha * x
   public void sscal(int n, float alpha, float[] x, int offsetx, int incx) {
     if (n <= 0) {
+      return;
+    }
+    if (incx <= 0) {
       return;
     }
     if (alpha == 1.0) {
