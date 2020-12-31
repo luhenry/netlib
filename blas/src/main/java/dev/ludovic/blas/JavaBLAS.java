@@ -1482,7 +1482,70 @@ public class JavaBLAS implements BLAS {
   }
 
   public void dsyr2(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
-    f2j.dsyr2(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    if (!lsame("U", uplo) && !lsame("L", uplo)) {
+      throw illegalArgument("DSYR2", 1);
+    }
+    if (n < 0) {
+      throw illegalArgument("DSYR2", 2);
+    }
+    if (incx == 0) {
+      throw illegalArgument("DSYR2", 5);
+    }
+    if (incy == 0) {
+      throw illegalArgument("DSYR2", 7);
+    }
+    if (lda < Math.max(1, n)) {
+      throw illegalArgument("DSYR2", 9);
+    }
+    if (n == 0) {
+      return;
+    }
+    if (alpha != 0.0) {
+      if (lsame("U", uplo)) {
+        int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+        for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
+          double alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          double alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          double alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          double alphaxix3 = alpha * x[offsetx + ix + incx * 3];
+          double alphayiy0 = alpha * y[offsety + iy + incy * 0];
+          double alphayiy1 = alpha * y[offsety + iy + incy * 1];
+          double alphayiy2 = alpha * y[offsety + iy + incy * 2];
+          double alphayiy3 = alpha * y[offsety + iy + incy * 3];
+          int row = 0, jx = incx < 0 ? col * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+          for (; row < col + 1; row += 1, jx += incx, jy += incy) {
+            double xjx = x[offsetx + jx];
+            double yjy = y[offsety + jy];
+            a[offseta + row + (col + 0) * lda] += alphaxix0 * yjy + alphayiy0 * xjx;
+            a[offseta + row + (col + 1) * lda] += alphaxix1 * yjy + alphayiy1 * xjx;
+            a[offseta + row + (col + 2) * lda] += alphaxix2 * yjy + alphayiy2 * xjx;
+            a[offseta + row + (col + 3) * lda] += alphaxix3 * yjy + alphayiy3 * xjx;
+          }
+          double xjx0 = x[offsetx + jx + incx * 0];
+          double yjy0 = y[offsety + jy + incy * 0];
+          a[offseta + (row + 0) + (col + 1) * lda] += alphaxix1 * yjy0 + alphayiy1 * xjx0;
+          a[offseta + (row + 0) + (col + 2) * lda] += alphaxix2 * yjy0 + alphayiy2 * xjx0;
+          a[offseta + (row + 0) + (col + 3) * lda] += alphaxix3 * yjy0 + alphayiy3 * xjx0;
+          double xjx1 = x[offsetx + jx + incx * 1];
+          double yjy1 = y[offsety + jy + incy * 1];
+          a[offseta + (row + 1) + (col + 2) * lda] += alphaxix2 * yjy1 + alphayiy2 * xjx1;
+          a[offseta + (row + 1) + (col + 3) * lda] += alphaxix3 * yjy1 + alphayiy3 * xjx1;
+          double xjx2 = x[offsetx + jx + incx * 2];
+          double yjy2 = y[offsety + jy + incy * 2];
+          a[offseta + (row + 2) + (col + 3) * lda] += alphaxix3 * yjy2 + alphayiy3 * xjx2;
+        }
+        for (; col < n; col += 1, ix += incx, iy += incy) {
+          double alphaxix = alpha * x[offsetx + ix];
+          double alphayiy = alpha * y[offsety + iy];
+          int row = 0, jx = incx < 0 ? col * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+          for (; row < col + 1; row += 1, jx += incx, jy += incy) {
+            a[offseta + row + col * lda] += alphaxix * y[offsety + jy] + alphayiy * x[offsetx + jx];
+          }
+        }
+      } else {
+        f2j.dsyr2(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+      }
+    }
   }
 
   public void ssyr2(String uplo, int n, float alpha, float[] x, int incx, float[] y, int incy, float[] a, int lda) {
@@ -1490,7 +1553,70 @@ public class JavaBLAS implements BLAS {
   }
 
   public void ssyr2(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
-    f2j.ssyr2(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    if (!lsame("U", uplo) && !lsame("L", uplo)) {
+      throw illegalArgument("SSYR2", 1);
+    }
+    if (n < 0) {
+      throw illegalArgument("SSYR2", 2);
+    }
+    if (incx == 0) {
+      throw illegalArgument("SSYR2", 5);
+    }
+    if (incy == 0) {
+      throw illegalArgument("SSYR2", 7);
+    }
+    if (lda < Math.max(1, n)) {
+      throw illegalArgument("SSYR2", 9);
+    }
+    if (n == 0) {
+      return;
+    }
+    if (alpha != 0.0) {
+      if (lsame("U", uplo)) {
+        int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+        for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
+          float alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          float alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          float alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          float alphaxix3 = alpha * x[offsetx + ix + incx * 3];
+          float alphayiy0 = alpha * y[offsety + iy + incy * 0];
+          float alphayiy1 = alpha * y[offsety + iy + incy * 1];
+          float alphayiy2 = alpha * y[offsety + iy + incy * 2];
+          float alphayiy3 = alpha * y[offsety + iy + incy * 3];
+          int row = 0, jx = incx < 0 ? col * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+          for (; row < col + 1; row += 1, jx += incx, jy += incy) {
+            float xjx = x[offsetx + jx];
+            float yjy = y[offsety + jy];
+            a[offseta + row + (col + 0) * lda] += alphaxix0 * yjy + alphayiy0 * xjx;
+            a[offseta + row + (col + 1) * lda] += alphaxix1 * yjy + alphayiy1 * xjx;
+            a[offseta + row + (col + 2) * lda] += alphaxix2 * yjy + alphayiy2 * xjx;
+            a[offseta + row + (col + 3) * lda] += alphaxix3 * yjy + alphayiy3 * xjx;
+          }
+          float xjx0 = x[offsetx + jx + incx * 0];
+          float yjy0 = y[offsety + jy + incy * 0];
+          a[offseta + (row + 0) + (col + 1) * lda] += alphaxix1 * yjy0 + alphayiy1 * xjx0;
+          a[offseta + (row + 0) + (col + 2) * lda] += alphaxix2 * yjy0 + alphayiy2 * xjx0;
+          a[offseta + (row + 0) + (col + 3) * lda] += alphaxix3 * yjy0 + alphayiy3 * xjx0;
+          float xjx1 = x[offsetx + jx + incx * 1];
+          float yjy1 = y[offsety + jy + incy * 1];
+          a[offseta + (row + 1) + (col + 2) * lda] += alphaxix2 * yjy1 + alphayiy2 * xjx1;
+          a[offseta + (row + 1) + (col + 3) * lda] += alphaxix3 * yjy1 + alphayiy3 * xjx1;
+          float xjx2 = x[offsetx + jx + incx * 2];
+          float yjy2 = y[offsety + jy + incy * 2];
+          a[offseta + (row + 2) + (col + 3) * lda] += alphaxix3 * yjy2 + alphayiy3 * xjx2;
+        }
+        for (; col < n; col += 1, ix += incx, iy += incy) {
+          float alphaxix = alpha * x[offsetx + ix];
+          float alphayiy = alpha * y[offsety + iy];
+          int row = 0, jx = incx < 0 ? col * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+          for (; row < col + 1; row += 1, jx += incx, jy += incy) {
+            a[offseta + row + col * lda] += alphaxix * y[offsety + jy] + alphayiy * x[offsetx + jx];
+          }
+        }
+      } else {
+        f2j.ssyr2(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+      }
+    }
   }
 
   public void dsyr2k(String uplo, String trans, int n, int k, double alpha, double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
