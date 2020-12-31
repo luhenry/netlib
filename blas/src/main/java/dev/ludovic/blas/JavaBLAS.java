@@ -702,10 +702,10 @@ public class JavaBLAS implements BLAS {
       if (lsame("U", uplo)) {
         int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
         for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
-          double alphaix0 = alpha * x[offsetx + ix + incx * 0];
-          double alphaix1 = alpha * x[offsetx + ix + incx * 1];
-          double alphaix2 = alpha * x[offsetx + ix + incx * 2];
-          double alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          double alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          double alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          double alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          double alphaxix3 = alpha * x[offsetx + ix + incx * 3];
           double sumiy0 = 0.0;
           double sumiy1 = 0.0;
           double sumiy2 = 0.0;
@@ -716,10 +716,10 @@ public class JavaBLAS implements BLAS {
             double a1 = a[offseta + row + (col + 1) * ((col + 1) + 1) / 2];
             double a2 = a[offseta + row + (col + 2) * ((col + 2) + 1) / 2];
             double a3 = a[offseta + row + (col + 3) * ((col + 3) + 1) / 2];
-            y[offsety + jy] += alphaix0 * a0
-                            +  alphaix1 * a1
-                            +  alphaix2 * a2
-                            +  alphaix3 * a3;
+            y[offsety + jy] += alphaxix0 * a0
+                            +  alphaxix1 * a1
+                            +  alphaxix2 * a2
+                            +  alphaxix3 * a3;
             double xjx = x[offsetx + jx];
             sumiy0 += xjx * a0;
             sumiy1 += xjx * a1;
@@ -752,11 +752,11 @@ public class JavaBLAS implements BLAS {
                                      +  alpha * xjx3 * a[offseta + (row + 3) + (col + 3) * ((col + 3) + 1) / 2];
         }
         for (; col < n; col += 1, ix += incx, iy += incy) {
-          double alphaix = alpha * x[offsetx + ix];
+          double alphaxix = alpha * x[offsetx + ix];
           double sumiy = 0.0;
           int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
           for (; row < col; row += 1, jx += incx, jy += incy) {
-            y[offsety + jy] += alphaix * a[offseta + row + col * (col + 1) / 2];
+            y[offsety + jy] += alphaxix * a[offseta + row + col * (col + 1) / 2];
             sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
           }
           y[offsety + iy] += alpha * (sumiy + x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2]);
@@ -796,10 +796,10 @@ public class JavaBLAS implements BLAS {
       if (lsame("U", uplo)) {
         int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
         for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
-          float alphaix0 = alpha * x[offsetx + ix + incx * 0];
-          float alphaix1 = alpha * x[offsetx + ix + incx * 1];
-          float alphaix2 = alpha * x[offsetx + ix + incx * 2];
-          float alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          float alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          float alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          float alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          float alphaxix3 = alpha * x[offsetx + ix + incx * 3];
           float sumiy0 = 0.0f;
           float sumiy1 = 0.0f;
           float sumiy2 = 0.0f;
@@ -810,10 +810,10 @@ public class JavaBLAS implements BLAS {
             float a1 = a[offseta + row + (col + 1) * ((col + 1) + 1) / 2];
             float a2 = a[offseta + row + (col + 2) * ((col + 2) + 1) / 2];
             float a3 = a[offseta + row + (col + 3) * ((col + 3) + 1) / 2];
-            y[offsety + jy] += alphaix0 * a0
-                            +  alphaix1 * a1
-                            +  alphaix2 * a2
-                            +  alphaix3 * a3;
+            y[offsety + jy] += alphaxix0 * a0
+                            +  alphaxix1 * a1
+                            +  alphaxix2 * a2
+                            +  alphaxix3 * a3;
             float xjx = x[offsetx + jx];
             sumiy0 += xjx * a0;
             sumiy1 += xjx * a1;
@@ -846,11 +846,11 @@ public class JavaBLAS implements BLAS {
                                      +  alpha * xjx3 * a[offseta + (row + 3) + (col + 3) * ((col + 3) + 1) / 2];
         }
         for (; col < n; col += 1, ix += incx, iy += incy) {
-          float alphaix = alpha * x[offsetx + ix];
+          float alphaxix = alpha * x[offsetx + ix];
           float sumiy = 0.0f;
           int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
           for (; row < col; row += 1, jx += incx, jy += incy) {
-            y[offsety + jy] += alphaix * a[offseta + row + col * (col + 1) / 2];
+            y[offsety + jy] += alphaxix * a[offseta + row + col * (col + 1) / 2];
             sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
           }
           y[offsety + iy] += alpha * (sumiy + x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2]);
@@ -879,38 +879,37 @@ public class JavaBLAS implements BLAS {
     if (n == 0) {
       return;
     }
-    // y += alpha * x * x.t
     if (alpha != 0.0) {
       if (lsame("U", uplo)) {
         int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
         for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
-          double alphaix0 = alpha * x[offsetx + ix + incx * 0];
-          double alphaix1 = alpha * x[offsetx + ix + incx * 1];
-          double alphaix2 = alpha * x[offsetx + ix + incx * 2];
-          double alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          double alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          double alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          double alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          double alphaxix3 = alpha * x[offsetx + ix + incx * 3];
           int row = 0, jx = incx < 0 ? col * -incx : 0;
           for (; row < col + 1; row += 1, jx += incx) {
             double xjx = x[offsetx + jx];
-            a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphaix0 * xjx;
-            a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphaix1 * xjx;
-            a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx;
-            a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx;
+            a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphaxix0 * xjx;
+            a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphaxix1 * xjx;
+            a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphaxix2 * xjx;
+            a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphaxix3 * xjx;
           }
           double xjx0 = x[offsetx + jx + incx * 0];
-          a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphaix1 * xjx0;
-          a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx0;
-          a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx0;
+          a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphaxix1 * xjx0;
+          a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphaxix2 * xjx0;
+          a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphaxix3 * xjx0;
           double xjx1 = x[offsetx + jx + incx * 1];
-          a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx1;
-          a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx1;
+          a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphaxix2 * xjx1;
+          a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphaxix3 * xjx1;
           double xjx2 = x[offsetx + jx + incx * 2];
-          a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx2;
+          a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphaxix3 * xjx2;
         }
         for (; col < n; col += 1, ix += incx) {
-          double alphaix = alpha * x[offsetx + ix];
+          double alphaxix = alpha * x[offsetx + ix];
           int row = 0, jx = incx < 0 ? col * -incx : 0;
           for (; row < col + 1; row += 1, jx += incx) {
-            a[offseta + row + col * (col + 1) / 2] += alphaix * x[offsetx + jx];
+            a[offseta + row + col * (col + 1) / 2] += alphaxix * x[offsetx + jx];
           }
         }
       } else {
@@ -941,33 +940,33 @@ public class JavaBLAS implements BLAS {
       if (lsame("U", uplo)) {
         int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
         for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
-          float alphaix0 = alpha * x[offsetx + ix + incx * 0];
-          float alphaix1 = alpha * x[offsetx + ix + incx * 1];
-          float alphaix2 = alpha * x[offsetx + ix + incx * 2];
-          float alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          float alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          float alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          float alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          float alphaxix3 = alpha * x[offsetx + ix + incx * 3];
           int row = 0, jx = incx < 0 ? col * -incx : 0;
           for (; row < col + 1; row += 1, jx += incx) {
             float xjx = x[offsetx + jx];
-            a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphaix0 * xjx;
-            a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphaix1 * xjx;
-            a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx;
-            a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx;
+            a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphaxix0 * xjx;
+            a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphaxix1 * xjx;
+            a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphaxix2 * xjx;
+            a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphaxix3 * xjx;
           }
           float xjx0 = x[offsetx + jx + incx * 0];
-          a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphaix1 * xjx0;
-          a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx0;
-          a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx0;
+          a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphaxix1 * xjx0;
+          a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphaxix2 * xjx0;
+          a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphaxix3 * xjx0;
           float xjx1 = x[offsetx + jx + incx * 1];
-          a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphaix2 * xjx1;
-          a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx1;
+          a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphaxix2 * xjx1;
+          a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphaxix3 * xjx1;
           float xjx2 = x[offsetx + jx + incx * 2];
-          a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphaix3 * xjx2;
+          a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphaxix3 * xjx2;
         }
         for (; col < n; col += 1, ix += incx) {
-          float alphaix = alpha * x[offsetx + ix];
+          float alphaxix = alpha * x[offsetx + ix];
           int row = 0, jx = incx < 0 ? col * -incx : 0;
           for (; row < col + 1; row += 1, jx += incx) {
-            a[offseta + row + col * (col + 1) / 2] += alphaix * x[offsetx + jx];
+            a[offseta + row + col * (col + 1) / 2] += alphaxix * x[offsetx + jx];
           }
         }
       } else {
@@ -1199,20 +1198,20 @@ public class JavaBLAS implements BLAS {
       if (lsame("U", uplo)) {
         int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
         for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
-          double alphaix0 = alpha * x[offsetx + ix + incx * 0];
-          double alphaix1 = alpha * x[offsetx + ix + incx * 1];
-          double alphaix2 = alpha * x[offsetx + ix + incx * 2];
-          double alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          double alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          double alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          double alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          double alphaxix3 = alpha * x[offsetx + ix + incx * 3];
           double sumiy0 = 0.0;
           double sumiy1 = 0.0;
           double sumiy2 = 0.0;
           double sumiy3 = 0.0;
           int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
           for (; row < col; row += 1, jx += incx, jy += incy) {
-            y[offsety + jy] += alphaix0 * a[offseta + row + (col + 0) * lda]
-                            +  alphaix1 * a[offseta + row + (col + 1) * lda]
-                            +  alphaix2 * a[offseta + row + (col + 2) * lda]
-                            +  alphaix3 * a[offseta + row + (col + 3) * lda];
+            y[offsety + jy] += alphaxix0 * a[offseta + row + (col + 0) * lda]
+                            +  alphaxix1 * a[offseta + row + (col + 1) * lda]
+                            +  alphaxix2 * a[offseta + row + (col + 2) * lda]
+                            +  alphaxix3 * a[offseta + row + (col + 3) * lda];
             double xjx = x[offsetx + jx];
             sumiy0 += xjx * a[offseta + row + (col + 0) * lda];
             sumiy1 += xjx * a[offseta + row + (col + 1) * lda];
@@ -1245,11 +1244,11 @@ public class JavaBLAS implements BLAS {
                                      +  alpha * xjx3 * a[offseta + (row + 3) + (col + 3) * lda];
         }
         for (; col < n; col += 1, ix += incx, iy += incy) {
-          double alphaix = alpha * x[offsetx + ix];
+          double alphaxix = alpha * x[offsetx + ix];
           double sumiy = 0.0;
           int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
           for (; row < col; row += 1, jx += incx, jy += incy) {
-            y[offsety + jy] += alphaix * a[offseta + row + col * lda];
+            y[offsety + jy] += alphaxix * a[offseta + row + col * lda];
             sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
           }
           y[offsety + iy] += alpha * (sumiy + x[offsetx + jx] * a[offseta + row + col * lda]);
@@ -1292,20 +1291,20 @@ public class JavaBLAS implements BLAS {
       if (lsame("U", uplo)) {
         int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
         for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
-          float alphaix0 = alpha * x[offsetx + ix + incx * 0];
-          float alphaix1 = alpha * x[offsetx + ix + incx * 1];
-          float alphaix2 = alpha * x[offsetx + ix + incx * 2];
-          float alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          float alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          float alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          float alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          float alphaxix3 = alpha * x[offsetx + ix + incx * 3];
           float sumiy0 = 0.0f;
           float sumiy1 = 0.0f;
           float sumiy2 = 0.0f;
           float sumiy3 = 0.0f;
           int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
           for (; row < col; row += 1, jx += incx, jy += incy) {
-            y[offsety + jy] += alphaix0 * a[offseta + row + (col + 0) * lda]
-                            +  alphaix1 * a[offseta + row + (col + 1) * lda]
-                            +  alphaix2 * a[offseta + row + (col + 2) * lda]
-                            +  alphaix3 * a[offseta + row + (col + 3) * lda];
+            y[offsety + jy] += alphaxix0 * a[offseta + row + (col + 0) * lda]
+                            +  alphaxix1 * a[offseta + row + (col + 1) * lda]
+                            +  alphaxix2 * a[offseta + row + (col + 2) * lda]
+                            +  alphaxix3 * a[offseta + row + (col + 3) * lda];
             float xjx = x[offsetx + jx];
             sumiy0 += xjx * a[offseta + row + (col + 0) * lda];
             sumiy1 += xjx * a[offseta + row + (col + 1) * lda];
@@ -1338,11 +1337,11 @@ public class JavaBLAS implements BLAS {
                                      +  alpha * xjx3 * a[offseta + (row + 3) + (col + 3) * lda];
         }
         for (; col < n; col += 1, ix += incx, iy += incy) {
-          float alphaix = alpha * x[offsetx + ix];
+          float alphaxix = alpha * x[offsetx + ix];
           float sumiy = 0.0f;
           int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
           for (; row < col; row += 1, jx += incx, jy += incy) {
-            y[offsety + jy] += alphaix * a[offseta + row + col * lda];
+            y[offsety + jy] += alphaxix * a[offseta + row + col * lda];
             sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
           }
           y[offsety + iy] += alpha * (sumiy + x[offsetx + jx] * a[offseta + row + col * lda]);
@@ -1378,33 +1377,33 @@ public class JavaBLAS implements BLAS {
       if (lsame("U", uplo)) {
         int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
         for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
-          double alphaix0 = alpha * x[offsetx + ix + incx * 0];
-          double alphaix1 = alpha * x[offsetx + ix + incx * 1];
-          double alphaix2 = alpha * x[offsetx + ix + incx * 2];
-          double alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          double alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          double alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          double alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          double alphaxix3 = alpha * x[offsetx + ix + incx * 3];
           int row = 0, jx = incx < 0 ? col * -incx : 0;
           for (; row < col + 1; row += 1, jx += incx) {
             double xjx = x[offsetx + jx];
-            a[offseta + row + (col + 0) * lda] += alphaix0 * xjx;
-            a[offseta + row + (col + 1) * lda] += alphaix1 * xjx;
-            a[offseta + row + (col + 2) * lda] += alphaix2 * xjx;
-            a[offseta + row + (col + 3) * lda] += alphaix3 * xjx;
+            a[offseta + row + (col + 0) * lda] += alphaxix0 * xjx;
+            a[offseta + row + (col + 1) * lda] += alphaxix1 * xjx;
+            a[offseta + row + (col + 2) * lda] += alphaxix2 * xjx;
+            a[offseta + row + (col + 3) * lda] += alphaxix3 * xjx;
           }
           double xjx0 = x[offsetx + jx + incx * 0];
-          a[offseta + (row + 0) + (col + 1) * lda] += alphaix1 * xjx0;
-          a[offseta + (row + 0) + (col + 2) * lda] += alphaix2 * xjx0;
-          a[offseta + (row + 0) + (col + 3) * lda] += alphaix3 * xjx0;
+          a[offseta + (row + 0) + (col + 1) * lda] += alphaxix1 * xjx0;
+          a[offseta + (row + 0) + (col + 2) * lda] += alphaxix2 * xjx0;
+          a[offseta + (row + 0) + (col + 3) * lda] += alphaxix3 * xjx0;
           double xjx1 = x[offsetx + jx + incx * 1];
-          a[offseta + (row + 1) + (col + 2) * lda] += alphaix2 * xjx1;
-          a[offseta + (row + 1) + (col + 3) * lda] += alphaix3 * xjx1;
+          a[offseta + (row + 1) + (col + 2) * lda] += alphaxix2 * xjx1;
+          a[offseta + (row + 1) + (col + 3) * lda] += alphaxix3 * xjx1;
           double xjx2 = x[offsetx + jx + incx * 2];
-          a[offseta + (row + 2) + (col + 3) * lda] += alphaix3 * xjx2;
+          a[offseta + (row + 2) + (col + 3) * lda] += alphaxix3 * xjx2;
         }
         for (; col < n; col += 1, ix += incx) {
-          double alphaix = alpha * x[offsetx + ix];
+          double alphaxix = alpha * x[offsetx + ix];
           int row = 0, jx = incx < 0 ? col * -incx : 0;
           for (; row < col + 1; row += 1, jx += incx) {
-            a[offseta + row + col * lda] += alphaix * x[offsetx + jx];
+            a[offseta + row + col * lda] += alphaxix * x[offsetx + jx];
           }
         }
       } else {
@@ -1437,33 +1436,33 @@ public class JavaBLAS implements BLAS {
       if (lsame("U", uplo)) {
         int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
         for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
-          float alphaix0 = alpha * x[offsetx + ix + incx * 0];
-          float alphaix1 = alpha * x[offsetx + ix + incx * 1];
-          float alphaix2 = alpha * x[offsetx + ix + incx * 2];
-          float alphaix3 = alpha * x[offsetx + ix + incx * 3];
+          float alphaxix0 = alpha * x[offsetx + ix + incx * 0];
+          float alphaxix1 = alpha * x[offsetx + ix + incx * 1];
+          float alphaxix2 = alpha * x[offsetx + ix + incx * 2];
+          float alphaxix3 = alpha * x[offsetx + ix + incx * 3];
           int row = 0, jx = incx < 0 ? col * -incx : 0;
           for (; row < col + 1; row += 1, jx += incx) {
             float xjx = x[offsetx + jx];
-            a[offseta + row + (col + 0) * lda] += alphaix0 * xjx;
-            a[offseta + row + (col + 1) * lda] += alphaix1 * xjx;
-            a[offseta + row + (col + 2) * lda] += alphaix2 * xjx;
-            a[offseta + row + (col + 3) * lda] += alphaix3 * xjx;
+            a[offseta + row + (col + 0) * lda] += alphaxix0 * xjx;
+            a[offseta + row + (col + 1) * lda] += alphaxix1 * xjx;
+            a[offseta + row + (col + 2) * lda] += alphaxix2 * xjx;
+            a[offseta + row + (col + 3) * lda] += alphaxix3 * xjx;
           }
           float xjx0 = x[offsetx + jx + incx * 0];
-          a[offseta + (row + 0) + (col + 1) * lda] += alphaix1 * xjx0;
-          a[offseta + (row + 0) + (col + 2) * lda] += alphaix2 * xjx0;
-          a[offseta + (row + 0) + (col + 3) * lda] += alphaix3 * xjx0;
+          a[offseta + (row + 0) + (col + 1) * lda] += alphaxix1 * xjx0;
+          a[offseta + (row + 0) + (col + 2) * lda] += alphaxix2 * xjx0;
+          a[offseta + (row + 0) + (col + 3) * lda] += alphaxix3 * xjx0;
           float xjx1 = x[offsetx + jx + incx * 1];
-          a[offseta + (row + 1) + (col + 2) * lda] += alphaix2 * xjx1;
-          a[offseta + (row + 1) + (col + 3) * lda] += alphaix3 * xjx1;
+          a[offseta + (row + 1) + (col + 2) * lda] += alphaxix2 * xjx1;
+          a[offseta + (row + 1) + (col + 3) * lda] += alphaxix3 * xjx1;
           float xjx2 = x[offsetx + jx + incx * 2];
-          a[offseta + (row + 2) + (col + 3) * lda] += alphaix3 * xjx2;
+          a[offseta + (row + 2) + (col + 3) * lda] += alphaxix3 * xjx2;
         }
         for (; col < n; col += 1, ix += incx) {
-          float alphaix = alpha * x[offsetx + ix];
+          float alphaxix = alpha * x[offsetx + ix];
           int row = 0, jx = incx < 0 ? col * -incx : 0;
           for (; row < col + 1; row += 1, jx += incx) {
-            a[offseta + row + col * lda] += alphaix * x[offsetx + jx];
+            a[offseta + row + col * lda] += alphaxix * x[offsetx + jx];
           }
         }
       } else {
