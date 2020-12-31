@@ -54,9 +54,7 @@ public class JavaBLAS implements BLAS {
     }
 
     double sum = 0.0;
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0;
-          (incx < 0 ? ix >= 0 : ix < n * incx);
-          ix += incx) {
+    for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       sum += Math.abs(x[offsetx + ix]);
     }
     return sum;
@@ -72,9 +70,7 @@ public class JavaBLAS implements BLAS {
     }
 
     float sum = 0.0f;
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx);
-         ix += incx) {
+    for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       sum += Math.abs(x[offsetx + ix]);
     }
     return sum;
@@ -654,9 +650,7 @@ public class JavaBLAS implements BLAS {
     if (alpha == 1.0) {
       return;
     }
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx);
-         ix += incx) {
+    for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       x[offsetx + ix] *= alpha;
     }
   }
@@ -673,9 +667,7 @@ public class JavaBLAS implements BLAS {
     if (alpha == 1.0) {
       return;
     }
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx);
-         ix += incx) {
+    for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       x[offsetx + ix] *= alpha;
     }
   }
