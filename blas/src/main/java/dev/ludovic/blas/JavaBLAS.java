@@ -815,30 +815,40 @@ public class JavaBLAS implements BLAS {
             sumiy2 += xjx * a2;
             sumiy3 += xjx * a3;
           }
+          double a00 = a[offseta + (row + 0) + (col + 0) * ((col + 0) + 1) / 2];
+          double a01 = a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2];
+          double a02 = a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2];
+          double a03 = a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2];
+          double a11 = a[offseta + (row + 1) + (col + 1) * ((col + 1) + 1) / 2];
+          double a12 = a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2];
+          double a13 = a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2];
+          double a22 = a[offseta + (row + 2) + (col + 2) * ((col + 2) + 1) / 2];
+          double a23 = a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2];
+          double a33 = a[offseta + (row + 3) + (col + 3) * ((col + 3) + 1) / 2];
           double xjx0 = x[offsetx + jx + incx * 0];
           double xjx1 = x[offsetx + jx + incx * 1];
           double xjx2 = x[offsetx + jx + incx * 2];
           double xjx3 = x[offsetx + jx + incx * 3];
-          y[offsety + iy + incy * 0] += alpha * sumiy0
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 0) * ((col + 0) + 1) / 2]
-                                     +  alpha * xjx1 * a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2]
-                                     +  alpha * xjx2 * a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx3 * a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2];
-          y[offsety + iy + incy * 1] += alpha * sumiy1
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 1) * ((col + 1) + 1) / 2]
-                                     +  alpha * xjx2 * a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx3 * a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2];
-          y[offsety + iy + incy * 2] += alpha * sumiy2
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx2 * a[offseta + (row + 2) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx3 * a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2];
-          y[offsety + iy + incy * 3] += alpha * sumiy3
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2]
-                                     +  alpha * xjx2 * a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2]
-                                     +  alpha * xjx3 * a[offseta + (row + 3) + (col + 3) * ((col + 3) + 1) / 2];
+          sumiy0 += xjx0 * a00
+                 +  xjx1 * a01
+                 +  xjx2 * a02
+                 +  xjx3 * a03;
+          sumiy1 += xjx0 * a01
+                 +  xjx1 * a11
+                 +  xjx2 * a12
+                 +  xjx3 * a13;
+          sumiy2 += xjx0 * a02
+                 +  xjx1 * a12
+                 +  xjx2 * a22
+                 +  xjx3 * a23;
+          sumiy3 += xjx0 * a03
+                 +  xjx1 * a13
+                 +  xjx2 * a23
+                 +  xjx3 * a33;
+          y[offsety + iy + incy * 0] += alpha * sumiy0;
+          y[offsety + iy + incy * 1] += alpha * sumiy1;
+          y[offsety + iy + incy * 2] += alpha * sumiy2;
+          y[offsety + iy + incy * 3] += alpha * sumiy3;
         }
         for (; col < n; col += 1, ix += incx, iy += incy) {
           double alphaxix = alpha * x[offsetx + ix];
@@ -848,7 +858,8 @@ public class JavaBLAS implements BLAS {
             y[offsety + jy] += alphaxix * a[offseta + row + col * (col + 1) / 2];
             sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
           }
-          y[offsety + iy] += alpha * (sumiy + x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2]);
+          sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
+          y[offsety + iy] += alpha * sumiy;
         }
       } else {
         f2j.dspmv(uplo, n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
@@ -909,30 +920,40 @@ public class JavaBLAS implements BLAS {
             sumiy2 += xjx * a2;
             sumiy3 += xjx * a3;
           }
+          float a00 = a[offseta + (row + 0) + (col + 0) * ((col + 0) + 1) / 2];
+          float a01 = a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2];
+          float a02 = a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2];
+          float a03 = a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2];
+          float a11 = a[offseta + (row + 1) + (col + 1) * ((col + 1) + 1) / 2];
+          float a12 = a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2];
+          float a13 = a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2];
+          float a22 = a[offseta + (row + 2) + (col + 2) * ((col + 2) + 1) / 2];
+          float a23 = a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2];
+          float a33 = a[offseta + (row + 3) + (col + 3) * ((col + 3) + 1) / 2];
           float xjx0 = x[offsetx + jx + incx * 0];
           float xjx1 = x[offsetx + jx + incx * 1];
           float xjx2 = x[offsetx + jx + incx * 2];
           float xjx3 = x[offsetx + jx + incx * 3];
-          y[offsety + iy + incy * 0] += alpha * sumiy0
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 0) * ((col + 0) + 1) / 2]
-                                     +  alpha * xjx1 * a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2]
-                                     +  alpha * xjx2 * a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx3 * a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2];
-          y[offsety + iy + incy * 1] += alpha * sumiy1
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 1) * ((col + 1) + 1) / 2]
-                                     +  alpha * xjx2 * a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx3 * a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2];
-          y[offsety + iy + incy * 2] += alpha * sumiy2
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx2 * a[offseta + (row + 2) + (col + 2) * ((col + 2) + 1) / 2]
-                                     +  alpha * xjx3 * a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2];
-          y[offsety + iy + incy * 3] += alpha * sumiy3
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2]
-                                     +  alpha * xjx2 * a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2]
-                                     +  alpha * xjx3 * a[offseta + (row + 3) + (col + 3) * ((col + 3) + 1) / 2];
+          sumiy0 += xjx0 * a00
+                 +  xjx1 * a01
+                 +  xjx2 * a02
+                 +  xjx3 * a03;
+          sumiy1 += xjx0 * a01
+                 +  xjx1 * a11
+                 +  xjx2 * a12
+                 +  xjx3 * a13;
+          sumiy2 += xjx0 * a02
+                 +  xjx1 * a12
+                 +  xjx2 * a22
+                 +  xjx3 * a23;
+          sumiy3 += xjx0 * a03
+                 +  xjx1 * a13
+                 +  xjx2 * a23
+                 +  xjx3 * a33;
+          y[offsety + iy + incy * 0] += alpha * sumiy0;
+          y[offsety + iy + incy * 1] += alpha * sumiy1;
+          y[offsety + iy + incy * 2] += alpha * sumiy2;
+          y[offsety + iy + incy * 3] += alpha * sumiy3;
         }
         for (; col < n; col += 1, ix += incx, iy += incy) {
           float alphaxix = alpha * x[offsetx + ix];
@@ -1307,30 +1328,40 @@ public class JavaBLAS implements BLAS {
             sumiy2 += xjx * a[offseta + row + (col + 2) * lda];
             sumiy3 += xjx * a[offseta + row + (col + 3) * lda];
           }
+          double a00 = a[offseta + (row + 0) + (col + 0) * lda];
+          double a01 = a[offseta + (row + 0) + (col + 1) * lda];
+          double a02 = a[offseta + (row + 0) + (col + 2) * lda];
+          double a03 = a[offseta + (row + 0) + (col + 3) * lda];
+          double a11 = a[offseta + (row + 1) + (col + 1) * lda];
+          double a12 = a[offseta + (row + 1) + (col + 2) * lda];
+          double a13 = a[offseta + (row + 1) + (col + 3) * lda];
+          double a22 = a[offseta + (row + 2) + (col + 2) * lda];
+          double a23 = a[offseta + (row + 2) + (col + 3) * lda];
+          double a33 = a[offseta + (row + 3) + (col + 3) * lda];
           double xjx0 = x[offsetx + jx + incx * 0];
           double xjx1 = x[offsetx + jx + incx * 1];
           double xjx2 = x[offsetx + jx + incx * 2];
           double xjx3 = x[offsetx + jx + incx * 3];
-          y[offsety + iy + incy * 0] += alpha * sumiy0
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 0) * lda]
-                                     +  alpha * xjx1 * a[offseta + (row + 0) + (col + 1) * lda]
-                                     +  alpha * xjx2 * a[offseta + (row + 0) + (col + 2) * lda]
-                                     +  alpha * xjx3 * a[offseta + (row + 0) + (col + 3) * lda];
-          y[offsety + iy + incy * 1] += alpha * sumiy1
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 1) * lda]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 1) * lda]
-                                     +  alpha * xjx2 * a[offseta + (row + 1) + (col + 2) * lda]
-                                     +  alpha * xjx3 * a[offseta + (row + 1) + (col + 3) * lda];
-          y[offsety + iy + incy * 2] += alpha * sumiy2
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 2) * lda]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 2) * lda]
-                                     +  alpha * xjx2 * a[offseta + (row + 2) + (col + 2) * lda]
-                                     +  alpha * xjx3 * a[offseta + (row + 2) + (col + 3) * lda];
-          y[offsety + iy + incy * 3] += alpha * sumiy3
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 3) * lda]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 3) * lda]
-                                     +  alpha * xjx2 * a[offseta + (row + 2) + (col + 3) * lda]
-                                     +  alpha * xjx3 * a[offseta + (row + 3) + (col + 3) * lda];
+          sumiy0 += xjx0 * a00
+                 +  xjx1 * a01
+                 +  xjx2 * a02
+                 +  xjx3 * a03;
+          sumiy1 += xjx0 * a01
+                 +  xjx1 * a11
+                 +  xjx2 * a12
+                 +  xjx3 * a13;
+          sumiy2 += xjx0 * a02
+                 +  xjx1 * a12
+                 +  xjx2 * a22
+                 +  xjx3 * a23;
+          sumiy3 += xjx0 * a03
+                 +  xjx1 * a13
+                 +  xjx2 * a23
+                 +  xjx3 * a33;
+          y[offsety + iy + incy * 0] += alpha * sumiy0;
+          y[offsety + iy + incy * 1] += alpha * sumiy1;
+          y[offsety + iy + incy * 2] += alpha * sumiy2;
+          y[offsety + iy + incy * 3] += alpha * sumiy3;
         }
         for (; col < n; col += 1, ix += incx, iy += incy) {
           double alphaxix = alpha * x[offsetx + ix];
@@ -1400,30 +1431,40 @@ public class JavaBLAS implements BLAS {
             sumiy2 += xjx * a[offseta + row + (col + 2) * lda];
             sumiy3 += xjx * a[offseta + row + (col + 3) * lda];
           }
+          float a00 = a[offseta + (row + 0) + (col + 0) * lda];
+          float a01 = a[offseta + (row + 0) + (col + 1) * lda];
+          float a02 = a[offseta + (row + 0) + (col + 2) * lda];
+          float a03 = a[offseta + (row + 0) + (col + 3) * lda];
+          float a11 = a[offseta + (row + 1) + (col + 1) * lda];
+          float a12 = a[offseta + (row + 1) + (col + 2) * lda];
+          float a13 = a[offseta + (row + 1) + (col + 3) * lda];
+          float a22 = a[offseta + (row + 2) + (col + 2) * lda];
+          float a23 = a[offseta + (row + 2) + (col + 3) * lda];
+          float a33 = a[offseta + (row + 3) + (col + 3) * lda];
           float xjx0 = x[offsetx + jx + incx * 0];
           float xjx1 = x[offsetx + jx + incx * 1];
           float xjx2 = x[offsetx + jx + incx * 2];
           float xjx3 = x[offsetx + jx + incx * 3];
-          y[offsety + iy + incy * 0] += alpha * sumiy0
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 0) * lda]
-                                     +  alpha * xjx1 * a[offseta + (row + 0) + (col + 1) * lda]
-                                     +  alpha * xjx2 * a[offseta + (row + 0) + (col + 2) * lda]
-                                     +  alpha * xjx3 * a[offseta + (row + 0) + (col + 3) * lda];
-          y[offsety + iy + incy * 1] += alpha * sumiy1
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 1) * lda]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 1) * lda]
-                                     +  alpha * xjx2 * a[offseta + (row + 1) + (col + 2) * lda]
-                                     +  alpha * xjx3 * a[offseta + (row + 1) + (col + 3) * lda];
-          y[offsety + iy + incy * 2] += alpha * sumiy2
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 2) * lda]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 2) * lda]
-                                     +  alpha * xjx2 * a[offseta + (row + 2) + (col + 2) * lda]
-                                     +  alpha * xjx3 * a[offseta + (row + 2) + (col + 3) * lda];
-          y[offsety + iy + incy * 3] += alpha * sumiy3
-                                     +  alpha * xjx0 * a[offseta + (row + 0) + (col + 3) * lda]
-                                     +  alpha * xjx1 * a[offseta + (row + 1) + (col + 3) * lda]
-                                     +  alpha * xjx2 * a[offseta + (row + 2) + (col + 3) * lda]
-                                     +  alpha * xjx3 * a[offseta + (row + 3) + (col + 3) * lda];
+          sumiy0 += xjx0 * a00
+                 +  xjx1 * a01
+                 +  xjx2 * a02
+                 +  xjx3 * a03;
+          sumiy1 += xjx0 * a01
+                 +  xjx1 * a11
+                 +  xjx2 * a12
+                 +  xjx3 * a13;
+          sumiy2 += xjx0 * a02
+                 +  xjx1 * a12
+                 +  xjx2 * a22
+                 +  xjx3 * a23;
+          sumiy3 += xjx0 * a03
+                 +  xjx1 * a13
+                 +  xjx2 * a23
+                 +  xjx3 * a33;
+          y[offsety + iy + incy * 0] += alpha * sumiy0;
+          y[offsety + iy + incy * 1] += alpha * sumiy1;
+          y[offsety + iy + incy * 2] += alpha * sumiy2;
+          y[offsety + iy + incy * 3] += alpha * sumiy3;
         }
         for (; col < n; col += 1, ix += incx, iy += incy) {
           float alphaxix = alpha * x[offsetx + ix];
