@@ -43,14 +43,23 @@ public class Dsyr2Test extends BLASTest {
             2.0, 2.0, 3.0, 4.0,
             3.0, 3.0, 3.0, 4.0,
             4.0, 4.0, 4.0, 4.0 };
-        double[] expected = new double[] {
+        double[] expectedU = new double[] {
              1.6,  2.0,   3.0, 4.0,
              3.0,  3.6,   3.0, 4.0,
             4.14, 4.86, 5.142, 4.0,
              5.1,  5.4,  5.83, 3.2 };
+        double[] expectedL = new double[] {
+             1.6,  3.0,  4.14, 5.1,
+             2.0,  3.6,  4.86, 5.4,
+             3.0,  3.0, 5.142, 5.83,
+             4.0,  4.0,   4.0, 3.2 };
 
         double[] a1 = a.clone();
         blas.dsyr2("U", n, alpha, x, 1, y, 1, a1, n);
-        assertArrayEquals(expected, a1, depsilon);
+        assertArrayEquals(expectedU, a1, depsilon);
+
+        double[] a2 = a.clone();
+        blas.dsyr2("L", n, alpha, x, 1, y, 1, a2, n);
+        assertArrayEquals(expectedL, a2, depsilon);
     }
 }

@@ -43,14 +43,23 @@ public class Ssyr2Test extends BLASTest {
             2.0f, 2.0f, 3.0f, 4.0f,
             3.0f, 3.0f, 3.0f, 4.0f,
             4.0f, 4.0f, 4.0f, 4.0f };
-        float[] expected = new float[] {
+        float[] expectedU = new float[] {
              1.6f,  2.0f,   3.0f, 4.0f,
              3.0f,  3.6f,   3.0f, 4.0f,
             4.14f, 4.86f, 5.142f, 4.0f,
              5.1f,  5.4f,  5.83f, 3.2f };
+        float[] expectedL = new float[] {
+             1.6f,  3.0f,  4.14f, 5.1f,
+             2.0f,  3.6f,  4.86f, 5.4f,
+             3.0f,  3.0f, 5.142f, 5.83f,
+             4.0f,  4.0f,   4.0f, 3.2f };
 
         float[] a1 = a.clone();
         blas.ssyr2("U", n, alpha, x, 1, y, 1, a1, n);
-        assertArrayEquals(expected, a1, sepsilon);
+        assertArrayEquals(expectedU, a1, sepsilon);
+
+        float[] a2 = a.clone();
+        blas.ssyr2("L", n, alpha, x, 1, y, 1, a2, n);
+        assertArrayEquals(expectedL, a2, sepsilon);
     }
 }
