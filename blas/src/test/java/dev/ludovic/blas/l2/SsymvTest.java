@@ -35,7 +35,7 @@ public class SsymvTest extends BLASTest {
         int n = 4;
         float[] a = new float[] {
              3.0f, -2.0f,  2.0f, -4.0f,
-            -2.0f, -8.0f,  4.0f,  6.0f,
+            -2.0f, -8.0f,  4.0f,  7.0f,
              2.0f,  4.0f, -3.0f, -3.0f,
             -4.0f,  7.0f, -3.0f,  0.0f };
         float[] x = new float[] {
@@ -84,5 +84,33 @@ public class SsymvTest extends BLASTest {
         float[] y7 = y.clone();
         blas.ssymv("U", n,  1.0f, a, n, x, 1,  0.0f, y7, 1);
         assertArrayEquals(expected7, y7, sepsilon);
+
+        float[] y8 = y.clone();
+        blas.ssymv("L", n,  1.0f, a, n, x, 1,  1.0f, y8, 1);
+        assertArrayEquals(expected1, y8, sepsilon);
+
+        float[] y9 = y.clone();
+        blas.ssymv("L", n,  0.5f, a, n, x, 1,  1.0f, y9, 1);
+        assertArrayEquals(expected2, y9, sepsilon);
+
+        float[] y10 = y.clone();
+        blas.ssymv("L", n, -0.5f, a, n, x, 1,  1.0f, y10, 1);
+        assertArrayEquals(expected3, y10, sepsilon);
+
+        float[] y11 = y.clone();
+        blas.ssymv("L", n,  0.0f, a, n, x, 1,  1.0f, y11, 1);
+        assertArrayEquals(expected4, y11, sepsilon);
+
+        float[] y12 = y.clone();
+        blas.ssymv("L", n,  1.0f, a, n, x, 1,  0.5f, y12, 1);
+        assertArrayEquals(expected5, y12, sepsilon);
+
+        float[] y13 = y.clone();
+        blas.ssymv("L", n,  1.0f, a, n, x, 1, -0.5f, y13, 1);
+        assertArrayEquals(expected6, y13, sepsilon);
+
+        float[] y14 = y.clone();
+        blas.ssymv("L", n,  1.0f, a, n, x, 1,  0.0f, y14, 1);
+        assertArrayEquals(expected7, y14, sepsilon);
     }
 }
