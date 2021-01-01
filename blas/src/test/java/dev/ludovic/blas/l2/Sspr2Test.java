@@ -38,19 +38,33 @@ public class Sspr2Test extends BLASTest {
             1.0f, 2.0f, 2.1f,  4.0f };
         float[] y = new float[] {
             3.0f, 4.0f, 5.1f, -1.0f };
-        float[] a = new float[] {
+        float[] aU = new float[] {
             1.0f,
             2.0f, 2.0f,
             3.0f, 3.0f, 3.0f,
             4.0f, 4.0f, 4.0f, 4.0f };
-        float[] expected = new float[] {
+        float[] aL = new float[] {
+            1.0f, 2.0f, 3.0f, 4.0f,
+                  2.0f, 3.0f, 4.0f,
+                        3.0f, 4.0f,
+                              4.0f };
+        float[] expectedU = new float[] {
              1.6f,
              3.0f,  3.6f,
             4.14f, 4.86f, 5.142f,
              5.1f,  5.4f,  5.83f, 3.2f };
+        float[] expectedL = new float[] {
+             1.6f,  3.0f,  4.14f,  5.1f,
+                    3.6f,  4.86f,  5.4f,
+                          5.142f, 5.83f,
+                                   3.2f };
 
-        float[] a1 = a.clone();
+        float[] a1 = aU.clone();
         blas.sspr2("U", n, alpha, x, 1, y, 1, a1);
-        assertArrayEquals(expected, a1, sepsilon);
+        assertArrayEquals(expectedU, a1, sepsilon);
+
+        float[] a2 = aL.clone();
+        blas.sspr2("L", n, alpha, x, 1, y, 1, a2);
+        assertArrayEquals(expectedL, a2, sepsilon);
     }
 }

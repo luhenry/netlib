@@ -38,19 +38,33 @@ public class Dspr2Test extends BLASTest {
             1.0, 2.0, 2.1,  4.0 };
         double[] y = new double[] {
             3.0, 4.0, 5.1, -1.0 };
-        double[] a = new double[] {
+        double[] aU = new double[] {
             1.0,
             2.0, 2.0,
             3.0, 3.0, 3.0,
             4.0, 4.0, 4.0, 4.0 };
-        double[] expected = new double[] {
+        double[] aL = new double[] {
+            1.0, 2.0, 3.0, 4.0,
+                 2.0, 3.0, 4.0,
+                      3.0, 4.0,
+                           4.0 };
+        double[] expectedU = new double[] {
              1.6,
              3.0,  3.6,
             4.14, 4.86, 5.142,
              5.1,  5.4,  5.83, 3.2 };
+        double[] expectedL = new double[] {
+             1.6,  3.0,  4.14,  5.1,
+                   3.6,  4.86,  5.4,
+                        5.142, 5.83,
+                                3.2 };
 
-        double[] a1 = a.clone();
+        double[] a1 = aU.clone();
         blas.dspr2("U", n, alpha, x, 1, y, 1, a1);
-        assertArrayEquals(expected, a1, depsilon);
+        assertArrayEquals(expectedU, a1, depsilon);
+
+        double[] a2 = aL.clone();
+        blas.dspr2("L", n, alpha, x, 1, y, 1, a2);
+        assertArrayEquals(expectedL, a2, depsilon);
     }
 }
