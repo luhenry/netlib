@@ -36,8 +36,7 @@ public class JavaBLAS implements BLAS {
   }
 
   private int loopBound(int index, int size) {
-    assert (size & (size - 1)) == 0;
-    return index & ~(size - 1);
+    return index - (index % size);
   }
 
   protected IllegalArgumentException illegalArgument(String method, int arg) {
