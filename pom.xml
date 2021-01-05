@@ -26,7 +26,7 @@ SOFTWARE.
 
     <groupId>dev.ludovic</groupId>
     <artifactId>blas-parent</artifactId>
-    <version>0.1.12</version>
+    <version>0.1.11</version>
     <packaging>pom</packaging>
 
     <name>Vectorized BLAS</name>
