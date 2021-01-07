@@ -105,7 +105,7 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return;
     }
-    if (alpha == 0.0) {
+    if (alpha == 0.0f) {
       return;
     }
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
@@ -850,10 +850,10 @@ public class JavaBLAS implements BLAS {
     if (ldc < Math.max(1, m)) {
       throw illegalArgument("SGEMM", 13);
     }
-    if (m == 0 || n == 0 || ((alpha == 0.0 || k == 0) && beta == 1.0)) {
+    if (m == 0 || n == 0 || ((alpha == 0.0f || k == 0) && beta == 1.0f)) {
       return;
     }
-    if (alpha == 0.0) {
+    if (alpha == 0.0f) {
       int col = 0;
       for (; col < loopBound(n, 4); col += 4) {
         int row = 0;
@@ -1561,7 +1561,7 @@ public class JavaBLAS implements BLAS {
   protected void sgemvN(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     // y = beta * y
     for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
-      if (beta != 0.0) {
+      if (beta != 0.0f) {
         y[offsety + iy] = beta * y[offsety + iy];
       } else {
         y[offsety + iy] = 0.0f;
@@ -1618,7 +1618,7 @@ public class JavaBLAS implements BLAS {
         sum6 += x[offsetx + ix] * a[offseta + row + (col + 6) * lda];
         sum7 += x[offsetx + ix] * a[offseta + row + (col + 7) * lda];
       }
-      if (beta != 0.0) {
+      if (beta != 0.0f) {
         y[offsety + iy + incy * 0] = alpha * sum0 + beta * y[offsety + iy + incy * 0];
         y[offsety + iy + incy * 1] = alpha * sum1 + beta * y[offsety + iy + incy * 1];
         y[offsety + iy + incy * 2] = alpha * sum2 + beta * y[offsety + iy + incy * 2];
@@ -1643,7 +1643,7 @@ public class JavaBLAS implements BLAS {
       for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
         sum += x[offsetx + ix] * a[offseta + row + col * lda];
       }
-      if (beta != 0.0) {
+      if (beta != 0.0f) {
         y[offsety + iy] = alpha * sum + beta * y[offsety + iy];
       } else {
         y[offsety + iy] = alpha * sum;
@@ -1724,7 +1724,7 @@ public class JavaBLAS implements BLAS {
     if (m == 0 || n == 0) {
       return;
     }
-    if (alpha != 0.0) {
+    if (alpha != 0.0f) {
       int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
       for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
         float alphayiy0 = alpha * y[offsety + iy + incy * 0];
@@ -1962,7 +1962,7 @@ public class JavaBLAS implements BLAS {
     if (incx <= 0) {
       return;
     }
-    if (alpha == 1.0) {
+    if (alpha == 1.0f) {
       return;
     }
     for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
@@ -2198,7 +2198,7 @@ public class JavaBLAS implements BLAS {
     if (n == 0) {
       return;
     }
-    if (alpha == 0.0) {
+    if (alpha == 0.0f) {
       for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
         if (beta != 0.0f) {
           y[offsety + iy] = beta * y[offsety + iy];
@@ -2270,7 +2270,7 @@ public class JavaBLAS implements BLAS {
              +  xjx1 * a13
              +  xjx2 * a23
              +  xjx3 * a33;
-      if (beta != 0.0) {
+      if (beta != 0.0f) {
         y[offsety + iy + incy * 0] = alpha * sumiy0 + beta * y[offsety + iy + incy * 0];
         y[offsety + iy + incy * 1] = alpha * sumiy1 + beta * y[offsety + iy + incy * 1];
         y[offsety + iy + incy * 2] = alpha * sumiy2 + beta * y[offsety + iy + incy * 2];
@@ -2291,7 +2291,7 @@ public class JavaBLAS implements BLAS {
         sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
       }
       sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
-      if (beta != 0.0) {
+      if (beta != 0.0f) {
         y[offsety + iy] = alpha * sumiy + beta * y[offsety + iy];
       } else {
         y[offsety + iy] = alpha * sumiy;
@@ -3218,10 +3218,10 @@ public class JavaBLAS implements BLAS {
     if (ldc < Math.max(1, m)) {
       throw illegalArgument("SSYMM", 12);
     }
-    if (m == 0 || n == 0 || (alpha == 0.0 && beta == 1.0)) {
+    if (m == 0 || n == 0 || (alpha == 0.0f && beta == 1.0f)) {
       return;
     }
-    if (alpha == 0.0) {
+    if (alpha == 0.0f) {
       // C := beta*C
       int col = 0;
       for (; col < loopBound(n, 4); col += 4) {
@@ -3836,7 +3836,7 @@ public class JavaBLAS implements BLAS {
              +  xjx1 * a13
              +  xjx2 * a23
              +  xjx3 * a33;
-      if (beta != 0.0) {
+      if (beta != 0.0f) {
         y[offsety + iy + incy * 0] = alpha * sumiy0 + beta * y[offsety + iy + incy * 0];
         y[offsety + iy + incy * 1] = alpha * sumiy1 + beta * y[offsety + iy + incy * 1];
         y[offsety + iy + incy * 2] = alpha * sumiy2 + beta * y[offsety + iy + incy * 2];
@@ -3857,7 +3857,7 @@ public class JavaBLAS implements BLAS {
         sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
       }
       sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
-      if (beta != 0.0) {
+      if (beta != 0.0f) {
         y[offsety + iy] = alpha * sumiy + beta * y[offsety + iy];
       } else {
         y[offsety + iy] = alpha * sumiy;
