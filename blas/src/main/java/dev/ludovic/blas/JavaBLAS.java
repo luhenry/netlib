@@ -301,11 +301,24 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgemmNN(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    // C = beta * C
-    dscal(m * n, beta, c, offsetc, 1);
-    // C += alpha * A * B
     int col = 0;
     for (; col < loopBound(n, 4); col += 4) {
+      if (beta != 1.0) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          if (beta != 0.0) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+            c[offsetc + row + (col + 1) * ldc] = beta * c[offsetc + row + (col + 1) * ldc];
+            c[offsetc + row + (col + 2) * ldc] = beta * c[offsetc + row + (col + 2) * ldc];
+            c[offsetc + row + (col + 3) * ldc] = beta * c[offsetc + row + (col + 3) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0;
+            c[offsetc + row + (col + 1) * ldc] = 0.0;
+            c[offsetc + row + (col + 2) * ldc] = 0.0;
+            c[offsetc + row + (col + 3) * ldc] = 0.0;
+          }
+        }
+      }
       int i = 0;
       for (; i < loopBound(k, 4); i += 4) {
         double alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
@@ -359,6 +372,16 @@ public class JavaBLAS implements BLAS {
       }
     }
     for (; col < n; col += 1) {
+      if (beta != 1.0) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          if (beta != 0.0) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0;
+          }
+        }
+      }
       int i = 0;
       for (; i < loopBound(k, 4); i += 4) {
         double alphab0 = alpha * b[offsetb + (i + 0) + col * ldb];
@@ -423,22 +446,41 @@ public class JavaBLAS implements BLAS {
           sum32 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 3) * ldb];
           sum33 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 3) * ldb];
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
-        c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
-        c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
-        c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
-        c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
-        c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
-        c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
-        c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
-        c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
-        c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
-        c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
-        c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
-        c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
-        c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
-        c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
-        c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
+        if (beta != 0.0) {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
+        } else {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01;
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02;
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03;
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10;
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11;
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12;
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13;
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20;
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21;
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22;
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23;
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30;
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31;
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32;
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33;
+        }
       }
       for (; row < m; row += 1) {
         double sum0 = 0.0;
@@ -452,10 +494,17 @@ public class JavaBLAS implements BLAS {
           sum2 += a[offseta + i + row * lda] * b[offsetb + i + (col + 2) * ldb];
           sum3 += a[offseta + i + row * lda] * b[offsetb + i + (col + 3) * ldb];
         }
-        c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
-        c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
-        c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
-        c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
+        if (beta != 0.0) {
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
+        } else {
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0;
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1;
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2;
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3;
+        }
       }
     }
     for (; col < n; col += 1) {
@@ -473,10 +522,17 @@ public class JavaBLAS implements BLAS {
           sum2 += a[offseta + i + (row + 2) * ldb] * bval;
           sum3 += a[offseta + i + (row + 3) * ldb] * bval;
         }
-        c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
-        c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
-        c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
-        c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
+        if (beta != 0.0) {
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
+        } else {
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0;
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1;
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2;
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3;
+        }
       }
       for (; row < m; row += 1) {
         double sum = 0.0;
@@ -486,14 +542,46 @@ public class JavaBLAS implements BLAS {
             sum += a[offseta + i + row * k] * b[offsetb + col * k + i];
           }
         }
-        c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
+        if (beta != 0.0) {
+          c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
+        } else {
+          c[offsetc + row + col * ldc] = alpha * sum;
+        }
       }
     }
   }
 
   protected void dgemmNT(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
     // C = beta * C
-    dscal(m * n, beta, c, offsetc, 1);
+    if (beta != 1.0) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          if (beta != 0.0) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+            c[offsetc + row + (col + 1) * ldc] = beta * c[offsetc + row + (col + 1) * ldc];
+            c[offsetc + row + (col + 2) * ldc] = beta * c[offsetc + row + (col + 2) * ldc];
+            c[offsetc + row + (col + 3) * ldc] = beta * c[offsetc + row + (col + 3) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0;
+            c[offsetc + row + (col + 1) * ldc] = 0.0;
+            c[offsetc + row + (col + 2) * ldc] = 0.0;
+            c[offsetc + row + (col + 3) * ldc] = 0.0;
+          }
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          if (beta != 0.0) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0;
+          }
+        }
+      }
+    }
     // C += alpha * A * B
     int i = 0;
     for (; i < loopBound(k, 4); i += 4) {
@@ -631,22 +719,41 @@ public class JavaBLAS implements BLAS {
                 sum32 += a2 * b3;
                 sum33 += a3 * b3;
               }
-              c[offsetc + (v + 0) + (u + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (v + 0) + (u + 0) * ldc];
-              c[offsetc + (v + 1) + (u + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (v + 1) + (u + 0) * ldc];
-              c[offsetc + (v + 2) + (u + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (v + 2) + (u + 0) * ldc];
-              c[offsetc + (v + 3) + (u + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (v + 3) + (u + 0) * ldc];
-              c[offsetc + (v + 0) + (u + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (v + 0) + (u + 1) * ldc];
-              c[offsetc + (v + 1) + (u + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (v + 1) + (u + 1) * ldc];
-              c[offsetc + (v + 2) + (u + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (v + 2) + (u + 1) * ldc];
-              c[offsetc + (v + 3) + (u + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (v + 3) + (u + 1) * ldc];
-              c[offsetc + (v + 0) + (u + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (v + 0) + (u + 2) * ldc];
-              c[offsetc + (v + 1) + (u + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (v + 1) + (u + 2) * ldc];
-              c[offsetc + (v + 2) + (u + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (v + 2) + (u + 2) * ldc];
-              c[offsetc + (v + 3) + (u + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (v + 3) + (u + 2) * ldc];
-              c[offsetc + (v + 0) + (u + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (v + 0) + (u + 3) * ldc];
-              c[offsetc + (v + 1) + (u + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (v + 1) + (u + 3) * ldc];
-              c[offsetc + (v + 2) + (u + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (v + 2) + (u + 3) * ldc];
-              c[offsetc + (v + 3) + (u + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (v + 3) + (u + 3) * ldc];
+              if (beta != 0.0) {
+                c[offsetc + (v + 0) + (u + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (v + 0) + (u + 0) * ldc];
+                c[offsetc + (v + 1) + (u + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (v + 1) + (u + 0) * ldc];
+                c[offsetc + (v + 2) + (u + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (v + 2) + (u + 0) * ldc];
+                c[offsetc + (v + 3) + (u + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (v + 3) + (u + 0) * ldc];
+                c[offsetc + (v + 0) + (u + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (v + 0) + (u + 1) * ldc];
+                c[offsetc + (v + 1) + (u + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (v + 1) + (u + 1) * ldc];
+                c[offsetc + (v + 2) + (u + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (v + 2) + (u + 1) * ldc];
+                c[offsetc + (v + 3) + (u + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (v + 3) + (u + 1) * ldc];
+                c[offsetc + (v + 0) + (u + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (v + 0) + (u + 2) * ldc];
+                c[offsetc + (v + 1) + (u + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (v + 1) + (u + 2) * ldc];
+                c[offsetc + (v + 2) + (u + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (v + 2) + (u + 2) * ldc];
+                c[offsetc + (v + 3) + (u + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (v + 3) + (u + 2) * ldc];
+                c[offsetc + (v + 0) + (u + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (v + 0) + (u + 3) * ldc];
+                c[offsetc + (v + 1) + (u + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (v + 1) + (u + 3) * ldc];
+                c[offsetc + (v + 2) + (u + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (v + 2) + (u + 3) * ldc];
+                c[offsetc + (v + 3) + (u + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (v + 3) + (u + 3) * ldc];
+              } else {
+                c[offsetc + (v + 0) + (u + 0) * ldc] = alpha * sum00;
+                c[offsetc + (v + 1) + (u + 0) * ldc] = alpha * sum01;
+                c[offsetc + (v + 2) + (u + 0) * ldc] = alpha * sum02;
+                c[offsetc + (v + 3) + (u + 0) * ldc] = alpha * sum03;
+                c[offsetc + (v + 0) + (u + 1) * ldc] = alpha * sum10;
+                c[offsetc + (v + 1) + (u + 1) * ldc] = alpha * sum11;
+                c[offsetc + (v + 2) + (u + 1) * ldc] = alpha * sum12;
+                c[offsetc + (v + 3) + (u + 1) * ldc] = alpha * sum13;
+                c[offsetc + (v + 0) + (u + 2) * ldc] = alpha * sum20;
+                c[offsetc + (v + 1) + (u + 2) * ldc] = alpha * sum21;
+                c[offsetc + (v + 2) + (u + 2) * ldc] = alpha * sum22;
+                c[offsetc + (v + 3) + (u + 2) * ldc] = alpha * sum23;
+                c[offsetc + (v + 0) + (u + 3) * ldc] = alpha * sum30;
+                c[offsetc + (v + 1) + (u + 3) * ldc] = alpha * sum31;
+                c[offsetc + (v + 2) + (u + 3) * ldc] = alpha * sum32;
+                c[offsetc + (v + 3) + (u + 3) * ldc] = alpha * sum33;
+              }
             }
             for (; v < Math.min(row + T, m); v += 1) {
               double sum0 = 0.0;
@@ -660,10 +767,17 @@ public class JavaBLAS implements BLAS {
                 sum2 += aval * b[offsetb + (u + 2) + w * ldb];
                 sum3 += aval * b[offsetb + (u + 3) + w * ldb];
               }
-              c[offsetc + v + (u + 0) * ldc] = alpha * sum0 + beta * c[offsetc + v + (u + 0) * ldc];
-              c[offsetc + v + (u + 1) * ldc] = alpha * sum1 + beta * c[offsetc + v + (u + 1) * ldc];
-              c[offsetc + v + (u + 2) * ldc] = alpha * sum2 + beta * c[offsetc + v + (u + 2) * ldc];
-              c[offsetc + v + (u + 3) * ldc] = alpha * sum3 + beta * c[offsetc + v + (u + 3) * ldc];
+              if (beta != 0.0) {
+                c[offsetc + v + (u + 0) * ldc] = alpha * sum0 + beta * c[offsetc + v + (u + 0) * ldc];
+                c[offsetc + v + (u + 1) * ldc] = alpha * sum1 + beta * c[offsetc + v + (u + 1) * ldc];
+                c[offsetc + v + (u + 2) * ldc] = alpha * sum2 + beta * c[offsetc + v + (u + 2) * ldc];
+                c[offsetc + v + (u + 3) * ldc] = alpha * sum3 + beta * c[offsetc + v + (u + 3) * ldc];
+              } else {
+                c[offsetc + v + (u + 0) * ldc] = alpha * sum0;
+                c[offsetc + v + (u + 1) * ldc] = alpha * sum1;
+                c[offsetc + v + (u + 2) * ldc] = alpha * sum2;
+                c[offsetc + v + (u + 3) * ldc] = alpha * sum3;
+              }
             }
           }
           for (; u < Math.min(col + T, n); u += 1) {
@@ -680,17 +794,28 @@ public class JavaBLAS implements BLAS {
                 sum2 += a[offseta + w + (v + 2) * lda] * bval;
                 sum3 += a[offseta + w + (v + 3) * lda] * bval;
               }
-              c[offsetc + (v + 0) + u * ldc] = alpha * sum0 + beta * c[offsetc + (v + 0) + u * ldc];
-              c[offsetc + (v + 1) + u * ldc] = alpha * sum1 + beta * c[offsetc + (v + 1) + u * ldc];
-              c[offsetc + (v + 2) + u * ldc] = alpha * sum2 + beta * c[offsetc + (v + 2) + u * ldc];
-              c[offsetc + (v + 3) + u * ldc] = alpha * sum3 + beta * c[offsetc + (v + 3) + u * ldc];
+              if (beta != 0.0) {
+                c[offsetc + (v + 0) + u * ldc] = alpha * sum0 + beta * c[offsetc + (v + 0) + u * ldc];
+                c[offsetc + (v + 1) + u * ldc] = alpha * sum1 + beta * c[offsetc + (v + 1) + u * ldc];
+                c[offsetc + (v + 2) + u * ldc] = alpha * sum2 + beta * c[offsetc + (v + 2) + u * ldc];
+                c[offsetc + (v + 3) + u * ldc] = alpha * sum3 + beta * c[offsetc + (v + 3) + u * ldc];
+              } else {
+                c[offsetc + (v + 0) + u * ldc] = alpha * sum0;
+                c[offsetc + (v + 1) + u * ldc] = alpha * sum1;
+                c[offsetc + (v + 2) + u * ldc] = alpha * sum2;
+                c[offsetc + (v + 3) + u * ldc] = alpha * sum3;
+              }
             }
             for (; v < Math.min(row + T, m); v += 1) {
               double sum = 0.0;
               for (int w = i; w < Math.min(i + T, k); w += 1) {
                 sum += a[offseta + w + v * lda] * b[offsetb + u + w * ldb];
               }
-              c[offsetc + v + u * ldc] = alpha * sum + beta * c[offsetc + v + u * ldc];
+              if (beta != 0.0) {
+                c[offsetc + v + u * ldc] = alpha * sum + beta * c[offsetc + v + u * ldc];
+              } else {
+                c[offsetc + v + u * ldc] = alpha * sum;
+              }
             }
           }
         }
@@ -759,11 +884,24 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sgemmNN(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    // C = beta * C
-    sscal(m * n, beta, c, offsetc, 1);
-    // C += alpha * A * B
     int col = 0;
     for (; col < loopBound(n, 4); col += 4) {
+      if (beta != 1.0f) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          if (beta != 0.0f) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+            c[offsetc + row + (col + 1) * ldc] = beta * c[offsetc + row + (col + 1) * ldc];
+            c[offsetc + row + (col + 2) * ldc] = beta * c[offsetc + row + (col + 2) * ldc];
+            c[offsetc + row + (col + 3) * ldc] = beta * c[offsetc + row + (col + 3) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0f;
+            c[offsetc + row + (col + 1) * ldc] = 0.0f;
+            c[offsetc + row + (col + 2) * ldc] = 0.0f;
+            c[offsetc + row + (col + 3) * ldc] = 0.0f;
+          }
+        }
+      }
       int i = 0;
       for (; i < loopBound(k, 4); i += 4) {
         float alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
@@ -817,6 +955,16 @@ public class JavaBLAS implements BLAS {
       }
     }
     for (; col < n; col += 1) {
+      if (beta != 1.0f) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          if (beta != 0.0f) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0f;
+          }
+        }
+      }
       int i = 0;
       for (; i < loopBound(k, 4); i += 4) {
         float alphab0 = alpha * b[offsetb + (i + 0) + col * ldb];
@@ -883,22 +1031,41 @@ public class JavaBLAS implements BLAS {
             sum33 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 3) * ldb];
           }
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
-        c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
-        c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
-        c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
-        c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
-        c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
-        c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
-        c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
-        c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
-        c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
-        c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
-        c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
-        c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
-        c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
-        c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
-        c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
+        if (beta != 0.0f) {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
+        } else {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01;
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02;
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03;
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10;
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11;
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12;
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13;
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20;
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21;
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22;
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23;
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30;
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31;
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32;
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33;
+        }
       }
       for (; row < m; row += 1) {
         float sum0 = 0.0f;
@@ -914,10 +1081,17 @@ public class JavaBLAS implements BLAS {
             sum3 += a[offseta + i + row * lda] * b[offsetb + i + (col + 3) * ldb];
           }
         }
-        c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
-        c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
-        c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
-        c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
+        if (beta != 0.0f) {
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
+        } else {
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0;
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1;
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2;
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3;
+        }
       }
     }
     for (; col < n; col += 1) {
@@ -937,10 +1111,17 @@ public class JavaBLAS implements BLAS {
             sum3 += a[offseta + i + (row + 3) * lda] * bval;
           }
         }
-        c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
-        c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
-        c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
-        c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
+        if (beta != 0.0f) {
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
+        } else {
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0;
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1;
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2;
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3;
+        }
       }
       for (; row < m; row += 1) {
         float sum = 0.0f;
@@ -950,14 +1131,46 @@ public class JavaBLAS implements BLAS {
             sum += a[offseta + i + row * lda] * b[offsetb + i + col * ldb];
           }
         }
-        c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
+        if (beta != 0.0f) {
+          c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
+        } else {
+          c[offsetc + row + col * ldc] = alpha * sum;
+        }
       }
     }
   }
 
   protected void sgemmNT(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
     // C = beta * C
-    sscal(m * n, beta, c, offsetc, 1);
+    if (beta != 1.0f) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          if (beta != 0.0f) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+            c[offsetc + row + (col + 1) * ldc] = beta * c[offsetc + row + (col + 1) * ldc];
+            c[offsetc + row + (col + 2) * ldc] = beta * c[offsetc + row + (col + 2) * ldc];
+            c[offsetc + row + (col + 3) * ldc] = beta * c[offsetc + row + (col + 3) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0f;
+            c[offsetc + row + (col + 1) * ldc] = 0.0f;
+            c[offsetc + row + (col + 2) * ldc] = 0.0f;
+            c[offsetc + row + (col + 3) * ldc] = 0.0f;
+          }
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          if (beta != 0.0f) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0f;
+          }
+        }
+      }
+    }
     // C += alpha * A * B
     int i = 0;
     for (; i < loopBound(k, 4); i += 4) {
@@ -1095,22 +1308,41 @@ public class JavaBLAS implements BLAS {
                 sum32 += a2 * b3;
                 sum33 += a3 * b3;
               }
-              c[offsetc + (v + 0) + (u + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (v + 0) + (u + 0) * ldc];
-              c[offsetc + (v + 1) + (u + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (v + 1) + (u + 0) * ldc];
-              c[offsetc + (v + 2) + (u + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (v + 2) + (u + 0) * ldc];
-              c[offsetc + (v + 3) + (u + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (v + 3) + (u + 0) * ldc];
-              c[offsetc + (v + 0) + (u + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (v + 0) + (u + 1) * ldc];
-              c[offsetc + (v + 1) + (u + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (v + 1) + (u + 1) * ldc];
-              c[offsetc + (v + 2) + (u + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (v + 2) + (u + 1) * ldc];
-              c[offsetc + (v + 3) + (u + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (v + 3) + (u + 1) * ldc];
-              c[offsetc + (v + 0) + (u + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (v + 0) + (u + 2) * ldc];
-              c[offsetc + (v + 1) + (u + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (v + 1) + (u + 2) * ldc];
-              c[offsetc + (v + 2) + (u + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (v + 2) + (u + 2) * ldc];
-              c[offsetc + (v + 3) + (u + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (v + 3) + (u + 2) * ldc];
-              c[offsetc + (v + 0) + (u + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (v + 0) + (u + 3) * ldc];
-              c[offsetc + (v + 1) + (u + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (v + 1) + (u + 3) * ldc];
-              c[offsetc + (v + 2) + (u + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (v + 2) + (u + 3) * ldc];
-              c[offsetc + (v + 3) + (u + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (v + 3) + (u + 3) * ldc];
+              if (beta != 0.0f) {
+                c[offsetc + (v + 0) + (u + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (v + 0) + (u + 0) * ldc];
+                c[offsetc + (v + 1) + (u + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (v + 1) + (u + 0) * ldc];
+                c[offsetc + (v + 2) + (u + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (v + 2) + (u + 0) * ldc];
+                c[offsetc + (v + 3) + (u + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (v + 3) + (u + 0) * ldc];
+                c[offsetc + (v + 0) + (u + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (v + 0) + (u + 1) * ldc];
+                c[offsetc + (v + 1) + (u + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (v + 1) + (u + 1) * ldc];
+                c[offsetc + (v + 2) + (u + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (v + 2) + (u + 1) * ldc];
+                c[offsetc + (v + 3) + (u + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (v + 3) + (u + 1) * ldc];
+                c[offsetc + (v + 0) + (u + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (v + 0) + (u + 2) * ldc];
+                c[offsetc + (v + 1) + (u + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (v + 1) + (u + 2) * ldc];
+                c[offsetc + (v + 2) + (u + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (v + 2) + (u + 2) * ldc];
+                c[offsetc + (v + 3) + (u + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (v + 3) + (u + 2) * ldc];
+                c[offsetc + (v + 0) + (u + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (v + 0) + (u + 3) * ldc];
+                c[offsetc + (v + 1) + (u + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (v + 1) + (u + 3) * ldc];
+                c[offsetc + (v + 2) + (u + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (v + 2) + (u + 3) * ldc];
+                c[offsetc + (v + 3) + (u + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (v + 3) + (u + 3) * ldc];
+              } else {
+                c[offsetc + (v + 0) + (u + 0) * ldc] = alpha * sum00;
+                c[offsetc + (v + 1) + (u + 0) * ldc] = alpha * sum01;
+                c[offsetc + (v + 2) + (u + 0) * ldc] = alpha * sum02;
+                c[offsetc + (v + 3) + (u + 0) * ldc] = alpha * sum03;
+                c[offsetc + (v + 0) + (u + 1) * ldc] = alpha * sum10;
+                c[offsetc + (v + 1) + (u + 1) * ldc] = alpha * sum11;
+                c[offsetc + (v + 2) + (u + 1) * ldc] = alpha * sum12;
+                c[offsetc + (v + 3) + (u + 1) * ldc] = alpha * sum13;
+                c[offsetc + (v + 0) + (u + 2) * ldc] = alpha * sum20;
+                c[offsetc + (v + 1) + (u + 2) * ldc] = alpha * sum21;
+                c[offsetc + (v + 2) + (u + 2) * ldc] = alpha * sum22;
+                c[offsetc + (v + 3) + (u + 2) * ldc] = alpha * sum23;
+                c[offsetc + (v + 0) + (u + 3) * ldc] = alpha * sum30;
+                c[offsetc + (v + 1) + (u + 3) * ldc] = alpha * sum31;
+                c[offsetc + (v + 2) + (u + 3) * ldc] = alpha * sum32;
+                c[offsetc + (v + 3) + (u + 3) * ldc] = alpha * sum33;
+              }
             }
             for (; v < Math.min(row + T, m); v += 1) {
               float sum0 = 0.0f;
@@ -1124,10 +1356,17 @@ public class JavaBLAS implements BLAS {
                 sum2 += aval * b[offsetb + (u + 2) + w * ldb];
                 sum3 += aval * b[offsetb + (u + 3) + w * ldb];
               }
-              c[offsetc + v + (u + 0) * ldc] = alpha * sum0 + beta * c[offsetc + v + (u + 0) * ldc];
-              c[offsetc + v + (u + 1) * ldc] = alpha * sum1 + beta * c[offsetc + v + (u + 1) * ldc];
-              c[offsetc + v + (u + 2) * ldc] = alpha * sum2 + beta * c[offsetc + v + (u + 2) * ldc];
-              c[offsetc + v + (u + 3) * ldc] = alpha * sum3 + beta * c[offsetc + v + (u + 3) * ldc];
+              if (beta != 0.0f) {
+                c[offsetc + v + (u + 0) * ldc] = alpha * sum0 + beta * c[offsetc + v + (u + 0) * ldc];
+                c[offsetc + v + (u + 1) * ldc] = alpha * sum1 + beta * c[offsetc + v + (u + 1) * ldc];
+                c[offsetc + v + (u + 2) * ldc] = alpha * sum2 + beta * c[offsetc + v + (u + 2) * ldc];
+                c[offsetc + v + (u + 3) * ldc] = alpha * sum3 + beta * c[offsetc + v + (u + 3) * ldc];
+              } else {
+                c[offsetc + v + (u + 0) * ldc] = alpha * sum0;
+                c[offsetc + v + (u + 1) * ldc] = alpha * sum1;
+                c[offsetc + v + (u + 2) * ldc] = alpha * sum2;
+                c[offsetc + v + (u + 3) * ldc] = alpha * sum3;
+              }
             }
           }
           for (; u < Math.min(col + T, n); u += 1) {
@@ -1138,23 +1377,34 @@ public class JavaBLAS implements BLAS {
               float sum2 = 0.0f;
               float sum3 = 0.0f;
               for (int w = i; w < Math.min(i + T, k); w += 1) {
-                float bval = b[offsetb + w * n + u];
+                float bval = b[offsetb + u + w * ldb];
                 sum0 += a[offseta + w + (v + 0) * lda] * bval;
                 sum1 += a[offseta + w + (v + 1) * lda] * bval;
                 sum2 += a[offseta + w + (v + 2) * lda] * bval;
                 sum3 += a[offseta + w + (v + 3) * lda] * bval;
               }
-              c[offsetc + (v + 0) + u * ldc] = alpha * sum0 + beta * c[offsetc + (v + 0) + u * ldc];
-              c[offsetc + (v + 1) + u * ldc] = alpha * sum1 + beta * c[offsetc + (v + 1) + u * ldc];
-              c[offsetc + (v + 2) + u * ldc] = alpha * sum2 + beta * c[offsetc + (v + 2) + u * ldc];
-              c[offsetc + (v + 3) + u * ldc] = alpha * sum3 + beta * c[offsetc + (v + 3) + u * ldc];
+              if (beta != 0.0f) {
+                c[offsetc + (v + 0) + u * ldc] = alpha * sum0 + beta * c[offsetc + (v + 0) + u * ldc];
+                c[offsetc + (v + 1) + u * ldc] = alpha * sum1 + beta * c[offsetc + (v + 1) + u * ldc];
+                c[offsetc + (v + 2) + u * ldc] = alpha * sum2 + beta * c[offsetc + (v + 2) + u * ldc];
+                c[offsetc + (v + 3) + u * ldc] = alpha * sum3 + beta * c[offsetc + (v + 3) + u * ldc];
+              } else {
+                c[offsetc + (v + 0) + u * ldc] = alpha * sum0;
+                c[offsetc + (v + 1) + u * ldc] = alpha * sum1;
+                c[offsetc + (v + 2) + u * ldc] = alpha * sum2;
+                c[offsetc + (v + 3) + u * ldc] = alpha * sum3;
+              }
             }
             for (; v < Math.min(row + T, m); v += 1) {
               float sum = 0.0f;
               for (int w = i; w < Math.min(i + T, k); w += 1) {
                 sum += a[offseta + w + v * lda] * b[offsetb + u + w * ldb];
               }
-              c[offsetc + v + u * ldc] = alpha * sum + beta * c[offsetc + v + u * ldc];
+              if (beta != 0.0f) {
+                c[offsetc + v + u * ldc] = alpha * sum + beta * c[offsetc + v + u * ldc];
+              } else {
+                c[offsetc + v + u * ldc] = alpha * sum;
+              }
             }
           }
         }
@@ -1190,7 +1440,14 @@ public class JavaBLAS implements BLAS {
       return;
     }
     if (alpha == 0.0) {
-      dscal(lsame("N", trans) ? m : n, beta, y, offsety, incy);
+      int len = lsame("N", trans) ? m : n;
+      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
+        if (beta != 0.0) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0;
+        }
+      }
     } else if (lsame("N", trans)) {
       dgemvN(m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     } else if (lsame("T", trans) || lsame("C", trans)) {
@@ -1200,7 +1457,13 @@ public class JavaBLAS implements BLAS {
 
   protected void dgemvN(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     // y = beta * y
-    dscal(m, beta, y, offsety, incy);
+    for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+      if (beta != 0.0) {
+        y[offsety + iy] = beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = 0.0;
+      }
+    }
     // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
@@ -1224,9 +1487,6 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgemvT(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    // y = beta * y
-    dscal(n, beta, y, offsety, incy);
-    // y += alpha * A * x
     int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
       double sum0 = 0.0;
@@ -1240,17 +1500,28 @@ public class JavaBLAS implements BLAS {
         sum2 += xix * a[offseta + row + (col + 2) * lda];
         sum3 += xix * a[offseta + row + (col + 3) * lda];
       }
-      y[offsety + iy + incy * 0] += alpha * sum0;
-      y[offsety + iy + incy * 1] += alpha * sum1;
-      y[offsety + iy + incy * 2] += alpha * sum2;
-      y[offsety + iy + incy * 3] += alpha * sum3;
+      if (beta != 0.0) {
+        y[offsety + iy + incy * 0] = alpha * sum0 + beta * y[offsety + iy + incy * 0];
+        y[offsety + iy + incy * 1] = alpha * sum1 + beta * y[offsety + iy + incy * 1];
+        y[offsety + iy + incy * 2] = alpha * sum2 + beta * y[offsety + iy + incy * 2];
+        y[offsety + iy + incy * 3] = alpha * sum3 + beta * y[offsety + iy + incy * 3];
+      } else {
+        y[offsety + iy + incy * 0] = alpha * sum0;
+        y[offsety + iy + incy * 1] = alpha * sum1;
+        y[offsety + iy + incy * 2] = alpha * sum2;
+        y[offsety + iy + incy * 3] = alpha * sum3;
+      }
     }
     for (; col < n; col += 1, iy += incy) {
       double sum = 0.0;
       for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
         sum += x[offsetx + ix] * a[offseta + row + col * lda];
       }
-      y[offsety + iy] += alpha * sum;
+      if (beta != 0.0) {
+        y[offsety + iy] = alpha * sum + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sum;
+      }
     }
   }
 
@@ -1281,8 +1552,15 @@ public class JavaBLAS implements BLAS {
     if (m == 0 || n == 0) {
       return;
     }
-    if (alpha == 0.0) {
-      sscal(lsame("N", trans) ? m : n, beta, y, offsety, incy);
+    if (alpha == 0.0f) {
+      int len = lsame("N", trans) ? m : n;
+      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
+      }
     } else if (lsame("N", trans)) {
       sgemvN(m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     } else if (lsame("T", trans) || lsame("C", trans)) {
@@ -1292,7 +1570,13 @@ public class JavaBLAS implements BLAS {
 
   protected void sgemvN(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     // y = beta * y
-    sscal(m, beta, y, offsety, incy);
+    for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+      if (beta != 0.0) {
+        y[offsety + iy] = beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = 0.0f;
+      }
+    }
     // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
     for (; col < loopBound(n, 8); col += 8, ix += incx * 8) {
@@ -1323,11 +1607,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  // y = alpha * A * x + beta * y
   protected void sgemvT(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    // y = beta * y
-    sscal(n, beta, y, offsety, incy);
-    // y += alpha * A * x
     int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 8); col += 8, iy += incy * 8) {
       float sum0 = 0.0f;
@@ -1348,21 +1628,36 @@ public class JavaBLAS implements BLAS {
         sum6 += x[offsetx + ix] * a[offseta + row + (col + 6) * lda];
         sum7 += x[offsetx + ix] * a[offseta + row + (col + 7) * lda];
       }
-      y[offsety + iy + incy * 0] += alpha * sum0;
-      y[offsety + iy + incy * 1] += alpha * sum1;
-      y[offsety + iy + incy * 2] += alpha * sum2;
-      y[offsety + iy + incy * 3] += alpha * sum3;
-      y[offsety + iy + incy * 4] += alpha * sum4;
-      y[offsety + iy + incy * 5] += alpha * sum5;
-      y[offsety + iy + incy * 6] += alpha * sum6;
-      y[offsety + iy + incy * 7] += alpha * sum7;
+      if (beta != 0.0) {
+        y[offsety + iy + incy * 0] = alpha * sum0 + beta * y[offsety + iy + incy * 0];
+        y[offsety + iy + incy * 1] = alpha * sum1 + beta * y[offsety + iy + incy * 1];
+        y[offsety + iy + incy * 2] = alpha * sum2 + beta * y[offsety + iy + incy * 2];
+        y[offsety + iy + incy * 3] = alpha * sum3 + beta * y[offsety + iy + incy * 3];
+        y[offsety + iy + incy * 4] = alpha * sum4 + beta * y[offsety + iy + incy * 4];
+        y[offsety + iy + incy * 5] = alpha * sum5 + beta * y[offsety + iy + incy * 5];
+        y[offsety + iy + incy * 6] = alpha * sum6 + beta * y[offsety + iy + incy * 6];
+        y[offsety + iy + incy * 7] = alpha * sum7 + beta * y[offsety + iy + incy * 7];
+      } else {
+        y[offsety + iy + incy * 0] = alpha * sum0;
+        y[offsety + iy + incy * 1] = alpha * sum1;
+        y[offsety + iy + incy * 2] = alpha * sum2;
+        y[offsety + iy + incy * 3] = alpha * sum3;
+        y[offsety + iy + incy * 4] = alpha * sum4;
+        y[offsety + iy + incy * 5] = alpha * sum5;
+        y[offsety + iy + incy * 6] = alpha * sum6;
+        y[offsety + iy + incy * 7] = alpha * sum7;
+      }
     }
     for (; col < n; col += 1, iy += incy) {
       float sum = 0.0f;
       for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
         sum += x[offsetx + ix] * a[offseta + row + col * lda];
       }
-      y[offsety + iy] += alpha * sum;
+      if (beta != 0.0) {
+        y[offsety + iy] = alpha * sum + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sum;
+      }
     }
   }
 
@@ -1707,7 +2002,13 @@ public class JavaBLAS implements BLAS {
       return;
     }
     if (alpha == 0.0) {
-      dscal(n, beta, y, offsety, incy);
+      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+        if (beta != 0.0) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0;
+        }
+      }
     } else if (lsame("U", uplo)) {
       dspmvU(n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
     } else if (lsame("L", uplo)) {
@@ -1716,9 +2017,6 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dspmvU(int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    // y = beta * y
-    dscal(n, beta, y, offsety, incy);
-    // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
       double alphaxix0 = alpha * x[offsetx + ix + incx * 0];
@@ -1775,10 +2073,17 @@ public class JavaBLAS implements BLAS {
              +  xjx1 * a13
              +  xjx2 * a23
              +  xjx3 * a33;
-      y[offsety + iy + incy * 0] += alpha * sumiy0;
-      y[offsety + iy + incy * 1] += alpha * sumiy1;
-      y[offsety + iy + incy * 2] += alpha * sumiy2;
-      y[offsety + iy + incy * 3] += alpha * sumiy3;
+      if (beta != 0.0) {
+        y[offsety + iy + incy * 0] = alpha * sumiy0 + beta * y[offsety + iy + incy * 0];
+        y[offsety + iy + incy * 1] = alpha * sumiy1 + beta * y[offsety + iy + incy * 1];
+        y[offsety + iy + incy * 2] = alpha * sumiy2 + beta * y[offsety + iy + incy * 2];
+        y[offsety + iy + incy * 3] = alpha * sumiy3 + beta * y[offsety + iy + incy * 3];
+      } else {
+        y[offsety + iy + incy * 0] = alpha * sumiy0;
+        y[offsety + iy + incy * 1] = alpha * sumiy1;
+        y[offsety + iy + incy * 2] = alpha * sumiy2;
+        y[offsety + iy + incy * 3] = alpha * sumiy3;
+      }
     }
     for (; col < n; col += 1, ix += incx, iy += incy) {
       double alphaxix = alpha * x[offsetx + ix];
@@ -1789,13 +2094,25 @@ public class JavaBLAS implements BLAS {
         sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
       }
       sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
-      y[offsety + iy] += alpha * sumiy;
+      if (beta != 0.0) {
+        y[offsety + iy] = alpha * sumiy + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sumiy;
+      }
     }
   }
 
   protected void dspmvL(int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     // y = beta * y
-    dscal(n, beta, y, offsety, incy);
+    if (beta != 1.0) {
+      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+        if (beta != 0.0) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0;
+        }
+      }
+    }
     // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
@@ -1892,7 +2209,13 @@ public class JavaBLAS implements BLAS {
       return;
     }
     if (alpha == 0.0) {
-      sscal(n, beta, y, offsety, incy);
+      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
+      }
     } else if (lsame("U", uplo)) {
       sspmvU(n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
     } else if (lsame("L", uplo)) {
@@ -1901,9 +2224,6 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sspmvU(int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    // y = beta * y
-    sscal(n, beta, y, offsety, incy);
-    // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
       float alphaxix0 = alpha * x[offsetx + ix + incx * 0];
@@ -1960,10 +2280,17 @@ public class JavaBLAS implements BLAS {
              +  xjx1 * a13
              +  xjx2 * a23
              +  xjx3 * a33;
-      y[offsety + iy + incy * 0] += alpha * sumiy0;
-      y[offsety + iy + incy * 1] += alpha * sumiy1;
-      y[offsety + iy + incy * 2] += alpha * sumiy2;
-      y[offsety + iy + incy * 3] += alpha * sumiy3;
+      if (beta != 0.0) {
+        y[offsety + iy + incy * 0] = alpha * sumiy0 + beta * y[offsety + iy + incy * 0];
+        y[offsety + iy + incy * 1] = alpha * sumiy1 + beta * y[offsety + iy + incy * 1];
+        y[offsety + iy + incy * 2] = alpha * sumiy2 + beta * y[offsety + iy + incy * 2];
+        y[offsety + iy + incy * 3] = alpha * sumiy3 + beta * y[offsety + iy + incy * 3];
+      } else {
+        y[offsety + iy + incy * 0] = alpha * sumiy0;
+        y[offsety + iy + incy * 1] = alpha * sumiy1;
+        y[offsety + iy + incy * 2] = alpha * sumiy2;
+        y[offsety + iy + incy * 3] = alpha * sumiy3;
+      }
     }
     for (; col < n; col += 1, ix += incx, iy += incy) {
       float alphaxix = alpha * x[offsetx + ix];
@@ -1973,13 +2300,26 @@ public class JavaBLAS implements BLAS {
         y[offsety + jy] += alphaxix * a[offseta + row + col * (col + 1) / 2];
         sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
       }
-      y[offsety + iy] += alpha * (sumiy + x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2]);
+      sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
+      if (beta != 0.0) {
+        y[offsety + iy] = alpha * sumiy + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sumiy;
+      }
     }
   }
 
   protected void sspmvL(int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     // y = beta * y
-    sscal(n, beta, y, offsety, incy);
+    if (beta != 1.0f) {
+      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
+      }
+    }
     // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
@@ -3233,7 +3573,13 @@ public class JavaBLAS implements BLAS {
       return;
     }
     if (alpha == 0.0) {
-      dscal(n, beta, y, offsety, incy);
+      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+        if (beta != 0.0) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0;
+        }
+      }
     } else if (lsame("U", uplo)) {
       dsymvU(n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     } else if (lsame("L", uplo)) {
@@ -3242,9 +3588,6 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dsymvU(int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    // y = beta * y
-    dscal(n, beta, y, offsety, incy);
-    // y += alpha * A * x 
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
       double alphaxix0 = alpha * x[offsetx + ix + incx * 0];
@@ -3297,10 +3640,17 @@ public class JavaBLAS implements BLAS {
              +  xjx1 * a13
              +  xjx2 * a23
              +  xjx3 * a33;
-      y[offsety + iy + incy * 0] += alpha * sumiy0;
-      y[offsety + iy + incy * 1] += alpha * sumiy1;
-      y[offsety + iy + incy * 2] += alpha * sumiy2;
-      y[offsety + iy + incy * 3] += alpha * sumiy3;
+      if (beta != 0.0) {
+        y[offsety + iy + incy * 0] = alpha * sumiy0 + beta * y[offsety + iy + incy * 0];
+        y[offsety + iy + incy * 1] = alpha * sumiy1 + beta * y[offsety + iy + incy * 1];
+        y[offsety + iy + incy * 2] = alpha * sumiy2 + beta * y[offsety + iy + incy * 2];
+        y[offsety + iy + incy * 3] = alpha * sumiy3 + beta * y[offsety + iy + incy * 3];
+      } else {
+        y[offsety + iy + incy * 0] = alpha * sumiy0;
+        y[offsety + iy + incy * 1] = alpha * sumiy1;
+        y[offsety + iy + incy * 2] = alpha * sumiy2;
+        y[offsety + iy + incy * 3] = alpha * sumiy3;
+      }
     }
     for (; col < n; col += 1, ix += incx, iy += incy) {
       double alphaxix = alpha * x[offsetx + ix];
@@ -3310,13 +3660,26 @@ public class JavaBLAS implements BLAS {
         y[offsety + jy] += alphaxix * a[offseta + row + col * lda];
         sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
       }
-      y[offsety + iy] += alpha * (sumiy + x[offsetx + jx] * a[offseta + row + col * lda]);
+      sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
+      if (beta != 0.0) {
+        y[offsety + iy] = alpha * sumiy + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sumiy;
+      }
     }
   }
 
   protected void dsymvL(int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     // y = beta * y
-    dscal(n, beta, y, offsety, incy);
+    if (beta != 1.0) {
+      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+        if (beta != 0.0) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0;
+        }
+      }
+    }
     // y += alpha * A * x 
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
@@ -3416,7 +3779,13 @@ public class JavaBLAS implements BLAS {
       return;
     }
     if (alpha == 0.0f) {
-      sscal(n, beta, y, offsety, incy);
+      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
+      }
     } else if (lsame("U", uplo)) {
       ssymvU(n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     } else if (lsame("L", uplo)) {
@@ -3425,9 +3794,6 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void ssymvU(int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    // y = beta * y
-    sscal(n, beta, y, offsety, incy);
-    // y += alpha * A * x 
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
       float alphaxix0 = alpha * x[offsetx + ix + incx * 0];
@@ -3480,10 +3846,17 @@ public class JavaBLAS implements BLAS {
              +  xjx1 * a13
              +  xjx2 * a23
              +  xjx3 * a33;
-      y[offsety + iy + incy * 0] += alpha * sumiy0;
-      y[offsety + iy + incy * 1] += alpha * sumiy1;
-      y[offsety + iy + incy * 2] += alpha * sumiy2;
-      y[offsety + iy + incy * 3] += alpha * sumiy3;
+      if (beta != 0.0) {
+        y[offsety + iy + incy * 0] = alpha * sumiy0 + beta * y[offsety + iy + incy * 0];
+        y[offsety + iy + incy * 1] = alpha * sumiy1 + beta * y[offsety + iy + incy * 1];
+        y[offsety + iy + incy * 2] = alpha * sumiy2 + beta * y[offsety + iy + incy * 2];
+        y[offsety + iy + incy * 3] = alpha * sumiy3 + beta * y[offsety + iy + incy * 3];
+      } else {
+        y[offsety + iy + incy * 0] = alpha * sumiy0;
+        y[offsety + iy + incy * 1] = alpha * sumiy1;
+        y[offsety + iy + incy * 2] = alpha * sumiy2;
+        y[offsety + iy + incy * 3] = alpha * sumiy3;
+      }
     }
     for (; col < n; col += 1, ix += incx, iy += incy) {
       float alphaxix = alpha * x[offsetx + ix];
@@ -3493,13 +3866,26 @@ public class JavaBLAS implements BLAS {
         y[offsety + jy] += alphaxix * a[offseta + row + col * lda];
         sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
       }
-      y[offsety + iy] += alpha * (sumiy + x[offsetx + jx] * a[offseta + row + col * lda]);
+      sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
+      if (beta != 0.0) {
+        y[offsety + iy] = alpha * sumiy + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sumiy;
+      }
     }
   }
 
   protected void ssymvL(int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     // y = beta * y
-    sscal(n, beta, y, offsety, incy);
+    if (beta != 1.0f) {
+      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
+      }
+    }
     // y += alpha * A * x 
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
