@@ -350,11 +350,34 @@ public class VectorizedBLAS extends JavaBLAS {
     }
   }
 
+  /*
+   * Trow = 1000, Tcol = 4, Ti = 250
+   *
+   * Benchmark                                  (implementation)   (k)   (m)   (n)  (transa)  (transb)   Mode  Cnt            Score   Error      Units
+   * DgemmBenchmark.blas                                  vector  1000  1000  1000         N         T  thrpt       10727477343.415              ops/s
+   * DgemmBenchmark.blas:CPI                              vector  1000  1000  1000         N         T  thrpt                 0.398          clks/insn
+   * DgemmBenchmark.blas:IPC                              vector  1000  1000  1000         N         T  thrpt                 2.516          insns/clk
+   * DgemmBenchmark.blas:L1-dcache-load-misses            vector  1000  1000  1000         N         T  thrpt                 0.091               #/op
+   * DgemmBenchmark.blas:L1-dcache-loads                  vector  1000  1000  1000         N         T  thrpt                 0.368               #/op
+   * DgemmBenchmark.blas:L1-dcache-stores                 vector  1000  1000  1000         N         T  thrpt                 0.055               #/op
+   * DgemmBenchmark.blas:L1-icache-load-misses            vector  1000  1000  1000         N         T  thrpt                ≈ 10⁻⁴               #/op
+   * DgemmBenchmark.blas:branch-misses                    vector  1000  1000  1000         N         T  thrpt                ≈ 10⁻⁴               #/op
+   * DgemmBenchmark.blas:branches                         vector  1000  1000  1000         N         T  thrpt                 0.031               #/op
+   * DgemmBenchmark.blas:cycles                           vector  1000  1000  1000         N         T  thrpt                 0.403               #/op
+   * DgemmBenchmark.blas:dTLB-load-misses                 vector  1000  1000  1000         N         T  thrpt                ≈ 10⁻⁵               #/op
+   * DgemmBenchmark.blas:dTLB-loads                       vector  1000  1000  1000         N         T  thrpt                 0.365               #/op
+   * DgemmBenchmark.blas:dTLB-store-misses                vector  1000  1000  1000         N         T  thrpt                ≈ 10⁻⁵               #/op
+   * DgemmBenchmark.blas:dTLB-stores                      vector  1000  1000  1000         N         T  thrpt                 0.056               #/op
+   * DgemmBenchmark.blas:iTLB-load-misses                 vector  1000  1000  1000         N         T  thrpt                ≈ 10⁻⁶               #/op
+   * DgemmBenchmark.blas:iTLB-loads                       vector  1000  1000  1000         N         T  thrpt                ≈ 10⁻⁶               #/op
+   * DgemmBenchmark.blas:instructions                     vector  1000  1000  1000         N         T  thrpt                 1.015               #/op
+   * DgemmBenchmark.blas:·asm                             vector  1000  1000  1000         N         T  thrpt                   NaN                ---
+   */
   @Override
   protected void dgemmNTKernel(int cols, int cole, int rows, int rowe, int is, int ie,
       double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb,
       double beta, double[] c, int offsetc, int ldc) {
-    final int Tcol = 2, Ti = 5;
+    final int Tcol = 2, Ti = 6;
     int col = cols;
     for (; col < loopBound(cole, Tcol); col += Tcol) {
       if (beta != 1.0) {
@@ -388,22 +411,25 @@ public class VectorizedBLAS extends JavaBLAS {
         DoubleVector valphab02 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 2) * ldb]);
         DoubleVector valphab03 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 3) * ldb]);
         DoubleVector valphab04 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 4) * ldb]);
+        DoubleVector valphab05 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 5) * ldb]);
         DoubleVector valphab10 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 1) + (i + 0) * ldb]);
         DoubleVector valphab11 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 1) + (i + 1) * ldb]);
         DoubleVector valphab12 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 1) + (i + 2) * ldb]);
         DoubleVector valphab13 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 1) + (i + 3) * ldb]);
         DoubleVector valphab14 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 1) + (i + 4) * ldb]);
+        DoubleVector valphab15 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 1) + (i + 5) * ldb]);
         for (; row < DMAX.loopBound(rowe); row += DMAX.length()) {
           DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 0) * lda);
           DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 1) * lda);
           DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 2) * lda);
           DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 3) * lda);
           DoubleVector va4 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 4) * lda);
+          DoubleVector va5 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 5) * lda);
           DoubleVector vc0 = DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 0) * ldc);
           DoubleVector vc1 = DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 1) * ldc);
-          valphab00.fma(va0, valphab01.fma(va1, valphab02.fma(va2, valphab03.fma(va3, valphab04.fma(va4, vc0)))))
+          valphab00.fma(va0, valphab01.fma(va1, valphab02.fma(va2, valphab03.fma(va3, valphab04.fma(va4, valphab05.fma(va5, vc0))))))
             .intoArray(c, offsetc + row + (col + 0) * ldc);
-          valphab10.fma(va0, valphab11.fma(va1, valphab12.fma(va2, valphab13.fma(va3, valphab14.fma(va4, vc1)))))
+          valphab10.fma(va0, valphab11.fma(va1, valphab12.fma(va2, valphab13.fma(va3, valphab14.fma(va4, valphab15.fma(va5, vc1))))))
             .intoArray(c, offsetc + row + (col + 1) * ldc);
         }
         double alphab00 = alpha * b[offsetb + (col + 0) + (i + 0) * ldb];
@@ -411,27 +437,32 @@ public class VectorizedBLAS extends JavaBLAS {
         double alphab02 = alpha * b[offsetb + (col + 0) + (i + 2) * ldb];
         double alphab03 = alpha * b[offsetb + (col + 0) + (i + 3) * ldb];
         double alphab04 = alpha * b[offsetb + (col + 0) + (i + 4) * ldb];
+        double alphab05 = alpha * b[offsetb + (col + 0) + (i + 5) * ldb];
         double alphab10 = alpha * b[offsetb + (col + 1) + (i + 0) * ldb];
         double alphab11 = alpha * b[offsetb + (col + 1) + (i + 1) * ldb];
         double alphab12 = alpha * b[offsetb + (col + 1) + (i + 2) * ldb];
         double alphab13 = alpha * b[offsetb + (col + 1) + (i + 3) * ldb];
         double alphab14 = alpha * b[offsetb + (col + 1) + (i + 4) * ldb];
+        double alphab15 = alpha * b[offsetb + (col + 1) + (i + 5) * ldb];
         for (; row < rowe; row += 1) {
           double a0 = a[offseta + row + (i + 0) * lda];
           double a1 = a[offseta + row + (i + 1) * lda];
           double a2 = a[offseta + row + (i + 2) * lda];
           double a3 = a[offseta + row + (i + 3) * lda];
           double a4 = a[offseta + row + (i + 4) * lda];
+          double a5 = a[offseta + row + (i + 5) * lda];
           c[offsetc + row + (col + 0) * ldc] += alphab00 * a0
                                              +  alphab01 * a1
                                              +  alphab02 * a2
                                              +  alphab03 * a3
-                                             +  alphab04 * a4;
+                                             +  alphab04 * a4
+                                             +  alphab05 * a5;
           c[offsetc + row + (col + 1) * ldc] += alphab10 * a0
                                              +  alphab11 * a1
                                              +  alphab12 * a2
                                              +  alphab13 * a3
-                                             +  alphab14 * a4;
+                                             +  alphab14 * a4
+                                             +  alphab15 * a5;
         }
       }
       for (; i < ie; i += 1) {
@@ -475,21 +506,23 @@ public class VectorizedBLAS extends JavaBLAS {
         }
       }
       int i = is;
-      for (; i < loopBound(ie, 5); i += 5) {
+      for (; i < loopBound(ie, Ti); i += Ti) {
         int row = rows;
         DoubleVector valphab00 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 0) * ldb]);
         DoubleVector valphab01 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 1) * ldb]);
         DoubleVector valphab02 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 2) * ldb]);
         DoubleVector valphab03 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 3) * ldb]);
         DoubleVector valphab04 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 4) * ldb]);
+        DoubleVector valphab05 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 5) * ldb]);
         for (; row < DMAX.loopBound(rowe); row += DMAX.length()) {
           DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 0) * lda);
           DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 1) * lda);
           DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 2) * lda);
           DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 3) * lda);
           DoubleVector va4 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 4) * lda);
+          DoubleVector va5 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 5) * lda);
           DoubleVector vc0 = DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 0) * ldc);
-          valphab00.fma(va0, valphab01.fma(va1, valphab02.fma(va2, valphab03.fma(va3, valphab04.fma(va4, vc0)))))
+          valphab00.fma(va0, valphab01.fma(va1, valphab02.fma(va2, valphab03.fma(va3, valphab04.fma(va4, valphab05.fma(va5, vc0))))))
             .intoArray(c, offsetc + row + col * ldc);
         }
         double alphab00 = alpha * b[offsetb + (col + 0) + (i + 0) * ldb];
@@ -497,17 +530,20 @@ public class VectorizedBLAS extends JavaBLAS {
         double alphab02 = alpha * b[offsetb + (col + 0) + (i + 2) * ldb];
         double alphab03 = alpha * b[offsetb + (col + 0) + (i + 3) * ldb];
         double alphab04 = alpha * b[offsetb + (col + 0) + (i + 4) * ldb];
+        double alphab05 = alpha * b[offsetb + (col + 0) + (i + 5) * ldb];
         for (; row < rowe; row += 1) {
           double a0 = a[offseta + row + (i + 0) * lda];
           double a1 = a[offseta + row + (i + 1) * lda];
           double a2 = a[offseta + row + (i + 2) * lda];
           double a3 = a[offseta + row + (i + 3) * lda];
           double a4 = a[offseta + row + (i + 4) * lda];
+          double a5 = a[offseta + row + (i + 5) * lda];
           c[offsetc + row + (col + 0) * ldc] += alphab00 * a0
                                              +  alphab01 * a1
                                              +  alphab02 * a2
                                              +  alphab03 * a3
-                                             +  alphab04 * a4;
+                                             +  alphab04 * a4
+                                             +  alphab05 * a5;
         }
       }
       for (; i < ie; i += 1) {
