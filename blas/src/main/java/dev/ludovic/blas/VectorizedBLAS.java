@@ -173,26 +173,178 @@ public class VectorizedBLAS extends JavaBLAS {
     }
   }
 
-  // c = alpha * a * b + beta * c
   @Override
-  protected void dgemmNN(int m, int n, int k,
+  protected void dgemmNNKernel(int cols, int cole, int rows, int rowe, int is, int ie,
       double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb,
       double beta, double[] c, int offsetc, int ldc) {
-    // C = beta * C
-    dscal(m * n, beta, c, offsetc, 1);
-    // C += alpha * A * B
-    DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
-    for (int col = 0; col < n; col += 1) {
-      for (int i = 0; i < k; i += 1) {
-        int row = 0;
-        for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-          DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + i * lda + row);
-          DoubleVector vc = DoubleVector.fromArray(DMAX, c, offsetc + col * ldc + row);
-          valpha.mul(b[offsetb + col * ldb + i]).fma(va, vc)
-                .intoArray(c, offsetc + col * ldc + row);
+    int col = cols;
+    for (; col < loopBound(cole, 2); col += 2) {
+      if (beta != 1.0) {
+        int row = rows;
+        DoubleVector vbeta = DoubleVector.broadcast(DMAX, beta);
+        DoubleVector vzero = DoubleVector.zero(DMAX);
+        for (; row < DMAX.loopBound(rowe); row += DMAX.length()) {
+          if (beta != 0.0) {
+            DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 0) * ldc).mul(vbeta).intoArray(c, offsetc + row + (col + 0) * ldc);
+            DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 1) * ldc).mul(vbeta).intoArray(c, offsetc + row + (col + 1) * ldc);
+          } else {
+            vzero.intoArray(c, offsetc + row + (col + 0) * ldc);
+            vzero.intoArray(c, offsetc + row + (col + 1) * ldc);
+          }
         }
-        for (; row < m; row += 1) {
-          c[offsetc + col * ldc + row] += alpha * a[offseta + i * lda + row] * b[offsetb + col * ldb + i];
+        for (; row < rowe; row += 1) {
+          if (beta != 0.0) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+            c[offsetc + row + (col + 1) * ldc] = beta * c[offsetc + row + (col + 1) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0;
+            c[offsetc + row + (col + 1) * ldc] = 0.0;
+          }
+        }
+      }
+      int i = is;
+      for (; i < loopBound(ie, 5); i += 5) {
+        int row = rows;
+        DoubleVector valphab00 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 0) + (col + 0) * ldb]);
+        DoubleVector valphab01 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 1) + (col + 0) * ldb]);
+        DoubleVector valphab02 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 2) + (col + 0) * ldb]);
+        DoubleVector valphab03 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 3) + (col + 0) * ldb]);
+        DoubleVector valphab04 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 4) + (col + 0) * ldb]);
+        DoubleVector valphab10 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 0) + (col + 1) * ldb]);
+        DoubleVector valphab11 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 1) + (col + 1) * ldb]);
+        DoubleVector valphab12 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 2) + (col + 1) * ldb]);
+        DoubleVector valphab13 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 3) + (col + 1) * ldb]);
+        DoubleVector valphab14 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 4) + (col + 1) * ldb]);
+        for (; row < DMAX.loopBound(rowe); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 2) * lda);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 3) * lda);
+          DoubleVector va4 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 4) * lda);
+          DoubleVector vc0 = DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 0) * ldc);
+          DoubleVector vc1 = DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 1) * ldc);
+          valphab00.fma(va0, valphab01.fma(va1, valphab02.fma(va2, valphab03.fma(va3, valphab04.fma(va4, vc0)))))
+            .intoArray(c, offsetc + row + (col + 0) * ldc);
+          valphab10.fma(va0, valphab11.fma(va1, valphab12.fma(va2, valphab13.fma(va3, valphab14.fma(va4, vc1)))))
+            .intoArray(c, offsetc + row + (col + 1) * ldc);
+        }
+        double alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
+        double alphab01 = alpha * b[offsetb + (i + 1) + (col + 0) * ldb];
+        double alphab02 = alpha * b[offsetb + (i + 2) + (col + 0) * ldb];
+        double alphab03 = alpha * b[offsetb + (i + 3) + (col + 0) * ldb];
+        double alphab04 = alpha * b[offsetb + (i + 4) + (col + 0) * ldb];
+        double alphab10 = alpha * b[offsetb + (i + 0) + (col + 1) * ldb];
+        double alphab11 = alpha * b[offsetb + (i + 1) + (col + 1) * ldb];
+        double alphab12 = alpha * b[offsetb + (i + 2) + (col + 1) * ldb];
+        double alphab13 = alpha * b[offsetb + (i + 3) + (col + 1) * ldb];
+        double alphab14 = alpha * b[offsetb + (i + 4) + (col + 1) * ldb];
+        for (; row < rowe; row += 1) {
+          double a0 = a[offseta + row + (i + 0) * lda];
+          double a1 = a[offseta + row + (i + 1) * lda];
+          double a2 = a[offseta + row + (i + 2) * lda];
+          double a3 = a[offseta + row + (i + 3) * lda];
+          double a4 = a[offseta + row + (i + 4) * lda];
+          c[offsetc + row + (col + 0) * ldc] += alphab00 * a0
+                                             +  alphab01 * a1
+                                             +  alphab02 * a2
+                                             +  alphab03 * a3
+                                             +  alphab04 * a4;
+          c[offsetc + row + (col + 1) * ldc] += alphab10 * a0
+                                             +  alphab11 * a1
+                                             +  alphab12 * a2
+                                             +  alphab13 * a3
+                                             +  alphab14 * a4;
+        }
+      }
+      for (; i < ie; i += 1) {
+        int row = rows;
+        DoubleVector valphab00 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 0) + (col + 0) * ldb]);
+        DoubleVector valphab10 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 0) + (col + 1) * ldb]);
+        for (; row < DMAX.loopBound(rowe); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 0) * lda);
+          DoubleVector vc0 = DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 0) * ldc);
+          DoubleVector vc1 = DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 1) * ldc);
+          valphab00.fma(va0, vc0).intoArray(c, offsetc + row + (col + 0) * ldc);
+          valphab10.fma(va0, vc1).intoArray(c, offsetc + row + (col + 1) * ldc);
+        }
+        double alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
+        double alphab10 = alpha * b[offsetb + (i + 0) + (col + 1) * ldb];
+        for (; row < rowe; row += 1) {
+          double a0 = a[offseta + row + (i + 0) * lda];
+          c[offsetc + row + (col + 0) * ldc] += alphab00 * a0;
+          c[offsetc + row + (col + 1) * ldc] += alphab10 * a0;
+        }
+      }
+    }
+    for (; col < cole; col += 1) {
+      if (beta != 1.0) {
+        int row = rows;
+        DoubleVector vbeta = DoubleVector.broadcast(DMAX, beta);
+        DoubleVector vzero = DoubleVector.zero(DMAX);
+        for (; row < DMAX.loopBound(rowe); row += DMAX.length()) {
+          if (beta != 0.0) {
+            DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 0) * ldc).mul(vbeta).intoArray(c, offsetc + row + (col + 0) * ldc);
+          } else {
+            vzero.intoArray(c, offsetc + row + (col + 0) * ldc);
+          }
+        }
+        for (; row < rowe; row += 1) {
+          if (beta != 0.0) {
+            c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+          } else {
+            c[offsetc + row + (col + 0) * ldc] = 0.0;
+          }
+        }
+      }
+      int i = is;
+      for (; i < loopBound(ie, 5); i += 5) {
+        int row = rows;
+        DoubleVector valphab00 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 0) + (col + 0) * ldb]);
+        DoubleVector valphab01 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 1) + (col + 0) * ldb]);
+        DoubleVector valphab02 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 2) + (col + 0) * ldb]);
+        DoubleVector valphab03 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 3) + (col + 0) * ldb]);
+        DoubleVector valphab04 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 4) + (col + 0) * ldb]);
+        for (; row < DMAX.loopBound(rowe); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 2) * lda);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 3) * lda);
+          DoubleVector va4 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 4) * lda);
+          DoubleVector vc0 = DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 0) * ldc);
+          valphab00.fma(va0, valphab01.fma(va1, valphab02.fma(va2, valphab03.fma(va3, valphab04.fma(va4, vc0)))))
+            .intoArray(c, offsetc + row + col * ldc);
+        }
+        double alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
+        double alphab01 = alpha * b[offsetb + (i + 1) + (col + 0) * ldb];
+        double alphab02 = alpha * b[offsetb + (i + 2) + (col + 0) * ldb];
+        double alphab03 = alpha * b[offsetb + (i + 3) + (col + 0) * ldb];
+        double alphab04 = alpha * b[offsetb + (i + 4) + (col + 0) * ldb];
+        for (; row < rowe; row += 1) {
+          double a0 = a[offseta + row + (i + 0) * lda];
+          double a1 = a[offseta + row + (i + 1) * lda];
+          double a2 = a[offseta + row + (i + 2) * lda];
+          double a3 = a[offseta + row + (i + 3) * lda];
+          double a4 = a[offseta + row + (i + 4) * lda];
+          c[offsetc + row + (col + 0) * ldc] += alphab00 * a0
+                                             +  alphab01 * a1
+                                             +  alphab02 * a2
+                                             +  alphab03 * a3
+                                             +  alphab04 * a4;
+        }
+      }
+      for (; i < ie; i += 1) {
+        int row = rows;
+        DoubleVector valphab00 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (i + 0) + (col + 0) * ldb]);
+        for (; row < DMAX.loopBound(rowe); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (i + 0) * lda);
+          DoubleVector vc0 = DoubleVector.fromArray(DMAX, c, offsetc + row + (col + 0) * ldc);
+          valphab00.fma(va0, vc0)
+            .intoArray(c, offsetc + row + col * ldc);
+        }
+        double alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
+        for (; row < rowe; row += 1) {
+          double a0 = a[offseta + row + (i + 0) * lda];
+          c[offsetc + row + (col + 0) * ldc] += alphab00 * a0;
         }
       }
     }
