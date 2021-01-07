@@ -35,7 +35,7 @@ public class JavaBLAS implements BLAS {
     return instance;
   }
 
-  private int loopBound(int index, int size) {
+  protected int loopBound(int index, int size) {
     return index - (index % size);
   }
 
