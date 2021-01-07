@@ -301,11 +301,11 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgemmNN(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Trow = 1000, Tcol = 4, Ti = 250;
-    for (int col = 0; col < n; col += Tcol) {
-      for (int row = 0; row < m; row += Trow) {
-        for (int i = 0; i < k; i += Ti) {
-          dgemmNNKernel(col, Math.min(col + Tcol, n), row, Math.min(row + Trow, m), i, Math.min(i + Ti, k),
+    final int Krow = 1000, Kcol = 4, Ki = 250;
+    for (int col = 0; col < n; col += Kcol) {
+      for (int row = 0; row < m; row += Krow) {
+        for (int i = 0; i < k; i += Ki) {
+          dgemmNNKernel(col, Math.min(col + Kcol, n), row, Math.min(row + Krow, m), i, Math.min(i + Ki, k),
                         alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
         }
       }
@@ -415,11 +415,11 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgemmTN(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Tcol = n, Trow = m, Ti = k;
-    for (int col = 0; col < n; col += Tcol) {
-      for (int row = 0; row < m; row += Trow) {
-        for (int i = 0; i < k; i += Ti) {
-          dgemmTNKernel(col, Math.min(col + Tcol, n), row, Math.min(row + Trow, m), i, Math.min(i + Ti, k),
+    final int Kcol = 3, Krow = 249, Ki = 1000;
+    for (int col = 0; col < n; col += Kcol) {
+      for (int row = 0; row < m; row += Krow) {
+        for (int i = 0; i < k; i += Ki) {
+          dgemmTNKernel(col, Math.min(col + Kcol, n), row, Math.min(row + Krow, m), i, Math.min(i + Ki, k),
                         alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
         }
       }
@@ -427,10 +427,11 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgemmTNKernel(int cols, int cole, int rows, int rowe, int is, int ie, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    final int Tcol = 4, Trow = 4;
     int col = cols;
-    for (; col < loopBound(cole, 4); col += 4) {
+    for (; col < loopBound(cole, Tcol); col += Tcol) {
       int row = rows;
-      for (; row < loopBound(rowe, 4); row += 4) {
+      for (; row < loopBound(rowe, Trow); row += Trow) {
         int i = is;
         double sum00 = 0.0;
         double sum01 = 0.0;
@@ -529,7 +530,7 @@ public class JavaBLAS implements BLAS {
     }
     for (; col < cole; col += 1) {
       int row = rows;
-      for (; row < loopBound(rowe, 4); row += 4) {
+      for (; row < loopBound(rowe, Trow); row += Trow) {
         int i = is;
         double sum00 = 0.0;
         double sum01 = 0.0;
@@ -570,11 +571,11 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgemmNT(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Trow = 1000, Tcol = 4, Ti = 250;
-    for (int i = 0; i < k; i += Ti) {
-      for (int col = 0; col < n; col += Tcol) {
-        for (int row = 0; row < m; row += Trow) {
-          dgemmNTKernel(col, Math.min(col + Tcol, n), row, Math.min(row + Trow, m), i, Math.min(i + Ti, k),
+    final int Krow = 1000, Kcol = 4, Ki = 250;
+    for (int i = 0; i < k; i += Ki) {
+      for (int col = 0; col < n; col += Kcol) {
+        for (int row = 0; row < m; row += Krow) {
+          dgemmNTKernel(col, Math.min(col + Kcol, n), row, Math.min(row + Krow, m), i, Math.min(i + Ki, k),
                         alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
         }
       }
@@ -681,11 +682,11 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgemmTT(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Tcol = 16, Trow = 16, Ti = 16;
-    for (int col = 0; col < n; col += Tcol) {
-      for (int row = 0; row < m; row += Trow) {
-        for (int i = 0; i < k; i += Ti) {
-          dgemmTTKernel(col, Math.min(col + Tcol, n), row, Math.min(row + Trow, m), i, Math.min(i + Ti, k),
+    final int Kcol = 16, Krow = 16, Ki = 16;
+    for (int col = 0; col < n; col += Kcol) {
+      for (int row = 0; row < m; row += Krow) {
+        for (int i = 0; i < k; i += Ki) {
+          dgemmTTKernel(col, Math.min(col + Kcol, n), row, Math.min(row + Krow, m), i, Math.min(i + Ki, k),
                         alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
         }
       }
@@ -901,11 +902,11 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sgemmNN(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    final int Tcol = n, Trow = m, Ti = k;
-    for (int col = 0; col < n; col += Tcol) {
-      for (int row = 0; row < m; row += Trow) {
-        for (int i = 0; i < k; i += Ti) {
-          sgemmNNKernel(col, Math.min(col + Tcol, n), row, Math.min(row + Trow, m), i, Math.min(i + Ti, k),
+    final int Kcol = n, Krow = m, Ki = k;
+    for (int col = 0; col < n; col += Kcol) {
+      for (int row = 0; row < m; row += Krow) {
+        for (int i = 0; i < k; i += Ki) {
+          sgemmNNKernel(col, Math.min(col + Kcol, n), row, Math.min(row + Krow, m), i, Math.min(i + Ki, k),
                         alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
         }
       }
@@ -1019,11 +1020,11 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sgemmTN(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    final int Tcol = n, Trow = m, Ti = k;
-    for (int col = 0; col < n; col += Tcol) {
-      for (int row = 0; row < m; row += Trow) {
-        for (int i = 0; i < k; i += Ti) {
-          sgemmTNKernel(col, Math.min(col + Tcol, n), row, Math.min(row + Trow, m), i, Math.min(i + Ti, k),
+    final int Kcol = n, Krow = m, Ki = k;
+    for (int col = 0; col < n; col += Kcol) {
+      for (int row = 0; row < m; row += Krow) {
+        for (int i = 0; i < k; i += Ki) {
+          sgemmTNKernel(col, Math.min(col + Kcol, n), row, Math.min(row + Krow, m), i, Math.min(i + Ki, k),
                         alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
         }
       }
@@ -1174,11 +1175,11 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sgemmNT(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    final int Tcol = n, Trow = m, Ti = k;
-    for (int col = 0; col < n; col += Tcol) {
-      for (int row = 0; row < m; row += Trow) {
-        for (int i = 0; i < k; i += Ti) {
-          sgemmNTKernel(col, Math.min(col + Tcol, n), row, Math.min(row + Trow, m), i, Math.min(i + Ti, k),
+    final int Kcol = n, Krow = m, Ki = k;
+    for (int col = 0; col < n; col += Kcol) {
+      for (int row = 0; row < m; row += Krow) {
+        for (int i = 0; i < k; i += Ki) {
+          sgemmNTKernel(col, Math.min(col + Kcol, n), row, Math.min(row + Krow, m), i, Math.min(i + Ki, k),
                         alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
         }
       }
@@ -1302,11 +1303,11 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sgemmTT(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    final int Tcol = 16, Trow = 16, Ti = 16;
-    for (int col = 0; col < n; col += Tcol) {
-      for (int row = 0; row < m; row += Trow) {
-        for (int i = 0; i < k; i += Ti) {
-          sgemmTTKernel(col, Math.min(col + Tcol, n), row, Math.min(row + Trow, m), i, Math.min(i + Ti, k),
+    final int Kcol = 16, Krow = 16, Ki = 16;
+    for (int col = 0; col < n; col += Kcol) {
+      for (int row = 0; row < m; row += Krow) {
+        for (int i = 0; i < k; i += Ki) {
+          sgemmTTKernel(col, Math.min(col + Kcol, n), row, Math.min(row + Krow, m), i, Math.min(i + Ki, k),
                         alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
         }
       }

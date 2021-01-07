@@ -354,8 +354,9 @@ public class VectorizedBLAS extends JavaBLAS {
   protected void dgemmNTKernel(int cols, int cole, int rows, int rowe, int is, int ie,
       double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb,
       double beta, double[] c, int offsetc, int ldc) {
+    final int Tcol = 2, Ti = 5;
     int col = cols;
-    for (; col < loopBound(cole, 2); col += 2) {
+    for (; col < loopBound(cole, Tcol); col += Tcol) {
       if (beta != 1.0) {
         int row = rows;
         DoubleVector vbeta = DoubleVector.broadcast(DMAX, beta);
@@ -380,7 +381,7 @@ public class VectorizedBLAS extends JavaBLAS {
         }
       }
       int i = is;
-      for (; i < loopBound(ie, 5); i += 5) {
+      for (; i < loopBound(ie, Ti); i += Ti) {
         int row = rows;
         DoubleVector valphab00 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 0) * ldb]);
         DoubleVector valphab01 = DoubleVector.broadcast(DMAX, alpha * b[offsetb + (col + 0) + (i + 1) * ldb]);
