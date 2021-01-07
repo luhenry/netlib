@@ -272,288 +272,293 @@ public class JavaBLAS implements BLAS {
     if (m == 0 || n == 0 || ((alpha == 0.0 || k == 0) && beta == 1.0)) {
       return;
     }
-    if (lsame("N", transa) && lsame("N", transb)) {
+    if (alpha == 0.0) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+          c[offsetc + row + (col + 1) * ldc] = beta * c[offsetc + row + (col + 1) * ldc];
+          c[offsetc + row + (col + 2) * ldc] = beta * c[offsetc + row + (col + 2) * ldc];
+          c[offsetc + row + (col + 3) * ldc] = beta * c[offsetc + row + (col + 3) * ldc];
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+        }
+      }
+    } else if (lsame("N", transa) && lsame("N", transb)) {
       // C = beta * C
       dscal(m * n, beta, c, offsetc, 1);
       // C += alpha * A * B
-      if (alpha != 0.0) {
-        int col = 0;
-        for (; col < loopBound(n, 4); col += 4) {
-          int i = 0;
-          for (; i < loopBound(k, 4); i += 4) {
-            double alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
-            double alphab01 = alpha * b[offsetb + (i + 1) + (col + 0) * ldb];
-            double alphab02 = alpha * b[offsetb + (i + 2) + (col + 0) * ldb];
-            double alphab03 = alpha * b[offsetb + (i + 3) + (col + 0) * ldb];
-            double alphab10 = alpha * b[offsetb + (i + 0) + (col + 1) * ldb];
-            double alphab11 = alpha * b[offsetb + (i + 1) + (col + 1) * ldb];
-            double alphab12 = alpha * b[offsetb + (i + 2) + (col + 1) * ldb];
-            double alphab13 = alpha * b[offsetb + (i + 3) + (col + 1) * ldb];
-            double alphab20 = alpha * b[offsetb + (i + 0) + (col + 2) * ldb];
-            double alphab21 = alpha * b[offsetb + (i + 1) + (col + 2) * ldb];
-            double alphab22 = alpha * b[offsetb + (i + 2) + (col + 2) * ldb];
-            double alphab23 = alpha * b[offsetb + (i + 3) + (col + 2) * ldb];
-            double alphab30 = alpha * b[offsetb + (i + 0) + (col + 3) * ldb];
-            double alphab31 = alpha * b[offsetb + (i + 1) + (col + 3) * ldb];
-            double alphab32 = alpha * b[offsetb + (i + 2) + (col + 3) * ldb];
-            double alphab33 = alpha * b[offsetb + (i + 3) + (col + 3) * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + (col + 0) * ldc] += alphab00 * a[offseta + row + (i + 0) * lda]
-                                                 +  alphab01 * a[offseta + row + (i + 1) * lda]
-                                                 +  alphab02 * a[offseta + row + (i + 2) * lda]
-                                                 +  alphab03 * a[offseta + row + (i + 3) * lda];
-              c[offsetc + row + (col + 1) * ldc] += alphab10 * a[offseta + row + (i + 0) * lda]
-                                                 +  alphab11 * a[offseta + row + (i + 1) * lda]
-                                                 +  alphab12 * a[offseta + row + (i + 2) * lda]
-                                                 +  alphab13 * a[offseta + row + (i + 3) * lda];
-              c[offsetc + row + (col + 2) * ldc] += alphab20 * a[offseta + row + (i + 0) * lda]
-                                                 +  alphab21 * a[offseta + row + (i + 1) * lda]
-                                                 +  alphab22 * a[offseta + row + (i + 2) * lda]
-                                                 +  alphab23 * a[offseta + row + (i + 3) * lda];
-              c[offsetc + row + (col + 3) * ldc] += alphab30 * a[offseta + row + (i + 0) * lda]
-                                                 +  alphab31 * a[offseta + row + (i + 1) * lda]
-                                                 +  alphab32 * a[offseta + row + (i + 2) * lda]
-                                                 +  alphab33 * a[offseta + row + (i + 3) * lda];
-            }
-          }
-          for (; i < k; i += 1) {
-            double alphab0 = alpha * b[offsetb + i + (col + 0) * ldb];
-            double alphab1 = alpha * b[offsetb + i + (col + 1) * ldb];
-            double alphab2 = alpha * b[offsetb + i + (col + 2) * ldb];
-            double alphab3 = alpha * b[offsetb + i + (col + 3) * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + (col + 0) * ldc] += alphab0 * a[offseta + row + i * lda];
-              c[offsetc + row + (col + 1) * ldc] += alphab1 * a[offseta + row + i * lda];
-              c[offsetc + row + (col + 2) * ldc] += alphab2 * a[offseta + row + i * lda];
-              c[offsetc + row + (col + 3) * ldc] += alphab3 * a[offseta + row + i * lda];
-            }
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int i = 0;
+        for (; i < loopBound(k, 4); i += 4) {
+          double alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
+          double alphab01 = alpha * b[offsetb + (i + 1) + (col + 0) * ldb];
+          double alphab02 = alpha * b[offsetb + (i + 2) + (col + 0) * ldb];
+          double alphab03 = alpha * b[offsetb + (i + 3) + (col + 0) * ldb];
+          double alphab10 = alpha * b[offsetb + (i + 0) + (col + 1) * ldb];
+          double alphab11 = alpha * b[offsetb + (i + 1) + (col + 1) * ldb];
+          double alphab12 = alpha * b[offsetb + (i + 2) + (col + 1) * ldb];
+          double alphab13 = alpha * b[offsetb + (i + 3) + (col + 1) * ldb];
+          double alphab20 = alpha * b[offsetb + (i + 0) + (col + 2) * ldb];
+          double alphab21 = alpha * b[offsetb + (i + 1) + (col + 2) * ldb];
+          double alphab22 = alpha * b[offsetb + (i + 2) + (col + 2) * ldb];
+          double alphab23 = alpha * b[offsetb + (i + 3) + (col + 2) * ldb];
+          double alphab30 = alpha * b[offsetb + (i + 0) + (col + 3) * ldb];
+          double alphab31 = alpha * b[offsetb + (i + 1) + (col + 3) * ldb];
+          double alphab32 = alpha * b[offsetb + (i + 2) + (col + 3) * ldb];
+          double alphab33 = alpha * b[offsetb + (i + 3) + (col + 3) * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + (col + 0) * ldc] += alphab00 * a[offseta + row + (i + 0) * lda]
+                                                +  alphab01 * a[offseta + row + (i + 1) * lda]
+                                                +  alphab02 * a[offseta + row + (i + 2) * lda]
+                                                +  alphab03 * a[offseta + row + (i + 3) * lda];
+            c[offsetc + row + (col + 1) * ldc] += alphab10 * a[offseta + row + (i + 0) * lda]
+                                                +  alphab11 * a[offseta + row + (i + 1) * lda]
+                                                +  alphab12 * a[offseta + row + (i + 2) * lda]
+                                                +  alphab13 * a[offseta + row + (i + 3) * lda];
+            c[offsetc + row + (col + 2) * ldc] += alphab20 * a[offseta + row + (i + 0) * lda]
+                                                +  alphab21 * a[offseta + row + (i + 1) * lda]
+                                                +  alphab22 * a[offseta + row + (i + 2) * lda]
+                                                +  alphab23 * a[offseta + row + (i + 3) * lda];
+            c[offsetc + row + (col + 3) * ldc] += alphab30 * a[offseta + row + (i + 0) * lda]
+                                                +  alphab31 * a[offseta + row + (i + 1) * lda]
+                                                +  alphab32 * a[offseta + row + (i + 2) * lda]
+                                                +  alphab33 * a[offseta + row + (i + 3) * lda];
           }
         }
-        for (; col < n; col += 1) {
-          int i = 0;
-          for (; i < loopBound(k, 4); i += 4) {
-            double alphab0 = alpha * b[offsetb + (i + 0) + col * ldb];
-            double alphab1 = alpha * b[offsetb + (i + 1) + col * ldb];
-            double alphab2 = alpha * b[offsetb + (i + 2) + col * ldb];
-            double alphab3 = alpha * b[offsetb + (i + 3) + col * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + col * ldc] += alphab0 * a[offseta + row + (i + 0) * lda]
-                                           +  alphab1 * a[offseta + row + (i + 1) * lda]
-                                           +  alphab2 * a[offseta + row + (i + 2) * lda]
-                                           +  alphab3 * a[offseta + row + (i + 3) * lda];
-            }
+        for (; i < k; i += 1) {
+          double alphab0 = alpha * b[offsetb + i + (col + 0) * ldb];
+          double alphab1 = alpha * b[offsetb + i + (col + 1) * ldb];
+          double alphab2 = alpha * b[offsetb + i + (col + 2) * ldb];
+          double alphab3 = alpha * b[offsetb + i + (col + 3) * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + (col + 0) * ldc] += alphab0 * a[offseta + row + i * lda];
+            c[offsetc + row + (col + 1) * ldc] += alphab1 * a[offseta + row + i * lda];
+            c[offsetc + row + (col + 2) * ldc] += alphab2 * a[offseta + row + i * lda];
+            c[offsetc + row + (col + 3) * ldc] += alphab3 * a[offseta + row + i * lda];
           }
-          for (; i < k; i += 1) {
-            double alphab = alpha * b[offsetb + i + col * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + col * ldc] += alphab * a[offseta + row + i * lda];
-            }
+        }
+      }
+      for (; col < n; col += 1) {
+        int i = 0;
+        for (; i < loopBound(k, 4); i += 4) {
+          double alphab0 = alpha * b[offsetb + (i + 0) + col * ldb];
+          double alphab1 = alpha * b[offsetb + (i + 1) + col * ldb];
+          double alphab2 = alpha * b[offsetb + (i + 2) + col * ldb];
+          double alphab3 = alpha * b[offsetb + (i + 3) + col * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + col * ldc] += alphab0 * a[offseta + row + (i + 0) * lda]
+                                          +  alphab1 * a[offseta + row + (i + 1) * lda]
+                                          +  alphab2 * a[offseta + row + (i + 2) * lda]
+                                          +  alphab3 * a[offseta + row + (i + 3) * lda];
+          }
+        }
+        for (; i < k; i += 1) {
+          double alphab = alpha * b[offsetb + i + col * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + col * ldc] += alphab * a[offseta + row + i * lda];
           }
         }
       }
     } else if (lsame("T", transa) && lsame("N", transb)) {
-      if (alpha != 0. || beta != 1.) {
-        int col = 0;
-        for (; col < loopBound(n, 4); col += 4) {
-          int row = 0;
-          for (; row < loopBound(m, 4); row += 4) {
-            double sum00 = 0.0;
-            double sum01 = 0.0;
-            double sum02 = 0.0;
-            double sum03 = 0.0;
-            double sum10 = 0.0;
-            double sum11 = 0.0;
-            double sum12 = 0.0;
-            double sum13 = 0.0;
-            double sum20 = 0.0;
-            double sum21 = 0.0;
-            double sum22 = 0.0;
-            double sum23 = 0.0;
-            double sum30 = 0.0;
-            double sum31 = 0.0;
-            double sum32 = 0.0;
-            double sum33 = 0.0;
-            if (alpha != 0.) {
-              int i = 0;
-              for (; i < k; i += 1) {
-                sum00 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum01 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum02 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum03 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum10 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum11 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum12 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum13 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum20 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum21 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum22 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum23 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum30 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 3) * ldb];
-                sum31 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 3) * ldb];
-                sum32 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 3) * ldb];
-                sum33 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 3) * ldb];
-              }
-            }
-            c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
-            c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
-            c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
-            c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
-            c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
-            c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
-            c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
-            c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
-            c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
-            c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
-            c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
-            c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
-            c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
-            c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
-            c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
-            c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        for (; row < loopBound(m, 4); row += 4) {
+          double sum00 = 0.0;
+          double sum01 = 0.0;
+          double sum02 = 0.0;
+          double sum03 = 0.0;
+          double sum10 = 0.0;
+          double sum11 = 0.0;
+          double sum12 = 0.0;
+          double sum13 = 0.0;
+          double sum20 = 0.0;
+          double sum21 = 0.0;
+          double sum22 = 0.0;
+          double sum23 = 0.0;
+          double sum30 = 0.0;
+          double sum31 = 0.0;
+          double sum32 = 0.0;
+          double sum33 = 0.0;
+          int i = 0;
+          for (; i < k; i += 1) {
+            sum00 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 0) * ldb];
+            sum01 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 0) * ldb];
+            sum02 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 0) * ldb];
+            sum03 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 0) * ldb];
+            sum10 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 1) * ldb];
+            sum11 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 1) * ldb];
+            sum12 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 1) * ldb];
+            sum13 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 1) * ldb];
+            sum20 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 2) * ldb];
+            sum21 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 2) * ldb];
+            sum22 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 2) * ldb];
+            sum23 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 2) * ldb];
+            sum30 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 3) * ldb];
+            sum31 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 3) * ldb];
+            sum32 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 3) * ldb];
+            sum33 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 3) * ldb];
           }
-          for (; row < m; row += 1) {
-            double sum0 = 0.0;
-            double sum1 = 0.0;
-            double sum2 = 0.0;
-            double sum3 = 0.0;
-            if (alpha != 0.) {
-              int i = 0;
-              for (; i < k; i += 1) {
-                sum0 += a[offseta + i + row * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum1 += a[offseta + i + row * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum2 += a[offseta + i + row * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum3 += a[offseta + i + row * lda] * b[offsetb + i + (col + 3) * ldb];
-              }
-            }
-            c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
-            c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
-            c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
-            c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
-          }
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
         }
-        for (; col < n; col += 1) {
-          int row = 0;
-          for (; row < loopBound(m, 4); row += 4) {
-            double sum0 = 0.0;
-            double sum1 = 0.0;
-            double sum2 = 0.0;
-            double sum3 = 0.0;
-            if (alpha != 0.) {
-              int i = 0;
-              for (; i < k; i += 1) {
-                double bval = b[offsetb + i + col * ldb];
-                sum0 += a[offseta + i + (row + 0) * ldb] * bval;
-                sum1 += a[offseta + i + (row + 1) * ldb] * bval;
-                sum2 += a[offseta + i + (row + 2) * ldb] * bval;
-                sum3 += a[offseta + i + (row + 3) * ldb] * bval;
-              }
-            }
-            c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
-            c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
-            c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
-            c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
+        for (; row < m; row += 1) {
+          double sum0 = 0.0;
+          double sum1 = 0.0;
+          double sum2 = 0.0;
+          double sum3 = 0.0;
+          int i = 0;
+          for (; i < k; i += 1) {
+            sum0 += a[offseta + i + row * lda] * b[offsetb + i + (col + 0) * ldb];
+            sum1 += a[offseta + i + row * lda] * b[offsetb + i + (col + 1) * ldb];
+            sum2 += a[offseta + i + row * lda] * b[offsetb + i + (col + 2) * ldb];
+            sum3 += a[offseta + i + row * lda] * b[offsetb + i + (col + 3) * ldb];
           }
-          for (; row < m; row += 1) {
-            double sum = 0.0;
-            if (alpha != 0.) {
-              int i = 0;
-              for (; i < k; i += 1) {
-                sum += a[offseta + i + row * k] * b[offsetb + col * k + i];
-              }
-            }
-            c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        for (; row < loopBound(m, 4); row += 4) {
+          double sum0 = 0.0;
+          double sum1 = 0.0;
+          double sum2 = 0.0;
+          double sum3 = 0.0;
+          int i = 0;
+          for (; i < k; i += 1) {
+            double bval = b[offsetb + i + col * ldb];
+            sum0 += a[offseta + i + (row + 0) * ldb] * bval;
+            sum1 += a[offseta + i + (row + 1) * ldb] * bval;
+            sum2 += a[offseta + i + (row + 2) * ldb] * bval;
+            sum3 += a[offseta + i + (row + 3) * ldb] * bval;
           }
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
+        }
+        for (; row < m; row += 1) {
+          double sum = 0.0;
+          if (alpha != 0.) {
+            int i = 0;
+            for (; i < k; i += 1) {
+              sum += a[offseta + i + row * k] * b[offsetb + col * k + i];
+            }
+          }
+          c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
         }
       }
     } else if (lsame("N", transa) && lsame("T", transb)) {
       // C = beta * C
       dscal(m * n, beta, c, offsetc, 1);
       // C += alpha * A * B
-      if (alpha != 0.) {
-        int i = 0;
-        for (; i < loopBound(k, 4); i += 4) {
-          int col = 0;
-          for (; col < loopBound(n, 4); col += 4) {
-            double alphab00 = alpha * b[offsetb + (col + 0) + (i + 0) * ldb];
-            double alphab01 = alpha * b[offsetb + (col + 1) + (i + 0) * ldb];
-            double alphab02 = alpha * b[offsetb + (col + 2) + (i + 0) * ldb];
-            double alphab03 = alpha * b[offsetb + (col + 3) + (i + 0) * ldb];
-            double alphab10 = alpha * b[offsetb + (col + 0) + (i + 1) * ldb];
-            double alphab11 = alpha * b[offsetb + (col + 1) + (i + 1) * ldb];
-            double alphab12 = alpha * b[offsetb + (col + 2) + (i + 1) * ldb];
-            double alphab13 = alpha * b[offsetb + (col + 3) + (i + 1) * ldb];
-            double alphab20 = alpha * b[offsetb + (col + 0) + (i + 2) * ldb];
-            double alphab21 = alpha * b[offsetb + (col + 1) + (i + 2) * ldb];
-            double alphab22 = alpha * b[offsetb + (col + 2) + (i + 2) * ldb];
-            double alphab23 = alpha * b[offsetb + (col + 3) + (i + 2) * ldb];
-            double alphab30 = alpha * b[offsetb + (col + 0) + (i + 3) * ldb];
-            double alphab31 = alpha * b[offsetb + (col + 1) + (i + 3) * ldb];
-            double alphab32 = alpha * b[offsetb + (col + 2) + (i + 3) * ldb];
-            double alphab33 = alpha * b[offsetb + (col + 3) + (i + 3) * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              double a0 = a[offseta + row + (i + 0) * lda];
-              double a1 = a[offseta + row + (i + 1) * lda];
-              double a2 = a[offseta + row + (i + 2) * lda];
-              double a3 = a[offseta + row + (i + 3) * lda];
-              c[offsetc + row + (col + 0) * ldc] += alphab00 * a0
-                                                 +  alphab10 * a1
-                                                 +  alphab20 * a2
-                                                 +  alphab30 * a3;
-              c[offsetc + row + (col + 1) * ldc] += alphab01 * a0
-                                                 +  alphab11 * a1
-                                                 +  alphab21 * a2
-                                                 +  alphab31 * a3;
-              c[offsetc + row + (col + 2) * ldc] += alphab02 * a0
-                                                 +  alphab12 * a1
-                                                 +  alphab22 * a2
-                                                 +  alphab32 * a3;
-              c[offsetc + row + (col + 3) * ldc] += alphab03 * a0
-                                                 +  alphab13 * a1
-                                                 +  alphab23 * a2
-                                                 +  alphab33 * a3;
-            }
-          }
-          for (; col < n; col += 1) {
-            double alphab0 = alpha * b[offsetb + col + (i + 0) * ldb];
-            double alphab1 = alpha * b[offsetb + col + (i + 1) * ldb];
-            double alphab2 = alpha * b[offsetb + col + (i + 2) * ldb];
-            double alphab3 = alpha * b[offsetb + col + (i + 3) * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + col * ldc] += alphab0 * a[offseta + row + (i + 0) * lda]
-                                           +  alphab1 * a[offseta + row + (i + 1) * lda]
-                                           +  alphab2 * a[offseta + row + (i + 2) * lda]
-                                           +  alphab3 * a[offseta + row + (i + 3) * lda];
-            }
+      int i = 0;
+      for (; i < loopBound(k, 4); i += 4) {
+        int col = 0;
+        for (; col < loopBound(n, 4); col += 4) {
+          double alphab00 = alpha * b[offsetb + (col + 0) + (i + 0) * ldb];
+          double alphab01 = alpha * b[offsetb + (col + 1) + (i + 0) * ldb];
+          double alphab02 = alpha * b[offsetb + (col + 2) + (i + 0) * ldb];
+          double alphab03 = alpha * b[offsetb + (col + 3) + (i + 0) * ldb];
+          double alphab10 = alpha * b[offsetb + (col + 0) + (i + 1) * ldb];
+          double alphab11 = alpha * b[offsetb + (col + 1) + (i + 1) * ldb];
+          double alphab12 = alpha * b[offsetb + (col + 2) + (i + 1) * ldb];
+          double alphab13 = alpha * b[offsetb + (col + 3) + (i + 1) * ldb];
+          double alphab20 = alpha * b[offsetb + (col + 0) + (i + 2) * ldb];
+          double alphab21 = alpha * b[offsetb + (col + 1) + (i + 2) * ldb];
+          double alphab22 = alpha * b[offsetb + (col + 2) + (i + 2) * ldb];
+          double alphab23 = alpha * b[offsetb + (col + 3) + (i + 2) * ldb];
+          double alphab30 = alpha * b[offsetb + (col + 0) + (i + 3) * ldb];
+          double alphab31 = alpha * b[offsetb + (col + 1) + (i + 3) * ldb];
+          double alphab32 = alpha * b[offsetb + (col + 2) + (i + 3) * ldb];
+          double alphab33 = alpha * b[offsetb + (col + 3) + (i + 3) * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            double a0 = a[offseta + row + (i + 0) * lda];
+            double a1 = a[offseta + row + (i + 1) * lda];
+            double a2 = a[offseta + row + (i + 2) * lda];
+            double a3 = a[offseta + row + (i + 3) * lda];
+            c[offsetc + row + (col + 0) * ldc] += alphab00 * a0
+                                                +  alphab10 * a1
+                                                +  alphab20 * a2
+                                                +  alphab30 * a3;
+            c[offsetc + row + (col + 1) * ldc] += alphab01 * a0
+                                                +  alphab11 * a1
+                                                +  alphab21 * a2
+                                                +  alphab31 * a3;
+            c[offsetc + row + (col + 2) * ldc] += alphab02 * a0
+                                                +  alphab12 * a1
+                                                +  alphab22 * a2
+                                                +  alphab32 * a3;
+            c[offsetc + row + (col + 3) * ldc] += alphab03 * a0
+                                                +  alphab13 * a1
+                                                +  alphab23 * a2
+                                                +  alphab33 * a3;
           }
         }
-        for (; i < k; i += 1) {
-          int col = 0;
-          for (; col < loopBound(n, 4); col += 4) {
-            double alphab0 = alpha * b[offsetb + (col + 0) + i * ldb];
-            double alphab1 = alpha * b[offsetb + (col + 1) + i * ldb];
-            double alphab2 = alpha * b[offsetb + (col + 2) + i * ldb];
-            double alphab3 = alpha * b[offsetb + (col + 3) + i * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              double aval = a[offseta + row + i * lda];
-              c[offsetc + row + (col + 0) * ldc] += alphab0 * aval;
-              c[offsetc + row + (col + 1) * ldc] += alphab1 * aval;
-              c[offsetc + row + (col + 2) * ldc] += alphab2 * aval;
-              c[offsetc + row + (col + 3) * ldc] += alphab3 * aval;
-            }
+        for (; col < n; col += 1) {
+          double alphab0 = alpha * b[offsetb + col + (i + 0) * ldb];
+          double alphab1 = alpha * b[offsetb + col + (i + 1) * ldb];
+          double alphab2 = alpha * b[offsetb + col + (i + 2) * ldb];
+          double alphab3 = alpha * b[offsetb + col + (i + 3) * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + col * ldc] += alphab0 * a[offseta + row + (i + 0) * lda]
+                                          +  alphab1 * a[offseta + row + (i + 1) * lda]
+                                          +  alphab2 * a[offseta + row + (i + 2) * lda]
+                                          +  alphab3 * a[offseta + row + (i + 3) * lda];
           }
-          for (; col < n; col += 1) {
-            double alphab = alpha * b[offsetb + col + i * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + col * ldc] += alphab * a[offseta + row + i * lda];
-            }
+        }
+      }
+      for (; i < k; i += 1) {
+        int col = 0;
+        for (; col < loopBound(n, 4); col += 4) {
+          double alphab0 = alpha * b[offsetb + (col + 0) + i * ldb];
+          double alphab1 = alpha * b[offsetb + (col + 1) + i * ldb];
+          double alphab2 = alpha * b[offsetb + (col + 2) + i * ldb];
+          double alphab3 = alpha * b[offsetb + (col + 3) + i * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            double aval = a[offseta + row + i * lda];
+            c[offsetc + row + (col + 0) * ldc] += alphab0 * aval;
+            c[offsetc + row + (col + 1) * ldc] += alphab1 * aval;
+            c[offsetc + row + (col + 2) * ldc] += alphab2 * aval;
+            c[offsetc + row + (col + 3) * ldc] += alphab3 * aval;
+          }
+        }
+        for (; col < n; col += 1) {
+          double alphab = alpha * b[offsetb + col + i * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + col * ldc] += alphab * a[offseta + row + i * lda];
           }
         }
       }
@@ -583,33 +588,31 @@ public class JavaBLAS implements BLAS {
                 double sum31 = 0.0;
                 double sum32 = 0.0;
                 double sum33 = 0.0;
-                if (alpha != 0.0) {
-                  for (int w = i; w < Math.min(i + T, k); w++) {
-                    double b0 = b[offsetb + (u + 0) + w * ldb];
-                    double b1 = b[offsetb + (u + 1) + w * ldb];
-                    double b2 = b[offsetb + (u + 2) + w * ldb];
-                    double b3 = b[offsetb + (u + 3) + w * ldb];
-                    double a0 = a[offseta + w + (v + 0) * lda];
-                    double a1 = a[offseta + w + (v + 1) * lda];
-                    double a2 = a[offseta + w + (v + 2) * lda];
-                    double a3 = a[offseta + w + (v + 3) * lda];
-                    sum00 += a0 * b0;
-                    sum01 += a1 * b0;
-                    sum02 += a2 * b0;
-                    sum03 += a3 * b0;
-                    sum10 += a0 * b1;
-                    sum11 += a1 * b1;
-                    sum12 += a2 * b1;
-                    sum13 += a3 * b1;
-                    sum20 += a0 * b2;
-                    sum21 += a1 * b2;
-                    sum22 += a2 * b2;
-                    sum23 += a3 * b2;
-                    sum30 += a0 * b3;
-                    sum31 += a1 * b3;
-                    sum32 += a2 * b3;
-                    sum33 += a3 * b3;
-                  }
+                for (int w = i; w < Math.min(i + T, k); w++) {
+                  double b0 = b[offsetb + (u + 0) + w * ldb];
+                  double b1 = b[offsetb + (u + 1) + w * ldb];
+                  double b2 = b[offsetb + (u + 2) + w * ldb];
+                  double b3 = b[offsetb + (u + 3) + w * ldb];
+                  double a0 = a[offseta + w + (v + 0) * lda];
+                  double a1 = a[offseta + w + (v + 1) * lda];
+                  double a2 = a[offseta + w + (v + 2) * lda];
+                  double a3 = a[offseta + w + (v + 3) * lda];
+                  sum00 += a0 * b0;
+                  sum01 += a1 * b0;
+                  sum02 += a2 * b0;
+                  sum03 += a3 * b0;
+                  sum10 += a0 * b1;
+                  sum11 += a1 * b1;
+                  sum12 += a2 * b1;
+                  sum13 += a3 * b1;
+                  sum20 += a0 * b2;
+                  sum21 += a1 * b2;
+                  sum22 += a2 * b2;
+                  sum23 += a3 * b2;
+                  sum30 += a0 * b3;
+                  sum31 += a1 * b3;
+                  sum32 += a2 * b3;
+                  sum33 += a3 * b3;
                 }
                 c[offsetc + (v + 0) + (u + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (v + 0) + (u + 0) * ldc];
                 c[offsetc + (v + 1) + (u + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (v + 1) + (u + 0) * ldc];
@@ -633,14 +636,12 @@ public class JavaBLAS implements BLAS {
                 double sum1 = 0.0;
                 double sum2 = 0.0;
                 double sum3 = 0.0;
-                if (alpha != 0.0) {
-                  for (int w = i; w < Math.min(i + T, k); w += 1) {
-                    double aval = a[offseta + w + v * lda];
-                    sum0 += aval * b[offsetb + (u + 0) + w * ldb];
-                    sum1 += aval * b[offsetb + (u + 1) + w * ldb];
-                    sum2 += aval * b[offsetb + (u + 2) + w * ldb];
-                    sum3 += aval * b[offsetb + (u + 3) + w * ldb];
-                  }
+                for (int w = i; w < Math.min(i + T, k); w += 1) {
+                  double aval = a[offseta + w + v * lda];
+                  sum0 += aval * b[offsetb + (u + 0) + w * ldb];
+                  sum1 += aval * b[offsetb + (u + 1) + w * ldb];
+                  sum2 += aval * b[offsetb + (u + 2) + w * ldb];
+                  sum3 += aval * b[offsetb + (u + 3) + w * ldb];
                 }
                 c[offsetc + v + (u + 0) * ldc] = alpha * sum0 + beta * c[offsetc + v + (u + 0) * ldc];
                 c[offsetc + v + (u + 1) * ldc] = alpha * sum1 + beta * c[offsetc + v + (u + 1) * ldc];
@@ -655,14 +656,12 @@ public class JavaBLAS implements BLAS {
                 double sum1 = 0.0;
                 double sum2 = 0.0;
                 double sum3 = 0.0;
-                if (alpha != 0.0) {
-                  for (int w = i; w < Math.min(i + T, k); w += 1) {
-                    double bval = b[offsetb + u + w * ldb];
-                    sum0 += a[offseta + w + (v + 0) * lda] * bval;
-                    sum1 += a[offseta + w + (v + 1) * lda] * bval;
-                    sum2 += a[offseta + w + (v + 2) * lda] * bval;
-                    sum3 += a[offseta + w + (v + 3) * lda] * bval;
-                  }
+                for (int w = i; w < Math.min(i + T, k); w += 1) {
+                  double bval = b[offsetb + u + w * ldb];
+                  sum0 += a[offseta + w + (v + 0) * lda] * bval;
+                  sum1 += a[offseta + w + (v + 1) * lda] * bval;
+                  sum2 += a[offseta + w + (v + 2) * lda] * bval;
+                  sum3 += a[offseta + w + (v + 3) * lda] * bval;
                 }
                 c[offsetc + (v + 0) + u * ldc] = alpha * sum0 + beta * c[offsetc + (v + 0) + u * ldc];
                 c[offsetc + (v + 1) + u * ldc] = alpha * sum1 + beta * c[offsetc + (v + 1) + u * ldc];
@@ -671,10 +670,8 @@ public class JavaBLAS implements BLAS {
               }
               for (; v < Math.min(row + T, m); v += 1) {
                 double sum = 0.0;
-                if (alpha != 0.0) {
-                  for (int w = i; w < Math.min(i + T, k); w += 1) {
-                    sum += a[offseta + w + v * lda] * b[offsetb + u + w * ldb];
-                  }
+                for (int w = i; w < Math.min(i + T, k); w += 1) {
+                  sum += a[offseta + w + v * lda] * b[offsetb + u + w * ldb];
                 }
                 c[offsetc + v + u * ldc] = alpha * sum + beta * c[offsetc + v + u * ldc];
               }
@@ -717,288 +714,299 @@ public class JavaBLAS implements BLAS {
     if (m == 0 || n == 0 || ((alpha == 0.0 || k == 0) && beta == 1.0)) {
       return;
     }
-    if (lsame("N", transa) && lsame("N", transb)) {
+    if (alpha == 0.0) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+          c[offsetc + row + (col + 1) * ldc] = beta * c[offsetc + row + (col + 1) * ldc];
+          c[offsetc + row + (col + 2) * ldc] = beta * c[offsetc + row + (col + 2) * ldc];
+          c[offsetc + row + (col + 3) * ldc] = beta * c[offsetc + row + (col + 3) * ldc];
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        for (; row < m; row += 1) {
+          c[offsetc + row + (col + 0) * ldc] = beta * c[offsetc + row + (col + 0) * ldc];
+        }
+      }
+    } else if (lsame("N", transa) && lsame("N", transb)) {
       // C = beta * C
       sscal(m * n, beta, c, offsetc, 1);
       // C += alpha * A * B
-      if (alpha != 0.0) {
-        int col = 0;
-        for (; col < loopBound(n, 4); col += 4) {
-          int i = 0;
-          for (; i < loopBound(k, 4); i += 4) {
-            float alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
-            float alphab01 = alpha * b[offsetb + (i + 1) + (col + 0) * ldb];
-            float alphab02 = alpha * b[offsetb + (i + 2) + (col + 0) * ldb];
-            float alphab03 = alpha * b[offsetb + (i + 3) + (col + 0) * ldb];
-            float alphab10 = alpha * b[offsetb + (i + 0) + (col + 1) * ldb];
-            float alphab11 = alpha * b[offsetb + (i + 1) + (col + 1) * ldb];
-            float alphab12 = alpha * b[offsetb + (i + 2) + (col + 1) * ldb];
-            float alphab13 = alpha * b[offsetb + (i + 3) + (col + 1) * ldb];
-            float alphab20 = alpha * b[offsetb + (i + 0) + (col + 2) * ldb];
-            float alphab21 = alpha * b[offsetb + (i + 1) + (col + 2) * ldb];
-            float alphab22 = alpha * b[offsetb + (i + 2) + (col + 2) * ldb];
-            float alphab23 = alpha * b[offsetb + (i + 3) + (col + 2) * ldb];
-            float alphab30 = alpha * b[offsetb + (i + 0) + (col + 3) * ldb];
-            float alphab31 = alpha * b[offsetb + (i + 1) + (col + 3) * ldb];
-            float alphab32 = alpha * b[offsetb + (i + 2) + (col + 3) * ldb];
-            float alphab33 = alpha * b[offsetb + (i + 3) + (col + 3) * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + (col + 0) * ldc] += alphab00 * a[offseta + row + (i + 0) * lda]
-                                                 +  alphab01 * a[offseta + row + (i + 1) * lda]
-                                                 +  alphab02 * a[offseta + row + (i + 2) * lda]
-                                                 +  alphab03 * a[offseta + row + (i + 3) * lda];
-              c[offsetc + row + (col + 1) * ldc] += alphab10 * a[offseta + row + (i + 0) * lda]
-                                                 +  alphab11 * a[offseta + row + (i + 1) * lda]
-                                                 +  alphab12 * a[offseta + row + (i + 2) * lda]
-                                                 +  alphab13 * a[offseta + row + (i + 3) * lda];
-              c[offsetc + row + (col + 2) * ldc] += alphab20 * a[offseta + row + (i + 0) * lda]
-                                                 +  alphab21 * a[offseta + row + (i + 1) * lda]
-                                                 +  alphab22 * a[offseta + row + (i + 2) * lda]
-                                                 +  alphab23 * a[offseta + row + (i + 3) * lda];
-              c[offsetc + row + (col + 3) * ldc] += alphab30 * a[offseta + row + (i + 0) * lda]
-                                                 +  alphab31 * a[offseta + row + (i + 1) * lda]
-                                                 +  alphab32 * a[offseta + row + (i + 2) * lda]
-                                                 +  alphab33 * a[offseta + row + (i + 3) * lda];
-            }
-          }
-          for (; i < k; i += 1) {
-            float alphab0 = alpha * b[offsetb + i + (col + 0) * ldb];
-            float alphab1 = alpha * b[offsetb + i + (col + 1) * ldb];
-            float alphab2 = alpha * b[offsetb + i + (col + 2) * ldb];
-            float alphab3 = alpha * b[offsetb + i + (col + 3) * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + (col + 0) * ldc] += alphab0 * a[offseta + row + i * lda];
-              c[offsetc + row + (col + 1) * ldc] += alphab1 * a[offseta + row + i * lda];
-              c[offsetc + row + (col + 2) * ldc] += alphab2 * a[offseta + row + i * lda];
-              c[offsetc + row + (col + 3) * ldc] += alphab3 * a[offseta + row + i * lda];
-            }
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int i = 0;
+        for (; i < loopBound(k, 4); i += 4) {
+          float alphab00 = alpha * b[offsetb + (i + 0) + (col + 0) * ldb];
+          float alphab01 = alpha * b[offsetb + (i + 1) + (col + 0) * ldb];
+          float alphab02 = alpha * b[offsetb + (i + 2) + (col + 0) * ldb];
+          float alphab03 = alpha * b[offsetb + (i + 3) + (col + 0) * ldb];
+          float alphab10 = alpha * b[offsetb + (i + 0) + (col + 1) * ldb];
+          float alphab11 = alpha * b[offsetb + (i + 1) + (col + 1) * ldb];
+          float alphab12 = alpha * b[offsetb + (i + 2) + (col + 1) * ldb];
+          float alphab13 = alpha * b[offsetb + (i + 3) + (col + 1) * ldb];
+          float alphab20 = alpha * b[offsetb + (i + 0) + (col + 2) * ldb];
+          float alphab21 = alpha * b[offsetb + (i + 1) + (col + 2) * ldb];
+          float alphab22 = alpha * b[offsetb + (i + 2) + (col + 2) * ldb];
+          float alphab23 = alpha * b[offsetb + (i + 3) + (col + 2) * ldb];
+          float alphab30 = alpha * b[offsetb + (i + 0) + (col + 3) * ldb];
+          float alphab31 = alpha * b[offsetb + (i + 1) + (col + 3) * ldb];
+          float alphab32 = alpha * b[offsetb + (i + 2) + (col + 3) * ldb];
+          float alphab33 = alpha * b[offsetb + (i + 3) + (col + 3) * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + (col + 0) * ldc] += alphab00 * a[offseta + row + (i + 0) * lda]
+                                                +  alphab01 * a[offseta + row + (i + 1) * lda]
+                                                +  alphab02 * a[offseta + row + (i + 2) * lda]
+                                                +  alphab03 * a[offseta + row + (i + 3) * lda];
+            c[offsetc + row + (col + 1) * ldc] += alphab10 * a[offseta + row + (i + 0) * lda]
+                                                +  alphab11 * a[offseta + row + (i + 1) * lda]
+                                                +  alphab12 * a[offseta + row + (i + 2) * lda]
+                                                +  alphab13 * a[offseta + row + (i + 3) * lda];
+            c[offsetc + row + (col + 2) * ldc] += alphab20 * a[offseta + row + (i + 0) * lda]
+                                                +  alphab21 * a[offseta + row + (i + 1) * lda]
+                                                +  alphab22 * a[offseta + row + (i + 2) * lda]
+                                                +  alphab23 * a[offseta + row + (i + 3) * lda];
+            c[offsetc + row + (col + 3) * ldc] += alphab30 * a[offseta + row + (i + 0) * lda]
+                                                +  alphab31 * a[offseta + row + (i + 1) * lda]
+                                                +  alphab32 * a[offseta + row + (i + 2) * lda]
+                                                +  alphab33 * a[offseta + row + (i + 3) * lda];
           }
         }
-        for (; col < n; col += 1) {
-          int i = 0;
-          for (; i < loopBound(k, 4); i += 4) {
-            float alphab0 = alpha * b[offsetb + (i + 0) + col * ldb];
-            float alphab1 = alpha * b[offsetb + (i + 1) + col * ldb];
-            float alphab2 = alpha * b[offsetb + (i + 2) + col * ldb];
-            float alphab3 = alpha * b[offsetb + (i + 3) + col * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + col * ldc] += alphab0 * a[offseta + row + (i + 0) * lda]
-                                           +  alphab1 * a[offseta + row + (i + 1) * lda]
-                                           +  alphab2 * a[offseta + row + (i + 2) * lda]
-                                           +  alphab3 * a[offseta + row + (i + 3) * lda];
-            }
+        for (; i < k; i += 1) {
+          float alphab0 = alpha * b[offsetb + i + (col + 0) * ldb];
+          float alphab1 = alpha * b[offsetb + i + (col + 1) * ldb];
+          float alphab2 = alpha * b[offsetb + i + (col + 2) * ldb];
+          float alphab3 = alpha * b[offsetb + i + (col + 3) * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + (col + 0) * ldc] += alphab0 * a[offseta + row + i * lda];
+            c[offsetc + row + (col + 1) * ldc] += alphab1 * a[offseta + row + i * lda];
+            c[offsetc + row + (col + 2) * ldc] += alphab2 * a[offseta + row + i * lda];
+            c[offsetc + row + (col + 3) * ldc] += alphab3 * a[offseta + row + i * lda];
           }
-          for (; i < k; i += 1) {
-            float alphab = alpha * b[offsetb + i + col * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + col * ldc] += alphab * a[offseta + row + i * lda];
-            }
+        }
+      }
+      for (; col < n; col += 1) {
+        int i = 0;
+        for (; i < loopBound(k, 4); i += 4) {
+          float alphab0 = alpha * b[offsetb + (i + 0) + col * ldb];
+          float alphab1 = alpha * b[offsetb + (i + 1) + col * ldb];
+          float alphab2 = alpha * b[offsetb + (i + 2) + col * ldb];
+          float alphab3 = alpha * b[offsetb + (i + 3) + col * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + col * ldc] += alphab0 * a[offseta + row + (i + 0) * lda]
+                                          +  alphab1 * a[offseta + row + (i + 1) * lda]
+                                          +  alphab2 * a[offseta + row + (i + 2) * lda]
+                                          +  alphab3 * a[offseta + row + (i + 3) * lda];
+          }
+        }
+        for (; i < k; i += 1) {
+          float alphab = alpha * b[offsetb + i + col * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + col * ldc] += alphab * a[offseta + row + i * lda];
           }
         }
       }
     } else if (lsame("T", transa) && lsame("N", transb)) {
-      if (alpha != 0. || beta != 1.) {
-        int col = 0;
-        for (; col < loopBound(n, 4); col += 4) {
-          int row = 0;
-          for (; row < loopBound(m, 4); row += 4) {
-            float sum00 = 0.0f;
-            float sum01 = 0.0f;
-            float sum02 = 0.0f;
-            float sum03 = 0.0f;
-            float sum10 = 0.0f;
-            float sum11 = 0.0f;
-            float sum12 = 0.0f;
-            float sum13 = 0.0f;
-            float sum20 = 0.0f;
-            float sum21 = 0.0f;
-            float sum22 = 0.0f;
-            float sum23 = 0.0f;
-            float sum30 = 0.0f;
-            float sum31 = 0.0f;
-            float sum32 = 0.0f;
-            float sum33 = 0.0f;
-            if (alpha != 0.) {
-              int i = 0;
-              for (; i < k; i += 1) {
-                sum00 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum01 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum02 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum03 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum10 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum11 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum12 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum13 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum20 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum21 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum22 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum23 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum30 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 3) * ldb];
-                sum31 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 3) * ldb];
-                sum32 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 3) * ldb];
-                sum33 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 3) * ldb];
-              }
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        for (; row < loopBound(m, 4); row += 4) {
+          float sum00 = 0.0f;
+          float sum01 = 0.0f;
+          float sum02 = 0.0f;
+          float sum03 = 0.0f;
+          float sum10 = 0.0f;
+          float sum11 = 0.0f;
+          float sum12 = 0.0f;
+          float sum13 = 0.0f;
+          float sum20 = 0.0f;
+          float sum21 = 0.0f;
+          float sum22 = 0.0f;
+          float sum23 = 0.0f;
+          float sum30 = 0.0f;
+          float sum31 = 0.0f;
+          float sum32 = 0.0f;
+          float sum33 = 0.0f;
+          if (alpha != 0.) {
+            int i = 0;
+            for (; i < k; i += 1) {
+              sum00 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 0) * ldb];
+              sum01 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 0) * ldb];
+              sum02 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 0) * ldb];
+              sum03 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 0) * ldb];
+              sum10 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 1) * ldb];
+              sum11 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 1) * ldb];
+              sum12 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 1) * ldb];
+              sum13 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 1) * ldb];
+              sum20 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 2) * ldb];
+              sum21 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 2) * ldb];
+              sum22 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 2) * ldb];
+              sum23 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 2) * ldb];
+              sum30 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 3) * ldb];
+              sum31 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 3) * ldb];
+              sum32 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 3) * ldb];
+              sum33 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 3) * ldb];
             }
-            c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
-            c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
-            c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
-            c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
-            c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
-            c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
-            c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
-            c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
-            c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
-            c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
-            c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
-            c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
-            c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
-            c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
-            c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
-            c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
           }
-          for (; row < m; row += 1) {
-            float sum0 = 0.0f;
-            float sum1 = 0.0f;
-            float sum2 = 0.0f;
-            float sum3 = 0.0f;
-            if (alpha != 0.) {
-              int i = 0;
-              for (; i < k; i += 1) {
-                sum0 += a[offseta + i + row * lda] * b[offsetb + i + (col + 0) * ldb];
-                sum1 += a[offseta + i + row * lda] * b[offsetb + i + (col + 1) * ldb];
-                sum2 += a[offseta + i + row * lda] * b[offsetb + i + (col + 2) * ldb];
-                sum3 += a[offseta + i + row * lda] * b[offsetb + i + (col + 3) * ldb];
-              }
-            }
-            c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
-            c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
-            c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
-            c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
-          }
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
         }
-        for (; col < n; col += 1) {
-          int row = 0;
-          for (; row < loopBound(m, 4); row += 4) {
-            float sum0 = 0.0f;
-            float sum1 = 0.0f;
-            float sum2 = 0.0f;
-            float sum3 = 0.0f;
-            if (alpha != 0.) {
-              int i = 0;
-              for (; i < k; i += 1) {
-                float bval = b[offsetb + i + col * ldb];
-                sum0 += a[offseta + i + (row + 0) * lda] * bval;
-                sum1 += a[offseta + i + (row + 1) * lda] * bval;
-                sum2 += a[offseta + i + (row + 2) * lda] * bval;
-                sum3 += a[offseta + i + (row + 3) * lda] * bval;
-              }
+        for (; row < m; row += 1) {
+          float sum0 = 0.0f;
+          float sum1 = 0.0f;
+          float sum2 = 0.0f;
+          float sum3 = 0.0f;
+          if (alpha != 0.) {
+            int i = 0;
+            for (; i < k; i += 1) {
+              sum0 += a[offseta + i + row * lda] * b[offsetb + i + (col + 0) * ldb];
+              sum1 += a[offseta + i + row * lda] * b[offsetb + i + (col + 1) * ldb];
+              sum2 += a[offseta + i + row * lda] * b[offsetb + i + (col + 2) * ldb];
+              sum3 += a[offseta + i + row * lda] * b[offsetb + i + (col + 3) * ldb];
             }
-            c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
-            c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
-            c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
-            c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
           }
-          for (; row < m; row += 1) {
-            float sum = 0.0f;
-            if (alpha != 0.) {
-              int i = 0;
-              for (; i < k; i += 1) {
-                sum += a[offseta + i + row * lda] * b[offsetb + i + col * ldb];
-              }
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        for (; row < loopBound(m, 4); row += 4) {
+          float sum0 = 0.0f;
+          float sum1 = 0.0f;
+          float sum2 = 0.0f;
+          float sum3 = 0.0f;
+          if (alpha != 0.) {
+            int i = 0;
+            for (; i < k; i += 1) {
+              float bval = b[offsetb + i + col * ldb];
+              sum0 += a[offseta + i + (row + 0) * lda] * bval;
+              sum1 += a[offseta + i + (row + 1) * lda] * bval;
+              sum2 += a[offseta + i + (row + 2) * lda] * bval;
+              sum3 += a[offseta + i + (row + 3) * lda] * bval;
             }
-            c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
           }
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
+        }
+        for (; row < m; row += 1) {
+          float sum = 0.0f;
+          if (alpha != 0.) {
+            int i = 0;
+            for (; i < k; i += 1) {
+              sum += a[offseta + i + row * lda] * b[offsetb + i + col * ldb];
+            }
+          }
+          c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
         }
       }
     } else if (lsame("N", transa) && lsame("T", transb)) {
       // C = beta * C
       sscal(m * n, beta, c, offsetc, 1);
       // C += alpha * A * B
-      if (alpha != 0.) {
-        int i = 0;
-        for (; i < loopBound(k, 4); i += 4) {
-          int col = 0;
-          for (; col < loopBound(n, 4); col += 4) {
-            float alphab00 = alpha * b[offsetb + (col + 0) + (i + 0) * ldb];
-            float alphab01 = alpha * b[offsetb + (col + 1) + (i + 0) * ldb];
-            float alphab02 = alpha * b[offsetb + (col + 2) + (i + 0) * ldb];
-            float alphab03 = alpha * b[offsetb + (col + 3) + (i + 0) * ldb];
-            float alphab10 = alpha * b[offsetb + (col + 0) + (i + 1) * ldb];
-            float alphab11 = alpha * b[offsetb + (col + 1) + (i + 1) * ldb];
-            float alphab12 = alpha * b[offsetb + (col + 2) + (i + 1) * ldb];
-            float alphab13 = alpha * b[offsetb + (col + 3) + (i + 1) * ldb];
-            float alphab20 = alpha * b[offsetb + (col + 0) + (i + 2) * ldb];
-            float alphab21 = alpha * b[offsetb + (col + 1) + (i + 2) * ldb];
-            float alphab22 = alpha * b[offsetb + (col + 2) + (i + 2) * ldb];
-            float alphab23 = alpha * b[offsetb + (col + 3) + (i + 2) * ldb];
-            float alphab30 = alpha * b[offsetb + (col + 0) + (i + 3) * ldb];
-            float alphab31 = alpha * b[offsetb + (col + 1) + (i + 3) * ldb];
-            float alphab32 = alpha * b[offsetb + (col + 2) + (i + 3) * ldb];
-            float alphab33 = alpha * b[offsetb + (col + 3) + (i + 3) * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              float a0 = a[offseta + row + (i + 0) * lda];
-              float a1 = a[offseta + row + (i + 1) * lda];
-              float a2 = a[offseta + row + (i + 2) * lda];
-              float a3 = a[offseta + row + (i + 3) * lda];
-              c[offsetc + row + (col + 0) * ldc] += alphab00 * a0
-                                                 +  alphab10 * a1
-                                                 +  alphab20 * a2
-                                                 +  alphab30 * a3;
-              c[offsetc + row + (col + 1) * ldc] += alphab01 * a0
-                                                 +  alphab11 * a1
-                                                 +  alphab21 * a2
-                                                 +  alphab31 * a3;
-              c[offsetc + row + (col + 2) * ldc] += alphab02 * a0
-                                                 +  alphab12 * a1
-                                                 +  alphab22 * a2
-                                                 +  alphab32 * a3;
-              c[offsetc + row + (col + 3) * ldc] += alphab03 * a0
-                                                 +  alphab13 * a1
-                                                 +  alphab23 * a2
-                                                 +  alphab33 * a3;
-            }
-          }
-          for (; col < n; col += 1) {
-            float alphab0 = alpha * b[offsetb + col + (i + 0) * ldb];
-            float alphab1 = alpha * b[offsetb + col + (i + 1) * ldb];
-            float alphab2 = alpha * b[offsetb + col + (i + 2) * ldb];
-            float alphab3 = alpha * b[offsetb + col + (i + 3) * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + col * ldc] += alphab0 * a[offseta + row + (i + 0) * lda]
-                                           +  alphab1 * a[offseta + row + (i + 1) * lda]
-                                           +  alphab2 * a[offseta + row + (i + 2) * lda]
-                                           +  alphab3 * a[offseta + row + (i + 3) * lda];
-            }
+      int i = 0;
+      for (; i < loopBound(k, 4); i += 4) {
+        int col = 0;
+        for (; col < loopBound(n, 4); col += 4) {
+          float alphab00 = alpha * b[offsetb + (col + 0) + (i + 0) * ldb];
+          float alphab01 = alpha * b[offsetb + (col + 1) + (i + 0) * ldb];
+          float alphab02 = alpha * b[offsetb + (col + 2) + (i + 0) * ldb];
+          float alphab03 = alpha * b[offsetb + (col + 3) + (i + 0) * ldb];
+          float alphab10 = alpha * b[offsetb + (col + 0) + (i + 1) * ldb];
+          float alphab11 = alpha * b[offsetb + (col + 1) + (i + 1) * ldb];
+          float alphab12 = alpha * b[offsetb + (col + 2) + (i + 1) * ldb];
+          float alphab13 = alpha * b[offsetb + (col + 3) + (i + 1) * ldb];
+          float alphab20 = alpha * b[offsetb + (col + 0) + (i + 2) * ldb];
+          float alphab21 = alpha * b[offsetb + (col + 1) + (i + 2) * ldb];
+          float alphab22 = alpha * b[offsetb + (col + 2) + (i + 2) * ldb];
+          float alphab23 = alpha * b[offsetb + (col + 3) + (i + 2) * ldb];
+          float alphab30 = alpha * b[offsetb + (col + 0) + (i + 3) * ldb];
+          float alphab31 = alpha * b[offsetb + (col + 1) + (i + 3) * ldb];
+          float alphab32 = alpha * b[offsetb + (col + 2) + (i + 3) * ldb];
+          float alphab33 = alpha * b[offsetb + (col + 3) + (i + 3) * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            float a0 = a[offseta + row + (i + 0) * lda];
+            float a1 = a[offseta + row + (i + 1) * lda];
+            float a2 = a[offseta + row + (i + 2) * lda];
+            float a3 = a[offseta + row + (i + 3) * lda];
+            c[offsetc + row + (col + 0) * ldc] += alphab00 * a0
+                                                +  alphab10 * a1
+                                                +  alphab20 * a2
+                                                +  alphab30 * a3;
+            c[offsetc + row + (col + 1) * ldc] += alphab01 * a0
+                                                +  alphab11 * a1
+                                                +  alphab21 * a2
+                                                +  alphab31 * a3;
+            c[offsetc + row + (col + 2) * ldc] += alphab02 * a0
+                                                +  alphab12 * a1
+                                                +  alphab22 * a2
+                                                +  alphab32 * a3;
+            c[offsetc + row + (col + 3) * ldc] += alphab03 * a0
+                                                +  alphab13 * a1
+                                                +  alphab23 * a2
+                                                +  alphab33 * a3;
           }
         }
-        for (; i < k; i += 1) {
-          int col = 0;
-          for (; col < loopBound(n, 4); col += 4) {
-            float alphab0 = alpha * b[offsetb + (col + 0) + i * ldb];
-            float alphab1 = alpha * b[offsetb + (col + 1) + i * ldb];
-            float alphab2 = alpha * b[offsetb + (col + 2) + i * ldb];
-            float alphab3 = alpha * b[offsetb + (col + 3) + i * ldb];
-            int row = 0;
-            for (; row < m; row += 1) {
-              float aval = a[offseta + i * m + row];
-              c[offsetc + row + (col + 0) * ldc] += alphab0 * aval;
-              c[offsetc + row + (col + 1) * ldc] += alphab1 * aval;
-              c[offsetc + row + (col + 2) * ldc] += alphab2 * aval;
-              c[offsetc + row + (col + 3) * ldc] += alphab3 * aval;
-            }
+        for (; col < n; col += 1) {
+          float alphab0 = alpha * b[offsetb + col + (i + 0) * ldb];
+          float alphab1 = alpha * b[offsetb + col + (i + 1) * ldb];
+          float alphab2 = alpha * b[offsetb + col + (i + 2) * ldb];
+          float alphab3 = alpha * b[offsetb + col + (i + 3) * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + col * ldc] += alphab0 * a[offseta + row + (i + 0) * lda]
+                                          +  alphab1 * a[offseta + row + (i + 1) * lda]
+                                          +  alphab2 * a[offseta + row + (i + 2) * lda]
+                                          +  alphab3 * a[offseta + row + (i + 3) * lda];
           }
-          for (; col < n; col += 1) {
-            float alphab = alpha * b[offsetb + col + i * n];
-            int row = 0;
-            for (; row < m; row += 1) {
-              c[offsetc + row + col * ldc] += alphab * a[offseta + row + i * lda];
-            }
+        }
+      }
+      for (; i < k; i += 1) {
+        int col = 0;
+        for (; col < loopBound(n, 4); col += 4) {
+          float alphab0 = alpha * b[offsetb + (col + 0) + i * ldb];
+          float alphab1 = alpha * b[offsetb + (col + 1) + i * ldb];
+          float alphab2 = alpha * b[offsetb + (col + 2) + i * ldb];
+          float alphab3 = alpha * b[offsetb + (col + 3) + i * ldb];
+          int row = 0;
+          for (; row < m; row += 1) {
+            float aval = a[offseta + i * m + row];
+            c[offsetc + row + (col + 0) * ldc] += alphab0 * aval;
+            c[offsetc + row + (col + 1) * ldc] += alphab1 * aval;
+            c[offsetc + row + (col + 2) * ldc] += alphab2 * aval;
+            c[offsetc + row + (col + 3) * ldc] += alphab3 * aval;
+          }
+        }
+        for (; col < n; col += 1) {
+          float alphab = alpha * b[offsetb + col + i * n];
+          int row = 0;
+          for (; row < m; row += 1) {
+            c[offsetc + row + col * ldc] += alphab * a[offseta + row + i * lda];
           }
         }
       }
@@ -1028,33 +1036,31 @@ public class JavaBLAS implements BLAS {
                 float sum31 = 0.0f;
                 float sum32 = 0.0f;
                 float sum33 = 0.0f;
-                if (alpha != 0.0) {
-                  for (int w = i; w < Math.min(i + T, k); w++) {
-                    float b0 = b[offsetb + (u + 0) + w * ldb];
-                    float b1 = b[offsetb + (u + 1) + w * ldb];
-                    float b2 = b[offsetb + (u + 2) + w * ldb];
-                    float b3 = b[offsetb + (u + 3) + w * ldb];
-                    float a0 = a[offseta + w + (v + 0) * lda];
-                    float a1 = a[offseta + w + (v + 1) * lda];
-                    float a2 = a[offseta + w + (v + 2) * lda];
-                    float a3 = a[offseta + w + (v + 3) * lda];
-                    sum00 += a0 * b0;
-                    sum01 += a1 * b0;
-                    sum02 += a2 * b0;
-                    sum03 += a3 * b0;
-                    sum10 += a0 * b1;
-                    sum11 += a1 * b1;
-                    sum12 += a2 * b1;
-                    sum13 += a3 * b1;
-                    sum20 += a0 * b2;
-                    sum21 += a1 * b2;
-                    sum22 += a2 * b2;
-                    sum23 += a3 * b2;
-                    sum30 += a0 * b3;
-                    sum31 += a1 * b3;
-                    sum32 += a2 * b3;
-                    sum33 += a3 * b3;
-                  }
+                for (int w = i; w < Math.min(i + T, k); w++) {
+                  float b0 = b[offsetb + (u + 0) + w * ldb];
+                  float b1 = b[offsetb + (u + 1) + w * ldb];
+                  float b2 = b[offsetb + (u + 2) + w * ldb];
+                  float b3 = b[offsetb + (u + 3) + w * ldb];
+                  float a0 = a[offseta + w + (v + 0) * lda];
+                  float a1 = a[offseta + w + (v + 1) * lda];
+                  float a2 = a[offseta + w + (v + 2) * lda];
+                  float a3 = a[offseta + w + (v + 3) * lda];
+                  sum00 += a0 * b0;
+                  sum01 += a1 * b0;
+                  sum02 += a2 * b0;
+                  sum03 += a3 * b0;
+                  sum10 += a0 * b1;
+                  sum11 += a1 * b1;
+                  sum12 += a2 * b1;
+                  sum13 += a3 * b1;
+                  sum20 += a0 * b2;
+                  sum21 += a1 * b2;
+                  sum22 += a2 * b2;
+                  sum23 += a3 * b2;
+                  sum30 += a0 * b3;
+                  sum31 += a1 * b3;
+                  sum32 += a2 * b3;
+                  sum33 += a3 * b3;
                 }
                 c[offsetc + (v + 0) + (u + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (v + 0) + (u + 0) * ldc];
                 c[offsetc + (v + 1) + (u + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (v + 1) + (u + 0) * ldc];
@@ -1078,14 +1084,12 @@ public class JavaBLAS implements BLAS {
                 float sum1 = 0.0f;
                 float sum2 = 0.0f;
                 float sum3 = 0.0f;
-                if (alpha != 0.0) {
-                  for (int w = i; w < Math.min(i + T, k); w += 1) {
-                    float aval = a[offseta + v * k + w];
-                    sum0 += aval * b[offsetb + (u + 0) + w * ldb];
-                    sum1 += aval * b[offsetb + (u + 1) + w * ldb];
-                    sum2 += aval * b[offsetb + (u + 2) + w * ldb];
-                    sum3 += aval * b[offsetb + (u + 3) + w * ldb];
-                  }
+                for (int w = i; w < Math.min(i + T, k); w += 1) {
+                  float aval = a[offseta + v * k + w];
+                  sum0 += aval * b[offsetb + (u + 0) + w * ldb];
+                  sum1 += aval * b[offsetb + (u + 1) + w * ldb];
+                  sum2 += aval * b[offsetb + (u + 2) + w * ldb];
+                  sum3 += aval * b[offsetb + (u + 3) + w * ldb];
                 }
                 c[offsetc + v + (u + 0) * ldc] = alpha * sum0 + beta * c[offsetc + v + (u + 0) * ldc];
                 c[offsetc + v + (u + 1) * ldc] = alpha * sum1 + beta * c[offsetc + v + (u + 1) * ldc];
@@ -1100,14 +1104,12 @@ public class JavaBLAS implements BLAS {
                 float sum1 = 0.0f;
                 float sum2 = 0.0f;
                 float sum3 = 0.0f;
-                if (alpha != 0.0) {
-                  for (int w = i; w < Math.min(i + T, k); w += 1) {
-                    float bval = b[offsetb + w * n + u];
-                    sum0 += a[offseta + w + (v + 0) * lda] * bval;
-                    sum1 += a[offseta + w + (v + 1) * lda] * bval;
-                    sum2 += a[offseta + w + (v + 2) * lda] * bval;
-                    sum3 += a[offseta + w + (v + 3) * lda] * bval;
-                  }
+                for (int w = i; w < Math.min(i + T, k); w += 1) {
+                  float bval = b[offsetb + w * n + u];
+                  sum0 += a[offseta + w + (v + 0) * lda] * bval;
+                  sum1 += a[offseta + w + (v + 1) * lda] * bval;
+                  sum2 += a[offseta + w + (v + 2) * lda] * bval;
+                  sum3 += a[offseta + w + (v + 3) * lda] * bval;
                 }
                 c[offsetc + (v + 0) + u * ldc] = alpha * sum0 + beta * c[offsetc + (v + 0) + u * ldc];
                 c[offsetc + (v + 1) + u * ldc] = alpha * sum1 + beta * c[offsetc + (v + 1) + u * ldc];
@@ -1116,10 +1118,8 @@ public class JavaBLAS implements BLAS {
               }
               for (; v < Math.min(row + T, m); v += 1) {
                 float sum = 0.0f;
-                if (alpha != 0.0) {
-                  for (int w = i; w < Math.min(i + T, k); w += 1) {
-                    sum += a[offseta + w + v * lda] * b[offsetb + u + w * ldb];
-                  }
+                for (int w = i; w < Math.min(i + T, k); w += 1) {
+                  sum += a[offseta + w + v * lda] * b[offsetb + u + w * ldb];
                 }
                 c[offsetc + v + u * ldc] = alpha * sum + beta * c[offsetc + v + u * ldc];
               }
