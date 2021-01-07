@@ -1229,7 +1229,7 @@ public class JavaBLAS implements BLAS {
         float alphab3 = alpha * b[offsetb + (col + 3) + i * ldb];
         int row = 0;
         for (; row < m; row += 1) {
-          float aval = a[offseta + i * m + row];
+          float aval = a[offseta + row + i * lda];
           c[offsetc + row + (col + 0) * ldc] += alphab0 * aval;
           c[offsetc + row + (col + 1) * ldc] += alphab1 * aval;
           c[offsetc + row + (col + 2) * ldc] += alphab2 * aval;
@@ -1237,7 +1237,7 @@ public class JavaBLAS implements BLAS {
         }
       }
       for (; col < n; col += 1) {
-        float alphab = alpha * b[offsetb + col + i * n];
+        float alphab = alpha * b[offsetb + col + i * ldb];
         int row = 0;
         for (; row < m; row += 1) {
           c[offsetc + row + col * ldc] += alphab * a[offseta + row + i * lda];
@@ -1340,7 +1340,7 @@ public class JavaBLAS implements BLAS {
               float sum2 = 0.0f;
               float sum3 = 0.0f;
               for (int w = i; w < Math.min(i + T, k); w += 1) {
-                float aval = a[offseta + v * k + w];
+                float aval = a[offseta + w + v * lda];
                 sum0 += aval * b[offsetb + (u + 0) + w * ldb];
                 sum1 += aval * b[offsetb + (u + 1) + w * ldb];
                 sum2 += aval * b[offsetb + (u + 2) + w * ldb];
