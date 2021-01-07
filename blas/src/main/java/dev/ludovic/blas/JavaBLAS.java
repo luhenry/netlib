@@ -536,11 +536,9 @@ public class JavaBLAS implements BLAS {
       }
       for (; row < m; row += 1) {
         double sum = 0.0;
-        if (alpha != 0.) {
-          int i = 0;
-          for (; i < k; i += 1) {
-            sum += a[offseta + i + row * k] * b[offsetb + col * k + i];
-          }
+        int i = 0;
+        for (; i < k; i += 1) {
+          sum += a[offseta + i + row * k] * b[offsetb + col * k + i];
         }
         if (beta != 0.0) {
           c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
@@ -1010,26 +1008,24 @@ public class JavaBLAS implements BLAS {
         float sum31 = 0.0f;
         float sum32 = 0.0f;
         float sum33 = 0.0f;
-        if (alpha != 0.) {
-          int i = 0;
-          for (; i < k; i += 1) {
-            sum00 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 0) * ldb];
-            sum01 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 0) * ldb];
-            sum02 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 0) * ldb];
-            sum03 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 0) * ldb];
-            sum10 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 1) * ldb];
-            sum11 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 1) * ldb];
-            sum12 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 1) * ldb];
-            sum13 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 1) * ldb];
-            sum20 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 2) * ldb];
-            sum21 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 2) * ldb];
-            sum22 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 2) * ldb];
-            sum23 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 2) * ldb];
-            sum30 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 3) * ldb];
-            sum31 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 3) * ldb];
-            sum32 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 3) * ldb];
-            sum33 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 3) * ldb];
-          }
+        int i = 0;
+        for (; i < k; i += 1) {
+          sum00 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 0) * ldb];
+          sum01 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 0) * ldb];
+          sum02 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 0) * ldb];
+          sum03 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 0) * ldb];
+          sum10 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 1) * ldb];
+          sum11 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 1) * ldb];
+          sum12 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 1) * ldb];
+          sum13 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 1) * ldb];
+          sum20 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 2) * ldb];
+          sum21 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 2) * ldb];
+          sum22 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 2) * ldb];
+          sum23 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 2) * ldb];
+          sum30 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 3) * ldb];
+          sum31 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 3) * ldb];
+          sum32 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 3) * ldb];
+          sum33 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 3) * ldb];
         }
         if (beta != 0.0f) {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
@@ -1072,14 +1068,12 @@ public class JavaBLAS implements BLAS {
         float sum1 = 0.0f;
         float sum2 = 0.0f;
         float sum3 = 0.0f;
-        if (alpha != 0.) {
-          int i = 0;
-          for (; i < k; i += 1) {
-            sum0 += a[offseta + i + row * lda] * b[offsetb + i + (col + 0) * ldb];
-            sum1 += a[offseta + i + row * lda] * b[offsetb + i + (col + 1) * ldb];
-            sum2 += a[offseta + i + row * lda] * b[offsetb + i + (col + 2) * ldb];
-            sum3 += a[offseta + i + row * lda] * b[offsetb + i + (col + 3) * ldb];
-          }
+        int i = 0;
+        for (; i < k; i += 1) {
+          sum0 += a[offseta + i + row * lda] * b[offsetb + i + (col + 0) * ldb];
+          sum1 += a[offseta + i + row * lda] * b[offsetb + i + (col + 1) * ldb];
+          sum2 += a[offseta + i + row * lda] * b[offsetb + i + (col + 2) * ldb];
+          sum3 += a[offseta + i + row * lda] * b[offsetb + i + (col + 3) * ldb];
         }
         if (beta != 0.0f) {
           c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
@@ -1101,15 +1095,13 @@ public class JavaBLAS implements BLAS {
         float sum1 = 0.0f;
         float sum2 = 0.0f;
         float sum3 = 0.0f;
-        if (alpha != 0.) {
-          int i = 0;
-          for (; i < k; i += 1) {
-            float bval = b[offsetb + i + col * ldb];
-            sum0 += a[offseta + i + (row + 0) * lda] * bval;
-            sum1 += a[offseta + i + (row + 1) * lda] * bval;
-            sum2 += a[offseta + i + (row + 2) * lda] * bval;
-            sum3 += a[offseta + i + (row + 3) * lda] * bval;
-          }
+        int i = 0;
+        for (; i < k; i += 1) {
+          float bval = b[offsetb + i + col * ldb];
+          sum0 += a[offseta + i + (row + 0) * ldb] * bval;
+          sum1 += a[offseta + i + (row + 1) * ldb] * bval;
+          sum2 += a[offseta + i + (row + 2) * ldb] * bval;
+          sum3 += a[offseta + i + (row + 3) * ldb] * bval;
         }
         if (beta != 0.0f) {
           c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
@@ -1125,11 +1117,9 @@ public class JavaBLAS implements BLAS {
       }
       for (; row < m; row += 1) {
         float sum = 0.0f;
-        if (alpha != 0.) {
-          int i = 0;
-          for (; i < k; i += 1) {
-            sum += a[offseta + i + row * lda] * b[offsetb + i + col * ldb];
-          }
+        int i = 0;
+        for (; i < k; i += 1) {
+          sum += a[offseta + i + row * k] * b[offsetb + col * k + i];
         }
         if (beta != 0.0f) {
           c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
