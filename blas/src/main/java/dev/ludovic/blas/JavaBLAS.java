@@ -427,7 +427,7 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgemmTNKernel(int cols, int cole, int rows, int rowe, int is, int ie, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Tcol = 4, Trow = 4;
+    final int Tcol = 3, Trow = 3;
     int col = cols;
     for (; col < loopBound(cole, Tcol); col += Tcol) {
       int row = rows;
@@ -436,71 +436,49 @@ public class JavaBLAS implements BLAS {
         double sum00 = 0.0;
         double sum01 = 0.0;
         double sum02 = 0.0;
-        double sum03 = 0.0;
         double sum10 = 0.0;
         double sum11 = 0.0;
         double sum12 = 0.0;
-        double sum13 = 0.0;
         double sum20 = 0.0;
         double sum21 = 0.0;
         double sum22 = 0.0;
-        double sum23 = 0.0;
-        double sum30 = 0.0;
-        double sum31 = 0.0;
-        double sum32 = 0.0;
-        double sum33 = 0.0;
         for (; i < ie; i += 1) {
-          sum00 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 0) * ldb];
-          sum01 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 0) * ldb];
-          sum02 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 0) * ldb];
-          sum03 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 0) * ldb];
-          sum10 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 1) * ldb];
-          sum11 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 1) * ldb];
-          sum12 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 1) * ldb];
-          sum13 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 1) * ldb];
-          sum20 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 2) * ldb];
-          sum21 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 2) * ldb];
-          sum22 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 2) * ldb];
-          sum23 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 2) * ldb];
-          sum30 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 3) * ldb];
-          sum31 += a[offseta + i + (row + 1) * lda] * b[offsetb + i + (col + 3) * ldb];
-          sum32 += a[offseta + i + (row + 2) * lda] * b[offsetb + i + (col + 3) * ldb];
-          sum33 += a[offseta + i + (row + 3) * lda] * b[offsetb + i + (col + 3) * ldb];
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double a1 = a[offseta + i + (row + 1) * lda];
+          double a2 = a[offseta + i + (row + 2) * lda];
+          double b0 = b[offsetb + i + (col + 0) * ldb];
+          double b1 = b[offsetb + i + (col + 1) * ldb];
+          double b2 = b[offsetb + i + (col + 2) * ldb];
+          sum00 += a0 * b0;
+          sum01 += a0 * b1;
+          sum02 += a0 * b2;
+          sum10 += a1 * b0;
+          sum11 += a1 * b1;
+          sum12 += a1 * b2;
+          sum20 += a2 * b0;
+          sum21 += a2 * b1;
+          sum22 += a2 * b2;
         }
         if (beta != 0.0) {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
-          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
-          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
-          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
-          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
           c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
-          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
-          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
-          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
-          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
           c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
-          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
-          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
-          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
-          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
-          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
-          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01;
-          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02;
-          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03;
-          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum10;
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02;
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
           c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11;
-          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum12;
-          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum13;
-          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum20;
-          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum21;
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12;
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20;
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21;
           c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22;
-          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum23;
-          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum30;
-          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum31;
-          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum32;
-          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33;
         }
       }
       for (; row < rowe; row += 1) {
@@ -508,23 +486,23 @@ public class JavaBLAS implements BLAS {
         double sum00 = 0.0;
         double sum01 = 0.0;
         double sum02 = 0.0;
-        double sum03 = 0.0;
         for (; i < ie; i += 1) {
-          sum00 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 0) * ldb];
-          sum01 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 1) * ldb];
-          sum02 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 2) * ldb];
-          sum03 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 3) * ldb];
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double b0 = b[offsetb + i + (col + 0) * ldb];
+          double b1 = b[offsetb + i + (col + 1) * ldb];
+          double b2 = b[offsetb + i + (col + 2) * ldb];
+          sum00 += a0 * b0;
+          sum01 += a0 * b1;
+          sum02 += a0 * b2;
         }
         if (beta != 0.0) {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
           c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
-          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
           c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02;
-          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum03;
         }
       }
     }
@@ -535,31 +513,32 @@ public class JavaBLAS implements BLAS {
         double sum00 = 0.0;
         double sum01 = 0.0;
         double sum02 = 0.0;
-        double sum03 = 0.0;
         for (; i < ie; i += 1) {
-          double bval = b[offsetb + i + col * ldb];
-          sum00 += a[offseta + i + (row + 0) * ldb] * bval;
-          sum01 += a[offseta + i + (row + 1) * ldb] * bval;
-          sum02 += a[offseta + i + (row + 2) * ldb] * bval;
-          sum03 += a[offseta + i + (row + 3) * ldb] * bval;
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double a1 = a[offseta + i + (row + 1) * lda];
+          double a2 = a[offseta + i + (row + 2) * lda];
+          double b0 = b[offsetb + i + (col + 0) * ldb];
+          sum00 += a0 * b0;
+          sum01 += a1 * b0;
+          sum02 += a2 * b0;
         }
         if (beta != 0.0) {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
           c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
-          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01;
           c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02;
-          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum03;
         }
       }
       for (; row < rowe; row += 1) {
         int i = is;
         double sum00 = 0.0;
         for (; i < ie; i += 1) {
-          sum00 += a[offseta + i + (row + 0) * lda] * b[offsetb + i + (col + 0) * ldb];
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double b0 = b[offsetb + i + (col + 0) * ldb];
+          sum00 += a0 * b0;
         }
         if (beta != 0.0) {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];

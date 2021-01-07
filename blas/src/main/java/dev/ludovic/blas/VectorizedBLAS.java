@@ -564,26 +564,183 @@ public class VectorizedBLAS extends JavaBLAS {
     }
   }
 
-  // c = alpha * a * b + beta * c
   @Override
-  protected void dgemmTN(int m, int n, int k,
+  protected void dgemmTNKernel(int cols, int cole, int rows, int rowe, int is, int ie,
       double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb,
       double beta, double[] c, int offsetc, int ldc) {
-    for (int col = 0; col < n; col += 1) {
-      for (int row = 0; row < m; row += 1) {
-        // C = beta * C
-        c[offsetc + col * ldc + row] = beta * c[offsetc + col * ldc + row];
-        // C += alpha * A * B
-        int i = 0;
-        DoubleVector vsum = DoubleVector.zero(DMAX);
-        for (; i < DMAX.loopBound(k); i += DMAX.length()) {
-          DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + i + row * lda);
-          DoubleVector vb = DoubleVector.fromArray(DMAX, b, offsetb + col * ldb + i);
-          vsum = va.fma(vb, vsum);
+    final int Tcol = 3, Trow = 3;
+    int col = cols;
+    for (; col < loopBound(cole, Tcol); col += Tcol) {
+      int row = rows;
+      for (; row < loopBound(rowe, Trow); row += Trow) {
+        int i = is;
+        DoubleVector vsum00 = DoubleVector.zero(DMAX);
+        DoubleVector vsum01 = DoubleVector.zero(DMAX);
+        DoubleVector vsum02 = DoubleVector.zero(DMAX);
+        DoubleVector vsum10 = DoubleVector.zero(DMAX);
+        DoubleVector vsum11 = DoubleVector.zero(DMAX);
+        DoubleVector vsum12 = DoubleVector.zero(DMAX);
+        DoubleVector vsum20 = DoubleVector.zero(DMAX);
+        DoubleVector vsum21 = DoubleVector.zero(DMAX);
+        DoubleVector vsum22 = DoubleVector.zero(DMAX);
+        for (; i < DMAX.loopBound(ie); i += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + i + (row + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + i + (row + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + i + (row + 2) * lda);
+          DoubleVector vb0 = DoubleVector.fromArray(DMAX, b, offsetb + i + (col + 0) * ldb);
+          DoubleVector vb1 = DoubleVector.fromArray(DMAX, b, offsetb + i + (col + 1) * ldb);
+          DoubleVector vb2 = DoubleVector.fromArray(DMAX, b, offsetb + i + (col + 2) * ldb);
+          vsum00 = va0.fma(vb0, vsum00);
+          vsum01 = va0.fma(vb1, vsum01);
+          vsum02 = va0.fma(vb2, vsum02);
+          vsum10 = va1.fma(vb0, vsum10);
+          vsum11 = va1.fma(vb1, vsum11);
+          vsum12 = va1.fma(vb2, vsum12);
+          vsum20 = va2.fma(vb0, vsum20);
+          vsum21 = va2.fma(vb1, vsum21);
+          vsum22 = va2.fma(vb2, vsum22);
         }
-        c[offsetc + col * ldc + row] += alpha * vsum.reduceLanes(VectorOperators.ADD);
-        for (; i < k; i += 1) {
-          c[offsetc + col * ldc + row] += alpha * a[offseta + i + row * lda] * b[offsetb + col * ldb + i];
+        double sum00 = vsum00.reduceLanes(VectorOperators.ADD);
+        double sum01 = vsum01.reduceLanes(VectorOperators.ADD);
+        double sum02 = vsum02.reduceLanes(VectorOperators.ADD);
+        double sum10 = vsum10.reduceLanes(VectorOperators.ADD);
+        double sum11 = vsum11.reduceLanes(VectorOperators.ADD);
+        double sum12 = vsum12.reduceLanes(VectorOperators.ADD);
+        double sum20 = vsum20.reduceLanes(VectorOperators.ADD);
+        double sum21 = vsum21.reduceLanes(VectorOperators.ADD);
+        double sum22 = vsum22.reduceLanes(VectorOperators.ADD);
+        for (; i < ie; i += 1) {
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double a1 = a[offseta + i + (row + 1) * lda];
+          double a2 = a[offseta + i + (row + 2) * lda];
+          double b0 = b[offsetb + i + (col + 0) * ldb];
+          double b1 = b[offsetb + i + (col + 1) * ldb];
+          double b2 = b[offsetb + i + (col + 2) * ldb];
+          sum00 += a0 * b0;
+          sum01 += a0 * b1;
+          sum02 += a0 * b2;
+          sum10 += a1 * b0;
+          sum11 += a1 * b1;
+          sum12 += a1 * b2;
+          sum20 += a2 * b0;
+          sum21 += a2 * b1;
+          sum22 += a2 * b2;
+        }
+        if (beta != 0.0) {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
+        } else {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02;
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11;
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12;
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20;
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21;
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22;
+        }
+      }
+      for (; row < rowe; row += 1) {
+        int i = is;
+        DoubleVector vsum00 = DoubleVector.zero(DMAX);
+        DoubleVector vsum01 = DoubleVector.zero(DMAX);
+        DoubleVector vsum02 = DoubleVector.zero(DMAX);
+        for (; i < DMAX.loopBound(ie); i += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + i + (row + 0) * lda);
+          DoubleVector vb0 = DoubleVector.fromArray(DMAX, b, offsetb + i + (col + 0) * ldb);
+          DoubleVector vb1 = DoubleVector.fromArray(DMAX, b, offsetb + i + (col + 1) * ldb);
+          DoubleVector vb2 = DoubleVector.fromArray(DMAX, b, offsetb + i + (col + 2) * ldb);
+          vsum00 = va0.fma(vb0, vsum00);
+          vsum01 = va0.fma(vb1, vsum01);
+          vsum02 = va0.fma(vb2, vsum02);
+        }
+        double sum00 = vsum00.reduceLanes(VectorOperators.ADD);
+        double sum01 = vsum01.reduceLanes(VectorOperators.ADD);
+        double sum02 = vsum02.reduceLanes(VectorOperators.ADD);
+        for (; i < ie; i += 1) {
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double b0 = b[offsetb + i + (col + 0) * ldb];
+          double b1 = b[offsetb + i + (col + 1) * ldb];
+          double b2 = b[offsetb + i + (col + 2) * ldb];
+          sum00 += a0 * b0;
+          sum01 += a0 * b1;
+          sum02 += a0 * b2;
+        }
+        if (beta != 0.0) {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+        } else {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02;
+        }
+      }
+    }
+    for (; col < cole; col += 1) {
+      int row = rows;
+      for (; row < loopBound(rowe, Trow); row += Trow) {
+        int i = is;
+        DoubleVector vsum00 = DoubleVector.zero(DMAX);
+        DoubleVector vsum01 = DoubleVector.zero(DMAX);
+        DoubleVector vsum02 = DoubleVector.zero(DMAX);
+        for (; i < DMAX.loopBound(ie); i += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + i + (row + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + i + (row + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + i + (row + 2) * lda);
+          DoubleVector vb0 = DoubleVector.fromArray(DMAX, b, offsetb + i + (col + 0) * ldb);
+          vsum00 = va0.fma(vb0, vsum00);
+          vsum01 = va1.fma(vb0, vsum01);
+          vsum02 = va2.fma(vb0, vsum02);
+        }
+        double sum00 = vsum00.reduceLanes(VectorOperators.ADD);
+        double sum01 = vsum01.reduceLanes(VectorOperators.ADD);
+        double sum02 = vsum02.reduceLanes(VectorOperators.ADD);
+        for (; i < ie; i += 1) {
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double a1 = a[offseta + i + (row + 1) * lda];
+          double a2 = a[offseta + i + (row + 2) * lda];
+          double b0 = b[offsetb + i + (col + 0) * ldb];
+          sum00 += a0 * b0;
+          sum01 += a1 * b0;
+          sum02 += a2 * b0;
+        }
+        if (beta != 0.0) {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+        } else {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum01;
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum02;
+        }
+      }
+      for (; row < rowe; row += 1) {
+        int i = is;
+        DoubleVector vsum00 = DoubleVector.zero(DMAX);
+        for (; i < DMAX.loopBound(ie); i += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + i + (row + 0) * lda);
+          DoubleVector vb0 = DoubleVector.fromArray(DMAX, b, offsetb + i + (col + 0) * ldb);
+          vsum00 = va0.fma(vb0, vsum00);
+        }
+        double sum00 = vsum00.reduceLanes(VectorOperators.ADD);
+        for (; i < ie; i += 1) {
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double b0 = b[offsetb + i + (col + 0) * ldb];
+          sum00 += a0 * b0;
+        }
+        if (beta != 0.0) {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+        } else {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
         }
       }
     }
