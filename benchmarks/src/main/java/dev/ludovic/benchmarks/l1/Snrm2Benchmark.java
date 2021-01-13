@@ -46,6 +46,6 @@ public class Snrm2Benchmark extends BLASBenchmark {
 
     @Benchmark
     public void blas(Blackhole bh) {
-        bh.consume(blas.snrm2(n, x, -1));
+        bh.consume(blas.snrm2(n, x, 1));
     }
 }
