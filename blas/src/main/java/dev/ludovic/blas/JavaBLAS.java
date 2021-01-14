@@ -143,7 +143,7 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dcopyK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    if (x.length >= offsetx + n && incx == 1 && y.length >= offsety + n && incy == 1) {
+    if (incx == 1 && incy == 1) {
       System.arraycopy(x, offsetx, y, offsety, n);
     } else {
       for (int ix = incx < 0 ? (n - 1) * -incx : 0,
@@ -168,7 +168,7 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void scopyK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    if (x.length >= offsetx + n && incx == 1 && y.length >= offsety + n && incy == 1) {
+    if (incx == 1 && incy == 1) {
       System.arraycopy(x, offsetx, y, offsety, n);
     } else {
       for (int ix = incx < 0 ? (n - 1) * -incx : 0,
