@@ -46,7 +46,7 @@ public class DdotTest extends BLASTest {
         double[] x = new double[] { 0.0, 1.0 };
         double[] y = new double[] { 0.0, 1.0 };
 
-        assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
             blas.ddot(n, x, 1, y, 1);
         });
     }
@@ -60,7 +60,7 @@ public class DdotTest extends BLASTest {
         double[] y = new double[] { 2.0, 1.0,  0.0, 0.0, 2.0, 1.0,  0.0, 0.0, 0.0 };
         int offsety = 1;
 
-        assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
             blas.ddot(n, x, offsetx, 1, y, offsety, 1);
         });
     }
