@@ -40,98 +40,80 @@ public class VectorizedBLAS extends JavaBLAS {
     return instance;
   }
 
-  @Override
-  public double dasum(int n, double[] x, int offsetx, int incx) {
-    if (n > 0 && x != null && x.length >= offsetx + n && incx == 1) {
-      double sum = 0.;
+  protected double dasumK(int n, double[] x, int offsetx, int incx) {
+    if (incx == 1) {
       int i = 0;
       DoubleVector vsum = DoubleVector.zero(DMAX);
       for (; i < DMAX.loopBound(n); i += DMAX.length()) {
         DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + i);
         vsum = vx.abs().add(vsum);
       }
-      sum += vsum.reduceLanes(VectorOperators.ADD);
+      double sum = vsum.reduceLanes(VectorOperators.ADD);
       for (; i < n; i += 1) {
         sum += Math.abs(x[offsetx + i]);
       }
       return sum;
     } else {
-      return super.dasum(n, x, offsetx, incx);
+      return super.dasumK(n, x, offsetx, incx);
     }
   }
 
-  @Override
-  public float sasum(int n, float[] x, int offsetx, int incx) {
-    if (n > 0 && x != null && x.length >= offsetx + n && incx == 1) {
-      float sum = 0.f;
+  protected float sasumK(int n, float[] x, int offsetx, int incx) {
+    if (incx == 1) {
       int i = 0;
       FloatVector vsum = FloatVector.zero(FMAX);
       for (; i < FMAX.loopBound(n); i += FMAX.length()) {
         FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + i);
         vsum = vx.abs().add(vsum);
       }
-      sum += vsum.reduceLanes(VectorOperators.ADD);
+      float sum = vsum.reduceLanes(VectorOperators.ADD);
       for (; i < n; i += 1) {
         sum += Math.abs(x[offsetx + i]);
       }
       return sum;
     } else {
-      return super.sasum(n, x, offsetx, incx);
+      return super.sasumK(n, x, offsetx, incx);
     }
   }
 
-  // y += alpha * x
-  @Override
-  public void daxpy(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    if (n > 0
-        && x != null && x.length >= offsetx + n && incx == 1
-        && y != null && y.length >= offsety + n && incy == 1) {
-      if (alpha != 0.) {
-        int i = 0;
-        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
-        for (; i < DMAX.loopBound(n); i += DMAX.length()) {
-          DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + i);
-          DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + i);
-          vx.fma(valpha, vy).intoArray(y, offsety + i);
-        }
-        for (; i < n; i += 1) {
-          y[offsety + i] += alpha * x[offsetx + i];
-        }
+  protected void daxpyK(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
+      int i = 0;
+      DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+      for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+        DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + i);
+        DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + i);
+        valpha.fma(vx, vy)
+          .intoArray(y, offsety + i);
+      }
+      for (; i < n; i += 1) {
+        y[offsety + i] += alpha * x[offsetx + i];
       }
     } else {
-      super.daxpy(n, alpha, x, offsetx, incx, y, offsety, incy);
+      super.daxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
     }
   }
 
-  @Override
-  public void saxpy(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    if (n > 0
-        && x != null && x.length >= offsetx + n && incx == 1
-        && y != null && y.length >= offsety + n && incy == 1) {
-      if (alpha != 0.f) {
-        int i = 0;
-        FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
-        for (; i < FMAX.loopBound(n); i += FMAX.length()) {
-          FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + i);
-          FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + i);
-          vx.fma(valpha, vy).intoArray(y, offsety + i);
-        }
-        for (; i < n; i += 1) {
-          y[offsety + i] += alpha * x[offsetx + i];
-        }
+  protected void saxpyK(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
+      int i = 0;
+      FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
+      for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+        FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + i);
+        FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + i);
+        valpha.fma(vx, vy)
+          .intoArray(y, offsety + i);
+      }
+      for (; i < n; i += 1) {
+        y[offsety + i] += alpha * x[offsetx + i];
       }
     } else {
-      super.saxpy(n, alpha, x, offsetx, incx, y, offsety, incy);
+      super.saxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
     }
   }
 
-  // sum(x * y)
-  @Override
-  public double ddot(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    if (n > 0
-        && x != null && x.length >= offsetx + n && incx == 1
-        && y != null && y.length >= offsety + n && incy == 1) {
-      double sum = 0.;
+  protected double ddotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
       int i = 0;
       DoubleVector vsum = DoubleVector.zero(DMAX);
       for (; i < DMAX.loopBound(n); i += DMAX.length()) {
@@ -139,23 +121,18 @@ public class VectorizedBLAS extends JavaBLAS {
         DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + i);
         vsum = vx.fma(vy, vsum);
       }
-      sum += vsum.reduceLanes(VectorOperators.ADD);
+      double sum = vsum.reduceLanes(VectorOperators.ADD);
       for (; i < n; i += 1) {
         sum += x[offsetx + i] * y[offsety + i];
       }
       return sum;
     } else {
-      return super.ddot(n, x, offsetx, incx, y, offsety, incy);
+      return super.ddotK(n, x, offsetx, incx, y, offsety, incy);
     }
   }
 
-  // sum(x * y)
-  @Override
-  public float sdot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    if (n > 0
-        && x != null && x.length >= offsetx + n && incx == 1
-        && y != null && y.length >= offsety + n && incy == 1) {
-      float sum = 0.f;
+  protected float sdotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
       int i = 0;
       FloatVector vsum = FloatVector.zero(FMAX);
       for (; i < FMAX.loopBound(n); i += FMAX.length()) {
@@ -163,13 +140,13 @@ public class VectorizedBLAS extends JavaBLAS {
         FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + i);
         vsum = vx.fma(vy, vsum);
       }
-      sum += vsum.reduceLanes(VectorOperators.ADD);
+      float sum = vsum.reduceLanes(VectorOperators.ADD);
       for (; i < n; i += 1) {
         sum += x[offsetx + i] * y[offsety + i];
       }
       return sum;
     } else {
-      return super.sdot(n, x, offsetx, incx, y, offsety, incy);
+      return super.sdotK(n, x, offsetx, incx, y, offsety, incy);
     }
   }
 
@@ -746,258 +723,2124 @@ public class VectorizedBLAS extends JavaBLAS {
     }
   }
 
-  // y = alpha * A * x + beta * y
-  @Override
   protected void dgemvN(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    // y = beta * y
-    dscal(m, beta, y, offsety, 1);
-    // y += alpha * A * x
-    DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
-    for (int col = 0; col < n; col += 1) {
-      int row = 0;
-      for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-        DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + row + col * m);
-        DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + row);
-        valpha.mul(x[offsetx + col]).fma(va, vy)
+    if (incx == 1 && incy == 1) {
+      if (beta != 1.0) {
+        int row = 0;
+        DoubleVector vzero = DoubleVector.zero(DMAX);
+        DoubleVector vbeta = DoubleVector.broadcast(DMAX, beta);
+        for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+          if (beta != 0.0) {
+            DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + row);
+            vbeta.mul(vy)
               .intoArray(y, offsety + row);
+          } else {
+            vzero.intoArray(y, offsety + row);
+          }
+        }
+        for (; row < m; row += 1) {
+          if (beta != 0.0) {
+            y[offsety + row] = beta * y[offsety + row];
+          } else {
+            y[offsety + row] = 0.0;
+          }
+        }
       }
-      for (; row < m; row += 1) {
-        y[offsety + row] += alpha * x[offsetx + col] * a[offseta + row + col * m];
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        DoubleVector valphax1 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 1)]);
+        DoubleVector valphax2 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 2)]);
+        DoubleVector valphax3 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 3)]);
+        for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 2) * lda);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 3) * lda);
+          DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + row);
+          valphax0.fma(va0, valphax1.fma(va1, valphax2.fma(va2, valphax3.fma(va3, vy))))
+            .intoArray(y, offsety + row);
+        }
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double alphax1 = alpha * x[offsetx + (col + 1)];
+        double alphax2 = alpha * x[offsetx + (col + 2)];
+        double alphax3 = alpha * x[offsetx + (col + 3)];
+        for (; row < m; row += 1) {
+          y[offsety + row] += alphax0 * a[offseta + row + (col + 0) * lda]
+                           +  alphax1 * a[offseta + row + (col + 1) * lda]
+                           +  alphax2 * a[offseta + row + (col + 2) * lda]
+                           +  alphax3 * a[offseta + row + (col + 3) * lda];
+        }
       }
+      for (; col < n; col += 1) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + row);
+          valphax0.fma(va0, vy)
+            .intoArray(y, offsety + row);
+        }
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        for (; row < m; row += 1) {
+          y[offsety + row] += alphax0 * a[offseta + row + (col + 0) * lda];
+        }
+      }
+    } else {
+      super.dgemvN(m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     }
   }
 
-  // y = alpha * A * x + beta * y
-  @Override
   protected void dgemvT(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    for (int col = 0; col < n; col += 1) {
-      // y = beta * y
-      y[offsety + col] = beta * y[offsety + col];
-      // y += alpha * A * x
-      int row = 0;
-      DoubleVector vsum = DoubleVector.zero(DMAX);
-      for (; row < DMAX.loopBound(m); row += DMAX.length()) {
-        DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + row + col * m);
-        DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + row);
-        vsum = va.fma(vx, vsum);
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector vsum0 = DoubleVector.zero(DMAX);
+        DoubleVector vsum1 = DoubleVector.zero(DMAX);
+        DoubleVector vsum2 = DoubleVector.zero(DMAX);
+        DoubleVector vsum3 = DoubleVector.zero(DMAX);
+        for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 2) * lda);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 3) * lda);
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+          vsum1 = vx0.fma(va1, vsum1);
+          vsum2 = vx0.fma(va2, vsum2);
+          vsum3 = vx0.fma(va3, vsum3);
+        }
+        double sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        double sum1 = vsum1.reduceLanes(VectorOperators.ADD);
+        double sum2 = vsum2.reduceLanes(VectorOperators.ADD);
+        double sum3 = vsum3.reduceLanes(VectorOperators.ADD);
+        for (; row < m; row += 1) {
+          double a0 = a[offseta + row + (col + 0) * lda];
+          double a1 = a[offseta + row + (col + 1) * lda];
+          double a2 = a[offseta + row + (col + 2) * lda];
+          double a3 = a[offseta + row + (col + 3) * lda];
+          double x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+          sum1 += x0 * a1;
+          sum2 += x0 * a2;
+          sum3 += x0 * a3;
+        }
+        if (beta != 0.0) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+          y[offsety + (col + 1)] = alpha * sum1 + beta * y[offsety + (col + 1)];
+          y[offsety + (col + 2)] = alpha * sum2 + beta * y[offsety + (col + 2)];
+          y[offsety + (col + 3)] = alpha * sum3 + beta * y[offsety + (col + 3)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
+          y[offsety + (col + 1)] = alpha * sum1;
+          y[offsety + (col + 2)] = alpha * sum2;
+          y[offsety + (col + 3)] = alpha * sum3;
+        }
       }
-      y[offsety + col] += alpha * vsum.reduceLanes(VectorOperators.ADD);
-      for (; row < m; row += 1) {
-        y[offsety + col] += alpha * x[offsetx + row] * a[offseta + row + col * m];
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector vsum0 = DoubleVector.zero(DMAX);
+        for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+        }
+        double sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        for (; row < m; row += 1) {
+          double a0 = a[offseta + row + (col + 0) * lda];
+          double x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+        }
+        if (beta != 0.0) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
+        }
       }
+    } else {
+      super.dgemvT(m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     }
   }
 
-  // y = alpha * A * x + beta * y
-  @Override
   protected void sgemvN(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    // y = beta * y
-    sscal(m, beta, y, offsety, 1);
-    // y += alpha * A * x
-    FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
-    for (int col = 0; col < n; col += 1) {
-      int row = 0;
-      for (; row < FMAX.loopBound(m); row += FMAX.length()) {
-        FloatVector va = FloatVector.fromArray(FMAX, a, offseta + row + col * m);
-        FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + row);
-        valpha.mul(x[offsetx + col]).fma(va, vy)
+    if (incx == 1 && incy == 1) {
+      if (beta != 1.0f) {
+        int row = 0;
+        FloatVector vzero = FloatVector.zero(FMAX);
+        FloatVector vbeta = FloatVector.broadcast(FMAX, beta);
+        for (; row < FMAX.loopBound(m); row += FMAX.length()) {
+          if (beta != 0.0f) {
+            FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + row);
+            vbeta.mul(vy)
               .intoArray(y, offsety + row);
+          } else {
+            vzero.intoArray(y, offsety + row);
+          }
+        }
+        for (; row < m; row += 1) {
+          if (beta != 0.0f) {
+            y[offsety + row] = beta * y[offsety + row];
+          } else {
+            y[offsety + row] = 0.0f;
+          }
+        }
       }
-      for (; row < m; row += 1) {
-        y[offsety + row] += alpha * x[offsetx + col] * a[offseta + row + col * m];
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        FloatVector valphax1 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 1)]);
+        FloatVector valphax2 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 2)]);
+        FloatVector valphax3 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 3)]);
+        for (; row < FMAX.loopBound(m); row += FMAX.length()) {
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          FloatVector va1 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 1) * lda);
+          FloatVector va2 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 2) * lda);
+          FloatVector va3 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 3) * lda);
+          FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + row);
+          valphax0.fma(va0, valphax1.fma(va1, valphax2.fma(va2, valphax3.fma(va3, vy))))
+            .intoArray(y, offsety + row);
+        }
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        float alphax1 = alpha * x[offsetx + (col + 1)];
+        float alphax2 = alpha * x[offsetx + (col + 2)];
+        float alphax3 = alpha * x[offsetx + (col + 3)];
+        for (; row < m; row += 1) {
+          y[offsety + row] += alphax0 * a[offseta + row + (col + 0) * lda]
+                           +  alphax1 * a[offseta + row + (col + 1) * lda]
+                           +  alphax2 * a[offseta + row + (col + 2) * lda]
+                           +  alphax3 * a[offseta + row + (col + 3) * lda];
+        }
       }
+      for (; col < n; col += 1) {
+        int row = 0;
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        for (; row < FMAX.loopBound(m); row += FMAX.length()) {
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          FloatVector vy = FloatVector.fromArray(FMAX, y, offsety + row);
+          valphax0.fma(va0, vy)
+            .intoArray(y, offsety + row);
+        }
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        for (; row < m; row += 1) {
+          y[offsety + row] += alphax0 * a[offseta + row + (col + 0) * lda];
+        }
+      }
+    } else {
+      super.sgemvN(m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     }
   }
 
-  // y = alpha * A * x + beta * y
-  @Override
   protected void sgemvT(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    for (int col = 0; col < n; col += 1) {
-      // y = beta * y
-      y[offsety + col] = beta * y[offsety + col];
-      // y += alpha * A * x
-      int row = 0;
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        FloatVector vsum0 = FloatVector.zero(FMAX);
+        FloatVector vsum1 = FloatVector.zero(FMAX);
+        FloatVector vsum2 = FloatVector.zero(FMAX);
+        FloatVector vsum3 = FloatVector.zero(FMAX);
+        for (; row < FMAX.loopBound(m); row += FMAX.length()) {
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          FloatVector va1 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 1) * lda);
+          FloatVector va2 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 2) * lda);
+          FloatVector va3 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 3) * lda);
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+          vsum1 = vx0.fma(va1, vsum1);
+          vsum2 = vx0.fma(va2, vsum2);
+          vsum3 = vx0.fma(va3, vsum3);
+        }
+        float sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        float sum1 = vsum1.reduceLanes(VectorOperators.ADD);
+        float sum2 = vsum2.reduceLanes(VectorOperators.ADD);
+        float sum3 = vsum3.reduceLanes(VectorOperators.ADD);
+        for (; row < m; row += 1) {
+          float a0 = a[offseta + row + (col + 0) * lda];
+          float a1 = a[offseta + row + (col + 1) * lda];
+          float a2 = a[offseta + row + (col + 2) * lda];
+          float a3 = a[offseta + row + (col + 3) * lda];
+          float x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+          sum1 += x0 * a1;
+          sum2 += x0 * a2;
+          sum3 += x0 * a3;
+        }
+        if (beta != 0.0f) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+          y[offsety + (col + 1)] = alpha * sum1 + beta * y[offsety + (col + 1)];
+          y[offsety + (col + 2)] = alpha * sum2 + beta * y[offsety + (col + 2)];
+          y[offsety + (col + 3)] = alpha * sum3 + beta * y[offsety + (col + 3)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
+          y[offsety + (col + 1)] = alpha * sum1;
+          y[offsety + (col + 2)] = alpha * sum2;
+          y[offsety + (col + 3)] = alpha * sum3;
+        }
+      }
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        FloatVector vsum0 = FloatVector.zero(FMAX);
+        for (; row < FMAX.loopBound(m); row += FMAX.length()) {
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+        }
+        float sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        for (; row < m; row += 1) {
+          float a0 = a[offseta + row + (col + 0) * lda];
+          float x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+        }
+        if (beta != 0.0f) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
+        }
+      }
+    } else {
+      super.sgemvT(m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
+    }
+  }
+
+  protected void dgerK(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector valphay0 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 0)]);
+        DoubleVector valphay1 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 1)]);
+        DoubleVector valphay2 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 2)]);
+        DoubleVector valphay3 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 3)]);
+        for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 2) * lda);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 3) * lda);
+          valphay0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * lda);
+          valphay1.fma(vx0, va1)
+            .intoArray(a, offseta + row + (col + 1) * lda);
+          valphay2.fma(vx0, va2)
+            .intoArray(a, offseta + row + (col + 2) * lda);
+          valphay3.fma(vx0, va3)
+            .intoArray(a, offseta + row + (col + 3) * lda);
+        }
+        double alphay0 = alpha * y[offsety + (col + 0)];
+        double alphay1 = alpha * y[offsety + (col + 1)];
+        double alphay2 = alpha * y[offsety + (col + 2)];
+        double alphay3 = alpha * y[offsety + (col + 3)];
+        for (; row < m; row += 1) {
+          double x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * lda] += alphay0 * x0;
+          a[offseta + row + (col + 1) * lda] += alphay1 * x0;
+          a[offseta + row + (col + 2) * lda] += alphay2 * x0;
+          a[offseta + row + (col + 3) * lda] += alphay3 * x0;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        DoubleVector valphay0 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 0)]);
+        for (; row < DMAX.loopBound(m); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          valphay0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * lda);
+        }
+        double alphay0 = alpha * y[offsety + col];
+        for (; row < m; row += 1) {
+          double x0 = x[offsetx + row];
+          a[offseta + row + col * lda] += alphay0 * x0;
+        }
+      }
+    } else {
+      super.dgerK(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    }
+  }
+
+  protected void sgerK(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        FloatVector valphay0 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 0)]);
+        FloatVector valphay1 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 1)]);
+        FloatVector valphay2 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 2)]);
+        FloatVector valphay3 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 3)]);
+        for (; row < FMAX.loopBound(m); row += FMAX.length()) {
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          FloatVector va1 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 1) * lda);
+          FloatVector va2 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 2) * lda);
+          FloatVector va3 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 3) * lda);
+          valphay0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * lda);
+          valphay1.fma(vx0, va1)
+            .intoArray(a, offseta + row + (col + 1) * lda);
+          valphay2.fma(vx0, va2)
+            .intoArray(a, offseta + row + (col + 2) * lda);
+          valphay3.fma(vx0, va3)
+            .intoArray(a, offseta + row + (col + 3) * lda);
+        }
+        float alphay0 = alpha * y[offsety + (col + 0)];
+        float alphay1 = alpha * y[offsety + (col + 1)];
+        float alphay2 = alpha * y[offsety + (col + 2)];
+        float alphay3 = alpha * y[offsety + (col + 3)];
+        for (; row < m; row += 1) {
+          float x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * lda] += alphay0 * x0;
+          a[offseta + row + (col + 1) * lda] += alphay1 * x0;
+          a[offseta + row + (col + 2) * lda] += alphay2 * x0;
+          a[offseta + row + (col + 3) * lda] += alphay3 * x0;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        FloatVector valphay0 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 0)]);
+        for (; row < FMAX.loopBound(m); row += FMAX.length()) {
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          valphay0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * lda);
+        }
+        float alphay0 = alpha * y[offsety + col];
+        for (; row < m; row += 1) {
+          float x0 = x[offsetx + row];
+          a[offseta + row + col * lda] += alphay0 * x0;
+        }
+      }
+    } else {
+      super.sgerK(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    }
+  }
+
+  protected double dnrm2K(int n, double[] x, int offsetx, int incx) {
+    if (incx == 1) {
+      int i = 0;
+      DoubleVector vsum = DoubleVector.zero(DMAX);
+      for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+        DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + i);
+        vsum = vx0.fma(vx0, vsum);
+      }
+      double sum = vsum.reduceLanes(VectorOperators.ADD);
+      for (; i < n; i += 1) {
+        double x0 = x[offsetx + i];
+        sum += x0 * x0;
+      }
+      return Math.sqrt(sum);
+    } else {
+      return super.dnrm2K(n, x, offsetx, incx);
+    }
+  }
+
+  protected float snrm2K(int n, float[] x, int offsetx, int incx) {
+    if (incx == 1) {
+      int i = 0;
       FloatVector vsum = FloatVector.zero(FMAX);
-      for (; row < FMAX.loopBound(m); row += FMAX.length()) {
-        FloatVector va = FloatVector.fromArray(FMAX, a, offseta + row + col * m);
-        FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + row);
-        vsum = va.fma(vx, vsum);
+      for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+        FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + i);
+        vsum = vx0.fma(vx0, vsum);
       }
-      y[offsety + col] += alpha * vsum.reduceLanes(VectorOperators.ADD);
-      for (; row < m; row += 1) {
-        y[offsety + col] += alpha * x[offsetx + row] * a[offseta + row + col * m];
+      float sum = vsum.reduceLanes(VectorOperators.ADD);
+      for (; i < n; i += 1) {
+        float x0 = x[offsetx + i];
+        sum += x0 * x0;
       }
+      return (float)Math.sqrt(sum);
+    } else {
+      return super.snrm2K(n, x, offsetx, incx);
     }
   }
 
-  // x = alpha * x
-  @Override
-  public void dscal(int n, double alpha, double[] x, int offsetx, int incx) {
-    if (n > 0 && x != null && x.length >= offsetx + n && incx == 1) {
-      if (alpha != 1.) {
-        int i = 0;
-        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
-        for (; i < DMAX.loopBound(n); i += DMAX.length()) {
-          DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + i);
-          vx.mul(valpha).intoArray(x, offsetx + i);
+  protected void drotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double c, double s) {
+    if (incx == 1 && incy == 1) {
+      int i = 0;
+      DoubleVector vc = DoubleVector.broadcast(DMAX, c);
+      DoubleVector vs = DoubleVector.broadcast(DMAX, s);
+      for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+        DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + i);
+        DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety + i);
+        vc.fma(vx0, vs.mul(vy0))
+          .intoArray(x, offsetx + i);
+        vc.mul(vy0).sub(vs.mul(vx0))
+          .intoArray(y, offsety + i);
+      }
+      for (; i < n; i += 1) {
+        double x0 = x[offsetx + i];
+        double y0 = y[offsety + i]; 
+        x[offsetx + i] = c * x0 + s * y0;
+        y[offsety + i] = c * y0 - s * x0;
+      }
+    } else {
+      super.drotK(n, x, offsetx, incx, y, offsety, incy, c, s);
+    }
+  }
+
+  protected void srotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float c, float s) {
+    if (incx == 1 && incy == 1) {
+      int i = 0;
+      FloatVector vc = FloatVector.broadcast(FMAX, c);
+      FloatVector vs = FloatVector.broadcast(FMAX, s);
+      for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+        FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + i);
+        FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety + i);
+        vc.fma(vx0, vs.mul(vy0))
+          .intoArray(x, offsetx + i);
+        vc.mul(vy0).sub(vs.mul(vx0))
+          .intoArray(y, offsety + i);
+      }
+      for (; i < n; i += 1) {
+        float x0 = x[offsetx + i];
+        float y0 = y[offsety + i];
+        x[offsetx + i] = c * x0 + s * y0;
+        y[offsety + i] = c * y0 - s * x0;
+      }
+    } else {
+      super.srotK(n, x, offsetx, incx, y, offsety, incy, c, s);
+    }
+  }
+
+  protected void dscalK(int n, double alpha, double[] x, int offsetx, int incx) {
+    if (incx == 1) {
+      int i = 0;
+      DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+      for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+        DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + i);
+        valpha.mul(vx0)
+          .intoArray(x, offsetx + i);
+      }
+      for (; i < n; i += 1) {
+        x[offsetx + i] *= alpha;
+      }
+    } else {
+      super.dscalK(n, alpha, x, offsetx, incx);
+    }
+  }
+
+  protected void sscalK(int n, float alpha, float[] x, int offsetx, int incx) {
+    if (incx == 1) {
+      int i = 0;
+      FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
+      for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+        FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + i);
+        valpha.mul(vx0)
+          .intoArray(x, offsetx + i);
+      }
+      for (; i < n; i += 1) {
+        x[offsetx + i] *= alpha;
+      }
+    } else {
+      super.sscalK(n, alpha, x, offsetx, incx);
+    }
+  }
+
+  protected void dspmvU(int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        DoubleVector valphax1 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 1)]);
+        DoubleVector valphax2 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 2)]);
+        DoubleVector valphax3 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 3)]);
+        DoubleVector vsum0 = DoubleVector.zero(DMAX);
+        DoubleVector vsum1 = DoubleVector.zero(DMAX);
+        DoubleVector vsum2 = DoubleVector.zero(DMAX);
+        DoubleVector vsum3 = DoubleVector.zero(DMAX);
+        for (; row < DMAX.loopBound(col); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+          DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety + row);
+          valphax0.fma(va0, valphax1.fma(va1, valphax2.fma(va2, valphax3.fma(va3, vy0))))
+            .intoArray(y, offsety + row);
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+          vsum1 = vx0.fma(va1, vsum1);
+          vsum2 = vx0.fma(va2, vsum2);
+          vsum3 = vx0.fma(va3, vsum3);
         }
-        for (; i < n; i += 1) {
-          x[offsetx + i] *= alpha;
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double alphax1 = alpha * x[offsetx + (col + 1)];
+        double alphax2 = alpha * x[offsetx + (col + 2)];
+        double alphax3 = alpha * x[offsetx + (col + 3)];
+        double sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        double sum1 = vsum1.reduceLanes(VectorOperators.ADD);
+        double sum2 = vsum2.reduceLanes(VectorOperators.ADD);
+        double sum3 = vsum3.reduceLanes(VectorOperators.ADD);
+        for (; row < col; row += 1) {
+          double a0 = a[offseta + row + (col + 0) * ((col + 0) + 1) / 2];
+          double a1 = a[offseta + row + (col + 1) * ((col + 1) + 1) / 2];
+          double a2 = a[offseta + row + (col + 2) * ((col + 2) + 1) / 2];
+          double a3 = a[offseta + row + (col + 3) * ((col + 3) + 1) / 2];
+          y[offsety + row] += alphax0 * a0 + alphax1 * a1 + alphax2 * a2 + alphax3 * a3;
+          double x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+          sum1 += x0 * a1;
+          sum2 += x0 * a2;
+          sum3 += x0 * a3;
+        }
+        double a00 = a[offseta + (row + 0) + (col + 0) * ((col + 0) + 1) / 2];
+        double a01 = a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2];
+        double a02 = a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2];
+        double a03 = a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2];
+        double a11 = a[offseta + (row + 1) + (col + 1) * ((col + 1) + 1) / 2];
+        double a12 = a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2];
+        double a13 = a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2];
+        double a22 = a[offseta + (row + 2) + (col + 2) * ((col + 2) + 1) / 2];
+        double a23 = a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2];
+        double a33 = a[offseta + (row + 3) + (col + 3) * ((col + 3) + 1) / 2];
+        double x0 = x[offsetx + (row + 0)];
+        double x1 = x[offsetx + (row + 1)];
+        double x2 = x[offsetx + (row + 2)];
+        double x3 = x[offsetx + (row + 3)];
+        sum0 += x0 * a00 + x1 * a01 + x2 * a02 + x3 * a03;
+        sum1 += x0 * a01 + x1 * a11 + x2 * a12 + x3 * a13;
+        sum2 += x0 * a02 + x1 * a12 + x2 * a22 + x3 * a23;
+        sum3 += x0 * a03 + x1 * a13 + x2 * a23 + x3 * a33;
+        if (beta != 0.0) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+          y[offsety + (col + 1)] = alpha * sum1 + beta * y[offsety + (col + 1)];
+          y[offsety + (col + 2)] = alpha * sum2 + beta * y[offsety + (col + 2)];
+          y[offsety + (col + 3)] = alpha * sum3 + beta * y[offsety + (col + 3)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
+          y[offsety + (col + 1)] = alpha * sum1;
+          y[offsety + (col + 2)] = alpha * sum2;
+          y[offsety + (col + 3)] = alpha * sum3;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double sum0 = 0.0;
+        for (; row < col; row += 1) {
+          double a0 = a[offseta + row + (col + 0) * ((col + 0) + 1) / 2];
+          y[offsety + row] += alphax0 * a0;
+          sum0 += x[offsetx + row] * a0;
+        }
+        sum0 += x[offsetx + row] * a[offseta + row + (col + 0) * ((col + 0) + 1) / 2];
+        if (beta != 0.0) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
         }
       }
     } else {
-      super.dscal(n, alpha, x, offsetx, incx);
+      super.dspmvU(n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
     }
   }
 
-  // x = alpha * x
-  @Override
-  public void sscal(int n, float alpha, float[] x, int offsetx, int incx) {
-    if (n > 0 && x != null && x.length >= offsetx + n && incx == 1) {
-      if (alpha != 1.f) {
-        int i = 0;
-        FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
-        for (; i < FMAX.loopBound(n); i += FMAX.length()) {
-          FloatVector vx = FloatVector.fromArray(FMAX, x, offsetx + i);
-          vx.mul(valpha).intoArray(x, offsetx + i);
+
+  protected void sspmvU(int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        FloatVector valphax1 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 1)]);
+        FloatVector valphax2 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 2)]);
+        FloatVector valphax3 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 3)]);
+        FloatVector vsum0 = FloatVector.zero(FMAX);
+        FloatVector vsum1 = FloatVector.zero(FMAX);
+        FloatVector vsum2 = FloatVector.zero(FMAX);
+        FloatVector vsum3 = FloatVector.zero(FMAX);
+        for (; row < FMAX.loopBound(col); row += FMAX.length()) {
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          FloatVector va1 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+          FloatVector va2 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+          FloatVector va3 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+          FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety + row);
+          valphax0.fma(va0, valphax1.fma(va1, valphax2.fma(va2, valphax3.fma(va3, vy0))))
+            .intoArray(y, offsety + row);
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+          vsum1 = vx0.fma(va1, vsum1);
+          vsum2 = vx0.fma(va2, vsum2);
+          vsum3 = vx0.fma(va3, vsum3);
         }
-        for (; i < n; i += 1) {
-          x[offsetx + i] *= alpha;
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        float alphax1 = alpha * x[offsetx + (col + 1)];
+        float alphax2 = alpha * x[offsetx + (col + 2)];
+        float alphax3 = alpha * x[offsetx + (col + 3)];
+        float sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        float sum1 = vsum1.reduceLanes(VectorOperators.ADD);
+        float sum2 = vsum2.reduceLanes(VectorOperators.ADD);
+        float sum3 = vsum3.reduceLanes(VectorOperators.ADD);
+        for (; row < col; row += 1) {
+          float a0 = a[offseta + row + (col + 0) * ((col + 0) + 1) / 2];
+          float a1 = a[offseta + row + (col + 1) * ((col + 1) + 1) / 2];
+          float a2 = a[offseta + row + (col + 2) * ((col + 2) + 1) / 2];
+          float a3 = a[offseta + row + (col + 3) * ((col + 3) + 1) / 2];
+          y[offsety + row] += alphax0 * a0 + alphax1 * a1 + alphax2 * a2 + alphax3 * a3;
+          float x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+          sum1 += x0 * a1;
+          sum2 += x0 * a2;
+          sum3 += x0 * a3;
+        }
+        float a00 = a[offseta + (row + 0) + (col + 0) * ((col + 0) + 1) / 2];
+        float a01 = a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2];
+        float a02 = a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2];
+        float a03 = a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2];
+        float a11 = a[offseta + (row + 1) + (col + 1) * ((col + 1) + 1) / 2];
+        float a12 = a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2];
+        float a13 = a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2];
+        float a22 = a[offseta + (row + 2) + (col + 2) * ((col + 2) + 1) / 2];
+        float a23 = a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2];
+        float a33 = a[offseta + (row + 3) + (col + 3) * ((col + 3) + 1) / 2];
+        float x0 = x[offsetx + (row + 0)];
+        float x1 = x[offsetx + (row + 1)];
+        float x2 = x[offsetx + (row + 2)];
+        float x3 = x[offsetx + (row + 3)];
+        sum0 += x0 * a00 + x1 * a01 + x2 * a02 + x3 * a03;
+        sum1 += x0 * a01 + x1 * a11 + x2 * a12 + x3 * a13;
+        sum2 += x0 * a02 + x1 * a12 + x2 * a22 + x3 * a23;
+        sum3 += x0 * a03 + x1 * a13 + x2 * a23 + x3 * a33;
+        if (beta != 0.0f) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+          y[offsety + (col + 1)] = alpha * sum1 + beta * y[offsety + (col + 1)];
+          y[offsety + (col + 2)] = alpha * sum2 + beta * y[offsety + (col + 2)];
+          y[offsety + (col + 3)] = alpha * sum3 + beta * y[offsety + (col + 3)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
+          y[offsety + (col + 1)] = alpha * sum1;
+          y[offsety + (col + 2)] = alpha * sum2;
+          y[offsety + (col + 3)] = alpha * sum3;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        float sum0 = 0.0f;
+        for (; row < col; row += 1) {
+          float a0 = a[offseta + row + (col + 0) * ((col + 0) + 1) / 2];
+          y[offsety + row] += alphax0 * a0;
+          sum0 += x[offsetx + row] * a0;
+        }
+        sum0 += x[offsetx + row] * a[offseta + row + (col + 0) * ((col + 0) + 1) / 2];
+        if (beta != 0.0f) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
         }
       }
     } else {
-      super.sscal(n, alpha, x, offsetx, incx);
+      super.sspmvU(n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
     }
   }
 
-  // y = alpha * a * x + beta * y
-  @Override
-  public void dspmv(String uplo, int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    if (lsame("U", uplo)
-        && n > 0
-        && a != null && a.length >= offseta + n * (n + 1) / 2
-        && x != null && x.length >= offsetx + n && incx == 1
-        && y != null && y.length >= offsety + n && incy == 1) {
-      // y = beta * y
-      dscal(n, beta, y, offsety, 1);
-      // y += alpha * A * x
-      if (alpha != 0.) {
-        DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
-        for (int row = 0; row < n; row += 1) {
-          int col = 0;
-          DoubleVector vyrowsum = DoubleVector.zero(DMAX);
-          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[offsetx + row]);
-          for (; col < DMAX.loopBound(row); col += DMAX.length()) {
-            DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + col);
-            DoubleVector vy = DoubleVector.fromArray(DMAX, y, offsety + col);
-            DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + col + row * (row + 1) / 2);
-            vyrowsum = valpha.mul(vx).fma(va, vyrowsum);
-            valphaxrow.fma(va, vy).intoArray(y, offsety + col);
-          }
-          y[offsety + row] += vyrowsum.reduceLanes(VectorOperators.ADD);
-          for (; col < row; col += 1) {
-            y[offsety + row] += alpha * x[offsetx + col] * a[offseta + col + row * (row + 1) / 2];
-            y[offsety + col] += alpha * x[offsetx + row] * a[offseta + col + row * (row + 1) / 2];
-          }
-          y[offsety + row] += alpha * x[offsetx + col] * a[offseta + col + row * (row + 1) / 2];
+  protected void dsprU(int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
+    if (incx == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        DoubleVector valphax1 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 1)]);
+        DoubleVector valphax2 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 2)]);
+        DoubleVector valphax3 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 3)]);
+        for (; row < DMAX.loopBound(col + 1); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+          valphax0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          valphax1.fma(vx0, va1)
+            .intoArray(a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+          valphax2.fma(vx0, va2)
+            .intoArray(a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+          valphax3.fma(vx0, va3)
+            .intoArray(a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+        }
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double alphax1 = alpha * x[offsetx + (col + 1)];
+        double alphax2 = alpha * x[offsetx + (col + 2)];
+        double alphax3 = alpha * x[offsetx + (col + 3)];
+        for (; row < col + 1; row += 1) {
+          double x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphax0 * x0;
+          a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphax1 * x0;
+          a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * x0;
+          a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * x0;
+        }
+        double x0 = x[offsetx + (row + 0)];
+        a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphax1 * x0;
+        a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * x0;
+        a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * x0;
+        double x1 = x[offsetx + (row + 1)];
+        a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * x1;
+        a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * x1;
+        double x2 = x[offsetx + (row + 2)];
+        a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * x2;
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        for (; row < DMAX.loopBound(col + 1); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          valphax0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+        }
+        double alphax0 = alpha * x[offsetx + col];
+        for (; row < col + 1; row += 1) {
+          double x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphax0 * x0;
         }
       }
     } else {
-      super.dspmv(uplo, n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
+      super.dsprU(n, alpha, x, offsetx, incx, a, offseta);
     }
   }
 
-  // a += alpha * x * x.t
-  @Override
-  public void dspr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
-    if (lsame("U", uplo)
-        && n > 0
-        && x != null && x.length >= offsetx + n && incx == 1
-        && a != null && a.length >= offseta + n * (n + 1) / 2) {
-      if (alpha != 0.) {
-        for (int row = 0; row < n; row += 1) {
-          int col = 0;
-          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[offsetx + row]);
-          for (; col < DMAX.loopBound(row + 1); col += DMAX.length()) {
-            DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + col);
-            DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + col + row * (row + 1) / 2);
-            vx.fma(valphaxrow, va).intoArray(a, offseta + col + row * (row + 1) / 2);
-          }
-          for (; col < row + 1; col += 1) {
-            a[offseta + col + row * (row + 1) / 2] += alpha * x[offsetx + row] * x[offsetx + col];
-          }
+  protected void ssprU(int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
+    if (incx == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        FloatVector valphax1 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 1)]);
+        FloatVector valphax2 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 2)]);
+        FloatVector valphax3 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 3)]);
+        for (; row < FMAX.loopBound(col + 1); row += FMAX.length()) {
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          FloatVector va1 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+          FloatVector va2 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+          FloatVector va3 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+          valphax0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          valphax1.fma(vx0, va1)
+            .intoArray(a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+          valphax2.fma(vx0, va2)
+            .intoArray(a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+          valphax3.fma(vx0, va3)
+            .intoArray(a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+        }
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        float alphax1 = alpha * x[offsetx + (col + 1)];
+        float alphax2 = alpha * x[offsetx + (col + 2)];
+        float alphax3 = alpha * x[offsetx + (col + 3)];
+        for (; row < col + 1; row += 1) {
+          float x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphax0 * x0;
+          a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphax1 * x0;
+          a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * x0;
+          a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * x0;
+        }
+        float x0 = x[offsetx + (row + 0)];
+        a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphax1 * x0;
+        a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * x0;
+        a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * x0;
+        float x1 = x[offsetx + (row + 1)];
+        a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * x1;
+        a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * x1;
+        float x2 = x[offsetx + (row + 2)];
+        a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * x2;
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        for (; row < FMAX.loopBound(col + 1); row += FMAX.length()) {
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          valphax0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+        }
+        float alphax0 = alpha * x[offsetx + col];
+        for (; row < col + 1; row += 1) {
+          float x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphax0 * x0;
         }
       }
     } else {
-      super.dspr(uplo, n, alpha, x, offsetx, incx, a, offseta);
+      super.ssprU(n, alpha, x, offsetx, incx, a, offseta);
     }
   }
 
-  @Override
-  public void dswap(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    if (n > 0
-        && x != null && x.length >= offsetx + n && incx == 1
-        && y != null && y.length >= offsety + n && incy == 1) {
+  protected void dspr2U(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta) {
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        DoubleVector valphax1 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 1)]);
+        DoubleVector valphax2 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 2)]);
+        DoubleVector valphax3 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 3)]);
+        DoubleVector valphay0 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 0)]);
+        DoubleVector valphay1 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 1)]);
+        DoubleVector valphay2 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 2)]);
+        DoubleVector valphay3 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 3)]);
+        for (; row < DMAX.loopBound(col + 1); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+          valphax0.fma(vy0, valphay0.fma(vx0, va0))
+            .intoArray(a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          valphax1.fma(vy0, valphay1.fma(vx0, va1))
+            .intoArray(a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+          valphax2.fma(vy0, valphay2.fma(vx0, va2))
+            .intoArray(a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+          valphax3.fma(vy0, valphay3.fma(vx0, va3))
+            .intoArray(a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+        }
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double alphax1 = alpha * x[offsetx + (col + 1)];
+        double alphax2 = alpha * x[offsetx + (col + 2)];
+        double alphax3 = alpha * x[offsetx + (col + 3)];
+        double alphay0 = alpha * y[offsety + (col + 0)];
+        double alphay1 = alpha * y[offsety + (col + 1)];
+        double alphay2 = alpha * y[offsety + (col + 2)];
+        double alphay3 = alpha * y[offsety + (col + 3)];
+        for (; row < col + 1; row += 1) {
+          double x0 = x[offsetx + row];
+          double y0 = y[offsety + row];
+          a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphax0 * y0 + alphay0 * x0;
+          a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphax1 * y0 + alphay1 * x0;
+          a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * y0 + alphay2 * x0;
+          a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * y0 + alphay3 * x0;
+        }
+        double x0 = x[offsetx + (row + 0)];
+        double y0 = y[offsety + (row + 0)];
+        a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphax1 * y0 + alphay1 * x0;
+        a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * y0 + alphay2 * x0;
+        a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * y0 + alphay3 * x0;
+        double x1 = x[offsetx + (row + 1)];
+        double y1 = y[offsety + (row + 1)];
+        a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * y1 + alphay2 * x1;
+        a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * y1 + alphay3 * x1;
+        double x2 = x[offsetx + (row + 2)];
+        double y2 = y[offsety + (row + 2)];
+        a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * y2 + alphay3 * x2;
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        DoubleVector valphay0 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 0)]);
+        for (; row < DMAX.loopBound(col + 1); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+          valphax0.fma(vy0, valphay0.fma(vx0, va0))
+            .intoArray(a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+        }
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double alphay0 = alpha * y[offsety + (col + 0)];
+        for (; row < col + 1; row += 1) {
+          double x0 = x[offsetx + row];
+          double y0 = y[offsety + row];
+          a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphax0 * y0 + alphay0 * x0;
+        }
+      }
+    } else {
+      super.dspr2U(n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta);
+    }
+  }
+
+  protected void sspr2U(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta) {
+    int col = 0;
+    for (; col < loopBound(n, 4); col += 4) {
+      int row = 0;
+      FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+      FloatVector valphax1 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 1)]);
+      FloatVector valphax2 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 2)]);
+      FloatVector valphax3 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 3)]);
+      FloatVector valphay0 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 0)]);
+      FloatVector valphay1 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 1)]);
+      FloatVector valphay2 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 2)]);
+      FloatVector valphay3 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 3)]);
+      for (; row < FMAX.loopBound(col + 1); row += FMAX.length()) {
+        FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+        FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety + row);
+        FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+        FloatVector va1 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+        FloatVector va2 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+        FloatVector va3 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+        valphax0.fma(vy0, valphay0.fma(vx0, va0))
+          .intoArray(a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+        valphax1.fma(vy0, valphay1.fma(vx0, va1))
+          .intoArray(a, offseta + row + (col + 1) * ((col + 1) + 1) / 2);
+        valphax2.fma(vy0, valphay2.fma(vx0, va2))
+          .intoArray(a, offseta + row + (col + 2) * ((col + 2) + 1) / 2);
+        valphax3.fma(vy0, valphay3.fma(vx0, va3))
+          .intoArray(a, offseta + row + (col + 3) * ((col + 3) + 1) / 2);
+      }
+      float alphax0 = alpha * x[offsetx + col + incx * 0];
+      float alphax1 = alpha * x[offsetx + col + incx * 1];
+      float alphax2 = alpha * x[offsetx + col + incx * 2];
+      float alphax3 = alpha * x[offsetx + col + incx * 3];
+      float alphay0 = alpha * y[offsety + col + incy * 0];
+      float alphay1 = alpha * y[offsety + col + incy * 1];
+      float alphay2 = alpha * y[offsety + col + incy * 2];
+      float alphay3 = alpha * y[offsety + col + incy * 3];
+      for (; row < col + 1; row += 1) {
+        float x0 = x[offsetx + row];
+        float y0 = y[offsety + row];
+        a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphax0 * y0 + alphay0 * x0;
+        a[offseta + row + (col + 1) * ((col + 1) + 1) / 2] += alphax1 * y0 + alphay1 * x0;
+        a[offseta + row + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * y0 + alphay2 * x0;
+        a[offseta + row + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * y0 + alphay3 * x0;
+      }
+      float x0 = x[offsetx + row + incx * 0];
+      float y0 = y[offsety + row + incy * 0];
+      a[offseta + (row + 0) + (col + 1) * ((col + 1) + 1) / 2] += alphax1 * y0 + alphay1 * x0;
+      a[offseta + (row + 0) + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * y0 + alphay2 * x0;
+      a[offseta + (row + 0) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * y0 + alphay3 * x0;
+      float x1 = x[offsetx + row + incx * 1];
+      float y1 = y[offsety + row + incy * 1];
+      a[offseta + (row + 1) + (col + 2) * ((col + 2) + 1) / 2] += alphax2 * y1 + alphay2 * x1;
+      a[offseta + (row + 1) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * y1 + alphay3 * x1;
+      float x2 = x[offsetx + row + incx * 2];
+      float y2 = y[offsety + row + incy * 2];
+      a[offseta + (row + 2) + (col + 3) * ((col + 3) + 1) / 2] += alphax3 * y2 + alphay3 * x2;
+    }
+    for (; col < n; col += 1) {
+      int row = 0;
+      FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+      FloatVector valphay0 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 0)]);
+      for (; row < FMAX.loopBound(col + 1); row += FMAX.length()) {
+        FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+        FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety + row);
+        FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+        valphax0.fma(vy0, valphay0.fma(vx0, va0))
+          .intoArray(a, offseta + row + (col + 0) * ((col + 0) + 1) / 2);
+      }
+      float alphax0 = alpha * x[offsetx + (col + 0)];
+      float alphay0 = alpha * y[offsety + (col + 0)];
+      for (; row < col + 1; row += 1) {
+        float x0 = x[offsetx + row];
+        float y0 = y[offsety + row];
+        a[offseta + row + (col + 0) * ((col + 0) + 1) / 2] += alphax0 * y0 + alphay0 * x0;
+      }
+    }
+  }
+
+  public void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
       int i = 0;
       for (; i < DMAX.loopBound(n); i += DMAX.length()) {
-        DoubleVector vtmp = DoubleVector.fromArray(DMAX, y, offsety + i);
-        DoubleVector.fromArray(DMAX, x, offsetx + i).intoArray(y, offsety + i);
-        vtmp.intoArray(x, offsetx + i);
+        DoubleVector x0 = DoubleVector.fromArray(DMAX, x, offsetx + i);
+        DoubleVector y0 = DoubleVector.fromArray(DMAX, y, offsety + i);
+        x0.intoArray(y, offsety + i);
+        y0.intoArray(x, offsetx + i);
       }
       for (; i < n; i += 1) {
-        double tmp = y[offsety + i];
-        y[offsety + i] = x[offsetx + i];
-        x[offsetx + i] = tmp;
+        double x0 = x[offsetx + i];
+        double y0 = y[offsety + i];
+        y[offsety + i] = x0;
+        x[offsetx + i] = y0;
       }
     } else {
-      super.dswap(n, x, offsetx, incx, y, offsety, incy);
+      super.dswapK(n, x, offsetx, incx, y, offsety, incy);
     }
   }
 
-  @Override
-  public void sswap(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    if (n > 0
-        && x != null && x.length >= offsetx + n && incx == 1
-        && y != null && y.length >= offsety + n && incy == 1) {
+  public void sswapK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
       int i = 0;
       for (; i < FMAX.loopBound(n); i += FMAX.length()) {
-        FloatVector vtmp = FloatVector.fromArray(FMAX, y, offsety + i);
-        FloatVector.fromArray(FMAX, x, offsetx + i).intoArray(y, offsety + i);
-        vtmp.intoArray(x, offsetx + i);
+        FloatVector x0 = FloatVector.fromArray(FMAX, x, offsetx + i);
+        FloatVector y0 = FloatVector.fromArray(FMAX, y, offsety + i);
+        x0.intoArray(y, offsety + i);
+        y0.intoArray(x, offsetx + i);
       }
       for (; i < n; i += 1) {
-        float tmp = y[offsety + i];
-        y[offsety + i] = x[offsetx + i];
-        x[offsetx + i] = tmp;
+        float x0 = x[offsetx + i];
+        float y0 = y[offsety + i];
+        y[offsety + i] = x0;
+        x[offsetx + i] = y0;
       }
     } else {
-      super.sswap(n, x, offsetx, incx, y, offsety, incy);
+      super.sswapK(n, x, offsetx, incx, y, offsety, incy);
     }
   }
 
-  // a += alpha * x * x.t
-  @Override
-  public void dsyr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
-    if (lsame("U", uplo)
-        && n > 0
-        && x != null && x.length >= offsetx + n && incx == 1
-        && a != null && a.length >= offseta + n * n && lda == n) {
-      if (alpha != 0.) {
-        for (int row = 0; row < n; row += 1) {
-          int col = 0;
-          DoubleVector valphaxrow = DoubleVector.broadcast(DMAX, alpha * x[offsetx + row]);
-          for (; col < DMAX.loopBound(row + 1); col += DMAX.length()) {
-            DoubleVector vx = DoubleVector.fromArray(DMAX, x, offsetx + col);
-            DoubleVector va = DoubleVector.fromArray(DMAX, a, offseta + col + row * n);
-            vx.fma(valphaxrow, va).intoArray(a, offseta + col + row * n);
-          }
-          for (; col < row + 1; col += 1) {
-            a[offseta + col + row * n] += alpha * x[offsetx + row] * x[offsetx + col];
-          }
+  protected void dsymmLU(int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    // C := alpha*A*B + beta*C
+    int col = 0;
+    for (; col < loopBound(n, 4); col += 4) {
+      int row = 0;
+      for (; row < loopBound(m, 4); row += 4) {
+        double sum00 = 0.0;
+        double sum10 = 0.0;
+        double sum20 = 0.0;
+        double sum30 = 0.0;
+        double sum01 = 0.0;
+        double sum11 = 0.0;
+        double sum21 = 0.0;
+        double sum31 = 0.0;
+        double sum02 = 0.0;
+        double sum12 = 0.0;
+        double sum22 = 0.0;
+        double sum32 = 0.0;
+        double sum03 = 0.0;
+        double sum13 = 0.0;
+        double sum23 = 0.0;
+        double sum33 = 0.0;
+        double alphab00 = alpha * b[offsetb + (row + 0) + (col + 0) * ldb];
+        double alphab10 = alpha * b[offsetb + (row + 1) + (col + 0) * ldb];
+        double alphab20 = alpha * b[offsetb + (row + 2) + (col + 0) * ldb];
+        double alphab30 = alpha * b[offsetb + (row + 3) + (col + 0) * ldb];
+        double alphab01 = alpha * b[offsetb + (row + 0) + (col + 1) * ldb];
+        double alphab11 = alpha * b[offsetb + (row + 1) + (col + 1) * ldb];
+        double alphab21 = alpha * b[offsetb + (row + 2) + (col + 1) * ldb];
+        double alphab31 = alpha * b[offsetb + (row + 3) + (col + 1) * ldb];
+        double alphab02 = alpha * b[offsetb + (row + 0) + (col + 2) * ldb];
+        double alphab12 = alpha * b[offsetb + (row + 1) + (col + 2) * ldb];
+        double alphab22 = alpha * b[offsetb + (row + 2) + (col + 2) * ldb];
+        double alphab32 = alpha * b[offsetb + (row + 3) + (col + 2) * ldb];
+        double alphab03 = alpha * b[offsetb + (row + 0) + (col + 3) * ldb];
+        double alphab13 = alpha * b[offsetb + (row + 1) + (col + 3) * ldb];
+        double alphab23 = alpha * b[offsetb + (row + 2) + (col + 3) * ldb];
+        double alphab33 = alpha * b[offsetb + (row + 3) + (col + 3) * ldb];
+        int i = 0;
+        for (; i < row; i += 1) {
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double a1 = a[offseta + i + (row + 1) * lda];
+          double a2 = a[offseta + i + (row + 2) * lda];
+          double a3 = a[offseta + i + (row + 3) * lda];
+          c[offsetc + i + (col + 0) * ldc] += alphab00 * a0
+                                           +  alphab10 * a1
+                                           +  alphab20 * a2
+                                           +  alphab30 * a3;
+          c[offsetc + i + (col + 1) * ldc] += alphab01 * a0
+                                           +  alphab11 * a1
+                                           +  alphab21 * a2
+                                           +  alphab31 * a3;
+          c[offsetc + i + (col + 2) * ldc] += alphab02 * a0
+                                           +  alphab12 * a1
+                                           +  alphab22 * a2
+                                           +  alphab32 * a3;
+          c[offsetc + i + (col + 3) * ldc] += alphab03 * a0
+                                           +  alphab13 * a1
+                                           +  alphab23 * a2
+                                           +  alphab33 * a3;
+          double b0 = b[offsetb + i + (col + 0) * ldb];
+          double b1 = b[offsetb + i + (col + 1) * ldb];
+          double b2 = b[offsetb + i + (col + 2) * ldb];
+          double b3 = b[offsetb + i + (col + 3) * ldb];
+          sum00 += a0 * b0;
+          sum10 += a1 * b0;
+          sum20 += a2 * b0;
+          sum30 += a3 * b0;
+          sum01 += a0 * b1;
+          sum11 += a1 * b1;
+          sum21 += a2 * b1;
+          sum31 += a3 * b1;
+          sum02 += a0 * b2;
+          sum12 += a1 * b2;
+          sum22 += a2 * b2;
+          sum32 += a3 * b2;
+          sum03 += a0 * b3;
+          sum13 += a1 * b3;
+          sum23 += a2 * b3;
+          sum33 += a3 * b3;
+        }
+        double a00 = a[offseta + (i + 0) + (row + 0) * lda];
+        double a01 = a[offseta + (i + 0) + (row + 1) * lda];
+        double a02 = a[offseta + (i + 0) + (row + 2) * lda];
+        double a03 = a[offseta + (i + 0) + (row + 3) * lda];
+        double a11 = a[offseta + (i + 1) + (row + 1) * lda];
+        double a12 = a[offseta + (i + 1) + (row + 2) * lda];
+        double a13 = a[offseta + (i + 1) + (row + 3) * lda];
+        double a22 = a[offseta + (i + 2) + (row + 2) * lda];
+        double a23 = a[offseta + (i + 2) + (row + 3) * lda];
+        double a33 = a[offseta + (i + 3) + (row + 3) * lda];
+        double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
+        double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
+        double b20 = b[offsetb + (i + 2) + (col + 0) * ldb];
+        double b30 = b[offsetb + (i + 3) + (col + 0) * ldb];
+        double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
+        double b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
+        double b21 = b[offsetb + (i + 2) + (col + 1) * ldb];
+        double b31 = b[offsetb + (i + 3) + (col + 1) * ldb];
+        double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
+        double b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
+        double b22 = b[offsetb + (i + 2) + (col + 2) * ldb];
+        double b32 = b[offsetb + (i + 3) + (col + 2) * ldb];
+        double b03 = b[offsetb + (i + 0) + (col + 3) * ldb];
+        double b13 = b[offsetb + (i + 1) + (col + 3) * ldb];
+        double b23 = b[offsetb + (i + 2) + (col + 3) * ldb];
+        double b33 = b[offsetb + (i + 3) + (col + 3) * ldb];
+        sum00 += a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30;
+        sum10 += a01 * b00 + a11 * b10 + a12 * b20 + a13 * b30;
+        sum20 += a02 * b00 + a12 * b10 + a22 * b20 + a23 * b30;
+        sum30 += a03 * b00 + a13 * b10 + a23 * b20 + a33 * b30;
+        sum01 += a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31;
+        sum11 += a01 * b01 + a11 * b11 + a12 * b21 + a13 * b31;
+        sum21 += a02 * b01 + a12 * b11 + a22 * b21 + a23 * b31;
+        sum31 += a03 * b01 + a13 * b11 + a23 * b21 + a33 * b31;
+        sum02 += a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32;
+        sum12 += a01 * b02 + a11 * b12 + a12 * b22 + a13 * b32;
+        sum22 += a02 * b02 + a12 * b12 + a22 * b22 + a23 * b32;
+        sum32 += a03 * b02 + a13 * b12 + a23 * b22 + a33 * b32;
+        sum03 += a00 * b03 + a01 * b13 + a02 * b23 + a03 * b33;
+        sum13 += a01 * b03 + a11 * b13 + a12 * b23 + a13 * b33;
+        sum23 += a02 * b03 + a12 * b13 + a22 * b23 + a23 * b33;
+        sum33 += a03 * b03 + a13 * b13 + a23 * b23 + a33 * b33;
+        if (beta != 0.0) {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
+        } else {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20;
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum30;
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11;
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21;
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum31;
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02;
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12;
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22;
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum32;
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum03;
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum13;
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum23;
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33;
+        }
+      }
+      for (; row < m; row += 1) {
+        double sum0 = 0.0;
+        double sum1 = 0.0;
+        double sum2 = 0.0;
+        double sum3 = 0.0;
+        double alphab0 = alpha * b[offsetb + row + (col + 0) * ldb];
+        double alphab1 = alpha * b[offsetb + row + (col + 1) * ldb];
+        double alphab2 = alpha * b[offsetb + row + (col + 2) * ldb];
+        double alphab3 = alpha * b[offsetb + row + (col + 3) * ldb];
+        int i = 0;
+        for (; i < row; i += 1) {
+          double a0 = a[offseta + i + row * lda];
+          c[offsetc + i + (col + 0) * ldc] += alphab0 * a0;
+          c[offsetc + i + (col + 1) * ldc] += alphab1 * a0;
+          c[offsetc + i + (col + 2) * ldc] += alphab2 * a0;
+          c[offsetc + i + (col + 3) * ldc] += alphab3 * a0;
+          sum0 += b[offsetb + i + (col + 0) * ldb] * a0;
+          sum1 += b[offsetb + i + (col + 1) * ldb] * a0;
+          sum2 += b[offsetb + i + (col + 2) * ldb] * a0;
+          sum3 += b[offsetb + i + (col + 3) * ldb] * a0;
+        }
+        double a0 = a[offseta + i + row * lda];
+        sum0 += b[offsetb + i + (col + 0) * ldb] * a0;
+        sum1 += b[offsetb + i + (col + 1) * ldb] * a0;
+        sum2 += b[offsetb + i + (col + 2) * ldb] * a0;
+        sum3 += b[offsetb + i + (col + 3) * ldb] * a0;
+        if (beta != 0.0) {
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
+        } else {
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0;
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1;
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2;
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3;
+        }
+      }
+    }
+    for (; col < n; col += 1) {
+      int row = 0;
+      for (; row < loopBound(m, 4); row += 4) {
+        double sum0 = 0.0;
+        double sum1 = 0.0;
+        double sum2 = 0.0;
+        double sum3 = 0.0;
+        double alphab0 = alpha * b[offsetb + (row + 0) + col * ldb];
+        double alphab1 = alpha * b[offsetb + (row + 1) + col * ldb];
+        double alphab2 = alpha * b[offsetb + (row + 2) + col * ldb];
+        double alphab3 = alpha * b[offsetb + (row + 3) + col * ldb];
+        int i = 0;
+        for (; i < row; i += 1) {
+          double a0 = a[offseta + i + (row + 0) * lda];
+          double a1 = a[offseta + i + (row + 1) * lda];
+          double a2 = a[offseta + i + (row + 2) * lda];
+          double a3 = a[offseta + i + (row + 3) * lda];
+          c[offsetc + i + col * ldc] += alphab0 * a0
+                                     +  alphab1 * a1
+                                     +  alphab2 * a2
+                                     +  alphab3 * a3;
+          double b0 = b[offsetb + i + col * ldb];
+          sum0 += b0 * a0;
+          sum1 += b0 * a1;
+          sum2 += b0 * a2;
+          sum3 += b0 * a3;
+        }
+        double a00 = a[offseta + (i + 0) + (row + 0) * lda];
+        double a01 = a[offseta + (i + 0) + (row + 1) * lda];
+        double a02 = a[offseta + (i + 0) + (row + 2) * lda];
+        double a03 = a[offseta + (i + 0) + (row + 3) * lda];
+        double a11 = a[offseta + (i + 1) + (row + 1) * lda];
+        double a12 = a[offseta + (i + 1) + (row + 2) * lda];
+        double a13 = a[offseta + (i + 1) + (row + 3) * lda];
+        double a22 = a[offseta + (i + 2) + (row + 2) * lda];
+        double a23 = a[offseta + (i + 2) + (row + 3) * lda];
+        double a33 = a[offseta + (i + 3) + (row + 3) * lda];
+        double b0 = b[offsetb + (i + 0) + col * ldb];
+        double b1 = b[offsetb + (i + 1) + col * ldb];
+        double b2 = b[offsetb + (i + 2) + col * ldb];
+        double b3 = b[offsetb + (i + 3) + col * ldb];
+        sum0 += b0 * a00 + b1 * a01 + b2 * a02 + b3 * a03;
+        sum1 += b0 * a01 + b1 * a11 + b2 * a12 + b3 * a13;
+        sum2 += b0 * a02 + b1 * a12 + b2 * a22 + b3 * a23;
+        sum3 += b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+        if (beta != 0.0) {
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
+        } else {
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0;
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1;
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2;
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3;
+        }
+      }
+      for (; row < m; row += 1) {
+        double alphab = alpha * b[offsetb + row + col * ldb];
+        double sum = 0.0;
+        int i = 0;
+        for (; i < row; i += 1) {
+          double aval = a[offseta + i + row * lda];
+          c[offsetc + i + col * ldc] += alphab * aval;
+          sum += b[offsetb + i + col * ldb] * aval;
+        }
+        sum += b[offsetb + i + col * ldb] * a[offseta + i + row * lda];
+        if (beta != 0.0) {
+          c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
+        } else {
+          c[offsetc + row + col * ldc] = alpha * sum;
+        }
+      }
+    }
+  }
+
+  protected void ssymmLU(int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+    // C := alpha*A*B + beta*C
+    int col = 0;
+    for (; col < loopBound(n, 4); col += 4) {
+      int row = 0;
+      for (; row < loopBound(m, 4); row += 4) {
+        float sum00 = 0.0f;
+        float sum10 = 0.0f;
+        float sum20 = 0.0f;
+        float sum30 = 0.0f;
+        float sum01 = 0.0f;
+        float sum11 = 0.0f;
+        float sum21 = 0.0f;
+        float sum31 = 0.0f;
+        float sum02 = 0.0f;
+        float sum12 = 0.0f;
+        float sum22 = 0.0f;
+        float sum32 = 0.0f;
+        float sum03 = 0.0f;
+        float sum13 = 0.0f;
+        float sum23 = 0.0f;
+        float sum33 = 0.0f;
+        float alphab00 = alpha * b[offsetb + (row + 0) + (col + 0) * ldb];
+        float alphab10 = alpha * b[offsetb + (row + 1) + (col + 0) * ldb];
+        float alphab20 = alpha * b[offsetb + (row + 2) + (col + 0) * ldb];
+        float alphab30 = alpha * b[offsetb + (row + 3) + (col + 0) * ldb];
+        float alphab01 = alpha * b[offsetb + (row + 0) + (col + 1) * ldb];
+        float alphab11 = alpha * b[offsetb + (row + 1) + (col + 1) * ldb];
+        float alphab21 = alpha * b[offsetb + (row + 2) + (col + 1) * ldb];
+        float alphab31 = alpha * b[offsetb + (row + 3) + (col + 1) * ldb];
+        float alphab02 = alpha * b[offsetb + (row + 0) + (col + 2) * ldb];
+        float alphab12 = alpha * b[offsetb + (row + 1) + (col + 2) * ldb];
+        float alphab22 = alpha * b[offsetb + (row + 2) + (col + 2) * ldb];
+        float alphab32 = alpha * b[offsetb + (row + 3) + (col + 2) * ldb];
+        float alphab03 = alpha * b[offsetb + (row + 0) + (col + 3) * ldb];
+        float alphab13 = alpha * b[offsetb + (row + 1) + (col + 3) * ldb];
+        float alphab23 = alpha * b[offsetb + (row + 2) + (col + 3) * ldb];
+        float alphab33 = alpha * b[offsetb + (row + 3) + (col + 3) * ldb];
+        int i = 0;
+        for (; i < row; i += 1) {
+          float a0 = a[offseta + i + (row + 0) * lda];
+          float a1 = a[offseta + i + (row + 1) * lda];
+          float a2 = a[offseta + i + (row + 2) * lda];
+          float a3 = a[offseta + i + (row + 3) * lda];
+          c[offsetc + i + (col + 0) * ldc] += alphab00 * a0
+                                           +  alphab10 * a1
+                                           +  alphab20 * a2
+                                           +  alphab30 * a3;
+          c[offsetc + i + (col + 1) * ldc] += alphab01 * a0
+                                           +  alphab11 * a1
+                                           +  alphab21 * a2
+                                           +  alphab31 * a3;
+          c[offsetc + i + (col + 2) * ldc] += alphab02 * a0
+                                           +  alphab12 * a1
+                                           +  alphab22 * a2
+                                           +  alphab32 * a3;
+          c[offsetc + i + (col + 3) * ldc] += alphab03 * a0
+                                           +  alphab13 * a1
+                                           +  alphab23 * a2
+                                           +  alphab33 * a3;
+          float b0 = b[offsetb + i + (col + 0) * ldb];
+          float b1 = b[offsetb + i + (col + 1) * ldb];
+          float b2 = b[offsetb + i + (col + 2) * ldb];
+          float b3 = b[offsetb + i + (col + 3) * ldb];
+          sum00 += a0 * b0;
+          sum10 += a1 * b0;
+          sum20 += a2 * b0;
+          sum30 += a3 * b0;
+          sum01 += a0 * b1;
+          sum11 += a1 * b1;
+          sum21 += a2 * b1;
+          sum31 += a3 * b1;
+          sum02 += a0 * b2;
+          sum12 += a1 * b2;
+          sum22 += a2 * b2;
+          sum32 += a3 * b2;
+          sum03 += a0 * b3;
+          sum13 += a1 * b3;
+          sum23 += a2 * b3;
+          sum33 += a3 * b3;
+        }
+        float a00 = a[offseta + (i + 0) + (row + 0) * lda];
+        float a01 = a[offseta + (i + 0) + (row + 1) * lda];
+        float a02 = a[offseta + (i + 0) + (row + 2) * lda];
+        float a03 = a[offseta + (i + 0) + (row + 3) * lda];
+        float a11 = a[offseta + (i + 1) + (row + 1) * lda];
+        float a12 = a[offseta + (i + 1) + (row + 2) * lda];
+        float a13 = a[offseta + (i + 1) + (row + 3) * lda];
+        float a22 = a[offseta + (i + 2) + (row + 2) * lda];
+        float a23 = a[offseta + (i + 2) + (row + 3) * lda];
+        float a33 = a[offseta + (i + 3) + (row + 3) * lda];
+        float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
+        float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
+        float b20 = b[offsetb + (i + 2) + (col + 0) * ldb];
+        float b30 = b[offsetb + (i + 3) + (col + 0) * ldb];
+        float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
+        float b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
+        float b21 = b[offsetb + (i + 2) + (col + 1) * ldb];
+        float b31 = b[offsetb + (i + 3) + (col + 1) * ldb];
+        float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
+        float b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
+        float b22 = b[offsetb + (i + 2) + (col + 2) * ldb];
+        float b32 = b[offsetb + (i + 3) + (col + 2) * ldb];
+        float b03 = b[offsetb + (i + 0) + (col + 3) * ldb];
+        float b13 = b[offsetb + (i + 1) + (col + 3) * ldb];
+        float b23 = b[offsetb + (i + 2) + (col + 3) * ldb];
+        float b33 = b[offsetb + (i + 3) + (col + 3) * ldb];
+        sum00 += a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30;
+        sum10 += a01 * b00 + a11 * b10 + a12 * b20 + a13 * b30;
+        sum20 += a02 * b00 + a12 * b10 + a22 * b20 + a23 * b30;
+        sum30 += a03 * b00 + a13 * b10 + a23 * b20 + a33 * b30;
+        sum01 += a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31;
+        sum11 += a01 * b01 + a11 * b11 + a12 * b21 + a13 * b31;
+        sum21 += a02 * b01 + a12 * b11 + a22 * b21 + a23 * b31;
+        sum31 += a03 * b01 + a13 * b11 + a23 * b21 + a33 * b31;
+        sum02 += a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32;
+        sum12 += a01 * b02 + a11 * b12 + a12 * b22 + a13 * b32;
+        sum22 += a02 * b02 + a12 * b12 + a22 * b22 + a23 * b32;
+        sum32 += a03 * b02 + a13 * b12 + a23 * b22 + a33 * b32;
+        sum03 += a00 * b03 + a01 * b13 + a02 * b23 + a03 * b33;
+        sum13 += a01 * b03 + a11 * b13 + a12 * b23 + a13 * b33;
+        sum23 += a02 * b03 + a12 * b13 + a22 * b23 + a23 * b33;
+        sum33 += a03 * b03 + a13 * b13 + a23 * b23 + a33 * b33;
+        if (beta != 0.0f) {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum30 + beta * c[offsetc + (row + 3) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum31 + beta * c[offsetc + (row + 3) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum32 + beta * c[offsetc + (row + 3) + (col + 2) * ldc];
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum03 + beta * c[offsetc + (row + 0) + (col + 3) * ldc];
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum13 + beta * c[offsetc + (row + 1) + (col + 3) * ldc];
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum23 + beta * c[offsetc + (row + 2) + (col + 3) * ldc];
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33 + beta * c[offsetc + (row + 3) + (col + 3) * ldc];
+        } else {
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20;
+          c[offsetc + (row + 3) + (col + 0) * ldc] = alpha * sum30;
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11;
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21;
+          c[offsetc + (row + 3) + (col + 1) * ldc] = alpha * sum31;
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02;
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12;
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22;
+          c[offsetc + (row + 3) + (col + 2) * ldc] = alpha * sum32;
+          c[offsetc + (row + 0) + (col + 3) * ldc] = alpha * sum03;
+          c[offsetc + (row + 1) + (col + 3) * ldc] = alpha * sum13;
+          c[offsetc + (row + 2) + (col + 3) * ldc] = alpha * sum23;
+          c[offsetc + (row + 3) + (col + 3) * ldc] = alpha * sum33;
+        }
+      }
+      for (; row < m; row += 1) {
+        float sum0 = 0.0f;
+        float sum1 = 0.0f;
+        float sum2 = 0.0f;
+        float sum3 = 0.0f;
+        float alphab0 = alpha * b[offsetb + row + (col + 0) * ldb];
+        float alphab1 = alpha * b[offsetb + row + (col + 1) * ldb];
+        float alphab2 = alpha * b[offsetb + row + (col + 2) * ldb];
+        float alphab3 = alpha * b[offsetb + row + (col + 3) * ldb];
+        int i = 0;
+        for (; i < row; i += 1) {
+          float a0 = a[offseta + i + row * lda];
+          c[offsetc + i + (col + 0) * ldc] += alphab0 * a0;
+          c[offsetc + i + (col + 1) * ldc] += alphab1 * a0;
+          c[offsetc + i + (col + 2) * ldc] += alphab2 * a0;
+          c[offsetc + i + (col + 3) * ldc] += alphab3 * a0;
+          sum0 += b[offsetb + i + (col + 0) * ldb] * a0;
+          sum1 += b[offsetb + i + (col + 1) * ldb] * a0;
+          sum2 += b[offsetb + i + (col + 2) * ldb] * a0;
+          sum3 += b[offsetb + i + (col + 3) * ldb] * a0;
+        }
+        float a0 = a[offseta + i + row * lda];
+        sum0 += b[offsetb + i + (col + 0) * ldb] * a0;
+        sum1 += b[offsetb + i + (col + 1) * ldb] * a0;
+        sum2 += b[offsetb + i + (col + 2) * ldb] * a0;
+        sum3 += b[offsetb + i + (col + 3) * ldb] * a0;
+        if (beta != 0.0f) {
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0 + beta * c[offsetc + row + (col + 0) * ldc];
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1 + beta * c[offsetc + row + (col + 1) * ldc];
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2 + beta * c[offsetc + row + (col + 2) * ldc];
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3 + beta * c[offsetc + row + (col + 3) * ldc];
+        } else {
+          c[offsetc + row + (col + 0) * ldc] = alpha * sum0;
+          c[offsetc + row + (col + 1) * ldc] = alpha * sum1;
+          c[offsetc + row + (col + 2) * ldc] = alpha * sum2;
+          c[offsetc + row + (col + 3) * ldc] = alpha * sum3;
+        }
+      }
+    }
+    for (; col < n; col += 1) {
+      int row = 0;
+      for (; row < loopBound(m, 4); row += 4) {
+        float sum0 = 0.0f;
+        float sum1 = 0.0f;
+        float sum2 = 0.0f;
+        float sum3 = 0.0f;
+        float alphab0 = alpha * b[offsetb + (row + 0) + col * ldb];
+        float alphab1 = alpha * b[offsetb + (row + 1) + col * ldb];
+        float alphab2 = alpha * b[offsetb + (row + 2) + col * ldb];
+        float alphab3 = alpha * b[offsetb + (row + 3) + col * ldb];
+        int i = 0;
+        for (; i < row; i += 1) {
+          float a0 = a[offseta + i + (row + 0) * lda];
+          float a1 = a[offseta + i + (row + 1) * lda];
+          float a2 = a[offseta + i + (row + 2) * lda];
+          float a3 = a[offseta + i + (row + 3) * lda];
+          c[offsetc + i + col * ldc] += alphab0 * a0
+                                     +  alphab1 * a1
+                                     +  alphab2 * a2
+                                     +  alphab3 * a3;
+          float b0 = b[offsetb + i + col * ldb];
+          sum0 += b0 * a0;
+          sum1 += b0 * a1;
+          sum2 += b0 * a2;
+          sum3 += b0 * a3;
+        }
+        float a00 = a[offseta + (i + 0) + (row + 0) * lda];
+        float a01 = a[offseta + (i + 0) + (row + 1) * lda];
+        float a02 = a[offseta + (i + 0) + (row + 2) * lda];
+        float a03 = a[offseta + (i + 0) + (row + 3) * lda];
+        float a11 = a[offseta + (i + 1) + (row + 1) * lda];
+        float a12 = a[offseta + (i + 1) + (row + 2) * lda];
+        float a13 = a[offseta + (i + 1) + (row + 3) * lda];
+        float a22 = a[offseta + (i + 2) + (row + 2) * lda];
+        float a23 = a[offseta + (i + 2) + (row + 3) * lda];
+        float a33 = a[offseta + (i + 3) + (row + 3) * lda];
+        float b0 = b[offsetb + (i + 0) + col * ldb];
+        float b1 = b[offsetb + (i + 1) + col * ldb];
+        float b2 = b[offsetb + (i + 2) + col * ldb];
+        float b3 = b[offsetb + (i + 3) + col * ldb];
+        sum0 += b0 * a00 + b1 * a01 + b2 * a02 + b3 * a03;
+        sum1 += b0 * a01 + b1 * a11 + b2 * a12 + b3 * a13;
+        sum2 += b0 * a02 + b1 * a12 + b2 * a22 + b3 * a23;
+        sum3 += b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+        if (beta != 0.0f) {
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0 + beta * c[offsetc + (row + 0) + col * ldc];
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1 + beta * c[offsetc + (row + 1) + col * ldc];
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2 + beta * c[offsetc + (row + 2) + col * ldc];
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3 + beta * c[offsetc + (row + 3) + col * ldc];
+        } else {
+          c[offsetc + (row + 0) + col * ldc] = alpha * sum0;
+          c[offsetc + (row + 1) + col * ldc] = alpha * sum1;
+          c[offsetc + (row + 2) + col * ldc] = alpha * sum2;
+          c[offsetc + (row + 3) + col * ldc] = alpha * sum3;
+        }
+      }
+      for (; row < m; row += 1) {
+        float alphab = alpha * b[offsetb + row + col * ldb];
+        float sum = 0.0f;
+        int i = 0;
+        for (; i < row; i += 1) {
+          float aval = a[offseta + i + row * lda];
+          c[offsetc + i + col * ldc] += alphab * aval;
+          sum += b[offsetb + i + col * ldb] * aval;
+        }
+        sum += b[offsetb + i + col * ldb] * a[offseta + i + row * lda];
+        if (beta != 0.0f) {
+          c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
+        } else {
+          c[offsetc + row + col * ldc] = alpha * sum;
+        }
+      }
+    }
+  }
+
+  protected void dsymvU(int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector vsum0 = DoubleVector.zero(DMAX);
+        DoubleVector vsum1 = DoubleVector.zero(DMAX);
+        DoubleVector vsum2 = DoubleVector.zero(DMAX);
+        DoubleVector vsum3 = DoubleVector.zero(DMAX);
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        DoubleVector valphax1 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 1)]);
+        DoubleVector valphax2 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 2)]);
+        DoubleVector valphax3 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 3)]);
+        for (; row < DMAX.loopBound(col); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 2) * lda);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 3) * lda);
+          DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety + row);
+          valphax0.fma(va0, valphax1.fma(va1, valphax2.fma(va2, valphax3.fma(va3, vy0))))
+            .intoArray(y, offsety + row);
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+          vsum1 = vx0.fma(va1, vsum1);
+          vsum2 = vx0.fma(va2, vsum2);
+          vsum3 = vx0.fma(va3, vsum3);
+        }
+        double sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        double sum1 = vsum1.reduceLanes(VectorOperators.ADD);
+        double sum2 = vsum2.reduceLanes(VectorOperators.ADD);
+        double sum3 = vsum3.reduceLanes(VectorOperators.ADD);
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double alphax1 = alpha * x[offsetx + (col + 1)];
+        double alphax2 = alpha * x[offsetx + (col + 2)];
+        double alphax3 = alpha * x[offsetx + (col + 3)];
+        for (; row < col; row += 1) {
+          double a0 = a[offseta + row + (col + 0) * lda];
+          double a1 = a[offseta + row + (col + 1) * lda];
+          double a2 = a[offseta + row + (col + 2) * lda];
+          double a3 = a[offseta + row + (col + 3) * lda];
+          y[offsety + row] += alphax0 * a0 + alphax1 * a1 + alphax2 * a2 + alphax3 * a3;
+          double x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+          sum1 += x0 * a1;
+          sum2 += x0 * a2;
+          sum3 += x0 * a3;
+        }
+        {
+          double a00 = a[offseta + (row + 0) + (col + 0) * lda];
+          double a01 = a[offseta + (row + 0) + (col + 1) * lda];
+          double a02 = a[offseta + (row + 0) + (col + 2) * lda];
+          double a03 = a[offseta + (row + 0) + (col + 3) * lda];
+          double a11 = a[offseta + (row + 1) + (col + 1) * lda];
+          double a12 = a[offseta + (row + 1) + (col + 2) * lda];
+          double a13 = a[offseta + (row + 1) + (col + 3) * lda];
+          double a22 = a[offseta + (row + 2) + (col + 2) * lda];
+          double a23 = a[offseta + (row + 2) + (col + 3) * lda];
+          double a33 = a[offseta + (row + 3) + (col + 3) * lda];
+          double x0 = x[offsetx + (row + 0)];
+          double x1 = x[offsetx + (row + 1)];
+          double x2 = x[offsetx + (row + 2)];
+          double x3 = x[offsetx + (row + 3)];
+          sum0 += x0 * a00 + x1 * a01 + x2 * a02 + x3 * a03;
+          sum1 += x0 * a01 + x1 * a11 + x2 * a12 + x3 * a13;
+          sum2 += x0 * a02 + x1 * a12 + x2 * a22 + x3 * a23;
+          sum3 += x0 * a03 + x1 * a13 + x2 * a23 + x3 * a33;
+        }
+        if (beta != 0.0) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+          y[offsety + (col + 1)] = alpha * sum1 + beta * y[offsety + (col + 1)];
+          y[offsety + (col + 2)] = alpha * sum2 + beta * y[offsety + (col + 2)];
+          y[offsety + (col + 3)] = alpha * sum3 + beta * y[offsety + (col + 3)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
+          y[offsety + (col + 1)] = alpha * sum1;
+          y[offsety + (col + 2)] = alpha * sum2;
+          y[offsety + (col + 3)] = alpha * sum3;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        DoubleVector vsum0 = DoubleVector.zero(DMAX);
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        for (; row < DMAX.loopBound(col); row += DMAX.length()) {
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety + row);
+          valphax0.fma(va0, vy0)
+            .intoArray(y, offsety + row);
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+        }
+        double sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        for (; row < col; row += 1) {
+          double a0 = a[offseta + row + (col + 0) * lda];
+          y[offsety + row] += alphax0 * a0;
+          double x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+        }
+        {
+          double a00 = a[offseta + (row + 0) + (col + 0) * lda];
+          double x0 = x[offsetx + (row + 0)];
+          sum0 += x0 * a00;
+        }
+        if (beta != 0.0) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
         }
       }
     } else {
-      super.dsyr(uplo, n, alpha, x, offsetx, incx, a, offseta, lda);
+      super.dsymvU(n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
+    }
+  }
+
+  protected void ssymvU(int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        FloatVector vsum0 = FloatVector.zero(FMAX);
+        FloatVector vsum1 = FloatVector.zero(FMAX);
+        FloatVector vsum2 = FloatVector.zero(FMAX);
+        FloatVector vsum3 = FloatVector.zero(FMAX);
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        FloatVector valphax1 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 1)]);
+        FloatVector valphax2 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 2)]);
+        FloatVector valphax3 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 3)]);
+        for (; row < FMAX.loopBound(col); row += FMAX.length()) {
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          FloatVector va1 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 1) * lda);
+          FloatVector va2 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 2) * lda);
+          FloatVector va3 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 3) * lda);
+          FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety + row);
+          valphax0.fma(va0, valphax1.fma(va1, valphax2.fma(va2, valphax3.fma(va3, vy0))))
+            .intoArray(y, offsety + row);
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+          vsum1 = vx0.fma(va1, vsum1);
+          vsum2 = vx0.fma(va2, vsum2);
+          vsum3 = vx0.fma(va3, vsum3);
+        }
+        float sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        float sum1 = vsum1.reduceLanes(VectorOperators.ADD);
+        float sum2 = vsum2.reduceLanes(VectorOperators.ADD);
+        float sum3 = vsum3.reduceLanes(VectorOperators.ADD);
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        float alphax1 = alpha * x[offsetx + (col + 1)];
+        float alphax2 = alpha * x[offsetx + (col + 2)];
+        float alphax3 = alpha * x[offsetx + (col + 3)];
+        for (; row < col; row += 1) {
+          float a0 = a[offseta + row + (col + 0) * lda];
+          float a1 = a[offseta + row + (col + 1) * lda];
+          float a2 = a[offseta + row + (col + 2) * lda];
+          float a3 = a[offseta + row + (col + 3) * lda];
+          y[offsety + row] += alphax0 * a0 + alphax1 * a1 + alphax2 * a2 + alphax3 * a3;
+          float x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+          sum1 += x0 * a1;
+          sum2 += x0 * a2;
+          sum3 += x0 * a3;
+        }
+        {
+          float a00 = a[offseta + (row + 0) + (col + 0) * lda];
+          float a01 = a[offseta + (row + 0) + (col + 1) * lda];
+          float a02 = a[offseta + (row + 0) + (col + 2) * lda];
+          float a03 = a[offseta + (row + 0) + (col + 3) * lda];
+          float a11 = a[offseta + (row + 1) + (col + 1) * lda];
+          float a12 = a[offseta + (row + 1) + (col + 2) * lda];
+          float a13 = a[offseta + (row + 1) + (col + 3) * lda];
+          float a22 = a[offseta + (row + 2) + (col + 2) * lda];
+          float a23 = a[offseta + (row + 2) + (col + 3) * lda];
+          float a33 = a[offseta + (row + 3) + (col + 3) * lda];
+          float x0 = x[offsetx + (row + 0)];
+          float x1 = x[offsetx + (row + 1)];
+          float x2 = x[offsetx + (row + 2)];
+          float x3 = x[offsetx + (row + 3)];
+          sum0 += x0 * a00 + x1 * a01 + x2 * a02 + x3 * a03;
+          sum1 += x0 * a01 + x1 * a11 + x2 * a12 + x3 * a13;
+          sum2 += x0 * a02 + x1 * a12 + x2 * a22 + x3 * a23;
+          sum3 += x0 * a03 + x1 * a13 + x2 * a23 + x3 * a33;
+        }
+        if (beta != 0.0f) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+          y[offsety + (col + 1)] = alpha * sum1 + beta * y[offsety + (col + 1)];
+          y[offsety + (col + 2)] = alpha * sum2 + beta * y[offsety + (col + 2)];
+          y[offsety + (col + 3)] = alpha * sum3 + beta * y[offsety + (col + 3)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
+          y[offsety + (col + 1)] = alpha * sum1;
+          y[offsety + (col + 2)] = alpha * sum2;
+          y[offsety + (col + 3)] = alpha * sum3;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        FloatVector vsum0 = FloatVector.zero(FMAX);
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        for (; row < FMAX.loopBound(col); row += FMAX.length()) {
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety + row);
+          valphax0.fma(va0, vy0)
+            .intoArray(y, offsety + row);
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          vsum0 = vx0.fma(va0, vsum0);
+        }
+        float sum0 = vsum0.reduceLanes(VectorOperators.ADD);
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        for (; row < col; row += 1) {
+          float a0 = a[offseta + row + (col + 0) * lda];
+          y[offsety + row] += alphax0 * a0;
+          float x0 = x[offsetx + row];
+          sum0 += x0 * a0;
+        }
+        {
+          float a00 = a[offseta + (row + 0) + (col + 0) * lda];
+          float x0 = x[offsetx + (row + 0)];
+          sum0 += x0 * a00;
+        }
+        if (beta != 0.0f) {
+          y[offsety + (col + 0)] = alpha * sum0 + beta * y[offsety + (col + 0)];
+        } else {
+          y[offsety + (col + 0)] = alpha * sum0;
+        }
+      }
+    } else {
+      super.ssymvU(n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
+    }
+  }
+
+  protected void dsyrU(int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
+    if (incx == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        DoubleVector valphax1 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 1)]);
+        DoubleVector valphax2 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 2)]);
+        DoubleVector valphax3 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 3)]);
+        for (; row < DMAX.loopBound(col + 1); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 2) * lda);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 3) * lda);
+          valphax0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * lda);
+          valphax1.fma(vx0, va1)
+            .intoArray(a, offseta + row + (col + 1) * lda);
+          valphax2.fma(vx0, va2)
+            .intoArray(a, offseta + row + (col + 2) * lda);
+          valphax3.fma(vx0, va3)
+            .intoArray(a, offseta + row + (col + 3) * lda);
+        }
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double alphax1 = alpha * x[offsetx + (col + 1)];
+        double alphax2 = alpha * x[offsetx + (col + 2)];
+        double alphax3 = alpha * x[offsetx + (col + 3)];
+        for (; row < col + 1; row += 1) {
+          double x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * lda] += alphax0 * x0;
+          a[offseta + row + (col + 1) * lda] += alphax1 * x0;
+          a[offseta + row + (col + 2) * lda] += alphax2 * x0;
+          a[offseta + row + (col + 3) * lda] += alphax3 * x0;
+        }
+        {
+          double x0 = x[offsetx + (row + 0)];
+          a[offseta + (row + 0) + (col + 1) * lda] += alphax1 * x0;
+          a[offseta + (row + 0) + (col + 2) * lda] += alphax2 * x0;
+          a[offseta + (row + 0) + (col + 3) * lda] += alphax3 * x0;
+          double x1 = x[offsetx + (row + 1)];
+          a[offseta + (row + 1) + (col + 2) * lda] += alphax2 * x1;
+          a[offseta + (row + 1) + (col + 3) * lda] += alphax3 * x1;
+          double x2 = x[offsetx + (row + 2)];
+          a[offseta + (row + 2) + (col + 3) * lda] += alphax3 * x2;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        for (; row < DMAX.loopBound(col + 1); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          valphax0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * lda);
+        }
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        for (; row < col + 1; row += 1) {
+          double x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * lda] += alphax0 * x0;
+        }
+      }
+    } else {
+      super.dsyrU(n, alpha, x, offsetx, incx, a, offseta, lda);
+    }
+  }
+
+  protected void ssyrU(int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda) {
+    if (incx == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        FloatVector valphax1 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 1)]);
+        FloatVector valphax2 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 2)]);
+        FloatVector valphax3 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 3)]);
+        for (; row < FMAX.loopBound(col + 1); row += FMAX.length()) {
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          FloatVector va1 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 1) * lda);
+          FloatVector va2 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 2) * lda);
+          FloatVector va3 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 3) * lda);
+          valphax0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * lda);
+          valphax1.fma(vx0, va1)
+            .intoArray(a, offseta + row + (col + 1) * lda);
+          valphax2.fma(vx0, va2)
+            .intoArray(a, offseta + row + (col + 2) * lda);
+          valphax3.fma(vx0, va3)
+            .intoArray(a, offseta + row + (col + 3) * lda);
+        }
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        float alphax1 = alpha * x[offsetx + (col + 1)];
+        float alphax2 = alpha * x[offsetx + (col + 2)];
+        float alphax3 = alpha * x[offsetx + (col + 3)];
+        for (; row < col + 1; row += 1) {
+          float x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * lda] += alphax0 * x0;
+          a[offseta + row + (col + 1) * lda] += alphax1 * x0;
+          a[offseta + row + (col + 2) * lda] += alphax2 * x0;
+          a[offseta + row + (col + 3) * lda] += alphax3 * x0;
+        }
+        {
+          float x0 = x[offsetx + (row + 0)];
+          a[offseta + (row + 0) + (col + 1) * lda] += alphax1 * x0;
+          a[offseta + (row + 0) + (col + 2) * lda] += alphax2 * x0;
+          a[offseta + (row + 0) + (col + 3) * lda] += alphax3 * x0;
+          float x1 = x[offsetx + (row + 1)];
+          a[offseta + (row + 1) + (col + 2) * lda] += alphax2 * x1;
+          a[offseta + (row + 1) + (col + 3) * lda] += alphax3 * x1;
+          float x2 = x[offsetx + (row + 2)];
+          a[offseta + (row + 2) + (col + 3) * lda] += alphax3 * x2;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        for (; row < FMAX.loopBound(col + 1); row += FMAX.length()) {
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          valphax0.fma(vx0, va0)
+            .intoArray(a, offseta + row + (col + 0) * lda);
+        }
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        for (; row < col + 1; row += 1) {
+          float x0 = x[offsetx + row];
+          a[offseta + row + (col + 0) * lda] += alphax0 * x0;
+        }
+      }
+    } else {
+      super.ssyrU(n, alpha, x, offsetx, incx, a, offseta, lda);
+    }
+  }
+
+  protected void dsyr2U(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        DoubleVector valphax1 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 1)]);
+        DoubleVector valphax2 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 2)]);
+        DoubleVector valphax3 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 3)]);
+        DoubleVector valphay0 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 0)]);
+        DoubleVector valphay1 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 1)]);
+        DoubleVector valphay2 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 2)]);
+        DoubleVector valphay3 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 3)]);
+        for (; row < DMAX.loopBound(col + 1); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          DoubleVector va1 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 1) * lda);
+          DoubleVector va2 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 2) * lda);
+          DoubleVector va3 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 3) * lda);
+          valphax0.fma(vy0, valphay0.fma(vx0, va0))
+            .intoArray(a, offseta + row + (col + 0) * lda);
+          valphax1.fma(vy0, valphay1.fma(vx0, va1))
+            .intoArray(a, offseta + row + (col + 1) * lda);
+          valphax2.fma(vy0, valphay2.fma(vx0, va2))
+            .intoArray(a, offseta + row + (col + 2) * lda);
+          valphax3.fma(vy0, valphay3.fma(vx0, va3))
+            .intoArray(a, offseta + row + (col + 3) * lda);
+        }
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double alphax1 = alpha * x[offsetx + (col + 1)];
+        double alphax2 = alpha * x[offsetx + (col + 2)];
+        double alphax3 = alpha * x[offsetx + (col + 3)];
+        double alphay0 = alpha * y[offsety + (col + 0)];
+        double alphay1 = alpha * y[offsety + (col + 1)];
+        double alphay2 = alpha * y[offsety + (col + 2)];
+        double alphay3 = alpha * y[offsety + (col + 3)];
+        for (; row < col + 1; row += 1) {
+          double x0 = x[offsetx + row];
+          double y0 = y[offsety + row];
+          a[offseta + row + (col + 0) * lda] += alphax0 * y0 + alphay0 * x0;
+          a[offseta + row + (col + 1) * lda] += alphax1 * y0 + alphay1 * x0;
+          a[offseta + row + (col + 2) * lda] += alphax2 * y0 + alphay2 * x0;
+          a[offseta + row + (col + 3) * lda] += alphax3 * y0 + alphay3 * x0;
+        }
+        {
+          double x0 = x[offsetx + (row + 0)];
+          double y0 = y[offsety + (row + 0)];
+          a[offseta + (row + 0) + (col + 1) * lda] += alphax1 * y0 + alphay1 * x0;
+          a[offseta + (row + 0) + (col + 2) * lda] += alphax2 * y0 + alphay2 * x0;
+          a[offseta + (row + 0) + (col + 3) * lda] += alphax3 * y0 + alphay3 * x0;
+          double x1 = x[offsetx + (row + 1)];
+          double y1 = y[offsety + (row + 1)];
+          a[offseta + (row + 1) + (col + 2) * lda] += alphax2 * y1 + alphay2 * x1;
+          a[offseta + (row + 1) + (col + 3) * lda] += alphax3 * y1 + alphay3 * x1;
+          double x2 = x[offsetx + (row + 2)];
+          double y2 = y[offsety + (row + 2)];
+          a[offseta + (row + 2) + (col + 3) * lda] += alphax3 * y2 + alphay3 * x2;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        DoubleVector valphax0 = DoubleVector.broadcast(DMAX, alpha * x[offsetx + (col + 0)]);
+        DoubleVector valphay0 = DoubleVector.broadcast(DMAX, alpha * y[offsety + (col + 0)]);
+        for (; row < DMAX.loopBound(col + 1); row += DMAX.length()) {
+          DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + row);
+          DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety + row);
+          DoubleVector va0 = DoubleVector.fromArray(DMAX, a, offseta + row + (col + 0) * lda);
+          valphax0.fma(vy0, valphay0.fma(vx0, va0))
+            .intoArray(a, offseta + row + (col + 0) * lda);
+        }
+        double alphax0 = alpha * x[offsetx + (col + 0)];
+        double alphay0 = alpha * y[offsety + (col + 0)];
+        for (; row < col + 1; row += 1) {
+          double x0 = x[offsetx + row];
+          double y0 = y[offsety + row];
+          a[offseta + row + (col + 0) * lda] += alphax0 * y0 + alphay0 * x0;
+        }
+      }
+    } else {
+      super.dsyr2U(n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    }
+  }
+
+  protected void ssyr2U(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
+    if (incx == 1 && incy == 1) {
+      int col = 0;
+      for (; col < loopBound(n, 4); col += 4) {
+        int row = 0;
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        FloatVector valphax1 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 1)]);
+        FloatVector valphax2 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 2)]);
+        FloatVector valphax3 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 3)]);
+        FloatVector valphay0 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 0)]);
+        FloatVector valphay1 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 1)]);
+        FloatVector valphay2 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 2)]);
+        FloatVector valphay3 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 3)]);
+        for (; row < FMAX.loopBound(col + 1); row += FMAX.length()) {
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety + row);
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          FloatVector va1 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 1) * lda);
+          FloatVector va2 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 2) * lda);
+          FloatVector va3 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 3) * lda);
+          valphax0.fma(vy0, valphay0.fma(vx0, va0))
+            .intoArray(a, offseta + row + (col + 0) * lda);
+          valphax1.fma(vy0, valphay1.fma(vx0, va1))
+            .intoArray(a, offseta + row + (col + 1) * lda);
+          valphax2.fma(vy0, valphay2.fma(vx0, va2))
+            .intoArray(a, offseta + row + (col + 2) * lda);
+          valphax3.fma(vy0, valphay3.fma(vx0, va3))
+            .intoArray(a, offseta + row + (col + 3) * lda);
+        }
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        float alphax1 = alpha * x[offsetx + (col + 1)];
+        float alphax2 = alpha * x[offsetx + (col + 2)];
+        float alphax3 = alpha * x[offsetx + (col + 3)];
+        float alphay0 = alpha * y[offsety + (col + 0)];
+        float alphay1 = alpha * y[offsety + (col + 1)];
+        float alphay2 = alpha * y[offsety + (col + 2)];
+        float alphay3 = alpha * y[offsety + (col + 3)];
+        for (; row < col + 1; row += 1) {
+          float x0 = x[offsetx + row];
+          float y0 = y[offsety + row];
+          a[offseta + row + (col + 0) * lda] += alphax0 * y0 + alphay0 * x0;
+          a[offseta + row + (col + 1) * lda] += alphax1 * y0 + alphay1 * x0;
+          a[offseta + row + (col + 2) * lda] += alphax2 * y0 + alphay2 * x0;
+          a[offseta + row + (col + 3) * lda] += alphax3 * y0 + alphay3 * x0;
+        }
+        {
+          float x0 = x[offsetx + (row + 0)];
+          float y0 = y[offsety + (row + 0)];
+          a[offseta + (row + 0) + (col + 1) * lda] += alphax1 * y0 + alphay1 * x0;
+          a[offseta + (row + 0) + (col + 2) * lda] += alphax2 * y0 + alphay2 * x0;
+          a[offseta + (row + 0) + (col + 3) * lda] += alphax3 * y0 + alphay3 * x0;
+          float x1 = x[offsetx + (row + 1)];
+          float y1 = y[offsety + (row + 1)];
+          a[offseta + (row + 1) + (col + 2) * lda] += alphax2 * y1 + alphay2 * x1;
+          a[offseta + (row + 1) + (col + 3) * lda] += alphax3 * y1 + alphay3 * x1;
+          float x2 = x[offsetx + (row + 2)];
+          float y2 = y[offsety + (row + 2)];
+          a[offseta + (row + 2) + (col + 3) * lda] += alphax3 * y2 + alphay3 * x2;
+        }
+      }
+      for (; col < n; col += 1) {
+        int row = 0;
+        FloatVector valphax0 = FloatVector.broadcast(FMAX, alpha * x[offsetx + (col + 0)]);
+        FloatVector valphay0 = FloatVector.broadcast(FMAX, alpha * y[offsety + (col + 0)]);
+        for (; row < FMAX.loopBound(col + 1); row += FMAX.length()) {
+          FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + row);
+          FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety + row);
+          FloatVector va0 = FloatVector.fromArray(FMAX, a, offseta + row + (col + 0) * lda);
+          valphax0.fma(vy0, valphay0.fma(vx0, va0))
+            .intoArray(a, offseta + row + (col + 0) * lda);
+        }
+        float alphax0 = alpha * x[offsetx + (col + 0)];
+        float alphay0 = alpha * y[offsety + (col + 0)];
+        for (; row < col + 1; row += 1) {
+          float x0 = x[offsetx + row];
+          float y0 = y[offsety + row];
+          a[offseta + row + (col + 0) * lda] += alphax0 * y0 + alphay0 * x0;
+        }
+      }
+    } else {
+      super.ssyr2U(n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
     }
   }
 }
