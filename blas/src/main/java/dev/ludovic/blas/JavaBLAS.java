@@ -1368,22 +1368,24 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgemvN(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    // y = beta * y
-    for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
-      if (beta != 0.0) {
-        y[offsety + iy] = beta * y[offsety + iy];
-      } else {
-        y[offsety + iy] = 0.0;
+    if (beta != 1.0) {
+      int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
+      for (; row < m; row += 1, iy += incy) {
+        if (beta != 0.0) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0;
+        }
       }
     }
-    // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
+      int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
       double alphax0 = alpha * x[offsetx + ix + incx * 0];
       double alphax1 = alpha * x[offsetx + ix + incx * 1];
       double alphax2 = alpha * x[offsetx + ix + incx * 2];
       double alphax3 = alpha * x[offsetx + ix + incx * 3];
-      for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+      for (; row < m; row += 1, iy += incy) {
         y[offsety + iy] += alphax0 * a[offseta + row + (col + 0) * lda]
                         +  alphax1 * a[offseta + row + (col + 1) * lda]
                         +  alphax2 * a[offseta + row + (col + 2) * lda]
@@ -1391,8 +1393,9 @@ public class JavaBLAS implements BLAS {
       }
     }
     for (; col < n; col += 1, ix += incx) {
+      int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
       double alphax = alpha * x[offsetx + ix];
-      for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+      for (; row < m; row += 1, iy += incy) {
         y[offsety + iy] += alphax * a[offseta + row + col * lda];
       }
     }
@@ -1401,11 +1404,12 @@ public class JavaBLAS implements BLAS {
   protected void dgemvT(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
+      int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0;
       double sum0 = 0.0;
       double sum1 = 0.0;
       double sum2 = 0.0;
       double sum3 = 0.0;
-      for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
+      for (; row < m; row += 1, ix += incx) {
         double xix = x[offsetx + ix];
         sum0 += xix * a[offseta + row + (col + 0) * lda];
         sum1 += xix * a[offseta + row + (col + 1) * lda];
@@ -1425,8 +1429,9 @@ public class JavaBLAS implements BLAS {
       }
     }
     for (; col < n; col += 1, iy += incy) {
+      int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0;
       double sum = 0.0;
-      for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
+      for (; row < m; row += 1, ix += incx) {
         sum += x[offsetx + ix] * a[offseta + row + col * lda];
       }
       if (beta != 0.0) {
@@ -1747,10 +1752,10 @@ public class JavaBLAS implements BLAS {
          (incx < 0 ? ix >= 0 : ix < n * incx)
           && (incy < 0 ? iy >= 0 : iy < n * incy);
          ix += incx, iy += incy) {
-      double xold = x[offsetx + ix];
-      double yold = y[offsety + iy];
-      x[offsetx + ix] = c * xold + s * yold;
-      y[offsety + iy] = c * yold - s * xold;
+      double x0 = x[offsetx + ix];
+      double y0 = y[offsety + iy];
+      x[offsetx + ix] = c * x0 + s * y0;
+      y[offsety + iy] = c * y0 - s * x0;
     }
   }
 
@@ -1771,10 +1776,10 @@ public class JavaBLAS implements BLAS {
          (incx < 0 ? ix >= 0 : ix < n * incx)
           && (incy < 0 ? iy >= 0 : iy < n * incy);
          ix += incx, iy += incy) {
-      float xnew = c * x[offsetx + ix] + s * y[offsety + iy];
-      float ynew = c * y[offsety + iy] - s * x[offsetx + ix];
-      x[offsetx + ix] = xnew;
-      y[offsety + iy] = ynew;
+      float x0 = x[offsetx + ix];
+      float y0 = y[offsety + iy];
+      x[offsetx + ix] = c * x0 + s * y0;
+      y[offsety + iy] = c * y0 - s * x0;
     }
   }
 
@@ -4097,15 +4102,16 @@ public class JavaBLAS implements BLAS {
       double sumiy3 = 0.0;
       int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
-        y[offsety + jy] += alphaxix0 * a[offseta + row + (col + 0) * lda]
-                        +  alphaxix1 * a[offseta + row + (col + 1) * lda]
-                        +  alphaxix2 * a[offseta + row + (col + 2) * lda]
-                        +  alphaxix3 * a[offseta + row + (col + 3) * lda];
-        double xjx = x[offsetx + jx];
-        sumiy0 += xjx * a[offseta + row + (col + 0) * lda];
-        sumiy1 += xjx * a[offseta + row + (col + 1) * lda];
-        sumiy2 += xjx * a[offseta + row + (col + 2) * lda];
-        sumiy3 += xjx * a[offseta + row + (col + 3) * lda];
+        double a0 = a[offseta + row + (col + 0) * lda];
+        double a1 = a[offseta + row + (col + 1) * lda];
+        double a2 = a[offseta + row + (col + 2) * lda];
+        double a3 = a[offseta + row + (col + 3) * lda];
+        y[offsety + jy] += alphaxix0 * a0 + alphaxix1 * a1 + alphaxix2 * a2 + alphaxix3 * a3;
+        double x0 = x[offsetx + jx];
+        sumiy0 += x0 * a0;
+        sumiy1 += x0 * a1;
+        sumiy2 += x0 * a2;
+        sumiy3 += x0 * a3;
       }
       double a00 = a[offseta + (row + 0) + (col + 0) * lda];
       double a01 = a[offseta + (row + 0) + (col + 1) * lda];
@@ -4154,8 +4160,9 @@ public class JavaBLAS implements BLAS {
       double sumiy = 0.0;
       int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
-        y[offsety + jy] += alphaxix * a[offseta + row + col * lda];
-        sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
+        double a0 = a[offseta + row + col * lda];
+        y[offsety + jy] += alphaxix * a0;
+        sumiy += x[offsetx + jx] * a0;
       }
       sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
       if (beta != 0.0) {
