@@ -35,6 +35,10 @@ public class JavaBLAS implements BLAS {
     return instance;
   }
 
+  protected int loopAlign(int index, int max, int size) {
+    return Math.min(loopBound(index + size - 1, size), max);
+  }
+
   protected int loopBound(int index, int size) {
     return index - (index % size);
   }
