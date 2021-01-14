@@ -51,7 +51,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return 0.0;
     }
+    return dasumK(n, x, offsetx, incx);
+  }
 
+  protected double dasumK(int n, double[] x, int offsetx, int incx) {
     double sum = 0.0;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       sum += Math.abs(x[offsetx + ix]);
@@ -67,7 +70,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return 0.0f;
     }
+    return sasumK(n, x, offsetx, incx);
+  }
 
+  protected float sasumK(int n, float[] x, int offsetx, int incx) {
     float sum = 0.0f;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       sum += Math.abs(x[offsetx + ix]);
@@ -87,6 +93,10 @@ public class JavaBLAS implements BLAS {
     if (alpha == 0.0) {
       return;
     }
+    daxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
+  }
+
+  protected void daxpyK(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
          (incx < 0 ? ix >= 0 : ix < n * incx)
@@ -108,6 +118,10 @@ public class JavaBLAS implements BLAS {
     if (alpha == 0.0f) {
       return;
     }
+    saxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
+  }
+
+  protected void saxpyK(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
          (incx < 0 ? ix >= 0 : ix < n * incx)
@@ -125,7 +139,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return;
     }
+    dcopyK(n, x, offsetx, incx, y, offsety, incy);
+  }
 
+  protected void dcopyK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     if (x.length >= offsetx + n && incx == 1 && y.length >= offsety + n && incy == 1) {
       System.arraycopy(x, offsetx, y, offsety, n);
     } else {
@@ -147,7 +164,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return;
     }
+    scopyK(n, x, offsetx, incx, y, offsety, incy);
+  }
 
+  protected void scopyK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (x.length >= offsetx + n && incx == 1 && y.length >= offsety + n && incy == 1) {
       System.arraycopy(x, offsetx, y, offsety, n);
     } else {
@@ -170,7 +190,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return 0.0;
     }
+    return ddotK(n, x, offsetx, incx, y, offsety, incy);
+  }
 
+  protected double ddotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     double sum = 0.0;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
@@ -191,7 +214,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return 0.0f;
     }
+    return sdotK(n, x, offsetx, incx, y, offsety, incy);
+  }
 
+  protected float sdotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     float sum = 0.0f;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
@@ -1725,27 +1751,31 @@ public class JavaBLAS implements BLAS {
       return;
     }
     if (alpha != 0.0) {
-      int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
-      for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
-        double alphayiy0 = alpha * y[offsety + iy + incy * 0];
-        double alphayiy1 = alpha * y[offsety + iy + incy * 1];
-        double alphayiy2 = alpha * y[offsety + iy + incy * 2];
-        double alphayiy3 = alpha * y[offsety + iy + incy * 3];
-        int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
-        for (; row < m; row += 1, jx += incx) {
-          double xjx = x[offsetx + jx];
-          a[offseta + row + (col + 0) * lda] += alphayiy0 * xjx;
-          a[offseta + row + (col + 1) * lda] += alphayiy1 * xjx;
-          a[offseta + row + (col + 2) * lda] += alphayiy2 * xjx;
-          a[offseta + row + (col + 3) * lda] += alphayiy3 * xjx;
-        }
+      dgerK(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    }
+  }
+
+  protected void dgerK(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
+    int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+    for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
+      double alphayiy0 = alpha * y[offsety + iy + incy * 0];
+      double alphayiy1 = alpha * y[offsety + iy + incy * 1];
+      double alphayiy2 = alpha * y[offsety + iy + incy * 2];
+      double alphayiy3 = alpha * y[offsety + iy + incy * 3];
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+      for (; row < m; row += 1, jx += incx) {
+        double xjx = x[offsetx + jx];
+        a[offseta + row + (col + 0) * lda] += alphayiy0 * xjx;
+        a[offseta + row + (col + 1) * lda] += alphayiy1 * xjx;
+        a[offseta + row + (col + 2) * lda] += alphayiy2 * xjx;
+        a[offseta + row + (col + 3) * lda] += alphayiy3 * xjx;
       }
-      for (; col < n; col += 1, iy += incy) {
-        double alphayiy = alpha * y[offsety + iy];
-        int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
-        for (; row < m; row += 1, jx += incx) {
-          a[offseta + row + col * lda] += alphayiy * x[offsetx + jx];
-        }
+    }
+    for (; col < n; col += 1, iy += incy) {
+      double alphayiy = alpha * y[offsety + iy];
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+      for (; row < m; row += 1, jx += incx) {
+        a[offseta + row + col * lda] += alphayiy * x[offsetx + jx];
       }
     }
   }
@@ -1774,27 +1804,31 @@ public class JavaBLAS implements BLAS {
       return;
     }
     if (alpha != 0.0f) {
-      int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
-      for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
-        float alphayiy0 = alpha * y[offsety + iy + incy * 0];
-        float alphayiy1 = alpha * y[offsety + iy + incy * 1];
-        float alphayiy2 = alpha * y[offsety + iy + incy * 2];
-        float alphayiy3 = alpha * y[offsety + iy + incy * 3];
-        int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
-        for (; row < m; row += 1, jx += incx) {
-          float xjx = x[offsetx + jx];
-          a[offseta + row + (col + 0) * lda] += alphayiy0 * xjx;
-          a[offseta + row + (col + 1) * lda] += alphayiy1 * xjx;
-          a[offseta + row + (col + 2) * lda] += alphayiy2 * xjx;
-          a[offseta + row + (col + 3) * lda] += alphayiy3 * xjx;
-        }
+      sgerK(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    }
+  }
+
+  protected void sgerK(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
+    int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+    for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
+      float alphayiy0 = alpha * y[offsety + iy + incy * 0];
+      float alphayiy1 = alpha * y[offsety + iy + incy * 1];
+      float alphayiy2 = alpha * y[offsety + iy + incy * 2];
+      float alphayiy3 = alpha * y[offsety + iy + incy * 3];
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+      for (; row < m; row += 1, jx += incx) {
+        float xjx = x[offsetx + jx];
+        a[offseta + row + (col + 0) * lda] += alphayiy0 * xjx;
+        a[offseta + row + (col + 1) * lda] += alphayiy1 * xjx;
+        a[offseta + row + (col + 2) * lda] += alphayiy2 * xjx;
+        a[offseta + row + (col + 3) * lda] += alphayiy3 * xjx;
       }
-      for (; col < n; col += 1, iy += incy) {
-        float alphayiy = alpha * y[offsety + iy];
-        int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
-        for (; row < m; row += 1, jx += incx) {
-          a[offseta + row + col * lda] += alphayiy * x[offsetx + jx];
-        }
+    }
+    for (; col < n; col += 1, iy += incy) {
+      float alphayiy = alpha * y[offsety + iy];
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+      for (; row < m; row += 1, jx += incx) {
+        a[offseta + row + col * lda] += alphayiy * x[offsetx + jx];
       }
     }
   }
@@ -1813,7 +1847,10 @@ public class JavaBLAS implements BLAS {
     if (n == 1) {
       return Math.abs(x[offsetx + 0]);
     }
+    return dnrm2K(n, x, offsetx, incx);
+  }
 
+  protected double dnrm2K(int n, double[] x, int offsetx, int incx) {
     double sum = 0.0;
     for (int ix = 0; ix < n * incx; ix += incx) {
       sum += Math.pow(x[offsetx + ix], 2);
@@ -1835,7 +1872,10 @@ public class JavaBLAS implements BLAS {
     if (n == 1) {
       return Math.abs(x[offsetx + 0]);
     }
+    return snrm2K(n, x, offsetx, incx);
+  }
 
+  protected float snrm2K(int n, float[] x, int offsetx, int incx) {
     float sum = 0.0f;
     for (int ix = 0; ix < n * incx; ix += incx) {
       sum += (float)Math.pow(x[offsetx + ix], 2);
@@ -1851,7 +1891,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return;
     }
+    drotK(n, x, offsetx, incx, y, offsety, incy, c, s);
+  }
 
+  protected void drotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double c, double s) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
          (incx < 0 ? ix >= 0 : ix < n * incx)
@@ -1872,7 +1915,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return;
     }
+    srotK(n, x, offsetx, incx, y, offsety, incy, c, s);
+  }
 
+  protected void srotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float c, float s) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
          (incx < 0 ? ix >= 0 : ix < n * incx)
@@ -1994,6 +2040,10 @@ public class JavaBLAS implements BLAS {
     if (alpha == 1.0) {
       return;
     }
+    dscalK(n, alpha, x, offsetx, incx);
+  }
+
+  protected void dscalK(int n, double alpha, double[] x, int offsetx, int incx) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       x[offsetx + ix] *= alpha;
     }
@@ -2014,6 +2064,10 @@ public class JavaBLAS implements BLAS {
     if (alpha == 1.0f) {
       return;
     }
+    sscalK(n, alpha, x, offsetx, incx);
+  }
+
+  protected void sscalK(int n, float alpha, float[] x, int offsetx, int incx) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       x[offsetx + ix] *= alpha;
     }
@@ -2864,6 +2918,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return;
     }
+    dswapK(n, x, offsetx, incx, y, offsety, incy);
+  }
+
+  protected void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
          (incx < 0 ? ix >= 0 : ix < n * incx)
@@ -2883,6 +2941,10 @@ public class JavaBLAS implements BLAS {
     if (n <= 0) {
       return;
     }
+    sswapK(n, x, offsetx, incx, y, offsety, incy);
+  }
+
+  protected void sswapK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
          (incx < 0 ? ix >= 0 : ix < n * incx)
