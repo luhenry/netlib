@@ -41,7 +41,7 @@ jobs:
         draft: true
 
     - name: Run benchmarks
-      run: java -jar benchmarks/target/blas-benchmarks.jar -f 1 -wi 3 -i 3 -e '.blas$' -rf csv -rff jmh-results.csv | tee jmh.out
+      run: java -jar benchmarks/target/blas-benchmarks.jar 'dev.ludovic.blas.benchmarks.l1.*' 'dev.ludovic.blas.benchmarks.l2.*' -f 1 -wi 3 -i 3 -p implementation=f2j,java,vector -rf csv -rff jmh-results.csv | tee jmh.out
     - name: Upload JMH results
       uses: actions/upload-release-asset@v1
       env:
