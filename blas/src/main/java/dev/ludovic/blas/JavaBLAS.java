@@ -304,14 +304,45 @@ public class JavaBLAS implements BLAS {
     }
     if (alpha == 0.0) {
       dgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    } else if (lsame("N", transa) && lsame("N", transb)) {
-      dgemmNN(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
-    } else if ((lsame("T", transa) || lsame("C", transa)) && lsame("N", transb)) {
-      dgemmTN(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
-    } else if (lsame("N", transa) && (lsame("T", transb) || lsame("C", transb))) {
-      dgemmNT(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
-    } else if ((lsame("T", transa) || lsame("C", transa)) && (lsame("T", transb) || lsame("C", transb))) {
-      dgemmTT(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
+    } else {
+      final int Krow = 60, Kcol = 1000, Ki = 500;
+
+      double[] packeda = new double[Krow * Ki];
+      double[] packedb = new double[Kcol * Ki];
+      double[] packedc = new double[Kcol * Krow];
+
+      // c = beta * c
+      dgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
+      // c += alpha * a * b
+      for (int col = 0; col < n; col += Kcol) {
+        int cols = col, cole = Math.min(col + Kcol, n);
+        for (int i = 0; i < k; i += Ki) {
+          int is = i, ie = Math.min(i + Ki, k);
+          // pack b
+          if (lsame("N", transb)) {
+            dgecpyNN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
+          } else {
+            dgecpyTN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
+          }
+          // GEPP
+          for (int row = 0; row < m; row += Krow) {
+            int rows = row, rowe = Math.min(row + Krow, m);
+            // pack A
+            if (lsame("N", transa)) {
+              dgecpyNT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
+            } else {
+              dgecpyTT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
+            }
+            // pack C
+            dgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
+            // GEBP
+            dgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
+                    alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
+            // unpack C
+            dgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
+          }
+        }
+      }
     }
   }
 
@@ -352,138 +383,6 @@ public class JavaBLAS implements BLAS {
           } else {
             c[offsetc + row + (col + 0) * ldc] = 0.0;
           }
-        }
-      }
-    }
-  }
-
-  protected void dgemmNN(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Krow = 60, Kcol = 1000, Ki = 500;
-
-    double[] packeda = new double[Krow * Ki];
-    double[] packedb = new double[Kcol * Ki];
-    double[] packedc = new double[Kcol * Krow];
-
-    // c = beta * c
-    dgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    // c += alpha * a * b
-    for (int col = 0; col < n; col += Kcol) {
-      int cols = col, cole = Math.min(col + Kcol, n);
-      for (int i = 0; i < k; i += Ki) {
-        int is = i, ie = Math.min(i + Ki, k);
-        // pack b
-        dgecpyNN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
-        // GEPP
-        for (int row = 0; row < m; row += Krow) {
-          int rows = row, rowe = Math.min(row + Krow, m);
-          // pack A
-          dgecpyNT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
-          // pack C
-          dgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
-          // GEBP
-          dgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
-                  alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
-          // unpack C
-          dgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
-        }
-      }
-    }
-  }
-
-  protected void dgemmNT(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Krow = 60, Kcol = 1000, Ki = 500;
-
-    double[] packeda = new double[Krow * Ki];
-    double[] packedb = new double[Kcol * Ki];
-    double[] packedc = new double[Kcol * Krow];
-
-    // c = beta * c
-    dgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    // c += alpha * a * b
-    for (int col = 0; col < n; col += Kcol) {
-      int cols = col, cole = Math.min(col + Kcol, n);
-      for (int i = 0; i < k; i += Ki) {
-        int is = i, ie = Math.min(i + Ki, k);
-        // pack b
-        dgecpyTN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
-        // GEPP
-        for (int row = 0; row < m; row += Krow) {
-          int rows = row, rowe = Math.min(row + Krow, m);
-          // pack A
-          dgecpyNT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
-          // pack C
-          dgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
-          // GEBP
-          dgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
-                  alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
-          // unpack C
-          dgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
-        }
-      }
-    }
-  }
-
-  protected void dgemmTN(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Krow = 60, Kcol = 1000, Ki = 500;
-
-    double[] packeda = new double[Krow * Ki];
-    double[] packedb = new double[Kcol * Ki];
-    double[] packedc = new double[Kcol * Krow];
-
-    // c = beta * c
-    dgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    // c += alpha * a * b
-    for (int col = 0; col < n; col += Kcol) {
-      int cols = col, cole = Math.min(col + Kcol, n);
-      for (int i = 0; i < k; i += Ki) {
-        int is = i, ie = Math.min(i + Ki, k);
-        // pack b
-        dgecpyNN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
-        // GEPP
-        for (int row = 0; row < m; row += Krow) {
-          int rows = row, rowe = Math.min(row + Krow, m);
-          // pack A
-          dgecpyTT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
-          // pack C
-          dgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
-          // GEBP
-          dgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
-                  alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
-          // unpack C
-          dgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
-        }
-      }
-    }
-  }
-
-  protected void dgemmTT(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Krow = 60, Kcol = 1000, Ki = 500;
-
-    double[] packeda = new double[Krow * Ki];
-    double[] packedb = new double[Kcol * Ki];
-    double[] packedc = new double[Kcol * Krow];
-
-    // c = beta * c
-    dgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    // c += alpha * a * b
-    for (int col = 0; col < n; col += Kcol) {
-      int cols = col, cole = Math.min(col + Kcol, n);
-      for (int i = 0; i < k; i += Ki) {
-        int is = i, ie = Math.min(i + Ki, k);
-        // pack b
-        dgecpyTN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
-        // GEPP
-        for (int row = 0; row < m; row += Krow) {
-          int rows = row, rowe = Math.min(row + Krow, m);
-          // pack A
-          dgecpyTT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
-          // pack C
-          dgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
-          // GEBP
-          dgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
-                  alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
-          // unpack C
-          dgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
         }
       }
     }
@@ -825,14 +724,45 @@ public class JavaBLAS implements BLAS {
     }
     if (alpha == 0.0f) {
       sgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    } else if (lsame("N", transa) && lsame("N", transb)) {
-      sgemmNN(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
-    } else if ((lsame("T", transa) || lsame("C", transa)) && lsame("N", transb)) {
-      sgemmTN(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
-    } else if (lsame("N", transa) && (lsame("T", transb) || lsame("C", transb))) {
-      sgemmNT(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
-    } else if ((lsame("T", transa) || lsame("C", transa)) && (lsame("T", transb) || lsame("C", transb))) {
-      sgemmTT(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
+    } else {
+      final int Krow = 60, Kcol = 1000, Ki = 500;
+
+      float[] packeda = new float[Krow * Ki];
+      float[] packedb = new float[Kcol * Ki];
+      float[] packedc = new float[Kcol * Krow];
+
+      // c = beta * c
+      sgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
+      // c += alpha * a * b
+      for (int col = 0; col < n; col += Kcol) {
+        int cols = col, cole = Math.min(col + Kcol, n);
+        for (int i = 0; i < k; i += Ki) {
+          int is = i, ie = Math.min(i + Ki, k);
+          // pack b
+          if (lsame("N", transb)) {
+            sgecpyNN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
+          } else {
+            sgecpyTN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
+          }
+          // GEPP
+          for (int row = 0; row < m; row += Krow) {
+            int rows = row, rowe = Math.min(row + Krow, m);
+            // pack A
+            if (lsame("N", transa)) {
+              sgecpyNT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
+            } else {
+              sgecpyTT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
+            }
+            // pack C
+            sgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
+            // GEBP
+            sgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
+                    alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
+            // unpack C
+            sgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
+          }
+        }
+      }
     }
   }
 
@@ -873,138 +803,6 @@ public class JavaBLAS implements BLAS {
           } else {
             c[offsetc + row + (col + 0) * ldc] = 0.0f;
           }
-        }
-      }
-    }
-  }
-
-  protected void sgemmNN(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    final int Krow = 60, Kcol = 1000, Ki = 500;
-
-    float[] packeda = new float[Krow * Ki];
-    float[] packedb = new float[Kcol * Ki];
-    float[] packedc = new float[Kcol * Krow];
-
-    // c = beta * c
-    sgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    // c += alpha * a * b
-    for (int col = 0; col < n; col += Kcol) {
-      int cols = col, cole = Math.min(col + Kcol, n);
-      for (int i = 0; i < k; i += Ki) {
-        int is = i, ie = Math.min(i + Ki, k);
-        // pack b
-        sgecpyNN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
-        // GEPP
-        for (int row = 0; row < m; row += Krow) {
-          int rows = row, rowe = Math.min(row + Krow, m);
-          // pack A
-          sgecpyNT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
-          // pack C
-          sgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
-          // GEBP
-          sgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
-                  alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
-          // unpack C
-          sgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
-        }
-      }
-    }
-  }
-
-  protected void sgemmNT(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    final int Krow = 60, Kcol = 1000, Ki = 500;
-
-    float[] packeda = new float[Krow * Ki];
-    float[] packedb = new float[Kcol * Ki];
-    float[] packedc = new float[Kcol * Krow];
-
-    // c = beta * c
-    sgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    // c += alpha * a * b
-    for (int col = 0; col < n; col += Kcol) {
-      int cols = col, cole = Math.min(col + Kcol, n);
-      for (int i = 0; i < k; i += Ki) {
-        int is = i, ie = Math.min(i + Ki, k);
-        // pack b
-        sgecpyTN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
-        // GEPP
-        for (int row = 0; row < m; row += Krow) {
-          int rows = row, rowe = Math.min(row + Krow, m);
-          // pack A
-          sgecpyNT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
-          // pack C
-          sgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
-          // GEBP
-          sgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
-                  alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
-          // unpack C
-          sgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
-        }
-      }
-    }
-  }
-
-  protected void sgemmTN(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    final int Krow = 60, Kcol = 1000, Ki = 500;
-
-    float[] packeda = new float[Krow * Ki];
-    float[] packedb = new float[Kcol * Ki];
-    float[] packedc = new float[Kcol * Krow];
-
-    // c = beta * c
-    sgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    // c += alpha * a * b
-    for (int col = 0; col < n; col += Kcol) {
-      int cols = col, cole = Math.min(col + Kcol, n);
-      for (int i = 0; i < k; i += Ki) {
-        int is = i, ie = Math.min(i + Ki, k);
-        // pack b
-        sgecpyNN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
-        // GEPP
-        for (int row = 0; row < m; row += Krow) {
-          int rows = row, rowe = Math.min(row + Krow, m);
-          // pack A
-          sgecpyTT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
-          // pack C
-          sgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
-          // GEBP
-          sgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
-                  alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
-          // unpack C
-          sgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
-        }
-      }
-    }
-  }
-
-  protected void sgemmTT(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    final int Krow = 60, Kcol = 1000, Ki = 500;
-
-    float[] packeda = new float[Krow * Ki];
-    float[] packedb = new float[Kcol * Ki];
-    float[] packedc = new float[Kcol * Krow];
-
-    // c = beta * c
-    sgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
-    // c += alpha * a * b
-    for (int col = 0; col < n; col += Kcol) {
-      int cols = col, cole = Math.min(col + Kcol, n);
-      for (int i = 0; i < k; i += Ki) {
-        int is = i, ie = Math.min(i + Ki, k);
-        // pack b
-        sgecpyTN(ie - is, cole - cols, b, offsetb, ldb, is, cols, packedb, 0, Ki, 0, 0);
-        // GEPP
-        for (int row = 0; row < m; row += Krow) {
-          int rows = row, rowe = Math.min(row + Krow, m);
-          // pack A
-          sgecpyTT(rowe - rows, ie - is, a, offseta, lda, rows, is, packeda, 0, Ki, 0, 0);
-          // pack C
-          sgecpyNN(rowe - rows, cole - cols, c, offsetc, ldc, rows, cols, packedc, 0, Krow, 0, 0);
-          // GEBP
-          sgebpTN(Krow, 0, rowe - rows, Kcol, 0, cole - cols, Ki, 0, ie - is,
-                  alpha, packeda, 0, Ki, packedb, 0, Ki, beta, packedc, 0, Krow);
-          // unpack C
-          sgecpyNN(rowe - rows, cole - cols, packedc, 0, Krow, 0, 0, c, offsetc, ldc, rows, cols);
         }
       }
     }
@@ -1310,7 +1108,6 @@ public class JavaBLAS implements BLAS {
       }
     }
   }
-
 
   public void dgemv(String trans, int m, int n, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy) {
     dgemv(trans, m, n, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
