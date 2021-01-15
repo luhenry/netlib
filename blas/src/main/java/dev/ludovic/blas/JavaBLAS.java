@@ -1011,9 +1011,6 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sgecpyNN(int m, int n, float[] src, int offsetsrc, int ldsrc, int rowssrc, int colssrc, float[] dst, int offsetdst, int lddst, int rowsdst, int colsdst) {
-    // System.out.println(String.format("sgecpyNN(m = %s, n = %s, src = %s, offsetsrc = %s, ldsrc = %s, rowssrc = %s, colssrc = %s, dst = %s, offsetdst = %s, lddst = %s, rowsdst = %s, colsdst = %s)",
-    //     m, n, src, offsetsrc, ldsrc, rowssrc, colssrc, dst, offsetdst, lddst, rowsdst, colsdst));
-
     int col = 0;
     for (; col < loopBound(n, 4); col += 4) {
       System.arraycopy(src, offsetsrc + rowssrc + (colssrc + col + 0) * ldsrc, dst, offsetdst + rowsdst + (colsdst + col + 0) * lddst, m);
@@ -1027,9 +1024,6 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sgecpyNT(int m, int n, float[] src, int offsetsrc, int ldsrc, int rowssrc, int colssrc, float[] dst, int offsetdst, int lddst, int rowsdst, int colsdst) {
-    // System.out.println(String.format("sgecpyNT(m = %s, n = %s, src = %s, offsetsrc = %s, ldsrc = %s, rowssrc = %s, colssrc = %s, dst = %s, offsetdst = %s, lddst = %s, rowsdst = %s, colsdst = %s)",
-    //     m, n, src, offsetsrc, ldsrc, rowssrc, colssrc, dst, offsetdst, lddst, rowsdst, colsdst));
-
     int col = 0;
     for (; col < loopBound(n, 3); col += 3) {
       int row = 0;
@@ -1064,9 +1058,6 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sgecpyTN(int m, int n, float[] src, int offsetsrc, int ldsrc, int rowssrc, int colssrc, float[] dst, int offsetdst, int lddst, int rowsdst, int colsdst) {
-    // System.out.println(String.format("sgecpyTN(m = %s, n = %s, src = %s, offsetsrc = %s, ldsrc = %s, rowssrc = %s, colssrc = %s, dst = %s, offsetdst = %s, lddst = %s, rowsdst = %s, colsdst = %s)",
-    //     m, n, src, offsetsrc, ldsrc, rowssrc, colssrc, dst, offsetdst, lddst, rowsdst, colsdst));
-
     int row = 0;
     for (; row < loopBound(m, 3); row += 3) {
       int col = 0;
@@ -1101,9 +1092,6 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void sgecpyTT(int m, int n, float[] src, int offsetsrc, int ldsrc, int rowssrc, int colssrc, float[] dst, int offsetdst, int lddst, int rowsdst, int colsdst) {
-    // System.out.println(String.format("sgecpyTT(m = %s, n = %s, src = %s, offsetsrc = %s, ldsrc = %s, rowssrc = %s, colssrc = %s, dst = %s, offsetdst = %s, lddst = %s, rowsdst = %s, colsdst = %s)",
-    //     m, n, src, offsetsrc, ldsrc, rowssrc, colssrc, dst, offsetdst, lddst, rowsdst, colsdst));
-
     int row = 0;
     for (; row < loopBound(m, 4); row += 4) {
       System.arraycopy(src, offsetsrc + colssrc + (rowssrc + row + 0) * ldsrc, dst, offsetdst + colsdst + (rowsdst + row + 0) * lddst, n);
