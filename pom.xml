@@ -29,9 +29,9 @@ SOFTWARE.
     <version>0.1.11</version>
     <packaging>pom</packaging>
 
-    <name>Vectorized BLAS</name>
+    <name>blas</name>
     <description>Implementation of some of the BLAS API in Java using hardware acceleration.</description>
-    <url>http://github.com/luhenry/vectorizedblas</url>
+    <url>http://github.com/luhenry/blas</url>
 
     <licenses>
         <license>
