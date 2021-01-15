@@ -27,13 +27,13 @@ SOFTWARE.
     <parent>
         <groupId>dev.ludovic</groupId>
         <artifactId>blas-parent</artifactId>
-        <version>0.1.11</version>
+        <version>0.1.12</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>dev.ludovic</groupId>
     <artifactId>blas-benchmarks</artifactId>
-    <version>0.1.11</version>
+    <version>0.1.12</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -45,7 +45,7 @@ SOFTWARE.
         <dependency>
             <groupId>dev.ludovic</groupId>
             <artifactId>blas</artifactId>
-            <version>0.1.11</version>
+            <version>0.1.12</version>
         </dependency>
 
         <dependency>
