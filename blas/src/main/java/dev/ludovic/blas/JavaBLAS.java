@@ -316,7 +316,13 @@ public class JavaBLAS implements BLAS {
         dgemmTT(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
       }
     } else {
-      final int Krow = 60, Kcol = 1000, Ki = 500;
+      final int Krow = (int)(Math.ceil((double)(Math.min(60,   m)) / 3) * 3),
+                Kcol = (int)(Math.ceil((double)(Math.min(1000, n)) / 3) * 3),
+                Ki   = (int)(Math.ceil((double)(Math.min(500,  k)) / 4) * 4);
+
+      assert Krow > 0;
+      assert Kcol > 0;
+      assert Ki   > 0;
 
       double[] packeda = new double[Krow * Ki];
       double[] packedb = new double[Kcol * Ki];
@@ -1541,7 +1547,13 @@ public class JavaBLAS implements BLAS {
         sgemmTT(m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
       }
     } else {
-      final int Krow = 60, Kcol = 1000, Ki = 500;
+      final int Krow = (int)(Math.ceil((double)(Math.min(60,   m)) / 3) * 3),
+                Kcol = (int)(Math.ceil((double)(Math.min(1000, n)) / 3) * 3),
+                Ki   = (int)(Math.ceil((double)(Math.min(500,  k)) / 4) * 4);
+
+      assert Krow > 0;
+      assert Kcol > 0;
+      assert Ki   > 0;
 
       float[] packeda = new float[Krow * Ki];
       float[] packedb = new float[Kcol * Ki];
