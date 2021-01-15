@@ -494,7 +494,7 @@ public class JavaBLAS implements BLAS {
   }
 
   protected void dgebpTN(int m, int rows, int rowe, int n, int cols, int cole, int k, int is, int ie, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    final int Tcol = 3, Trow = 3, Ti = 2;
+    final int Tcol = 3, Trow = 3;
 
     int col = cols;
     for (; col < loopAlign(cols, cole, Tcol); col += 1) {
@@ -556,91 +556,7 @@ public class JavaBLAS implements BLAS {
         c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
       }
       for (; row < loopBound(rowe, Trow); row += Trow) {
-        int i = is;
-        double sum00 = 0.0;
-        double sum01 = 0.0;
-        double sum02 = 0.0;
-        double sum10 = 0.0;
-        double sum11 = 0.0;
-        double sum12 = 0.0;
-        double sum20 = 0.0;
-        double sum21 = 0.0;
-        double sum22 = 0.0;
-        for (; i < loopAlign(is, ie, Ti); i += 1) {
-          double a0 = a[offseta + i + (row + 0) * lda];
-          double a1 = a[offseta + i + (row + 1) * lda];
-          double a2 = a[offseta + i + (row + 2) * lda];
-          double b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum10 = Math.fma(a1, b0, sum10);
-          sum20 = Math.fma(a2, b0, sum20);
-          double b1 = b[offsetb + i + (col + 1) * ldb];
-          sum01 = Math.fma(a0, b1, sum01);
-          sum11 = Math.fma(a1, b1, sum11);
-          sum21 = Math.fma(a2, b1, sum21);
-          double b2 = b[offsetb + i + (col + 2) * ldb];
-          sum02 = Math.fma(a0, b2, sum02);
-          sum12 = Math.fma(a1, b2, sum12);
-          sum22 = Math.fma(a2, b2, sum22);
-        }
-        for (; i < loopBound(ie, Ti); i += Ti) {
-          double a00 = a[offseta + (i + 0) + (row + 0) * lda];
-          double a01 = a[offseta + (i + 0) + (row + 1) * lda];
-          double a02 = a[offseta + (i + 0) + (row + 2) * lda];
-          double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a01, b00, sum10);
-          sum20 = Math.fma(a02, b00, sum20);
-          double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
-          sum01 = Math.fma(a00, b01, sum01);
-          sum11 = Math.fma(a01, b01, sum11);
-          sum21 = Math.fma(a02, b01, sum21);
-          double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum02 = Math.fma(a00, b02, sum02);
-          sum12 = Math.fma(a01, b02, sum12);
-          sum22 = Math.fma(a02, b02, sum22);
-          double a10 = a[offseta + (i + 1) + (row + 0) * lda];
-          double a11 = a[offseta + (i + 1) + (row + 1) * lda];
-          double a12 = a[offseta + (i + 1) + (row + 2) * lda];
-          double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a10, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a12, b10, sum20);
-          double b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
-          sum01 = Math.fma(a10, b11, sum01);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum21 = Math.fma(a12, b11, sum21);
-          double b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum02 = Math.fma(a10, b12, sum02);
-          sum12 = Math.fma(a11, b12, sum12);
-          sum22 = Math.fma(a12, b12, sum22);
-        }
-        for (; i < ie; i += 1) {
-          double a0 = a[offseta + i + (row + 0) * lda];
-          double a1 = a[offseta + i + (row + 1) * lda];
-          double a2 = a[offseta + i + (row + 2) * lda];
-          double b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum10 = Math.fma(a1, b0, sum10);
-          sum20 = Math.fma(a2, b0, sum20);
-          double b1 = b[offsetb + i + (col + 1) * ldb];
-          sum01 = Math.fma(a0, b1, sum01);
-          sum11 = Math.fma(a1, b1, sum11);
-          sum21 = Math.fma(a2, b1, sum21);
-          double b2 = b[offsetb + i + (col + 2) * ldb];
-          sum02 = Math.fma(a0, b2, sum02);
-          sum12 = Math.fma(a1, b2, sum12);
-          sum22 = Math.fma(a2, b2, sum22);
-        }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
-        c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
-        c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
-        c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, c[offsetc + (row + 1) + (col + 1) * ldc]);
-        c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, c[offsetc + (row + 1) + (col + 2) * ldc]);
-        c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
-        c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, c[offsetc + (row + 2) + (col + 1) * ldc]);
-        c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, c[offsetc + (row + 2) + (col + 2) * ldc]);
+        dgepdotTN(m, row, row + Trow, n, col, col + Tcol, k, is, ie, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
       }
       for (; row < rowe; row += 1) {
         double sum00 = 0.0;
@@ -698,6 +614,101 @@ public class JavaBLAS implements BLAS {
         c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
       }
     }
+  }
+
+  protected void dgepdotTN(int m, int rows, int rowe, int n, int cols, int cole, int k, int is, int ie, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    final int Ti = 2;
+
+    assert rowe - rows == 3;
+    assert cole - cols == 3;
+
+    int row = rows;
+    int col = cols;
+    int i = is;
+    double sum00 = 0.0;
+    double sum01 = 0.0;
+    double sum02 = 0.0;
+    double sum10 = 0.0;
+    double sum11 = 0.0;
+    double sum12 = 0.0;
+    double sum20 = 0.0;
+    double sum21 = 0.0;
+    double sum22 = 0.0;
+    for (; i < loopAlign(is, ie, Ti); i += 1) {
+      double a0 = a[offseta + i + (row + 0) * lda];
+      double a1 = a[offseta + i + (row + 1) * lda];
+      double a2 = a[offseta + i + (row + 2) * lda];
+      double b0 = b[offsetb + i + (col + 0) * ldb];
+      sum00 = Math.fma(a0, b0, sum00);
+      sum10 = Math.fma(a1, b0, sum10);
+      sum20 = Math.fma(a2, b0, sum20);
+      double b1 = b[offsetb + i + (col + 1) * ldb];
+      sum01 = Math.fma(a0, b1, sum01);
+      sum11 = Math.fma(a1, b1, sum11);
+      sum21 = Math.fma(a2, b1, sum21);
+      double b2 = b[offsetb + i + (col + 2) * ldb];
+      sum02 = Math.fma(a0, b2, sum02);
+      sum12 = Math.fma(a1, b2, sum12);
+      sum22 = Math.fma(a2, b2, sum22);
+    }
+    for (; i < loopBound(ie, Ti); i += Ti) {
+      double a00 = a[offseta + (i + 0) + (row + 0) * lda];
+      double a01 = a[offseta + (i + 0) + (row + 1) * lda];
+      double a02 = a[offseta + (i + 0) + (row + 2) * lda];
+      double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
+      sum00 = Math.fma(a00, b00, sum00);
+      sum10 = Math.fma(a01, b00, sum10);
+      sum20 = Math.fma(a02, b00, sum20);
+      double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
+      sum01 = Math.fma(a00, b01, sum01);
+      sum11 = Math.fma(a01, b01, sum11);
+      sum21 = Math.fma(a02, b01, sum21);
+      double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
+      sum02 = Math.fma(a00, b02, sum02);
+      sum12 = Math.fma(a01, b02, sum12);
+      sum22 = Math.fma(a02, b02, sum22);
+      double a10 = a[offseta + (i + 1) + (row + 0) * lda];
+      double a11 = a[offseta + (i + 1) + (row + 1) * lda];
+      double a12 = a[offseta + (i + 1) + (row + 2) * lda];
+      double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
+      sum00 = Math.fma(a10, b10, sum00);
+      sum10 = Math.fma(a11, b10, sum10);
+      sum20 = Math.fma(a12, b10, sum20);
+      double b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
+      sum01 = Math.fma(a10, b11, sum01);
+      sum11 = Math.fma(a11, b11, sum11);
+      sum21 = Math.fma(a12, b11, sum21);
+      double b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
+      sum02 = Math.fma(a10, b12, sum02);
+      sum12 = Math.fma(a11, b12, sum12);
+      sum22 = Math.fma(a12, b12, sum22);
+    }
+    for (; i < ie; i += 1) {
+      double a0 = a[offseta + i + (row + 0) * lda];
+      double a1 = a[offseta + i + (row + 1) * lda];
+      double a2 = a[offseta + i + (row + 2) * lda];
+      double b0 = b[offsetb + i + (col + 0) * ldb];
+      sum00 = Math.fma(a0, b0, sum00);
+      sum10 = Math.fma(a1, b0, sum10);
+      sum20 = Math.fma(a2, b0, sum20);
+      double b1 = b[offsetb + i + (col + 1) * ldb];
+      sum01 = Math.fma(a0, b1, sum01);
+      sum11 = Math.fma(a1, b1, sum11);
+      sum21 = Math.fma(a2, b1, sum21);
+      double b2 = b[offsetb + i + (col + 2) * ldb];
+      sum02 = Math.fma(a0, b2, sum02);
+      sum12 = Math.fma(a1, b2, sum12);
+      sum22 = Math.fma(a2, b2, sum22);
+    }
+    c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+    c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
+    c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
+    c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
+    c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, c[offsetc + (row + 1) + (col + 1) * ldc]);
+    c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, c[offsetc + (row + 1) + (col + 2) * ldc]);
+    c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
+    c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, c[offsetc + (row + 2) + (col + 1) * ldc]);
+    c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, c[offsetc + (row + 2) + (col + 2) * ldc]);
   }
 
   protected void dgemmNN(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
@@ -1770,91 +1781,7 @@ public class JavaBLAS implements BLAS {
         c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
       }
       for (; row < loopBound(rowe, Trow); row += Trow) {
-        int i = is;
-        float sum00 = 0.0f;
-        float sum01 = 0.0f;
-        float sum02 = 0.0f;
-        float sum10 = 0.0f;
-        float sum11 = 0.0f;
-        float sum12 = 0.0f;
-        float sum20 = 0.0f;
-        float sum21 = 0.0f;
-        float sum22 = 0.0f;
-        for (; i < loopAlign(is, ie, Ti); i += 1) {
-          float a0 = a[offseta + i + (row + 0) * lda];
-          float a1 = a[offseta + i + (row + 1) * lda];
-          float a2 = a[offseta + i + (row + 2) * lda];
-          float b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum10 = Math.fma(a1, b0, sum10);
-          sum20 = Math.fma(a2, b0, sum20);
-          float b1 = b[offsetb + i + (col + 1) * ldb];
-          sum01 = Math.fma(a0, b1, sum01);
-          sum11 = Math.fma(a1, b1, sum11);
-          sum21 = Math.fma(a2, b1, sum21);
-          float b2 = b[offsetb + i + (col + 2) * ldb];
-          sum02 = Math.fma(a0, b2, sum02);
-          sum12 = Math.fma(a1, b2, sum12);
-          sum22 = Math.fma(a2, b2, sum22);
-        }
-        for (; i < loopBound(ie, Ti); i += Ti) {
-          float a00 = a[offseta + (i + 0) + (row + 0) * lda];
-          float a01 = a[offseta + (i + 0) + (row + 1) * lda];
-          float a02 = a[offseta + (i + 0) + (row + 2) * lda];
-          float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a01, b00, sum10);
-          sum20 = Math.fma(a02, b00, sum20);
-          float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
-          sum01 = Math.fma(a00, b01, sum01);
-          sum11 = Math.fma(a01, b01, sum11);
-          sum21 = Math.fma(a02, b01, sum21);
-          float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum02 = Math.fma(a00, b02, sum02);
-          sum12 = Math.fma(a01, b02, sum12);
-          sum22 = Math.fma(a02, b02, sum22);
-          float a10 = a[offseta + (i + 1) + (row + 0) * lda];
-          float a11 = a[offseta + (i + 1) + (row + 1) * lda];
-          float a12 = a[offseta + (i + 1) + (row + 2) * lda];
-          float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a10, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a12, b10, sum20);
-          float b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
-          sum01 = Math.fma(a10, b11, sum01);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum21 = Math.fma(a12, b11, sum21);
-          float b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum02 = Math.fma(a10, b12, sum02);
-          sum12 = Math.fma(a11, b12, sum12);
-          sum22 = Math.fma(a12, b12, sum22);
-        }
-        for (; i < ie; i += 1) {
-          float a0 = a[offseta + i + (row + 0) * lda];
-          float a1 = a[offseta + i + (row + 1) * lda];
-          float a2 = a[offseta + i + (row + 2) * lda];
-          float b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum10 = Math.fma(a1, b0, sum10);
-          sum20 = Math.fma(a2, b0, sum20);
-          float b1 = b[offsetb + i + (col + 1) * ldb];
-          sum01 = Math.fma(a0, b1, sum01);
-          sum11 = Math.fma(a1, b1, sum11);
-          sum21 = Math.fma(a2, b1, sum21);
-          float b2 = b[offsetb + i + (col + 2) * ldb];
-          sum02 = Math.fma(a0, b2, sum02);
-          sum12 = Math.fma(a1, b2, sum12);
-          sum22 = Math.fma(a2, b2, sum22);
-        }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
-        c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
-        c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
-        c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, c[offsetc + (row + 1) + (col + 1) * ldc]);
-        c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, c[offsetc + (row + 1) + (col + 2) * ldc]);
-        c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
-        c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, c[offsetc + (row + 2) + (col + 1) * ldc]);
-        c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, c[offsetc + (row + 2) + (col + 2) * ldc]);
+        sgepdotTN(m, row, row + Trow, n, col, col + Tcol, k, is, ie, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
       }
       for (; row < rowe; row += 1) {
         float sum00 = 0.0f;
@@ -1912,6 +1839,101 @@ public class JavaBLAS implements BLAS {
         c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
       }
     }
+  }
+
+  protected void sgepdotTN(int m, int rows, int rowe, int n, int cols, int cole, int k, int is, int ie, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+    final int Ti = 2;
+
+    assert rowe - rows == 3;
+    assert cole - cols == 3;
+
+    int row = rows;
+    int col = cols;
+    int i = is;
+    float sum00 = 0.0f;
+    float sum01 = 0.0f;
+    float sum02 = 0.0f;
+    float sum10 = 0.0f;
+    float sum11 = 0.0f;
+    float sum12 = 0.0f;
+    float sum20 = 0.0f;
+    float sum21 = 0.0f;
+    float sum22 = 0.0f;
+    for (; i < loopAlign(is, ie, Ti); i += 1) {
+      float a0 = a[offseta + i + (row + 0) * lda];
+      float a1 = a[offseta + i + (row + 1) * lda];
+      float a2 = a[offseta + i + (row + 2) * lda];
+      float b0 = b[offsetb + i + (col + 0) * ldb];
+      sum00 = Math.fma(a0, b0, sum00);
+      sum10 = Math.fma(a1, b0, sum10);
+      sum20 = Math.fma(a2, b0, sum20);
+      float b1 = b[offsetb + i + (col + 1) * ldb];
+      sum01 = Math.fma(a0, b1, sum01);
+      sum11 = Math.fma(a1, b1, sum11);
+      sum21 = Math.fma(a2, b1, sum21);
+      float b2 = b[offsetb + i + (col + 2) * ldb];
+      sum02 = Math.fma(a0, b2, sum02);
+      sum12 = Math.fma(a1, b2, sum12);
+      sum22 = Math.fma(a2, b2, sum22);
+    }
+    for (; i < loopBound(ie, Ti); i += Ti) {
+      float a00 = a[offseta + (i + 0) + (row + 0) * lda];
+      float a01 = a[offseta + (i + 0) + (row + 1) * lda];
+      float a02 = a[offseta + (i + 0) + (row + 2) * lda];
+      float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
+      sum00 = Math.fma(a00, b00, sum00);
+      sum10 = Math.fma(a01, b00, sum10);
+      sum20 = Math.fma(a02, b00, sum20);
+      float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
+      sum01 = Math.fma(a00, b01, sum01);
+      sum11 = Math.fma(a01, b01, sum11);
+      sum21 = Math.fma(a02, b01, sum21);
+      float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
+      sum02 = Math.fma(a00, b02, sum02);
+      sum12 = Math.fma(a01, b02, sum12);
+      sum22 = Math.fma(a02, b02, sum22);
+      float a10 = a[offseta + (i + 1) + (row + 0) * lda];
+      float a11 = a[offseta + (i + 1) + (row + 1) * lda];
+      float a12 = a[offseta + (i + 1) + (row + 2) * lda];
+      float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
+      sum00 = Math.fma(a10, b10, sum00);
+      sum10 = Math.fma(a11, b10, sum10);
+      sum20 = Math.fma(a12, b10, sum20);
+      float b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
+      sum01 = Math.fma(a10, b11, sum01);
+      sum11 = Math.fma(a11, b11, sum11);
+      sum21 = Math.fma(a12, b11, sum21);
+      float b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
+      sum02 = Math.fma(a10, b12, sum02);
+      sum12 = Math.fma(a11, b12, sum12);
+      sum22 = Math.fma(a12, b12, sum22);
+    }
+    for (; i < ie; i += 1) {
+      float a0 = a[offseta + i + (row + 0) * lda];
+      float a1 = a[offseta + i + (row + 1) * lda];
+      float a2 = a[offseta + i + (row + 2) * lda];
+      float b0 = b[offsetb + i + (col + 0) * ldb];
+      sum00 = Math.fma(a0, b0, sum00);
+      sum10 = Math.fma(a1, b0, sum10);
+      sum20 = Math.fma(a2, b0, sum20);
+      float b1 = b[offsetb + i + (col + 1) * ldb];
+      sum01 = Math.fma(a0, b1, sum01);
+      sum11 = Math.fma(a1, b1, sum11);
+      sum21 = Math.fma(a2, b1, sum21);
+      float b2 = b[offsetb + i + (col + 2) * ldb];
+      sum02 = Math.fma(a0, b2, sum02);
+      sum12 = Math.fma(a1, b2, sum12);
+      sum22 = Math.fma(a2, b2, sum22);
+    }
+    c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+    c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
+    c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
+    c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
+    c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, c[offsetc + (row + 1) + (col + 1) * ldc]);
+    c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, c[offsetc + (row + 1) + (col + 2) * ldc]);
+    c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
+    c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, c[offsetc + (row + 2) + (col + 1) * ldc]);
+    c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, c[offsetc + (row + 2) + (col + 2) * ldc]);
   }
 
   protected void sgemmNN(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
