@@ -25,25 +25,25 @@ SOFTWARE.
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>dev.ludovic</groupId>
-        <artifactId>blas-parent</artifactId>
+        <groupId>dev.ludovic.netlib</groupId>
+        <artifactId>parent</artifactId>
         <version>0.1.13</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>dev.ludovic</groupId>
-    <artifactId>blas-benchmarks</artifactId>
+    <groupId>dev.ludovic.netlib</groupId>
+    <artifactId>benchmarks</artifactId>
     <version>0.1.13</version>
     <packaging>jar</packaging>
 
     <properties>
         <jmh.version>1.27</jmh.version>
-        <uberjar.name>blas-benchmarks</uberjar.name>
+        <uberjar.name>netlib-benchmarks</uberjar.name>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>dev.ludovic</groupId>
+            <groupId>dev.ludovic.netlib</groupId>
             <artifactId>blas</artifactId>
             <version>0.1.13</version>
         </dependency>

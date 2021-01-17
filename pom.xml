@@ -24,8 +24,8 @@ SOFTWARE.
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.ludovic</groupId>
-    <artifactId>blas-parent</artifactId>
+    <groupId>dev.ludovic.netlib</groupId>
+    <artifactId>parent</artifactId>
     <version>0.1.13</version>
     <packaging>pom</packaging>
 
@@ -56,8 +56,8 @@ SOFTWARE.
     </scm>
 
     <modules>
-        <module>benchmarks</module>
         <module>blas</module>
+        <module>benchmarks</module>
     </modules>
 
     <properties>

@@ -65,7 +65,7 @@ jobs:
       run: mvn --batch-mode package
 
     - name: Run ${{matrix.level}} benchmark
-      run: java -jar benchmarks/target/blas-benchmarks.jar 'dev.ludovic.blas.benchmarks.${{matrix.level}}.*' -f 1 -wi ${{matrix.wi}} -i 3 -p implementation=f2j,java,vector -rf csv -rff jmh-results-${{matrix.level}}.csv | tee jmh-${{matrix.level}}.out
+      run: java -jar benchmarks/target/netlib-benchmarks.jar 'dev.ludovic.netlib.benchmarks.blas.${{matrix.level}}.*' -f 1 -wi ${{matrix.wi}} -i 3 -p implementation=f2j,java,vector -rf csv -rff jmh-results-${{matrix.level}}.csv | tee jmh-${{matrix.level}}.out
     - name: Upload JMH results
       uses: actions/upload-release-asset@v1
       env:
