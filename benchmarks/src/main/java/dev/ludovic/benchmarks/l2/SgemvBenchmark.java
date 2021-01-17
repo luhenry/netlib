@@ -38,10 +38,10 @@ public class SgemvBenchmark extends BLASBenchmark {
     @Param({"N", "T"})
     public String trans;
 
-    @Param({"10", "10000"})
+    @Param({"10", "1000"})
     public int m;
 
-    @Param({"10", "10000"})
+    @Param({"10", "1000"})
     public int n;
 
     public float alpha;

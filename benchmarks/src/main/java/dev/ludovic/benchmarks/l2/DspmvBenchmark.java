@@ -38,7 +38,7 @@ public class DspmvBenchmark extends BLASBenchmark {
     @Param({"U", "L"})
     public String uplo;
 
-    @Param({"10", "10000"})
+    @Param({"10", "1000"})
     public int n;
 
     public double alpha;

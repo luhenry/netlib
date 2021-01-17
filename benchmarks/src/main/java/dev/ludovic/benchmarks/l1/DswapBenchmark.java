@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
 public class DswapBenchmark extends BLASBenchmark {
 
-    @Param({"100", "10000000"})
+    @Param({"10", "1000000"})
     public int n;
 
     public double[] x, xclone;

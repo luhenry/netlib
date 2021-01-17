@@ -35,10 +35,10 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
 public class DgerBenchmark extends BLASBenchmark {
 
-    @Param({"10", "10000"})
+    @Param({"10", "1000"})
     public int m;
 
-    @Param({"10", "10000"})
+    @Param({"10", "1000"})
     public int n;
 
     public double alpha;
