@@ -24,7 +24,7 @@ package dev.ludovic.netlib.blas;
 
 import dev.ludovic.netlib.BLAS;
 
-public class JavaBLAS implements BLAS {
+public class JavaBLAS extends AbstractBLAS {
 
   //FIXME: remove dependency on F2jBLAS
   private static final com.github.fommil.netlib.F2jBLAS f2j = new com.github.fommil.netlib.F2jBLAS();
@@ -37,29 +37,6 @@ public class JavaBLAS implements BLAS {
     return instance;
   }
 
-  protected int loopAlign(int index, int max, int size) {
-    return Math.min(loopBound(index + size - 1, size), max);
-  }
-
-  protected int loopBound(int index, int size) {
-    return index - (index % size);
-  }
-
-  protected IllegalArgumentException illegalArgument(String method, int arg) {
-    return new IllegalArgumentException(String.format("** On entry to '%s' parameter number %d had an illegal value", method, arg));
-  }
-
-  public double dasum(int n, double[] x, int incx) {
-    return dasum(n, x, 0, incx);
-  }
-
-  public double dasum(int n, double[] x, int offsetx, int incx) {
-    if (n <= 0) {
-      return 0.0;
-    }
-    return dasumK(n, x, offsetx, incx);
-  }
-
   protected double dasumK(int n, double[] x, int offsetx, int incx) {
     double sum = 0.0;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
@@ -68,38 +45,12 @@ public class JavaBLAS implements BLAS {
     return sum;
   }
 
-  public float sasum(int n, float[] x, int incx) {
-    return sasum(n, x, 0, incx);
-  }
-
-  public float sasum(int n, float[] x, int offsetx, int incx) {
-    if (n <= 0) {
-      return 0.0f;
-    }
-    return sasumK(n, x, offsetx, incx);
-  }
-
   protected float sasumK(int n, float[] x, int offsetx, int incx) {
     float sum = 0.0f;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       sum += Math.abs(x[offsetx + ix]);
     }
     return sum;
-  }
-
-  public void daxpy(int n, double alpha, double[] x, int incx, double[] y, int incy) {
-    daxpy(n, alpha, x, 0, incx, y, 0, incy);
-  }
-
-  // y += alpha * x
-  public void daxpy(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    if (n <= 0) {
-      return;
-    }
-    if (alpha == 0.0) {
-      return;
-    }
-    daxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
   }
 
   protected void daxpyK(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
@@ -112,21 +63,6 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void saxpy(int n, float alpha, float[] x, int incx, float[] y, int incy) {
-    saxpy(n, alpha, x, 0, incx, y, 0, incy);
-  }
-
-  // y += alpha * x
-  public void saxpy(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    if (n <= 0) {
-      return;
-    }
-    if (alpha == 0.0f) {
-      return;
-    }
-    saxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
-  }
-
   protected void saxpyK(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
@@ -135,17 +71,6 @@ public class JavaBLAS implements BLAS {
          ix += incx, iy += incy) {
       y[offsety + iy] += alpha * x[offsetx + ix];
     }
-  }
-
-  public void dcopy(int n, double[] x, int incx, double[] y, int incy) {
-    dcopy(n, x, 0, incx, y, 0, incy);
-  }
-
-  public void dcopy(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    if (n <= 0) {
-      return;
-    }
-    dcopyK(n, x, offsetx, incx, y, offsety, incy);
   }
 
   protected void dcopyK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
@@ -162,17 +87,6 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void scopy(int n, float[] x, int incx, float[] y, int incy) {
-    scopy(n, x, 0, incx, y, 0, incy);
-  }
-
-  public void scopy(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    if (n <= 0) {
-      return;
-    }
-    scopyK(n, x, offsetx, incx, y, offsety, incy);
-  }
-
   protected void scopyK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (incx == 1 && incy == 1) {
       System.arraycopy(x, offsetx, y, offsety, n);
@@ -187,18 +101,6 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public double ddot(int n, double[] x, int incx, double[] y, int incy) {
-    return ddot(n, x, 0, incx, y, 0, incy);
-  }
-
-  // sum(x * y)
-  public double ddot(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    if (n <= 0) {
-      return 0.0;
-    }
-    return ddotK(n, x, offsetx, incx, y, offsety, incy);
-  }
-
   protected double ddotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     double sum = 0.0;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
@@ -209,18 +111,6 @@ public class JavaBLAS implements BLAS {
       sum += x[offsetx + ix] * y[offsety + iy];
     }
     return sum;
-  }
-
-  public float sdot(int n, float[] x, int incx, float[] y, int incy) {
-    return sdot(n, x, 0, incx, y, 0, incy);
-  }
-
-  // sum(x * y)
-  public float sdot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    if (n <= 0) {
-      return 0.0f;
-    }
-    return sdotK(n, x, offsetx, incx, y, offsety, incy);
   }
 
   protected float sdotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
@@ -235,15 +125,7 @@ public class JavaBLAS implements BLAS {
     return sum;
   }
 
-  public float sdsdot(int n, float sb, float[] x, int incx, float[] y, int incy) {
-    return sdsdot(n, sb, x, 0, incx, y, 0, incy);
-  }
-
-  public float sdsdot(int n, float sb, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    if (n <= 0) {
-      return 0.0f;
-    }
-
+  protected float sdsdotK(int n, float sb, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     double sum = sb;
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
@@ -255,55 +137,14 @@ public class JavaBLAS implements BLAS {
     return (float)sum;
   }
 
-  public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    dgbmv(trans, m, n, kl, ku, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }
-
-  public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+  protected void dgbmvK(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     f2j.dgbmv(trans, m, n, kl, ku, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
-
-  public void sgbmv(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy) {
-    sgbmv(trans, m, n, kl, ku, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }
-
-  public void sgbmv(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+  protected void sgbmvK(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     f2j.sgbmv(trans, m, n, kl, ku, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
-  public void dgemm(String transa, String transb, int m, int n, int k, double alpha, double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
-    dgemm(transa, transb, m, n, k, alpha, a, 0, lda, b, 0, ldb, beta, c, 0, ldc);
-  }
-
-  // c = alpha * a * b + beta * c
-  public void dgemm(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    if (!lsame("T", transa) && !lsame("N", transa) && !lsame("C", transa)) {
-      throw illegalArgument("DGEMM", 1);
-    }
-    if (!lsame("T", transb) && !lsame("N", transb) && !lsame("C", transb)) {
-      throw illegalArgument("DGEMM", 2);
-    }
-    if (m < 0) {
-      throw illegalArgument("DGEMM", 3);
-    }
-    if (n < 0) {
-      throw illegalArgument("DGEMM", 4);
-    }
-    if (k < 0) {
-      throw illegalArgument("DGEMM", 5);
-    }
-    if (lda < Math.max(1, lsame("N", transa) ? m : k)) {
-      throw illegalArgument("DGEMM", 8);
-    }
-    if (ldb < Math.max(1, lsame("N", transb) ? k : n)) {
-      throw illegalArgument("DGEMM", 10);
-    }
-    if (ldc < Math.max(1, m)) {
-      throw illegalArgument("DGEMM", 13);
-    }
-    if (m == 0 || n == 0 || ((alpha == 0.0 || k == 0) && beta == 1.0)) {
-      return;
-    }
+  protected void dgemmK(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
     if (alpha == 0.0) {
       dgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
     } else if (m * n * k < 100 * 100 * 100) {
@@ -1502,39 +1343,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void sgemm(String transa, String transb, int m, int n, int k, float alpha, float[] a, int lda, float[] b, int ldb, float beta, float[] c, int ldc) {
-    sgemm(transa, transb, m, n, k, alpha, a, 0, lda, b, 0, ldb, beta, c, 0, ldc);
-  }
-
-  // c = alpha * a * b + beta * c
-  public void sgemm(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    if (!lsame("T", transa) && !lsame("N", transa) && !lsame("C", transa)) {
-      throw illegalArgument("SGEMM", 1);
-    }
-    if (!lsame("T", transb) && !lsame("N", transb) && !lsame("C", transb)) {
-      throw illegalArgument("SGEMM", 2);
-    }
-    if (m < 0) {
-      throw illegalArgument("SGEMM", 3);
-    }
-    if (n < 0) {
-      throw illegalArgument("SGEMM", 4);
-    }
-    if (k < 0) {
-      throw illegalArgument("SGEMM", 5);
-    }
-    if (lda < Math.max(1, lsame("N", transa) ? m : k)) {
-      throw illegalArgument("SGEMM", 8);
-    }
-    if (ldb < Math.max(1, lsame("N", transb) ? k : n)) {
-      throw illegalArgument("SGEMM", 10);
-    }
-    if (ldc < Math.max(1, m)) {
-      throw illegalArgument("SGEMM", 13);
-    }
-    if (m == 0 || n == 0 || ((alpha == 0.0f || k == 0) && beta == 1.0f)) {
-      return;
-    }
+  protected void sgemmK(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
     if (alpha == 0.0f) {
       sgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
     } else if (m * n * k < 100 * 100 * 100) {
@@ -2733,33 +2542,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void dgemv(String trans, int m, int n, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    dgemv(trans, m, n, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }
-
-  // y = alpha * A * x + beta * y
-  public void dgemv(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    if (!lsame("N", trans) && !lsame("T", trans) && !lsame("C", trans)) {
-      throw illegalArgument("DGEMV", 1);
-    }
-    if (m < 0) {
-      throw illegalArgument("DGEMV", 2);
-    }
-    if (n < 0) {
-      throw illegalArgument("DGEMV", 3);
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("DGEMV", 6);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DGEMV", 8);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DGEMV", 11);
-    }
-    if (m == 0 || n == 0) {
-      return;
-    }
+  protected void dgemvK(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (alpha == 0.0) {
       int len = lsame("N", trans) ? m : n;
       for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
@@ -2851,33 +2634,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void sgemv(String trans, int m, int n, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy) {
-    sgemv(trans, m, n, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }
-
-  // y = alpha * A * x + beta * y
-  public void sgemv(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    if (!lsame("N", trans) && !lsame("T", trans) && !lsame("C", trans)) {
-      throw illegalArgument("SGEMV", 1);
-    }
-    if (m < 0) {
-      throw illegalArgument("SGEMV", 2);
-    }
-    if (n < 0) {
-      throw illegalArgument("SGEMV", 3);
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("SGEMV", 6);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SGEMV", 8);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SGEMV", 11);
-    }
-    if (m == 0 || n == 0) {
-      return;
-    }
+  protected void sgemvK(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (alpha == 0.0f) {
       int len = lsame("N", trans) ? m : n;
       for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
@@ -2987,35 +2744,6 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  // A += alpha * x * y.t
-  public void dger(int m, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] a, int lda) {
-    dger(m, n, alpha, x, 0, incx, y, 0, incy, a, 0, lda);
-  }
-
-  public void dger(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
-    if (m < 0) {
-      throw illegalArgument("DGER", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DGER", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DGER", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DGER", 7);
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("DGER", 9);
-    }
-    if (m == 0 || n == 0) {
-      return;
-    }
-    if (alpha != 0.0) {
-      dgerK(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
-    }
-  }
-
   protected void dgerK(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
     int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
@@ -3038,34 +2766,6 @@ public class JavaBLAS implements BLAS {
       for (; row < m; row += 1, jx += incx) {
         a[offseta + row + col * lda] += alphayiy * x[offsetx + jx];
       }
-    }
-  }
-
-  public void sger(int m, int n, float alpha, float[] x, int incx, float[] y, int incy, float[] a, int lda) {
-    sger(m, n, alpha, x, 0, incx, y, 0, incy, a, 0, lda);
-  }
-
-  public void sger(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
-    if (m < 0) {
-      throw illegalArgument("SGER", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SGER", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SGER", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SGER", 7);
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("SGER", 9);
-    }
-    if (m == 0 || n == 0) {
-      return;
-    }
-    if (alpha != 0.0f) {
-      sgerK(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
     }
   }
 
@@ -3094,23 +2794,6 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public double dnrm2(int n, double[] x, int incx) {
-    return dnrm2(n, x, 0, incx);
-  }
-
-  public double dnrm2(int n, double[] x, int offsetx, int incx) {
-    if (n <= 0) {
-      return 0.0;
-    }
-    if (incx <= 0) {
-      return 0.0;
-    }
-    if (n == 1) {
-      return Math.abs(x[offsetx + 0]);
-    }
-    return dnrm2K(n, x, offsetx, incx);
-  }
-
   protected double dnrm2K(int n, double[] x, int offsetx, int incx) {
     double sum = 0.0;
     for (int ix = 0; ix < n * incx; ix += incx) {
@@ -3119,40 +2802,12 @@ public class JavaBLAS implements BLAS {
     return Math.sqrt(sum);
   }
 
-  public float snrm2(int n, float[] x, int incx) {
-    return snrm2(n, x, 0, incx);
-  }
-
-  public float snrm2(int n, float[] x, int offsetx, int incx) {
-    if (n <= 0) {
-      return 0.0f;
-    }
-    if (incx <= 0) {
-      return 0.0f;
-    }
-    if (n == 1) {
-      return Math.abs(x[offsetx + 0]);
-    }
-    return snrm2K(n, x, offsetx, incx);
-  }
-
   protected float snrm2K(int n, float[] x, int offsetx, int incx) {
     float sum = 0.0f;
     for (int ix = 0; ix < n * incx; ix += incx) {
       sum += (float)Math.pow(x[offsetx + ix], 2);
     }
     return (float)Math.sqrt(sum);
-  }
-
-  public void drot(int n, double[] x, int incx, double[] y, int incy, double c, double s) {
-    drot(n, x, 0, incx, y, 0, incy, c, s);
-  }
-
-  public void drot(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double c, double s) {
-    if (n <= 0) {
-      return;
-    }
-    drotK(n, x, offsetx, incx, y, offsety, incy, c, s);
   }
 
   protected void drotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double c, double s) {
@@ -3168,17 +2823,6 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void srot(int n, float[] x, int incx, float[] y, int incy, float c, float s) {
-    srot(n, x, 0, incx, y, 0, incy, c, s);
-  }
-
-  public void srot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float c, float s) {
-    if (n <= 0) {
-      return;
-    }
-    srotK(n, x, offsetx, incx, y, offsety, incy, c, s);
-  }
-
   protected void srotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float c, float s) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
@@ -3192,116 +2836,28 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void drotg(org.netlib.util.doubleW da, org.netlib.util.doubleW db, org.netlib.util.doubleW c, org.netlib.util.doubleW s) {
-    double scale = Math.abs(da.val) + Math.abs(db.val);
-    if (scale == 0.0) {
-      c.val = 1.0;
-      s.val = 0.0;
-      da.val = 0.0;
-      db.val = 0.0;
-    } else {
-      double r = scale * Math.sqrt(Math.pow(da.val / scale, 2) + Math.pow(db.val / scale, 2))
-                      * ((Math.abs(da.val) > Math.abs(db.val) ? da.val : db.val) >= 0.0 ? 1.0 : -1.0);
-      c.val = da.val / r;
-      s.val = db.val / r;
-      double z = 1.0;
-      if (Math.abs(da.val) > Math.abs(db.val)) {
-        z = s.val;
-      } else if (c.val != 0.0) {
-        z = 1.0 / c.val;
-      }
-      da.val = r;
-      db.val = z;
-    }
-  }
-
-  public void srotg(org.netlib.util.floatW sa, org.netlib.util.floatW sb, org.netlib.util.floatW c, org.netlib.util.floatW s) {
-    float scale = Math.abs(sa.val) + Math.abs(sb.val);
-    if (scale == 0.0f) {
-      c.val = 1.0f;
-      s.val = 0.0f;
-      sa.val = 0.0f;
-      sb.val = 0.0f;
-    } else {
-      float r = (float)(scale * Math.sqrt(Math.pow(sa.val / scale, 2) + Math.pow(sb.val / scale, 2))
-                              * ((Math.abs(sa.val) > Math.abs(sb.val) ? sa.val : sb.val) >= 0.0f ? 1.0 : -1.0));
-      c.val = sa.val / r;
-      s.val = sb.val / r;
-      float z = 1.0f;
-      if (Math.abs(sa.val) > Math.abs(sb.val)) {
-        z = s.val;
-      } else if (c.val != 0.0f) {
-        z = 1.0f / c.val;
-      }
-      sa.val = r;
-      sb.val = z;
-    }
-  }
-
-  public void drotm(int n, double[] x, int incx, double[] y, int incy, double[] param) {
-    drotm(n, x, 0, incx, y, 0, incy, param, 0);
-  }
-
-  public void drotm(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] param, int offsetparam) {
+  protected void drotmK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] param, int offsetparam) {
     f2j.drotm(n, x, offsetx, incx, y, offsety, incy, param, offsetparam);
   }
 
-  public void srotm(int n, float[] x, int incx, float[] y, int incy, float[] param) {
-    srotm(n, x, 0, incx, y, 0, incy, param, 0);
-  }
-
-  public void srotm(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] param, int offsetparam) {
+  protected void srotmK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] param, int offsetparam) {
     f2j.srotm(n, x, offsetx, incx, y, offsety, incy, param, offsetparam);
   }
 
-  public void drotmg(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] param) {
-    drotmg(dd1, dd2, dx1, dy1, param, 0);
-  }
-
-  public void drotmg(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] param, int offsetparam) {
+  protected void drotmgK(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] param, int offsetparam) {
     f2j.drotmg(dd1, dd2, dx1, dy1, param, offsetparam);
   }
 
-  public void srotmg(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] param) {
-    srotmg(sd1, sd2, sx1, sy1, param, 0);
-  }
-
-  public void srotmg(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] param, int offsetparam) {
+  protected void srotmgK(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] param, int offsetparam) {
     f2j.srotmg(sd1, sd2, sx1, sy1, param, offsetparam);
   }
 
-  public void dsbmv(String uplo, int n, int k, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    dsbmv(uplo, n, k, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }
-
-  public void dsbmv(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+  protected void dsbmvK(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     f2j.dsbmv(uplo, n, k, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
-  public void ssbmv(String uplo, int n, int k, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy) {
-    ssbmv(uplo, n, k, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }
-
-  public void ssbmv(String uplo, int n, int k, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+  protected void ssbmvK(String uplo, int n, int k, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     f2j.ssbmv(uplo, n, k, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
-  }
-
-  public void dscal(int n, double alpha, double[] x, int incx) {
-    dscal(n, alpha, x, 0, incx);
-  }
-
-  // x = alpha * x
-  public void dscal(int n, double alpha, double[] x, int offsetx, int incx) {
-    if (n <= 0) {
-      return;
-    }
-    if (incx <= 0) {
-      return;
-    }
-    if (alpha == 1.0) {
-      return;
-    }
-    dscalK(n, alpha, x, offsetx, incx);
   }
 
   protected void dscalK(int n, double alpha, double[] x, int offsetx, int incx) {
@@ -3310,51 +2866,13 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void sscal(int n, float alpha, float[] x, int incx) {
-    sscal(n, alpha, x, 0, incx);
-  }
-
-  // x = alpha * x
-  public void sscal(int n, float alpha, float[] x, int offsetx, int incx) {
-    if (n <= 0) {
-      return;
-    }
-    if (incx <= 0) {
-      return;
-    }
-    if (alpha == 1.0f) {
-      return;
-    }
-    sscalK(n, alpha, x, offsetx, incx);
-  }
-
   protected void sscalK(int n, float alpha, float[] x, int offsetx, int incx) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
       x[offsetx + ix] *= alpha;
     }
   }
 
-  public void dspmv(String uplo, int n, double alpha, double[] a, double[] x, int incx, double beta, double[] y, int incy) {
-    dspmv(uplo, n, alpha, a, 0, x, 0, incx, beta, y, 0, incy);
-  }
-
-  // y = alpha * a * x + beta * y
-  public void dspmv(String uplo, int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSPMV", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSPMV", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSPMV", 6);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DSPMV", 9);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void dspmvK(String uplo, int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (alpha == 0.0) {
       for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
         if (beta != 0.0) {
@@ -3542,26 +3060,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void sspmv(String uplo, int n, float alpha, float[] a, float[] x, int incx, float beta, float[] y, int incy) {
-    sspmv(uplo, n, alpha, a, 0, x, 0, incx, beta, y, 0, incy);
-  }
-
-  public void sspmv(String uplo, int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSPMV", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSPMV", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSPMV", 6);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SSPMV", 9);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void sspmvK(String uplo, int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (alpha == 0.0f) {
       for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
         if (beta != 0.0f) {
@@ -3749,24 +3248,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void dspr(String uplo, int n, double alpha, double[] x, int incx, double[] a) {
-    dspr(uplo, n, alpha, x, 0, incx, a, 0);
-  }
-
-  // a += alpha * x * x.t
-  public void dspr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSPR", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSPR", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSPR", 5);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void dsprK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
     if (alpha == 0.0) {
       // do nothing
     } else if (lsame("U", uplo)) {
@@ -3844,24 +3326,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void sspr(String uplo, int n, float alpha, float[] x, int incx, float[] a) {
-    sspr(uplo, n, alpha, x, 0, incx, a, 0);
-  }
-
-  // a += alpha * x * x.t
-  public void sspr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSPR", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSPR", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSPR", 5);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void ssprK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
     if (alpha == 0.0f) {
       // do nothing
     } else if (lsame("U", uplo)) {
@@ -3939,27 +3404,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void dspr2(String uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] a) {
-    dspr2(uplo, n, alpha, x, 0, incx, y, 0, incy, a, 0);
-  }
-
-  // a += alpha * x * y.t + alpha * y * x.t
-  public void dspr2(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSPR2", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSPR2", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSPR2", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DSPR2", 7);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void dspr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta) {
     if (alpha == 0.0) {
       // do nothing
     } else if (lsame("U", uplo)) {
@@ -4055,27 +3500,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void sspr2(String uplo, int n, float alpha, float[] x, int incx, float[] y, int incy, float[] a) {
-    sspr2(uplo, n, alpha, x, 0, incx, y, 0, incy, a, 0);
-  }
-
-  // a += alpha * x * y.t + alpha * y * x.t
-  public void sspr2(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSPR2", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSPR2", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSPR2", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SSPR2", 7);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void sspr2K(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta) {
     if (alpha == 0.0f) {
       // do nothing
     } else if (lsame("U", uplo)) {
@@ -4171,17 +3596,6 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void dswap(int n, double[] x, int incx, double[] y, int incy) {
-    dswap(n, x, 0, incx, y, 0, incy);
-  }
-
-  public void dswap(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    if (n <= 0) {
-      return;
-    }
-    dswapK(n, x, offsetx, incx, y, offsety, incy);
-  }
-
   protected void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     for (int ix = incx < 0 ? (n - 1) * -incx : 0,
              iy = incy < 0 ? (n - 1) * -incy : 0;
@@ -4192,17 +3606,6 @@ public class JavaBLAS implements BLAS {
       y[offsety + iy] = x[offsetx + ix];
       x[offsetx + ix] = tmp;
     }
-  }
-
-  public void sswap(int n, float[] x, int incx, float[] y, int incy) {
-    sswap(n, x, 0, incx, y, 0, incy);
-  }
-
-  public void sswap(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    if (n <= 0) {
-      return;
-    }
-    sswapK(n, x, offsetx, incx, y, offsety, incy);
   }
 
   protected void sswapK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
@@ -4217,35 +3620,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void dsymm(String side, String uplo, int m, int n, double alpha, double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
-    dsymm(side, uplo, m, n, alpha, a, 0, lda, b, 0, ldb, beta, c, 0, ldc);
-  }
-
-  public void dsymm(String side, String uplo, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    if (!lsame("L", side) && !lsame("R", side)) {
-      throw illegalArgument("DSYMM", 1);
-    }
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSYMM", 2);
-    }
-    if (m < 0) {
-      throw illegalArgument("DSYMM", 3);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSYMM", 4);
-    }
-    if (lda < Math.max(1, lsame("L", side) ? m : n)) {
-      throw illegalArgument("DSYMM", 7);
-    }
-    if (ldb < Math.max(1, m)) {
-      throw illegalArgument("DSYMM", 9);
-    }
-    if (ldc < Math.max(1, m)) {
-      throw illegalArgument("DSYMM", 12);
-    }
-    if (m == 0 || n == 0 || (alpha == 0.0 && beta == 1.0)) {
-      return;
-    }
+  protected void dsymmK(String side, String uplo, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
     if (alpha == 0.0) {
       // C := beta*C
       int col = 0;
@@ -4844,35 +4219,7 @@ public class JavaBLAS implements BLAS {
     f2j.dsymm("R", "L", m, n, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
-  public void ssymm(String side, String uplo, int m, int n, float alpha, float[] a, int lda, float[] b, int ldb, float beta, float[] c, int ldc) {
-    ssymm(side, uplo, m, n, alpha, a, 0, lda, b, 0, ldb, beta, c, 0, ldc);
-  }
-
-  public void ssymm(String side, String uplo, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    if (!lsame("L", side) && !lsame("R", side)) {
-      throw illegalArgument("SSYMM", 1);
-    }
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSYMM", 2);
-    }
-    if (m < 0) {
-      throw illegalArgument("SSYMM", 3);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSYMM", 4);
-    }
-    if (lda < Math.max(1, lsame("L", side) ? m : n)) {
-      throw illegalArgument("SSYMM", 7);
-    }
-    if (ldb < Math.max(1, m)) {
-      throw illegalArgument("SSYMM", 9);
-    }
-    if (ldc < Math.max(1, m)) {
-      throw illegalArgument("SSYMM", 12);
-    }
-    if (m == 0 || n == 0 || (alpha == 0.0f && beta == 1.0f)) {
-      return;
-    }
+  protected void ssymmK(String side, String uplo, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
     if (alpha == 0.0f) {
       // C := beta*C
       int col = 0;
@@ -5460,29 +4807,7 @@ public class JavaBLAS implements BLAS {
     f2j.ssymm("R", "L", m, n, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
-  public void dsymv(String uplo, int n, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy) {
-    dsymv(uplo, n, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }
-
-  public void dsymv(String uplo, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSYMV", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSYMV", 2);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("DSYMV", 5);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSYMV", 7);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DSYMV", 10);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void dsymvK(String uplo, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (alpha == 0.0) {
       for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
         if (beta != 0.0) {
@@ -5668,29 +4993,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void ssymv(String uplo, int n, float alpha, float[] a, int lda, float[] x, int incx, float beta, float[] y, int incy) {
-    ssymv(uplo, n, alpha, a, 0, lda, x, 0, incx, beta, y, 0, incy);
-  }
-
-  public void ssymv(String uplo, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSYMV", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSYMV", 2);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("SSYMV", 5);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSYMV", 7);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SSYMV", 10);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void ssymvK(String uplo, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (alpha == 0.0f) {
       for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
         if (beta != 0.0f) {
@@ -5874,27 +5177,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void dsyr(String uplo, int n, double alpha, double[] x, int incx, double[] a, int lda) {
-    dsyr(uplo, n, alpha, x, 0, incx, a, 0, lda);
-  }
-
-  // a += alpha * x * x.t
-  public void dsyr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSYR", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSYR", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSYR", 5);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("DSYR", 7);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void dsyrK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
     if (alpha == 0.0) {
       // do nothing
     } else if (lsame("U", uplo)) {
@@ -5972,26 +5255,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void ssyr(String uplo, int n, float alpha, float[] x, int incx, float[] a, int lda) {
-    ssyr(uplo, n, alpha, x, 0, incx, a, 0, lda);
-  }
-
-  public void ssyr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSYR", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSYR", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSYR", 5);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("SSYR", 7);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void ssyrK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda) {
     if (alpha == 0.0f) {
       // do nothing
     } else if (lsame("U", uplo)) {
@@ -6069,29 +5333,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void dsyr2(String uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] a, int lda) {
-    dsyr2(uplo, n, alpha, x, 0, incx, y, 0, incy, a, 0, lda);
-  }
-
-  public void dsyr2(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSYR2", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSYR2", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSYR2", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DSYR2", 7);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("DSYR2", 9);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void dsyr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
     if (alpha == 0.0) {
       // do nothing
     } else if (lsame("U", uplo)) {
@@ -6187,29 +5429,7 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void ssyr2(String uplo, int n, float alpha, float[] x, int incx, float[] y, int incy, float[] a, int lda) {
-    ssyr2(uplo, n, alpha, x, 0, incx, y, 0, incy, a, 0, lda);
-  }
-
-  public void ssyr2(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSYR2", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSYR2", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSYR2", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SSYR2", 7);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("SSYR2", 9);
-    }
-    if (n == 0) {
-      return;
-    }
+  protected void ssyr2K(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
     if (alpha == 0.0f) {
       // do nothing
     } else if (lsame("U", uplo)) {
@@ -6305,180 +5525,87 @@ public class JavaBLAS implements BLAS {
     }
   }
 
-  public void dsyr2k(String uplo, String trans, int n, int k, double alpha, double[] a, int lda, double[] b, int ldb, double beta, double[] c, int ldc) {
-    dsyr2k(uplo, trans, n, k, alpha, a, 0, lda, b, 0, ldb, beta, c, 0, ldc);
-  }
-
-  public void dsyr2k(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+  protected void dsyr2kK(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
     f2j.dsyr2k(uplo, trans, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
-  public void ssyr2k(String uplo, String trans, int n, int k, float alpha, float[] a, int lda, float[] b, int ldb, float beta, float[] c, int ldc) {
-    ssyr2k(uplo, trans, n, k, alpha, a, 0, lda, b, 0, ldb, beta, c, 0, ldc);
-  }
-
-  public void ssyr2k(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+  protected void ssyr2kK(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
     f2j.ssyr2k(uplo, trans, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
-  public void dsyrk(String uplo, String trans, int n, int k, double alpha, double[] a, int lda, double beta, double[] c, int ldc) {
-    dsyrk(uplo, trans, n, k, alpha, a, 0, lda, beta, c, 0, ldc);
-  }
-
-  public void dsyrk(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double beta, double[] c, int offsetc, int ldc) {
+  protected void dsyrkK(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double beta, double[] c, int offsetc, int ldc) {
     f2j.dsyrk(uplo, trans, n, k, alpha, a, offseta, lda, beta, c, offsetc, ldc);
   }
 
-  public void ssyrk(String uplo, String trans, int n, int k, float alpha, float[] a, int lda, float beta, float[] c, int ldc) {
-    ssyrk(uplo, trans, n, k, alpha, a, 0, lda, beta, c, 0, ldc);
-  }
-
-  public void ssyrk(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float beta, float[] c, int offsetc, int ldc) {
+  protected void ssyrkK(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float beta, float[] c, int offsetc, int ldc) {
     f2j.ssyrk(uplo, trans, n, k, alpha, a, offseta, lda, beta, c, offsetc, ldc);
   }
 
-  public void dtbmv(String uplo, String trans, String diag, int n, int k, double[] a, int lda, double[] x, int incx) {
-    dtbmv(uplo, trans, diag, n, k, a, 0, lda, x, 0, incx);
-  }
-
-  public void dtbmv(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
+  protected void dtbmvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
     f2j.dtbmv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
   }
 
-  public void stbmv(String uplo, String trans, String diag, int n, int k, float[] a, int lda, float[] x, int incx) {
-    stbmv(uplo, trans, diag, n, k, a, 0, lda, x, 0, incx);
-  }
-
-  public void stbmv(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
+  protected void stbmvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
     f2j.stbmv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
   }
 
-  public void dtbsv(String uplo, String trans, String diag, int n, int k, double[] a, int lda, double[] x, int incx) {
-    dtbsv(uplo, trans, diag, n, k, a, 0, lda, x, 0, incx);
-  }
-
-  public void dtbsv(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
+  protected void dtbsvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
     f2j.dtbsv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
   }
 
-  public void stbsv(String uplo, String trans, String diag, int n, int k, float[] a, int lda, float[] x, int incx) {
-    stbsv(uplo, trans, diag, n, k, a, 0, lda, x, 0, incx);
-  }
-
-  public void stbsv(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
+  protected void stbsvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
     f2j.stbsv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
   }
 
-  public void dtpmv(String uplo, String trans, String diag, int n, double[] a, double[] x, int incx) {
-    dtpmv(uplo, trans, diag, n, a, 0, x, 0, incx);
-  }
-
-  public void dtpmv(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
+  protected void dtpmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
     f2j.dtpmv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
   }
 
-  public void stpmv(String uplo, String trans, String diag, int n, float[] a, float[] x, int incx) {
-    stpmv(uplo, trans, diag, n, a, 0, x, 0, incx);
-  }
-
-  public void stpmv(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
+  protected void stpmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
     f2j.stpmv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
   }
 
-  public void dtpsv(String uplo, String trans, String diag, int n, double[] a, double[] x, int incx) {
-    dtpsv(uplo, trans, diag, n, a, 0, x, 0, incx);
-  }
-
-  public void dtpsv(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
+  protected void dtpsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
     f2j.dtpsv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
   }
 
-  public void stpsv(String uplo, String trans, String diag, int n, float[] a, float[] x, int incx) {
-    stpsv(uplo, trans, diag, n, a, 0, x, 0, incx);
-  }
-
-  public void stpsv(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
+  protected void stpsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
     f2j.stpsv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
   }
 
-  public void dtrmm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int lda, double[] b, int ldb) {
-    dtrmm(side, uplo, transa, diag, m, n, alpha, a, 0, lda, b, 0, ldb);
-  }
-
-  public void dtrmm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
+  protected void dtrmmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
     f2j.dtrmm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
   }
 
-  public void strmm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int lda, float[] b, int ldb) {
-    strmm(side, uplo, transa, diag, m, n, alpha, a, 0, lda, b, 0, ldb);
-  }
-
-  public void strmm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
+  protected void strmmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
     f2j.strmm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
   }
 
-  public void dtrmv(String uplo, String trans, String diag, int n, double[] a, int lda, double[] x, int incx) {
-    dtrmv(uplo, trans, diag, n, a, 0, lda, x, 0, incx);
-  }
-
-  public void dtrmv(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
+  protected void dtrmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
     f2j.dtrmv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
   }
 
-  public void strmv(String uplo, String trans, String diag, int n, float[] a, int lda, float[] x, int incx) {
-    strmv(uplo, trans, diag, n, a, 0, lda, x, 0, incx);
-  }
-
-  public void strmv(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
+  protected void strmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
     f2j.strmv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
   }
 
-  public void dtrsm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int lda, double[] b, int ldb) {
-    dtrsm(side, uplo, transa, diag, m, n, alpha, a, 0, lda, b, 0, ldb);
-  }
-
-  public void dtrsm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
+  protected void dtrsmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
     f2j.dtrsm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
   }
 
-  public void strsm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int lda, float[] b, int ldb) {
-    strsm(side, uplo, transa, diag, m, n, alpha, a, 0, lda, b, 0, ldb);
-  }
-
-  public void strsm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
+  protected void strsmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
     f2j.strsm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
   }
 
-  public void dtrsv(String uplo, String trans, String diag, int n, double[] a, int lda, double[] x, int incx) {
-    dtrsv(uplo, trans, diag, n, a, 0, lda, x, 0, incx);
-  }
-
-  public void dtrsv(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
+  protected void dtrsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
     f2j.dtrsv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
   }
 
-  public void strsv(String uplo, String trans, String diag, int n, float[] a, int lda, float[] x, int incx) {
-    strsv(uplo, trans, diag, n, a, 0, lda, x, 0, incx);
-  }
-
-  public void strsv(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
+  protected void strsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
     f2j.strsv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
   }
 
-  public int idamax(int n, double[] x, int incx) {
-    return idamax(n, x, 0, incx);
-  }
-
-  public int idamax(int n, double[] x, int offsetx, int incx) {
-    if (n <= 0) {
-      return -1;
-    }
-    if (incx <= 0) {
-      return -1;
-    }
-    if (n == 1) {
-      return 0;
-    }
+  protected int idamaxK(int n, double[] x, int offsetx, int incx) {
     int imax = 0;
     double max = x[offsetx];
     for (int i = 1, ix = incx; ix < n * incx; i += 1, ix += incx) {
@@ -6491,20 +5618,7 @@ public class JavaBLAS implements BLAS {
     return imax + 1; // +1 because Fortran arrays are 1-indexed
   }
 
-  public int isamax(int n, float[] x, int incx) {
-    return isamax(n, x, 0, incx);
-  }
-
-  public int isamax(int n, float[] x, int offsetx, int incx) {
-    if (n <= 0) {
-      return -1;
-    }
-    if (incx <= 0) {
-      return -1;
-    }
-    if (n == 1) {
-      return 0;
-    }
+  protected int isamaxK(int n, float[] x, int offsetx, int incx) {
     int imax = 0;
     float max = x[offsetx];
     for (int i = 1, ix = incx; ix < n * incx; i += 1, ix += incx) {
@@ -6515,9 +5629,5 @@ public class JavaBLAS implements BLAS {
       }
     }
     return imax + 1; // +1 because Fortran arrays are 1-indexed
-  }
-
-  public boolean lsame(String ca, String cb) {
-    return ca != null && ca.length() == 1 && ca.equalsIgnoreCase(cb);
   }
 }

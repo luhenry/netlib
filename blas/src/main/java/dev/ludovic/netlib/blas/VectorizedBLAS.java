@@ -1349,7 +1349,7 @@ public class VectorizedBLAS extends JavaBLAS {
     }
   }
 
-  public void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
+  protected void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     if (incx == 1 && incy == 1) {
       int i = 0;
       for (; i < DMAX.loopBound(n); i += DMAX.length()) {
@@ -1369,7 +1369,7 @@ public class VectorizedBLAS extends JavaBLAS {
     }
   }
 
-  public void sswapK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
+  protected void sswapK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (incx == 1 && incy == 1) {
       int i = 0;
       for (; i < FMAX.loopBound(n); i += FMAX.length()) {
