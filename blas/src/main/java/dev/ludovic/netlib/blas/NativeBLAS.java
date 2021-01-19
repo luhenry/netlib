@@ -64,13 +64,13 @@ public final class NativeBLAS extends AbstractBLAS {
     return library;
   }
 
-  private static enum CblasOrder {
+  private static enum CblasLayout {
     CblasRowMajor(101),
     CblasColMajor(102);
 
     private final int val;
 
-    private CblasOrder(int val) {
+    private CblasLayout(int val) {
       this.val = val;
     }
 
@@ -82,8 +82,7 @@ public final class NativeBLAS extends AbstractBLAS {
   private static enum CblasTranspose {
     CblasNoTrans(111),
     CblasTrans(112),
-    CblasConjTrans(113),
-    CblasConjNoTrans(114);
+    CblasConjTrans(113);
 
     private final int val;
 
@@ -140,6 +139,13 @@ public final class NativeBLAS extends AbstractBLAS {
     public int value() {
       return val;
     }
+    public static CblasDiag fromString(String diag) {
+      switch (diag) {
+        case "N": return CblasNonUnit;
+        case "U": return CblasUnit;
+        default: throw new IllegalArgumentException("unknown diag = " + diag);
+      }
+    }
   }
 
   private static enum CblasSide {
@@ -162,21 +168,6 @@ public final class NativeBLAS extends AbstractBLAS {
         case "R": return CblasRight;
         default: throw new IllegalArgumentException("unknown side = " + side);
       }
-    }
-  }
-
-  private static enum CblasLayout {
-    CblasRowMajor(101),
-    CblasColMajor(102);
-
-    private final int val;
-
-    private CblasLayout(int val) {
-      this.val = val;
-    }
-
-    public int value() {
-      return val;
     }
   }
 
@@ -386,7 +377,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      dgbmvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasTranspose.fromString(trans).value(), m, n, kl, ku, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
+      dgbmvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasTranspose.fromString(trans).value(), m, n, kl, ku, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -401,7 +392,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      sgbmvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasTranspose.fromString(trans).value(), m, n, kl, ku, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
+      sgbmvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasTranspose.fromString(trans).value(), m, n, kl, ku, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -416,7 +407,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment pb = segment(b, offsetb); MemoryNativeCopy cpb = copy(pb);
          MemorySegment pc = segment(c, offsetc); MemoryNativeCopy cpc = copy(pc, true)) {
-      dgemmHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasTranspose.fromString(transa).value(), CblasTranspose.fromString(transb).value(), m, n, k, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
+      dgemmHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasTranspose.fromString(transa).value(), CblasTranspose.fromString(transb).value(), m, n, k, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -431,7 +422,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment pb = segment(b, offsetb); MemoryNativeCopy cpb = copy(pb);
          MemorySegment pc = segment(c, offsetc); MemoryNativeCopy cpc = copy(pc, true)) {
-      sgemmHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasTranspose.fromString(transa).value(), CblasTranspose.fromString(transb).value(), m, n, k, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
+      sgemmHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasTranspose.fromString(transa).value(), CblasTranspose.fromString(transb).value(), m, n, k, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -446,7 +437,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      dgemvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasTranspose.fromString(trans).value(), m, n, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
+      dgemvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasTranspose.fromString(trans).value(), m, n, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -461,7 +452,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      sgemvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasTranspose.fromString(trans).value(), m, n, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
+      sgemvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasTranspose.fromString(trans).value(), m, n, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -476,7 +467,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      dgerHandle.get().invoke(CblasOrder.CblasColMajor.value(), m, n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address(), lda);
+      dgerHandle.get().invoke(CblasLayout.CblasColMajor.value(), m, n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address(), lda);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -491,7 +482,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      sgerHandle.get().invoke(CblasOrder.CblasColMajor.value(), m, n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address(), lda);
+      sgerHandle.get().invoke(CblasLayout.CblasColMajor.value(), m, n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address(), lda);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -608,7 +599,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      dsbmvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, k, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
+      dsbmvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, k, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -623,7 +614,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      ssbmvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, k, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
+      ssbmvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, k, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -664,7 +655,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      dspmvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpa.address(), cpx.address(), incx, beta, cpy.address(), incy);
+      dspmvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpa.address(), cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -679,7 +670,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      sspmvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpa.address(), cpx.address(), incx, beta, cpy.address(), incy);
+      sspmvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpa.address(), cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -693,7 +684,7 @@ public final class NativeBLAS extends AbstractBLAS {
   protected void dsprK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      dsprHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpa.address());
+      dsprHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpa.address());
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -707,7 +698,7 @@ public final class NativeBLAS extends AbstractBLAS {
   protected void ssprK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      ssprHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpa.address());
+      ssprHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpa.address());
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -722,7 +713,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      dspr2Handle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address());
+      dspr2Handle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address());
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -737,7 +728,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      sspr2Handle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address());
+      sspr2Handle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address());
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -780,7 +771,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment pb = segment(b, offsetb); MemoryNativeCopy cpb = copy(pb);
          MemorySegment pc = segment(c, offsetc); MemoryNativeCopy cpc = copy(pc, true)) {
-      dsymmHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasSide.fromString(side).value(), CblasUPLO.fromString(uplo).value(), m, n, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
+      dsymmHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasSide.fromString(side).value(), CblasUPLO.fromString(uplo).value(), m, n, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -795,7 +786,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment pb = segment(b, offsetb); MemoryNativeCopy cpb = copy(pb);
          MemorySegment pc = segment(c, offsetc); MemoryNativeCopy cpc = copy(pc, true)) {
-      ssymmHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasSide.fromString(side).value(), CblasUPLO.fromString(uplo).value(), m, n, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
+      ssymmHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasSide.fromString(side).value(), CblasUPLO.fromString(uplo).value(), m, n, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -810,7 +801,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      dsymvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
+      dsymvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -825,7 +816,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py, true)) {
-      ssymvHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
+      ssymvHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpa.address(), lda, cpx.address(), incx, beta, cpy.address(), incy);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -839,7 +830,7 @@ public final class NativeBLAS extends AbstractBLAS {
   protected void dsyrK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      dsyrHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpa.address(), lda);
+      dsyrHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpa.address(), lda);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -853,7 +844,7 @@ public final class NativeBLAS extends AbstractBLAS {
   protected void ssyrK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda) {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      ssyrHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpa.address(), lda);
+      ssyrHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpa.address(), lda);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -868,7 +859,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      dsyr2Handle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address(), lda);
+      dsyr2Handle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address(), lda);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -883,7 +874,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
          MemorySegment py = segment(y, offsety); MemoryNativeCopy cpy = copy(py);
          MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa, true)) {
-      ssyr2Handle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address(), lda);
+      ssyr2Handle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), n, alpha, cpx.address(), incx, cpy.address(), incy, cpa.address(), lda);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -898,7 +889,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment pb = segment(b, offsetb); MemoryNativeCopy cpb = copy(pb);
          MemorySegment pc = segment(c, offsetc); MemoryNativeCopy cpc = copy(pc, true)) {
-      dsyr2kHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), CblasTranspose.fromString(trans).value(), n, k, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
+      dsyr2kHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), CblasTranspose.fromString(trans).value(), n, k, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
@@ -913,7 +904,7 @@ public final class NativeBLAS extends AbstractBLAS {
     try (MemorySegment pa = segment(a, offseta); MemoryNativeCopy cpa = copy(pa);
          MemorySegment pb = segment(b, offsetb); MemoryNativeCopy cpb = copy(pb);
          MemorySegment pc = segment(c, offsetc); MemoryNativeCopy cpc = copy(pc, true)) {
-      ssyr2kHandle.get().invoke(CblasOrder.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), CblasTranspose.fromString(trans).value(), n, k, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
+      ssyr2kHandle.get().invoke(CblasLayout.CblasColMajor.value(), CblasUPLO.fromString(uplo).value(), CblasTranspose.fromString(trans).value(), n, k, alpha, cpa.address(), lda, cpb.address(), ldb, beta, cpc.address(), ldc);
     } catch (Throwable t) {
       throw new IllegalStateException(t);
     }
