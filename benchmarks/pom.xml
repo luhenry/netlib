@@ -21,97 +21,97 @@ SOFTWARE.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>dev.ludovic.netlib</groupId>
-        <artifactId>parent</artifactId>
-        <version>0.1.13</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-
+  <parent>
     <groupId>dev.ludovic.netlib</groupId>
-    <artifactId>benchmarks</artifactId>
+    <artifactId>parent</artifactId>
     <version>0.1.13</version>
-    <packaging>jar</packaging>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-    <properties>
-        <jmh.version>1.27</jmh.version>
-        <uberjar.name>netlib-benchmarks</uberjar.name>
-    </properties>
+  <groupId>dev.ludovic.netlib</groupId>
+  <artifactId>benchmarks</artifactId>
+  <version>0.1.13</version>
+  <packaging>jar</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>dev.ludovic.netlib</groupId>
-            <artifactId>blas</artifactId>
-            <version>0.1.13</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.ludovic.netlib</groupId>
-            <artifactId>arpack</artifactId>
-            <version>0.1.13</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.ludovic.netlib</groupId>
-            <artifactId>lapack</artifactId>
-            <version>0.1.13</version>
-        </dependency>
+  <properties>
+    <jmh.version>1.27</jmh.version>
+    <uberjar.name>netlib-benchmarks</uberjar.name>
+  </properties>
 
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-core</artifactId>
-            <version>${jmh.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>${jmh.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>dev.ludovic.netlib</groupId>
+      <artifactId>blas</artifactId>
+      <version>0.1.13</version>
+    </dependency>
+    <dependency>
+      <groupId>dev.ludovic.netlib</groupId>
+      <artifactId>arpack</artifactId>
+      <version>0.1.13</version>
+    </dependency>
+    <dependency>
+      <groupId>dev.ludovic.netlib</groupId>
+      <artifactId>lapack</artifactId>
+      <version>0.1.13</version>
+    </dependency>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>${uberjar.name}</finalName>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.openjdk.jmh.Main</mainClass>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <!--
-                                        Shading signed JARs will fail without this.
-                                        http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
-                                    -->
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>${jmh.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>${jmh.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <finalName>${uberjar.name}</finalName>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.openjdk.jmh.Main</mainClass>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+              <filters>
+                <filter>
+                  <!--
+                    Shading signed JARs will fail without this.
+                    http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+                  -->
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

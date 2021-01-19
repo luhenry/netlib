@@ -21,45 +21,45 @@ SOFTWARE.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>dev.ludovic.netlib</groupId>
-        <artifactId>parent</artifactId>
-        <version>0.1.13</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-
+  <parent>
     <groupId>dev.ludovic.netlib</groupId>
-    <artifactId>blas</artifactId>
+    <artifactId>parent</artifactId>
     <version>0.1.13</version>
-    <packaging>jar</packaging>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-    <properties>
-        <junit.version>5.5.2</junit.version>
-        <netlib.java.version>1.1.2</netlib.java.version>
-    </properties>
+  <groupId>dev.ludovic.netlib</groupId>
+  <artifactId>blas</artifactId>
+  <version>0.1.13</version>
+  <packaging>jar</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.github.fommil.netlib</groupId>
-            <artifactId>all</artifactId>
-            <version>${netlib.java.version}</version>
-            <type>pom</type>
-        </dependency>
+  <properties>
+    <junit.version>5.5.2</junit.version>
+    <netlib.java.version>1.1.2</netlib.java.version>
+  </properties>
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>com.github.fommil.netlib</groupId>
+      <artifactId>all</artifactId>
+      <version>${netlib.java.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
