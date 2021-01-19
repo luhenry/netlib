@@ -48,7 +48,7 @@ public class SdotTest extends BLASTest {
         float[] x = new float[] { 0.0f, 1.0f };
         float[] y = new float[] { 0.0f, 1.0f };
 
-        assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
             blas.sdot(n, x, 1, y, 1);
         });
     }
@@ -62,7 +62,7 @@ public class SdotTest extends BLASTest {
         float[] y = new float[] { 2.0f, 1.0f,  0.0f, 0.0f, 2.0f, 1.0f,  0.0f, 0.0f, 0.0f };
         int offsety = 1;
 
-        assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
             blas.sdot(n, x, offsetx, 1, y, offsety, 1);
         });
     }
@@ -70,11 +70,13 @@ public class SdotTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOutOfBoundOnlyForX(BLAS blas) {
-        int n = 5;
+        int n = 6;
         float[] x = new float[] { 1.0f, 0.0f, -2.0f, 3.0f, 1.0f, 0.0f, -2.0f, 3.0f, 3.0f };
         float[] y = new float[] { 2.0f, 1.0f,  0.0f, 0.0f, 2.0f, 1.0f,  0.0f, 0.0f, 0.0f };
 
-        assertEquals(6.0f, blas.sdot(n, x, 2, y, 1));
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.sdot(n, x, 2, y, 1);
+        });
     }
 
     @ParameterizedTest

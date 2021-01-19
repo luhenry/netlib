@@ -68,11 +68,13 @@ public class DdotTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOutOfBoundOnlyForX(BLAS blas) {
-        int n = 5;
+        int n = 6;
         double[] x = new double[] { 1.0, 0.0, -2.0, 3.0, 1.0, 0.0, -2.0, 3.0, 3.0 };
         double[] y = new double[] { 2.0, 1.0,  0.0, 0.0, 2.0, 1.0,  0.0, 0.0, 0.0 };
 
-        assertEquals(6.0, blas.ddot(n, x, 2, y, 1));
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.ddot(n, x, 2, y, 1);
+        });
     }
 
     @ParameterizedTest
