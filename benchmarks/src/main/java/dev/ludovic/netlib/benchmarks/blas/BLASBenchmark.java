@@ -27,8 +27,12 @@ import dev.ludovic.netlib.BLAS;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+@BenchmarkMode(Mode.Throughput)
+@OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
+@Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
 public abstract class BLASBenchmark {
 
     public BLAS blas;

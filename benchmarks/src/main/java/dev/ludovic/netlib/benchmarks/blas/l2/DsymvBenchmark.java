@@ -27,12 +27,7 @@ import dev.ludovic.netlib.benchmarks.blas.BLASBenchmark;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
-import java.util.concurrent.TimeUnit;
-
-@BenchmarkMode(Mode.Throughput)
-@OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
-@Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
 public class DsymvBenchmark extends BLASBenchmark {
 
     @Param({"U", "L"})
