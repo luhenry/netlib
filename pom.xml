@@ -57,8 +57,8 @@ SOFTWARE.
 
     <modules>
         <module>blas</module>
-        <!-- <module>lapack</module> -->
-        <!-- <module>arpack</module> -->
+        <module>arpack</module>
+        <module>lapack</module>
         <module>benchmarks</module>
     </modules>
 

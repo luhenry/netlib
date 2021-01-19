@@ -47,6 +47,16 @@ SOFTWARE.
             <artifactId>blas</artifactId>
             <version>0.1.13</version>
         </dependency>
+        <dependency>
+            <groupId>dev.ludovic.netlib</groupId>
+            <artifactId>arpack</artifactId>
+            <version>0.1.13</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.ludovic.netlib</groupId>
+            <artifactId>lapack</artifactId>
+            <version>0.1.13</version>
+        </dependency>
 
         <dependency>
             <groupId>org.openjdk.jmh</groupId>

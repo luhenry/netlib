@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package dev.ludovic.netlib.blas.profiler;
+package dev.ludovic.netlib.profiler;
 
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.profile.ExternalProfiler;
