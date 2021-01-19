@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
-@Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.vector"})
+@Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.foreign,jdk.incubator.vector", "-Dforeign.restricted=permit"})
 public abstract class BLASBenchmark {
 
     public BLAS blas;
@@ -46,14 +46,14 @@ public abstract class BLASBenchmark {
         case "f2j":
             blas = dev.ludovic.netlib.blas.NetlibWrapper.wrap(new com.github.fommil.netlib.F2jBLAS());
             break;
-        case "native":
-            blas = dev.ludovic.netlib.blas.NetlibWrapper.wrap(com.github.fommil.netlib.BLAS.getInstance());
-            break;
         case "java":
             blas = dev.ludovic.netlib.blas.JavaBLAS.getInstance();
             break;
         case "vector":
             blas = dev.ludovic.netlib.blas.VectorizedBLAS.getInstance();
+            break;
+        case "native":
+            blas = dev.ludovic.netlib.blas.NativeBLAS.getInstance();
             break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }
