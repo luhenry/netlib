@@ -41,7 +41,7 @@ import static jdk.incubator.foreign.CLinker.*;
 
 public final class NativeBLAS extends AbstractBLAS {
 
-  private static Logger LOGGER = Logger.getLogger(NativeBLAS.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(NativeBLAS.class.getName());
 
   private final LibraryLookup library;
 
