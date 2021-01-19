@@ -43,8 +43,6 @@ public final class NativeBLAS extends AbstractBLAS {
 
   private static Logger LOGGER = Logger.getLogger(NativeBLAS.class.getName());
 
-  private final BLAS fallback = null;
-
   private final LibraryLookup library;
 
   private static final NativeBLAS instance = new NativeBLAS();
@@ -927,7 +925,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT)));
 
   protected void dsyrkK(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double beta, double[] c, int offsetc, int ldc) {
-    fallback.dsyrk(uplo, trans, n, k, alpha, a, offseta, lda, beta, c, offsetc, ldc);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> ssyrkHandle = Lazy.let(() ->
@@ -936,7 +934,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT)));
 
   protected void ssyrkK(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float beta, float[] c, int offsetc, int ldc) {
-    fallback.ssyrk(uplo, trans, n, k, alpha, a, offseta, lda, beta, c, offsetc, ldc);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> dtbmvHandle = Lazy.let(() ->
@@ -945,7 +943,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void dtbmvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    fallback.dtbmv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> stbmvHandle = Lazy.let(() ->
@@ -954,7 +952,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void stbmvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    fallback.stbmv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> dtbsvHandle = Lazy.let(() ->
@@ -963,7 +961,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void dtbsvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    fallback.dtbsv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> stbsvHandle = Lazy.let(() ->
@@ -972,7 +970,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void stbsvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    fallback.stbsv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> dtpmvHandle = Lazy.let(() ->
@@ -981,7 +979,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_POINTER, C_INT)));
 
   protected void dtpmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
-    fallback.dtpmv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> stpmvHandle = Lazy.let(() ->
@@ -990,7 +988,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_POINTER, C_INT)));
 
   protected void stpmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
-    fallback.stpmv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> dtpsvHandle = Lazy.let(() ->
@@ -999,7 +997,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_POINTER, C_INT)));
 
   protected void dtpsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
-    fallback.dtpsv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> stpsvHandle = Lazy.let(() ->
@@ -1008,7 +1006,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_POINTER, C_INT)));
 
   protected void stpsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
-    fallback.stpsv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> dtrmmHandle = Lazy.let(() ->
@@ -1017,7 +1015,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void dtrmmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
-    fallback.dtrmm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> strmmHandle = Lazy.let(() ->
@@ -1026,7 +1024,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void strmmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
-    fallback.strmm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> dtrmvHandle = Lazy.let(() ->
@@ -1035,7 +1033,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void dtrmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    fallback.dtrmv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> strmvHandle = Lazy.let(() ->
@@ -1044,7 +1042,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void strmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    fallback.strmv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> dtrsmHandle = Lazy.let(() ->
@@ -1053,7 +1051,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void dtrsmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
-    fallback.dtrsm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> strsmHandle = Lazy.let(() ->
@@ -1062,7 +1060,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void strsmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
-    fallback.strsm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> dtrsvHandle = Lazy.let(() ->
@@ -1071,7 +1069,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void dtrsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    fallback.dtrsv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> strsvHandle = Lazy.let(() ->
@@ -1080,7 +1078,7 @@ public final class NativeBLAS extends AbstractBLAS {
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected void strsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    fallback.strsv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
+    throw new UnsupportedOperationException("not implemented");
   }
 
   private final Lazy<MethodHandle> idamaxHandle = Lazy.let(() ->
