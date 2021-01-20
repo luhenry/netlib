@@ -48,12 +48,7 @@ public final class NativeBLAS extends AbstractBLAS {
   private static final NativeBLAS instance = new NativeBLAS();
 
   protected NativeBLAS() {
-    try {
-      library = LibraryLookup.ofLibrary("blas");
-    } catch (Throwable t) {
-      LOGGER.log(Level.WARNING, "Failed to initialize " + this.getClass().getName(), t);
-      throw t;
-    }
+    library = LibraryLookup.ofLibrary("blas");
   }
 
   public static BLAS getInstance() {
