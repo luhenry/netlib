@@ -32,25 +32,18 @@ public class SgerTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int m = 5, n = 4;
-        float alpha = 0.1f;
-        float[] x = new float[] {
-            1.0f, 2.0f, 2.1f,  4.0f, 5.0f };
-        float[] y = new float[] {
-            3.0f, 4.0f, 5.1f, -1.0f };
-        float[] a = new float[] {
-            1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
-            2.0f, 2.0f, 3.0f, 4.0f, 5.0f,
-            3.0f, 3.0f, 3.0f, 4.0f, 5.0f,
-            4.0f, 4.0f, 4.0f, 4.0f, 4.0f };
-        float[] expected = new float[] {
-             1.3f,  2.6f,  3.63f,  5.2f,  6.5f,
-             2.4f,  2.8f,  3.84f,  5.6f,  7.0f,
-            3.51f, 4.02f, 4.071f, 6.04f, 7.55f,
-             3.9f,  3.8f,  3.79f,  3.6f,  3.5f };
+        float[] expected, sgeAcopy;
 
-        float[] a1 = a.clone();
-        blas.sger(m, n, alpha, x, 1, y, 1, a1, m);
-        assertArrayEquals(expected, a1, sepsilon);
+        f2j.sger(M, N, 2.0f, sX, 1, sY, 1, expected = sgeA.clone(), M);
+        blas.sger(M, N, 2.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+
+        f2j.sger(M, N, 0.0f, sX, 1, sY, 1, expected = sgeA.clone(), M);
+        blas.sger(M, N, 0.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+
+        f2j.sger(M, N, -1.0f, sX, 1, sY, 1, expected = sgeA.clone(), M);
+        blas.sger(M, N, -1.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
     }
 }

@@ -32,23 +32,26 @@ public class SrotTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 9;
-        float[] x = new float[] {
-            1.0f, 0.0f, -2.0f, 3.0f, 1.0f, 0.0f, -2.0f, 3.0f, 3.0f };
-        float[] y = new float[] {
-            2.0f, 1.0f,  0.0f, 0.0f, 2.0f, 1.0f,  0.0f, 0.0f, 0.0f };
-        float c = 2.0f;
-        float s = 3.0f;
+        float[] expectedX, expectedY, sXcopy, sYcopy;
 
-        float[] xexpected = new float[] {
-            8.0f, 3.0f, -4.0f,  6.0f, 8.0f, 3.0f, -4.0f,  6.0f,  6.0f };
-        float[] yexpected = new float[] {
-            1.0f, 2.0f,  6.0f, -9.0f, 1.0f, 2.0f,  6.0f, -9.0f, -9.0f };
+        f2j.srot(M, expectedX = sX.clone(), 1, expectedY = sY.clone(), 1, 2.0f, 3.0f);
+        blas.srot(M, sXcopy = sX.clone(), 1, sYcopy = sY.clone(), 1, 2.0f, 3.0f);
+        assertArrayEquals(expectedX, sXcopy, sepsilon);
+        assertArrayEquals(expectedY, sYcopy, sepsilon);
 
-        float[] x1 = x.clone();
-        float[] y1 = y.clone();
-        blas.srot(n, x1, 1, y1, 1, c, s);
-        assertArrayEquals(xexpected, x1, sepsilon);
-        assertArrayEquals(yexpected, y1, sepsilon);
+        f2j.srot(M, expectedX = sX.clone(), 1, expectedY = sY.clone(), 1, 0.0f, 3.0f);
+        blas.srot(M, sXcopy = sX.clone(), 1, sYcopy = sY.clone(), 1, 0.0f, 3.0f);
+        assertArrayEquals(expectedX, sXcopy, sepsilon);
+        assertArrayEquals(expectedY, sYcopy, sepsilon);
+
+        f2j.srot(M, expectedX = sX.clone(), 1, expectedY = sY.clone(), 1, 2.0f, 0.0f);
+        blas.srot(M, sXcopy = sX.clone(), 1, sYcopy = sY.clone(), 1, 2.0f, 0.0f);
+        assertArrayEquals(expectedX, sXcopy, sepsilon);
+        assertArrayEquals(expectedY, sYcopy, sepsilon);
+
+        f2j.srot(M, expectedX = sX.clone(), 1, expectedY = sY.clone(), 1, 0.0f, 0.0f);
+        blas.srot(M, sXcopy = sX.clone(), 1, sYcopy = sY.clone(), 1, 0.0f, 0.0f);
+        assertArrayEquals(expectedX, sXcopy, sepsilon);
+        assertArrayEquals(expectedY, sYcopy, sepsilon);
     }
 }

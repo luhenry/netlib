@@ -32,70 +32,44 @@ public class DdotTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 9;
-        double[] x = new double[] { 1.0, 0.0, -2.0, 3.0, 1.0, 0.0, -2.0, 3.0, 3.0 };
-        double[] y = new double[] { 2.0, 1.0,  0.0, 0.0, 2.0, 1.0,  0.0, 0.0, 0.0 };
-
-        assertEquals(4.0, blas.ddot(n, x, 1, y, 1));
+        assertEquals(f2j.ddot(M, dX, 1, dY, 1), blas.ddot(M, dX, 1, dY, 1), depsilon);
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOutOfBound(BLAS blas) {
-        int n = 5;
-        double[] x = new double[] { 0.0, 1.0 };
-        double[] y = new double[] { 0.0, 1.0 };
-
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            blas.ddot(n, x, 1, y, 1);
+            blas.ddot(M + 1, dX, 1, dY, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOutOfBoundBecauseOfOffset(BLAS blas) {
-        int n = 9;
-        double[] x = new double[] { 1.0, 0.0, -2.0, 3.0, 1.0, 0.0, -2.0, 3.0, 3.0 };
-        int offsetx = 1;
-        double[] y = new double[] { 2.0, 1.0,  0.0, 0.0, 2.0, 1.0,  0.0, 0.0, 0.0 };
-        int offsety = 1;
-
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            blas.ddot(n, x, offsetx, 1, y, offsety, 1);
+            blas.ddot(M, dX, 1, 1, dY, 1, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOutOfBoundOnlyForX(BLAS blas) {
-        int n = 6;
-        double[] x = new double[] { 1.0, 0.0, -2.0, 3.0, 1.0, 0.0, -2.0, 3.0, 3.0 };
-        double[] y = new double[] { 2.0, 1.0,  0.0, 0.0, 2.0, 1.0,  0.0, 0.0, 0.0 };
-
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            blas.ddot(n, x, 2, y, 1);
+            blas.ddot(M, dX, 2, dY, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testXAndYAreNullAndNIsZero(BLAS blas) {
-        int n = 0;
-        double[] x = null;
-        double[] y = null;
-
-        assertEquals(0.0, blas.ddot(n, x, 1, y, 1));
+        assertEquals(0.0, blas.ddot(0, null, 1, null, 1));
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testXAndYAreNullAndNIsOne(BLAS blas) {
-        int n = 1;
-        double[] x = null;
-        double[] y = null;
-
         assertThrows(java.lang.NullPointerException.class, () -> {
-            blas.ddot(n, x, 1, y, 1);
+            blas.ddot(M, null, 1, null, 1);
         });
     }
 }

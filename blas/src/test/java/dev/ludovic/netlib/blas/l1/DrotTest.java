@@ -32,23 +32,26 @@ public class DrotTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 9;
-        double[] x = new double[] {
-            1.0, 0.0, -2.0, 3.0, 1.0, 0.0, -2.0, 3.0, 3.0 };
-        double[] y = new double[] {
-            2.0, 1.0,  0.0, 0.0, 2.0, 1.0,  0.0, 0.0, 0.0 };
-        double c = 2.0;
-        double s = 3.0;
+        double[] expectedX, expectedY, dXcopy, dYcopy;
 
-        double[] xexpected = new double[] {
-            8.0, 3.0, -4.0,  6.0, 8.0, 3.0, -4.0,  6.0,  6.0 };
-        double[] yexpected = new double[] {
-            1.0, 2.0,  6.0, -9.0, 1.0, 2.0,  6.0, -9.0, -9.0 };
+        f2j.drot(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, 2.0, 3.0);
+        blas.drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 2.0, 3.0);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
 
-        double[] x1 = x.clone();
-        double[] y1 = y.clone();
-        blas.drot(n, x1, 1, y1, 1, c, s);
-        assertArrayEquals(xexpected, x1, depsilon);
-        assertArrayEquals(yexpected, y1, depsilon);
+        f2j.drot(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, 0.0, 3.0);
+        blas.drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 0.0, 3.0);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+
+        f2j.drot(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, 2.0, 0.0);
+        blas.drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 2.0, 0.0);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+
+        f2j.drot(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, 0.0, 0.0);
+        blas.drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 0.0, 0.0);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
     }
 }

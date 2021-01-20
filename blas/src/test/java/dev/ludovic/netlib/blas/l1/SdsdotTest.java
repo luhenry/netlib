@@ -32,13 +32,6 @@ public class SdsdotTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 9;
-        float sb = 3.0f;
-        float[] x = new float[] {
-            1.0f, 0.0f, -2.0f, 1.0f, 0.0f, -2.0f, 1.0f, 0.0f, -2.0f };
-        float[] y = new float[] {
-            2.0f, 1.0f, 0.0f, 2.0f, 1.0f, 0.0f, 2.0f, 1.0f, 0.0f };
-
-        assertEquals(9.0f, blas.sdsdot(n, sb, x, 1, y, 1));
+        assertEquals(f2j.sdsdot(M, 3.0f, sX, 1, sY, 1), blas.sdsdot(M, 3.0f, sX, 1, sY, 1));
     }
 }

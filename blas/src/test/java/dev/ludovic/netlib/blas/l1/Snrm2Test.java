@@ -32,10 +32,6 @@ public class Snrm2Test extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 9;
-        float[] x = new float[] {
-            1.0f, 0.0f, -2.0f, 1.0f, 0.0f, -2.0f, 1.0f, 0.0f, -2.0f };
-
-        assertEquals((float)Math.sqrt(15.0f), blas.snrm2(n, x, 1));
+        assertEquals(f2j.snrm2(M, sX, 1), blas.snrm2(M, sX, 1), sepsilon);
     }
 }

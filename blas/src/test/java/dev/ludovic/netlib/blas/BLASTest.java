@@ -20,22 +20,168 @@
 * SOFTWARE.
 */
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 
+import dev.ludovic.netlib.BLAS;
+import dev.ludovic.netlib.blas.*;
+
 public class BLASTest {
 
-    final static double depsilon = 1e-15d;
-    final static float sepsilon = 1e-6f;
+  final static double depsilon = 1e-11d;
+  final static float sepsilon = 1e-3f;
 
-    private static Stream<Arguments> BLASImplementations() {
-        return Stream.of(
-            Arguments.of(dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance()),
-            Arguments.of(dev.ludovic.netlib.blas.JavaBLAS.getInstance()),
-            Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance()),
-            Arguments.of(dev.ludovic.netlib.blas.NativeBLAS.getInstance())
-        );
+  final static BLAS f2j = NetlibF2jBLAS.getInstance();
+
+  private static Stream<Arguments> BLASImplementations() {
+    return Stream.of(
+      Arguments.of(JavaBLAS.getInstance()),
+      Arguments.of(VectorizedBLAS.getInstance()),
+      Arguments.of(NativeBLAS.getInstance())
+    );
+  }
+
+  protected static final double[] readArray(String name) {
+    InputStream is = BLASTest.class.getResourceAsStream(name);
+    assert is != null;
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+      String[] values = reader.readLine().split(",");
+      double[] result = new double[values.length];
+      for (int i = 0; i < values.length; i += 1) {
+        result[i] = Double.parseDouble(values[i]);
+      }
+      return result;
+    } catch (Throwable t) {
+      t.printStackTrace();
+      throw new UnsupportedOperationException(t);
     }
+  }
+
+  protected static final double[] transpose(String trans, double[] arr, int m, int n) {
+    assert arr.length == m * n;
+    double[] result = new double[n * m];
+    if (trans.equals("N")) {
+      for (int col = 0; col < n; col += 1) {
+        for (int row = 0; row < m; row += 1) {
+          result[col + row * n] = arr[row + col * m];
+        }
+      }
+    } else {
+      for (int row = 0; row < m; row += 1) {
+        for (int col = 0; col < n; col += 1) {
+          result[row + col * m] = arr[col + row * n];
+        }
+      }
+    }
+    return result;
+  }
+
+  protected static final double[] extractUPLO(String uplo, double[] arr, int n) {
+    assert arr.length == n * n;
+    double[] result = new double[n * (n + 1) / 2];
+    int i = 0;
+    if (uplo.equals("U")) {
+      for (int col = 0; col < n; col += 1) {
+        for (int row = 0; row < col + 1; row += 1) {
+          result[i++] = arr[row + col * n];
+        }
+      }
+    } else {
+      for (int col = 0; col < n; col += 1) {
+        for (int row = col; row < n; row += 1) {
+          result[i++] = arr[row + col * n];
+        }
+      }
+    }
+    assert i == n * (n + 1) / 2;
+    return result;
+  }
+
+  protected static final double[] makeSymmetric(double[] arr, int n) {
+    assert arr.length == n * n;
+    double[] result = arr.clone();
+    for (int col = 0; col < n; col += 1) {
+      for (int row = 0; row < col; row += 1) {
+        result[col + row * n] = arr[row + col * n];
+      }
+    }
+    return result;
+  }
+
+  protected static final float[] convertToFloat(double[] src) {
+    float[] result = new float[src.length];
+    for (int i = 0; i < src.length; i += 1) {
+      result[i] = (float)src[i];
+    }
+    return result;
+  }
+
+  protected static final void dumpArray(String name, double[] arr) {
+    System.out.print(name + ": ");
+    for(var e : arr) {
+      System.out.print(String.format("%.3f,", e));
+    }
+    System.out.println();
+  }
+
+  protected final int M = 100;
+  protected final int N = 100;
+  protected final int K = 100;
+
+  // double[m, k]
+  protected final double[] dgeA = readArray("/geA.mat");
+  // double[k, n]
+  protected final double[] dgeB = readArray("/geB.mat");
+  // double[m, n]
+  protected final double[] dgeC = readArray("/geC.mat");
+
+  // double[m, k]
+  protected final double[] dsyA = makeSymmetric(dgeA, M);
+
+  // double[m]
+  protected final double[] dX = readArray("/X.vec");
+  // double[m]
+  protected final double[] dY = readArray("/Y.vec");
+
+  // double[k, m]
+  protected final double[] dgeAT = transpose("N", dgeA, M, K);
+  // double[n, k]
+  protected final double[] dgeBT = transpose("N", dgeB, K, N);
+
+  // double[m, k][U]
+  protected final double[] dgeAU = extractUPLO("U", dgeA, M);
+  // double[m, k][L]
+  protected final double[] dgeAL = extractUPLO("L", dgeA, M);
+
+  // float[m, k]
+  protected final float[] sgeA = convertToFloat(dgeA);
+  // float[k, n]
+  protected final float[] sgeB = convertToFloat(dgeB);
+  // float[m, n]
+  protected final float[] sgeC = convertToFloat(dgeC);
+
+  // float[m, k]
+  protected final float[] ssyA = convertToFloat(dsyA);
+
+  // double[m]
+  protected final float[] sX = convertToFloat(dX);
+  // double[m]
+  protected final float[] sY = convertToFloat(dY);
+
+  // float[k, m]
+  protected final float[] sgeAT = convertToFloat(dgeAT);
+  // float[n, k]
+  protected final float[] sgeBT = convertToFloat(dgeBT);
+
+  // float[m, k][U]
+  protected final float[] sgeAU = convertToFloat(dgeAU);
+  // float[m, k][L]
+  protected final float[] sgeAL = convertToFloat(dgeAL);
 }

@@ -32,97 +32,54 @@ public class DgemmTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int m = 5;
-        int n = 4;
-        int k = 4;
-        double[] a = new double[] {
-            0.0, 1.0, 0.0, 0.0, 1.5,
-            2.0, 0.0, 1.0, 0.0, 1.5,
-            0.0, 0.0, 0.0, 3.0, 1.5,
-            0.0, 0.0, 0.0, 3.0, 1.5, };
-        double[] aT = new double[] {
-            0.0, 2.0, 0.0, 0.0,
-            1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 3.0, 3.0,
-            1.5, 1.5, 1.5, 1.5 };
-        double[] b = new double[] {
-             1.0, 0.0,  0.0,  5.0,
-             0.0, 2.0,  1.0,  1.0,
-             0.0, 5.0,  2.0, -2.0,
-            -1.0, 3.0, -1.0, -2.0 };
-        double[] bT = new double[] {
-            1.0, 0.0,  0.0, -1.0,
-            0.0, 2.0,  5.0,  3.0,
-            0.0, 1.0,  2.0, -1.0,
-            5.0, 1.0, -2.0, -2.0 };
-        double[] c = new double[] {
-             1.0,  0.0,  2.0,  1.0, 3.0,
-             0.0,  0.0,  1.0,  0.0, 3.0,
-            -4.0,  0.0,  3.0, -2.0, 1.0,
-             2.0, -5.0, -4.0, -1.0, 3.0 };
-        double[] expected1 = new double[] {
-             2.0,    1.0,   4.0,  17.0, 15.0,
-             4.0,    0.0,   4.0,   6.0, 12.0,
-             2.0,    0.0,  11.0,  -4.0,  9.5,
-             10.0, -11.0,  -5.0, -11.0,  4.5 };
-        double[] expected2 = new double[] {
-             0.0,  1.0,  0.0, 15.0,  9.0,
-             4.0,  0.0,  2.0,  6.0,  6.0,
-            10.0,  0.0,  5.0,  0.0,  7.5, 
-             6.0, -1.0,  3.0, -9.0, -1.5 };
-        double[] expected3 = new double[] {
-             1.0,  0.0,  2.0,  1.0,  3.0,
-             0.0,  0.0,  1.0,  0.0,  3.0,
-            -4.0,  0.0,  3.0, -2.0,  1.0,
-             2.0, -5.0, -4.0, -1.0,  3.0 };
+        double[] expected, dgeCcopy;
 
-        double[] c1 = c.clone();
-        blas.dgemm("N", "N", m, n, k, 1.0, a, m, b, k, 2.0, c1, m);
-        assertArrayEquals(expected1, c1, depsilon);
+        f2j.dgemm("N", "N", M, N, K, 1.0, dgeA, M, dgeB, K, 2.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "N", M, N, K, 1.0, dgeA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c2 = c.clone();
-        blas.dgemm("N", "T", m, n, k, 1.0, a, m, bT, n, 2.0, c2, m);
-        assertArrayEquals(expected1, c2, depsilon);
+        f2j.dgemm("N", "T", M, N, K, 1.0, dgeA, M, dgeBT, N, 2.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "T", M, N, K, 1.0, dgeA, M, dgeBT, N, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c3 = c.clone();
-        blas.dgemm("T", "N", m, n, k, 1.0, aT, k, b, k, 2.0, c3, m);
-        assertArrayEquals(expected1, c3, depsilon);
+        f2j.dgemm("T", "N", M, N, K, 1.0, dgeAT, K, dgeB, K, 2.0, expected = dgeC.clone(), M);
+        blas.dgemm("T", "N", M, N, K, 1.0, dgeAT, K, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c4 = c.clone();
-        blas.dgemm("T", "T", m, n, k, 1.0, aT, k, bT, n, 2.0, c4, m);
-        assertArrayEquals(expected1, c4, depsilon);
+        f2j.dgemm("T", "T", M, N, K, 1.0, dgeAT, K, dgeBT, N, 2.0, expected = dgeC.clone(), M);
+        blas.dgemm("T", "T", M, N, K, 1.0, dgeAT, K, dgeBT, N, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c5 = c.clone();
-        blas.dgemm("N", "N", m, n, k, 1.0, a, m, b, k, 0.0, c5, m);
-        assertArrayEquals(expected2, c5, depsilon);
+        f2j.dgemm("N", "N", M, N, K, 1.0, dgeA, M, dgeB, K, 0.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "N", M, N, K, 1.0, dgeA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c6 = c.clone();
-        blas.dgemm("N", "T", m, n, k, 1.0, a, m, bT, n, 0.0, c6, m);
-        assertArrayEquals(expected2, c6, depsilon);
+        f2j.dgemm("N", "T", M, N, K, 1.0, dgeA, M, dgeBT, N, 0.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "T", M, N, K, 1.0, dgeA, M, dgeBT, N, 0.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c7 = c.clone();
-        blas.dgemm("T", "N", m, n, k, 1.0, aT, k, b, k, 0.0, c7, m);
-        assertArrayEquals(expected2, c7, depsilon);
+        f2j.dgemm("T", "N", M, N, K, 1.0, dgeAT, K, dgeB, K, 0.0, expected = dgeC.clone(), M);
+        blas.dgemm("T", "N", M, N, K, 1.0, dgeAT, K, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c8 = c.clone();
-        blas.dgemm("T", "T", m, n, k, 1.0, aT, k, bT, n, 0.0, c8, m);
-        assertArrayEquals(expected2, c8, depsilon);
+        f2j.dgemm("T", "T", M, N, K, 1.0, dgeAT, K, dgeBT, N, 0.0, expected = dgeC.clone(), M);
+        blas.dgemm("T", "T", M, N, K, 1.0, dgeAT, K, dgeBT, N, 0.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c9 = c.clone();
-        blas.dgemm("N", "N", m, n, k, 0.0, a, m, b, k, 1.0, c9, m);
-        assertArrayEquals(expected3, c9, depsilon);
+        f2j.dgemm("N", "N", M, N, K, 0.0, dgeA, M, dgeB, K, 1.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "N", M, N, K, 0.0, dgeA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c10 = c.clone();
-        blas.dgemm("N", "T", m, n, k, 0.0, a, m, bT, n, 1.0, c10, m);
-        assertArrayEquals(expected3, c10, depsilon);
+        f2j.dgemm("N", "T", M, N, K, 0.0, dgeA, M, dgeBT, N, 1.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "T", M, N, K, 0.0, dgeA, M, dgeBT, N, 1.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c11 = c.clone();
-        blas.dgemm("T", "N", m, n, k, 0.0, aT, k, b, k, 1.0, c11, m);
-        assertArrayEquals(expected3, c11, depsilon);
+        f2j.dgemm("T", "N", M, N, K, 0.0, dgeAT, K, dgeB, K, 1.0, expected = dgeC.clone(), M);
+        blas.dgemm("T", "N", M, N, K, 0.0, dgeAT, K, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
 
-        double[] c12 = c.clone();
-        blas.dgemm("T", "T", m, n, k, 0.0, aT, k, bT, n, 1.0, c12, m);
-        assertArrayEquals(expected3, c12, depsilon);
+        f2j.dgemm("T", "T", M, N, K, 0.0, dgeAT, K, dgeBT, N, 1.0, expected = dgeC.clone(), M);
+        blas.dgemm("T", "T", M, N, K, 0.0, dgeAT, K, dgeBT, N, 1.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
     }
 }

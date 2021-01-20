@@ -32,101 +32,54 @@ public class SsymmTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int m = 5;
-        int n = 4;
-        float[] aR = new float[] {
-            0.0f,  2.0f,  0.0f,  0.0f,
-            2.0f,  0.0f,  1.0f,  0.0f,
-            0.0f,  1.0f,  0.0f,  3.0f,
-            0.0f,  0.0f,  3.0f,  2.5f, };
-        float[] aL = new float[] {
-            0.0f,  2.0f,  0.0f,  0.0f,  1.5f,
-            2.0f,  0.0f,  1.0f,  0.0f,  1.5f,
-            0.0f,  1.0f,  0.0f,  3.0f,  1.5f,
-            0.0f,  0.0f,  3.0f,  2.5f,  1.5f,
-            1.5f,  1.5f,  1.5f,  1.5f,  1.5f, };
-        float[] b = new float[] {
-             1.0f,  0.0f,  0.0f,  5.0f, -2.0f,
-             0.0f,  2.0f,  1.0f,  1.0f,  5.0f,
-             0.0f,  5.0f,  2.0f, -2.0f,  3.0f,
-            -1.0f,  3.0f, -1.0f, -2.0f,  0.0f, };
-        float[] c = new float[] {
-             1.0f,  0.0f,  2.0f,  1.0f, 3.0f,
-             0.0f,  0.0f,  1.0f,  0.0f, 3.0f,
-            -4.0f,  0.0f,  3.0f, -2.0f, 1.0f,
-             2.0f, -5.0f, -4.0f, -1.0f, 3.0f, };
-        float[] expected1 = new float[] {
-             -1.0f,  -1.0f,  16.0f,  11.5f,  12.0f,
-             11.5f,   8.5f,  14.5f,  13.0f,  19.5f,
-              6.5f,   6.5f,   9.5f,   1.5f,  14.0f,
-             10.0f, -13.0f, -11.0f, -10.0f,   4.5f, };
-        float[] expected2 = new float[] {
-              2.0f,   4.0f,   6.0f,   4.0f,  16.0f,
-              2.0f,   5.0f,   4.0f,   8.0f,   5.0f,
-            -11.0f,  11.0f,   4.0f,  -9.0f,   7.0f,
-              1.5f,  12.5f,  -4.5f, -13.0f,  15.0f, };
-        float[] expected3 = new float[] {
-             -3.0f,  -1.0f,  12.0f,   9.5f,   6.0f,
-             11.5f,   8.5f,  12.5f,  13.0f,  13.5f,
-             14.5f,   6.5f,   3.5f,   5.5f,  12.0f,
-              6.0f,  -3.0f,  -3.0f,  -8.0f,  -1.5f, };
-        float[] expected4 = new float[] {
-              0.0f,   4.0f,   2.0f,   2.0f,  10.0f,
-              2.0f,   5.0f,   2.0f,   8.0f,  -1.0f,
-             -3.0f,  11.0f,  -2.0f,  -5.0f,   5.0f,
-             -2.5f,  22.5f,   3.5f, -11.0f,   9.0f, };
-        float[] expected5 = new float[] {
-              1.0f,   0.0f,   2.0f,   1.0f,   3.0f,
-              0.0f,   0.0f,   1.0f,   0.0f,   3.0f,
-             -4.0f,   0.0f,   3.0f,  -2.0f,   1.0f,
-              2.0f,  -5.0f,  -4.0f,  -1.0f,   3.0f, };
+        float[] expected, sgeCcopy;
 
-        float[] c1 = c.clone();
-        blas.ssymm("L", "U", m, n, 1.0f, aL, m, b, m, 2.0f, c1, m);
-        assertArrayEquals(expected1, c1, sepsilon);
+        f2j.ssymm("L", "U", M, N, 1.0f, ssyA, M, sgeB, M, 2.0f, expected = sgeC.clone(), M);
+        blas.ssymm("L", "U", M, N, 1.0f, ssyA, M, sgeB, M, 2.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c2 = c.clone();
-        blas.ssymm("L", "L", m, n, 1.0f, aL, m, b, m, 2.0f, c2, m);
-        assertArrayEquals(expected1, c2, sepsilon);
+        f2j.ssymm("L", "L", M, N, 1.0f, ssyA, M, sgeB, M, 2.0f, expected = sgeC.clone(), M);
+        blas.ssymm("L", "L", M, N, 1.0f, ssyA, M, sgeB, M, 2.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c3 = c.clone();
-        blas.ssymm("R", "U", m, n, 1.0f, aR, n, b, m, 2.0f, c3, m);
-        assertArrayEquals(expected2, c3, sepsilon);
+        f2j.ssymm("R", "U", M, N, 1.0f, ssyA, N, sgeB, M, 2.0f, expected = sgeC.clone(), M);
+        blas.ssymm("R", "U", M, N, 1.0f, ssyA, N, sgeB, M, 2.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c4 = c.clone();
-        blas.ssymm("R", "L", m, n, 1.0f, aR, n, b, m, 2.0f, c4, m);
-        assertArrayEquals(expected2, c4, sepsilon);
+        f2j.ssymm("R", "L", M, N, 1.0f, ssyA, N, sgeB, M, 2.0f, expected = sgeC.clone(), M);
+        blas.ssymm("R", "L", M, N, 1.0f, ssyA, N, sgeB, M, 2.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c5 = c.clone();
-        blas.ssymm("L", "U", m, n, 1.0f, aL, m, b, m, 0.0f, c5, m);
-        assertArrayEquals(expected3, c5, sepsilon);
+        f2j.ssymm("L", "U", M, N, 1.0f, ssyA, M, sgeB, M, 0.0f, expected = sgeC.clone(), M);
+        blas.ssymm("L", "U", M, N, 1.0f, ssyA, M, sgeB, M, 0.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c6 = c.clone();
-        blas.ssymm("L", "L", m, n, 1.0f, aL, m, b, m, 0.0f, c6, m);
-        assertArrayEquals(expected3, c6, sepsilon);
+        f2j.ssymm("L", "L", M, N, 1.0f, ssyA, M, sgeB, M, 0.0f, expected = sgeC.clone(), M);
+        blas.ssymm("L", "L", M, N, 1.0f, ssyA, M, sgeB, M, 0.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c7 = c.clone();
-        blas.ssymm("R", "U", m, n, 1.0f, aR, n, b, m, 0.0f, c7, m);
-        assertArrayEquals(expected4, c7, sepsilon);
+        f2j.ssymm("R", "U", M, N, 1.0f, ssyA, N, sgeB, M, 0.0f, expected = sgeC.clone(), M);
+        blas.ssymm("R", "U", M, N, 1.0f, ssyA, N, sgeB, M, 0.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c8 = c.clone();
-        blas.ssymm("R", "L", m, n, 1.0f, aR, n, b, m, 0.0f, c8, m);
-        assertArrayEquals(expected4, c8, sepsilon);
+        f2j.ssymm("R", "L", M, N, 1.0f, ssyA, N, sgeB, M, 0.0f, expected = sgeC.clone(), M);
+        blas.ssymm("R", "L", M, N, 1.0f, ssyA, N, sgeB, M, 0.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c9 = c.clone();
-        blas.ssymm("L", "U", m, n, 0.0f, aL, m, b, m, 1.0f, c9, m);
-        assertArrayEquals(expected5, c9, sepsilon);
+        f2j.ssymm("L", "U", M, N, 0.0f, ssyA, M, sgeB, M, 1.0f, expected = sgeC.clone(), M);
+        blas.ssymm("L", "U", M, N, 0.0f, ssyA, M, sgeB, M, 1.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c10 = c.clone();
-        blas.ssymm("L", "L", m, n, 0.0f, aL, m, b, m, 1.0f, c10, m);
-        assertArrayEquals(expected5, c10, sepsilon);
+        f2j.ssymm("L", "L", M, N, 0.0f, ssyA, M, sgeB, M, 1.0f, expected = sgeC.clone(), M);
+        blas.ssymm("L", "L", M, N, 0.0f, ssyA, M, sgeB, M, 1.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c11 = c.clone();
-        blas.ssymm("R", "U", m, n, 0.0f, aR, n, b, m, 1.0f, c11, m);
-        assertArrayEquals(expected5, c11, sepsilon);
+        f2j.ssymm("R", "U", M, N, 0.0f, ssyA, N, sgeB, M, 1.0f, expected = sgeC.clone(), M);
+        blas.ssymm("R", "U", M, N, 0.0f, ssyA, N, sgeB, M, 1.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
 
-        float[] c12 = c.clone();
-        blas.ssymm("R", "L", m, n, 0.0f, aR, n, b, m, 1.0f, c12, m);
-        assertArrayEquals(expected5, c12, sepsilon);
+        f2j.ssymm("R", "L", M, N, 0.0f, ssyA, N, sgeB, M, 1.0f, expected = sgeC.clone(), M);
+        blas.ssymm("R", "L", M, N, 0.0f, ssyA, N, sgeB, M, 1.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
     }
 }

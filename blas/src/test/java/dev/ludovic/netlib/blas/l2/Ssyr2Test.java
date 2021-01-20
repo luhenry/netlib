@@ -32,34 +32,14 @@ public class Ssyr2Test extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 4;
-        float alpha = 0.1f;
-        float[] x = new float[] {
-            1.0f, 2.0f, 2.1f,  4.0f };
-        float[] y = new float[] {
-            3.0f, 4.0f, 5.1f, -1.0f };
-        float[] a = new float[] {
-            1.0f, 2.0f, 3.0f, 4.0f,
-            2.0f, 2.0f, 3.0f, 4.0f,
-            3.0f, 3.0f, 3.0f, 4.0f,
-            4.0f, 4.0f, 4.0f, 4.0f };
-        float[] expectedU = new float[] {
-             1.6f,  2.0f,   3.0f, 4.0f,
-             3.0f,  3.6f,   3.0f, 4.0f,
-            4.14f, 4.86f, 5.142f, 4.0f,
-             5.1f,  5.4f,  5.83f, 3.2f };
-        float[] expectedL = new float[] {
-             1.6f,  3.0f,  4.14f, 5.1f,
-             2.0f,  3.6f,  4.86f, 5.4f,
-             3.0f,  3.0f, 5.142f, 5.83f,
-             4.0f,  4.0f,   4.0f, 3.2f };
+        float[] expected, ssyAcopy;
 
-        float[] a1 = a.clone();
-        blas.ssyr2("U", n, alpha, x, 1, y, 1, a1, n);
-        assertArrayEquals(expectedU, a1, sepsilon);
+        f2j.ssyr2("U", N, 2.0f, sX, 1, sY, 1, expected = ssyA.clone(), N);
+        blas.ssyr2("U", N, 2.0f, sX, 1, sY, 1, ssyAcopy = ssyA.clone(), N);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
 
-        float[] a2 = a.clone();
-        blas.ssyr2("L", n, alpha, x, 1, y, 1, a2, n);
-        assertArrayEquals(expectedL, a2, sepsilon);
+        f2j.ssyr2("L", N, 2.0f, sX, 1, sY, 1, expected = ssyA.clone(), N);
+        blas.ssyr2("L", N, 2.0f, sX, 1, sY, 1, ssyAcopy = ssyA.clone(), N);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
     }
 }

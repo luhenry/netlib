@@ -32,10 +32,6 @@ public class Dnrm2Test extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 9;
-        double[] x = new double[] {
-            1.0, 0.0, -2.0, 1.0, 0.0, -2.0, 1.0, 0.0, -2.0 };
-
-        assertEquals(Math.sqrt(15.0), blas.dnrm2(n, x, 1));
+        assertEquals(f2j.dnrm2(M, dX, 1), blas.dnrm2(M, dX, 1), depsilon);
     }
 }

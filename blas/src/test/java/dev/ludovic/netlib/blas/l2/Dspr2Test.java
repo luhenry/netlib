@@ -32,39 +32,14 @@ public class Dspr2Test extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 4;
-        double alpha = 0.1;
-        double[] x = new double[] {
-            1.0, 2.0, 2.1,  4.0 };
-        double[] y = new double[] {
-            3.0, 4.0, 5.1, -1.0 };
-        double[] aU = new double[] {
-            1.0,
-            2.0, 2.0,
-            3.0, 3.0, 3.0,
-            4.0, 4.0, 4.0, 4.0 };
-        double[] aL = new double[] {
-            1.0, 2.0, 3.0, 4.0,
-                 2.0, 3.0, 4.0,
-                      3.0, 4.0,
-                           4.0 };
-        double[] expectedU = new double[] {
-             1.6,
-             3.0,  3.6,
-            4.14, 4.86, 5.142,
-             5.1,  5.4,  5.83, 3.2 };
-        double[] expectedL = new double[] {
-             1.6,  3.0,  4.14,  5.1,
-                   3.6,  4.86,  5.4,
-                        5.142, 5.83,
-                                3.2 };
+        double[] expected, dgeAcopy;
 
-        double[] a1 = aU.clone();
-        blas.dspr2("U", n, alpha, x, 1, y, 1, a1);
-        assertArrayEquals(expectedU, a1, depsilon);
+        f2j.dspr2("U", M, 2.0, dX, 1, dY, 1, expected = dgeAU.clone());
+        blas.dspr2("U", M, 2.0, dX, 1, dY, 1, dgeAcopy = dgeAU.clone());
+        assertArrayEquals(expected, dgeAcopy, depsilon);
 
-        double[] a2 = aL.clone();
-        blas.dspr2("L", n, alpha, x, 1, y, 1, a2);
-        assertArrayEquals(expectedL, a2, depsilon);
+        f2j.dspr2("L", M, 2.0, dX, 1, dY, 1, expected = dgeAL.clone());
+        blas.dspr2("L", M, 2.0, dX, 1, dY, 1, dgeAcopy = dgeAL.clone());
+        assertArrayEquals(expected, dgeAcopy, depsilon);
     }
 }

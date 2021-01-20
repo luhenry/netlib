@@ -32,42 +32,22 @@ public class SgemvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int m = 4;
-        int n = 3;
-        float[] a = new float[] {
-            0.0f, 1.0f, 0.0f, 0.0f,
-            2.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 3.0f };
-        float[] aT = new float[] {
-            0.0f, 2.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 3.0f };
-        float[] x = new float[] {
-            1.0f, 2.0f, 3.0f };
-        float[] y = new float[] {
-            1.0f, 3.0f, 1.0f, 0.0f };
-        float[] expected1 = new float[] {
-            4.0f, 1.0f, 2.0f, 9.0f };
-        float[] expected2 = new float[] {
-            6.0f, 7.0f, 4.0f, 9.0f };
-        float[] expected3 = new float[] {
-            10.0f, 8.0f, 6.0f, 18.0f };
+        float[] expected, sYcopy;
 
-        float[] y1 = y.clone();
-        blas.sgemv("N", m, n, 1.0f, a, m, x, 1, 2.0f, y1, 1);
-        assertArrayEquals(expected2, y1, sepsilon);
+        blas.sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
 
-        float[] y2 = y.clone();
-        blas.sgemv("T", n, m, 1.0f, aT, n, x, 1, 2.0f, y2, 1);
-        assertArrayEquals(expected2, y2, sepsilon);
+        blas.sgemv("T", N, M, 1.0f, sgeAT, N, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgemv("T", N, M, 1.0f, sgeAT, N, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
 
-        float[] y3 = y.clone();
-        blas.sgemv("N", m, n, 2.0f, a, m, x, 1, 2.0f, y3, 1);
-        assertArrayEquals(expected3, y3, sepsilon);
+        blas.sgemv("N", M, N, 2.0f, sgeA, M, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N, 2.0f, sgeA, M, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
 
-        float[] y4 = y.clone();
-        blas.sgemv("T", n, m, 2.0f, aT, n, x, 1, 2.0f, y4, 1);
-        assertArrayEquals(expected3, y4, sepsilon);
+        blas.sgemv("T", N, M, 2.0f, sgeAT, N, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgemv("T", N, M, 2.0f, sgeAT, N, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
     }
 }

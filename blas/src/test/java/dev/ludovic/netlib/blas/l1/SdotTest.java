@@ -32,72 +32,44 @@ public class SdotTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 9;
-        float[] x = new float[] {
-            1.0f, 0.0f, -2.0f, 1.0f, 0.0f, -2.0f, 1.0f, 0.0f, -2.0f };
-        float[] y = new float[] {
-            2.0f, 1.0f, 0.0f, 2.0f, 1.0f, 0.0f, 2.0f, 1.0f, 0.0f };
-
-        assertEquals(6.0f, blas.sdot(n, x, 1, y, 1));
+        assertEquals(f2j.sdot(M, sX, 1, sY, 1), blas.sdot(M, sX, 1, sY, 1), sepsilon);
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOutOfBound(BLAS blas) {
-        int n = 5;
-        float[] x = new float[] { 0.0f, 1.0f };
-        float[] y = new float[] { 0.0f, 1.0f };
-
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            blas.sdot(n, x, 1, y, 1);
+            blas.sdot(M + 1, sX, 1, sY, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOutOfBoundBecauseOfOffset(BLAS blas) {
-        int n = 9;
-        float[] x = new float[] { 1.0f, 0.0f, -2.0f, 3.0f, 1.0f, 0.0f, -2.0f, 3.0f, 3.0f };
-        int offsetx = 1;
-        float[] y = new float[] { 2.0f, 1.0f,  0.0f, 0.0f, 2.0f, 1.0f,  0.0f, 0.0f, 0.0f };
-        int offsety = 1;
-
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            blas.sdot(n, x, offsetx, 1, y, offsety, 1);
+            blas.sdot(M, sX, 2, 1, sY, 2, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOutOfBoundOnlyForX(BLAS blas) {
-        int n = 6;
-        float[] x = new float[] { 1.0f, 0.0f, -2.0f, 3.0f, 1.0f, 0.0f, -2.0f, 3.0f, 3.0f };
-        float[] y = new float[] { 2.0f, 1.0f,  0.0f, 0.0f, 2.0f, 1.0f,  0.0f, 0.0f, 0.0f };
-
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            blas.sdot(n, x, 2, y, 1);
+            blas.sdot(M, sX, 2, sY, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testXAndYAreNullAndNIsZero(BLAS blas) {
-        int n = 0;
-        float[] x = null;
-        float[] y = null;
-
-        assertEquals(0.0f, blas.sdot(n, x, 1, y, 1));
+        assertEquals(0.0f, blas.sdot(0, null, 1, null, 1));
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testXAndYAreNullAndNIsOne(BLAS blas) {
-        int n = 1;
-        float[] x = null;
-        float[] y = null;
-
         assertThrows(java.lang.NullPointerException.class, () -> {
-            blas.sdot(n, x, 1, y, 1);
+            blas.sdot(1, null, 1, null, 1);
         });
     }
 }

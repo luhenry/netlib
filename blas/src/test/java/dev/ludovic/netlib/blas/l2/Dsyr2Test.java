@@ -32,34 +32,14 @@ public class Dsyr2Test extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int n = 4;
-        double alpha = 0.1;
-        double[] x = new double[] {
-            1.0, 2.0, 2.1,  4.0 };
-        double[] y = new double[] {
-            3.0, 4.0, 5.1, -1.0 };
-        double[] a = new double[] {
-            1.0, 2.0, 3.0, 4.0,
-            2.0, 2.0, 3.0, 4.0,
-            3.0, 3.0, 3.0, 4.0,
-            4.0, 4.0, 4.0, 4.0 };
-        double[] expectedU = new double[] {
-             1.6,  2.0,   3.0, 4.0,
-             3.0,  3.6,   3.0, 4.0,
-            4.14, 4.86, 5.142, 4.0,
-             5.1,  5.4,  5.83, 3.2 };
-        double[] expectedL = new double[] {
-             1.6,  3.0,  4.14, 5.1,
-             2.0,  3.6,  4.86, 5.4,
-             3.0,  3.0, 5.142, 5.83,
-             4.0,  4.0,   4.0, 3.2 };
+        double[] expected, dsyAcopy;
 
-        double[] a1 = a.clone();
-        blas.dsyr2("U", n, alpha, x, 1, y, 1, a1, n);
-        assertArrayEquals(expectedU, a1, depsilon);
+        f2j.dsyr2("U", N, 2.0, dX, 1, dY, 1, expected = dsyA.clone(), N);
+        blas.dsyr2("U", N, 2.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), N);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
 
-        double[] a2 = a.clone();
-        blas.dsyr2("L", n, alpha, x, 1, y, 1, a2, n);
-        assertArrayEquals(expectedL, a2, depsilon);
+        f2j.dsyr2("L", N, 2.0, dX, 1, dY, 1, expected = dsyA.clone(), N);
+        blas.dsyr2("L", N, 2.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), N);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
     }
 }

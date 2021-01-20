@@ -32,42 +32,22 @@ public class DgemvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int m = 4;
-        int n = 3;
-        double[] a = new double[] {
-            0.0, 1.0, 0.0, 0.0,
-            2.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 3.0 };
-        double[] aT = new double[] {
-            0.0, 2.0, 0.0,
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 3.0 };
-        double[] x = new double[] {
-            1.0, 2.0, 3.0 };
-        double[] y = new double[] {
-            1.0, 3.0, 1.0, 0.0 };
-        double[] expected1 = new double[] {
-            4.0, 1.0, 2.0, 9.0 };
-        double[] expected2 = new double[] {
-            6.0, 7.0, 4.0, 9.0 };
-        double[] expected3 = new double[] {
-            10.0, 8.0, 6.0, 18.0 };
+        double[] expected, dYcopy;
 
-        double[] y1 = y.clone();
-        blas.dgemv("N", m, n, 1.0, a, m, x, 1, 2.0, y1, 1);
-        assertArrayEquals(expected2, y1, depsilon);
+        blas.dgemv("N", M, N, 1.0, dgeA, M, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dgemv("N", M, N, 1.0, dgeA, M, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
 
-        double[] y2 = y.clone();
-        blas.dgemv("T", n, m, 1.0, aT, n, x, 1, 2.0, y2, 1);
-        assertArrayEquals(expected2, y2, depsilon);
+        blas.dgemv("T", N, M, 1.0, dgeAT, N, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dgemv("T", N, M, 1.0, dgeAT, N, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
 
-        double[] y3 = y.clone();
-        blas.dgemv("N", m, n, 2.0, a, m, x, 1, 2.0, y3, 1);
-        assertArrayEquals(expected3, y3, depsilon);
+        blas.dgemv("N", M, N, 2.0, dgeA, M, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dgemv("N", M, N, 2.0, dgeA, M, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
 
-        double[] y4 = y.clone();
-        blas.dgemv("T", n, m, 2.0, aT, n, x, 1, 2.0, y4, 1);
-        assertArrayEquals(expected3, y4, depsilon);
+        blas.dgemv("T", N, M, 2.0, dgeAT, N, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dgemv("T", N, M, 2.0, dgeAT, N, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
     }
 }

@@ -32,25 +32,18 @@ public class DgerTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        int m = 5, n = 4;
-        double alpha = 0.1;
-        double[] x = new double[] {
-            1.0, 2.0, 2.1,  4.0, 5.0 };
-        double[] y = new double[] {
-            3.0, 4.0, 5.1, -1.0 };
-        double[] a = new double[] {
-            1.0, 2.0, 3.0, 4.0, 5.0,
-            2.0, 2.0, 3.0, 4.0, 5.0,
-            3.0, 3.0, 3.0, 4.0, 5.0,
-            4.0, 4.0, 4.0, 4.0, 4.0 };
-        double[] expected = new double[] {
-             1.3,  2.6,  3.63,  5.2,  6.5,
-             2.4,  2.8,  3.84,  5.6,  7.0,
-            3.51, 4.02, 4.071, 6.04, 7.55,
-             3.9,  3.8,  3.79,  3.6,  3.5 };
+        double[] expected, dgeAcopy;
 
-        double[] a1 = a.clone();
-        blas.dger(m, n, alpha, x, 1, y, 1, a1, m);
-        assertArrayEquals(expected, a1, depsilon);
+        f2j.dger(M, N, 2.0, dX, 1, dY, 1, expected = dgeA.clone(), M);
+        blas.dger(M, N, 2.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+
+        f2j.dger(M, N, 0.0, dX, 1, dY, 1, expected = dgeA.clone(), M);
+        blas.dger(M, N, 0.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+
+        f2j.dger(M, N, -1.0, dX, 1, dY, 1, expected = dgeA.clone(), M);
+        blas.dger(M, N, -1.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
+        assertArrayEquals(expected, dgeAcopy, depsilon);
     }
 }
