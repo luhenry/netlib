@@ -323,8 +323,8 @@ public final class NativeBLAS extends AbstractBLAS {
 
   private final Lazy<MethodHandle> ddotHandle = Lazy.let(() ->
       CLinker.getInstance().downcallHandle(
-        getLibrary().lookup("cblas_ddot").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
-          FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
+        getLibrary().lookup("cblas_ddot").get(), MethodType.methodType(double.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+          FunctionDescriptor.of(C_DOUBLE, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected double ddotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
@@ -337,8 +337,8 @@ public final class NativeBLAS extends AbstractBLAS {
 
   private final Lazy<MethodHandle> sdotHandle = Lazy.let(() ->
       CLinker.getInstance().downcallHandle(
-        getLibrary().lookup("cblas_sdot").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
-          FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
+        getLibrary().lookup("cblas_sdot").get(), MethodType.methodType(float.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+          FunctionDescriptor.of(C_FLOAT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT)));
 
   protected float sdotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     try (MemorySegment px = segment(x, offsetx); MemoryNativeCopy cpx = copy(px);
