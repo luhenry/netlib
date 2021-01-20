@@ -32,7 +32,7 @@ public class BLASTest {
 
     private static Stream<Arguments> BLASImplementations() {
         return Stream.of(
-            Arguments.of(dev.ludovic.netlib.blas.NetlibWrapper.wrap(new com.github.fommil.netlib.F2jBLAS())),
+            Arguments.of(dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance()),
             Arguments.of(dev.ludovic.netlib.blas.JavaBLAS.getInstance()),
             Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance()),
             Arguments.of(dev.ludovic.netlib.blas.NativeBLAS.getInstance())

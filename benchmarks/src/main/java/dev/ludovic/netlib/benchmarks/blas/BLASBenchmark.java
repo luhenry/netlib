@@ -44,7 +44,7 @@ public abstract class BLASBenchmark {
     public void setupImplementation() {
         switch (implementation) {
         case "f2j":
-            blas = dev.ludovic.netlib.blas.NetlibWrapper.wrap(new com.github.fommil.netlib.F2jBLAS());
+            blas = dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance();
             break;
         case "java":
             blas = dev.ludovic.netlib.blas.JavaBLAS.getInstance();
