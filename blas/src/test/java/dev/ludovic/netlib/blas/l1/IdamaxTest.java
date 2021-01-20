@@ -36,6 +36,6 @@ public class IdamaxTest extends BLASTest {
         double[] x = new double[] {
             1.0, 0.0, -2.0, 1.0, 0.0, -2.0, 1.0, 3.0, -2.0 };
 
-        assertEquals(8, blas.idamax(n, x, 1));
+        assertEquals(7, blas.idamax(n, x, 1));
     }
 }

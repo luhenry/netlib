@@ -5615,7 +5615,7 @@ public class JavaBLAS extends AbstractBLAS {
         max = val;
       }
     }
-    return imax + 1; // +1 because Fortran arrays are 1-indexed
+    return imax;
   }
 
   protected int isamaxK(int n, float[] x, int offsetx, int incx) {
@@ -5628,6 +5628,6 @@ public class JavaBLAS extends AbstractBLAS {
         max = val;
       }
     }
-    return imax + 1; // +1 because Fortran arrays are 1-indexed
+    return imax;
   }
 }

@@ -36,6 +36,6 @@ public class IsamaxTest extends BLASTest {
         float[] x = new float[] {
             1.0f, 0.0f, -2.0f, 1.0f, 0.0f, -2.0f, 1.0f, 3.0f, -2.0f };
 
-        assertEquals(8, blas.isamax(n, x, 1));
+        assertEquals(7, blas.isamax(n, x, 1));
     }
 }
