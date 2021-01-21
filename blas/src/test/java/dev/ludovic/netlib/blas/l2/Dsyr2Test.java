@@ -34,12 +34,12 @@ public class Dsyr2Test extends BLASTest {
     void testSanity(BLAS blas) {
         double[] expected, dsyAcopy;
 
-        f2j.dsyr2("U", N, 2.0, dX, 1, dY, 1, expected = dsyA.clone(), N);
-        blas.dsyr2("U", N, 2.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), N);
+        f2j.dsyr2("U", M, 2.0, dX, 1, dY, 1, expected = dsyA.clone(), M);
+        blas.dsyr2("U", M, 2.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), M);
         assertArrayEquals(expected, dsyAcopy, depsilon);
 
-        f2j.dsyr2("L", N, 2.0, dX, 1, dY, 1, expected = dsyA.clone(), N);
-        blas.dsyr2("L", N, 2.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), N);
+        f2j.dsyr2("L", M, 2.0, dX, 1, dY, 1, expected = dsyA.clone(), M);
+        blas.dsyr2("L", M, 2.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), M);
         assertArrayEquals(expected, dsyAcopy, depsilon);
     }
 }

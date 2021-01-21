@@ -83,20 +83,20 @@ public class BLASTest {
     return result;
   }
 
-  protected static final double[] extractUPLO(String uplo, double[] arr, int n) {
-    assert arr.length == n * n;
+  protected static final double[] extractUPLO(String uplo, double[] arr, int n, int ldarr) {
+    assert n <= ldarr;
     double[] result = new double[n * (n + 1) / 2];
     int i = 0;
     if (uplo.equals("U")) {
       for (int col = 0; col < n; col += 1) {
         for (int row = 0; row < col + 1; row += 1) {
-          result[i++] = arr[row + col * n];
+          result[i++] = arr[row + col * ldarr];
         }
       }
     } else {
       for (int col = 0; col < n; col += 1) {
         for (int row = col; row < n; row += 1) {
-          result[i++] = arr[row + col * n];
+          result[i++] = arr[row + col * ldarr];
         }
       }
     }
@@ -104,12 +104,12 @@ public class BLASTest {
     return result;
   }
 
-  protected static final double[] makeSymmetric(double[] arr, int n) {
-    assert arr.length == n * n;
-    double[] result = arr.clone();
+  protected static final double[] extractSymmetric(double[] arr, int n, int ldarr) {
+    assert n <= ldarr;
+    double[] result = new double[n * n];
     for (int col = 0; col < n; col += 1) {
-      for (int row = 0; row < col; row += 1) {
-        result[col + row * n] = arr[row + col * n];
+      for (int row = 0; row < col + 1; row += 1) {
+        result[row + col * n] = result[col + row * n] = arr[row + col * ldarr];
       }
     }
     return result;
@@ -131,9 +131,9 @@ public class BLASTest {
     System.out.println();
   }
 
-  protected final int M = 100;
-  protected final int N = 100;
-  protected final int K = 100;
+  protected final int M = 103;
+  protected final int N = 103;
+  protected final int K = 103;
 
   // double[m, k]
   protected final double[] dgeA = readArray("/geA.mat");
@@ -142,8 +142,8 @@ public class BLASTest {
   // double[m, n]
   protected final double[] dgeC = readArray("/geC.mat");
 
-  // double[m, k]
-  protected final double[] dsyA = makeSymmetric(dgeA, M);
+  // double[m, m]
+  protected final double[] dsyA = extractSymmetric(dgeA, M, M);
 
   // double[m]
   protected final double[] dX = readArray("/X.vec");
@@ -155,10 +155,10 @@ public class BLASTest {
   // double[n, k]
   protected final double[] dgeBT = transpose("N", dgeB, K, N);
 
-  // double[m, k][U]
-  protected final double[] dgeAU = extractUPLO("U", dgeA, M);
-  // double[m, k][L]
-  protected final double[] dgeAL = extractUPLO("L", dgeA, M);
+  // double[m, m][U]
+  protected final double[] dgeAU = extractUPLO("U", dgeA, M, M);
+  // double[m, m][L]
+  protected final double[] dgeAL = extractUPLO("L", dgeA, M, M);
 
   // float[m, k]
   protected final float[] sgeA = convertToFloat(dgeA);
@@ -167,7 +167,7 @@ public class BLASTest {
   // float[m, n]
   protected final float[] sgeC = convertToFloat(dgeC);
 
-  // float[m, k]
+  // float[m, m]
   protected final float[] ssyA = convertToFloat(dsyA);
 
   // double[m]
