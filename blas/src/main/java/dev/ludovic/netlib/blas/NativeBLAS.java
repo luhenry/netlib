@@ -160,7 +160,7 @@ public final class NativeBLAS extends AbstractBLAS {
     }
   }
 
-  private static class MemoryNativeCopy implements AutoCloseable {
+  private class MemoryNativeCopy implements AutoCloseable {
 
     private final MemorySegment source;
     private final boolean copyBack;
