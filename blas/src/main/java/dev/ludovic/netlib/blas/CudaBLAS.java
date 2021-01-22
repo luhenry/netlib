@@ -1044,7 +1044,7 @@ public final class CudaBLAS extends AbstractBLAS {
 
   private final MethodHandle dtpsvHandle =
       CLinker.getInstance().downcallHandle(
-        cublas.lookup("cublasDtpsv").get(), MethodType.methodType(void.class, byte.class, byte.class, int.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
+        cublas.lookup("cublasDtpsv").get(), MethodType.methodType(void.class, byte.class, byte.class, byte.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_CHAR, C_CHAR, C_CHAR, C_INT, C_INT, C_POINTER, C_POINTER, C_INT));
 
   protected void dtpsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
@@ -1062,7 +1062,7 @@ public final class CudaBLAS extends AbstractBLAS {
 
   private final MethodHandle dtrmmHandle =
       CLinker.getInstance().downcallHandle(
-        cublas.lookup("cublasDtrmm").get(), MethodType.methodType(void.class, byte.class, byte.class, byte.class, int.class, MemoryAddress.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        cublas.lookup("cublasDtrmm").get(), MethodType.methodType(void.class, byte.class, byte.class, byte.class, byte.class, MemoryAddress.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_CHAR, C_CHAR, C_CHAR, C_CHAR, C_POINTER, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dtrmmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
