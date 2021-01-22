@@ -50,7 +50,7 @@ public final class CudaBLAS extends AbstractBLAS {
   private static final CudaBLAS instance = new CudaBLAS();
 
   private final LibraryLookup cublas = LibraryLookup.ofLibrary("cublas");
-  private final LibraryLookup cudart = LibraryLookup.ofLibrary("cudart");
+  private final LibraryLookup cuda = LibraryLookup.ofLibrary("cuda");
 
   private final MethodHandle initHandle =
     CLinker.getInstance().downcallHandle(
@@ -69,12 +69,12 @@ public final class CudaBLAS extends AbstractBLAS {
 
   private final MethodHandle memcpyHtoDHandle =
     CLinker.getInstance().downcallHandle(
-      cudart.lookup("cuMemcpyHtoD").get(), MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class, long.class),
+      cuda.lookup("cuMemcpyHtoD").get(), MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class, long.class),
         FunctionDescriptor.of(C_INT, C_POINTER, C_POINTER, C_LONG));
 
   private final MethodHandle memcpyDtoHHandle =
     CLinker.getInstance().downcallHandle(
-      cudart.lookup("cuMemcpyDtoH").get(), MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class, long.class),
+      cuda.lookup("cuMemcpyDtoH").get(), MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class, long.class),
         FunctionDescriptor.of(C_INT, C_POINTER, C_POINTER, C_LONG));
 
   private final VarHandle addressHandle = MemoryHandles.varHandle(MemoryAddress.class, ByteOrder.nativeOrder());
