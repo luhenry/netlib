@@ -31,7 +31,7 @@ public final class NetlibNativeBLAS extends NetlibWrapper {
   static {
     com.github.fommil.netlib.BLAS blas = com.github.fommil.netlib.BLAS.getInstance();
     if (blas instanceof com.github.fommil.netlib.F2jBLAS) {
-        throw new IllegalStateException("Unable to load native implementation");
+        throw new RuntimeException("Unable to load native implementation");
     }
     instance = new NetlibNativeBLAS(blas);
   }
