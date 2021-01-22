@@ -81,7 +81,7 @@ public final class CudaBLAS extends AbstractBLAS {
 
   protected CudaBLAS() {
     try {
-      if ((CublasStatus)initHandle.invoke() != CublasStatus.Success) {
+      if (CublasStatus.cast((int)initHandle.invoke()) != CublasStatus.Success) {
         throw new RuntimeException("Failed to load cublas");
       }
     } catch (RuntimeException e) {
@@ -96,7 +96,8 @@ public final class CudaBLAS extends AbstractBLAS {
   }
 
   private static enum CudaError {
-    Success(0);
+    Success(0),
+    Error(-1);
 
     private final int val;
 
@@ -107,10 +108,18 @@ public final class CudaBLAS extends AbstractBLAS {
     public int value() {
       return val;
     }
+
+    public static CudaError cast(int val) {
+      switch (val) {
+        case 0: return Success;
+        default: return Error;
+      }
+    }
   }
 
   private static enum CublasStatus {
-    Success(0);
+    Success(0),
+    Error(-1);
 
     private final int val;
 
@@ -120,6 +129,13 @@ public final class CudaBLAS extends AbstractBLAS {
 
     public int value() {
       return val;
+    }
+
+    public static CublasStatus cast(int val) {
+      switch (val) {
+        case 0: return Success;
+        default: return Error;
+      }
     }
   }
 
@@ -262,12 +278,12 @@ public final class CudaBLAS extends AbstractBLAS {
         this.source = source;
         this.copyBack = copyBack;
         try (MemorySegment devicePtrC = MemorySegment.allocateNative(MemoryLayouts.ADDRESS)) {
-          if ((CublasStatus)allocHandle.invoke(source.byteSize() / 8, 8, devicePtrC.address()) != CublasStatus.Success) {
+          if (CublasStatus.cast((int)allocHandle.invoke(source.byteSize() / 8, 8, devicePtrC.address())) != CublasStatus.Success) {
             throw new RuntimeException("Failed to allocate device memory");
           }
           this.devicePtr = (MemoryAddress)longHandle.get(devicePtrC);
         }
-        if ((CudaError)memcpyHtoDHandle.invoke(this.devicePtr, source.address(), source.byteSize()) != CudaError.Success) {
+        if (CudaError.cast((int)memcpyHtoDHandle.invoke(this.devicePtr, source.address(), source.byteSize())) != CudaError.Success) {
           throw new RuntimeException("Failed to copy host memory to device memory");
         }
         this.copied = true;
@@ -286,7 +302,7 @@ public final class CudaBLAS extends AbstractBLAS {
       try {
         if (copied) {
           if (copyBack) {
-              if ((CudaError)memcpyDtoHHandle.invoke(source.address(), this.devicePtr, source.byteSize()) != CudaError.Success) {
+              if (CudaError.cast((int)memcpyDtoHHandle.invoke(source.address(), this.devicePtr, source.byteSize())) != CudaError.Success) {
                 throw new RuntimeException("Failed to copy device memory to host memory");
               }
           }
