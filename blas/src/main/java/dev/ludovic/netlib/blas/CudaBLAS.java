@@ -424,18 +424,8 @@ public final class CudaBLAS extends AbstractBLAS {
     }
   }
 
-  private final MethodHandle sdsdotHandle =
-      CLinker.getInstance().downcallHandle(
-        cublas.lookup("cublasSdsdot").get(), MethodType.methodType(float.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
-          FunctionDescriptor.of(C_FLOAT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT));
-
   protected float sdsdotK(int n, float sb, float[] sx, int offsetsx, int incsx, float[] sy, int offsetsy, int incsy) {
-    try (MemorySegment psx = segment(sx, offsetsx); MemoryNativeCopy cpsx = copy(psx);
-         MemorySegment psy = segment(sy, offsetsy); MemoryNativeCopy cpsy = copy(psy)) {
-      return (float)sdsdotHandle.invoke(n, sb, cpsx.address(), incsx, cpsy.address(), incsy);
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    throw new UnsupportedOperationException("Not supported by cublas");
   }
 
   private final MethodHandle dgbmvHandle =
