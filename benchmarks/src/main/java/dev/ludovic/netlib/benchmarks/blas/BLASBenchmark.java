@@ -55,6 +55,9 @@ public abstract class BLASBenchmark {
         case "native":
             blas = dev.ludovic.netlib.blas.NativeBLAS.getInstance();
             break;
+        case "cuda":
+            blas = dev.ludovic.netlib.blas.CudaBLAS.getInstance();
+            break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }
     }
