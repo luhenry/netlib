@@ -77,7 +77,7 @@ public final class CudaBLAS extends AbstractBLAS {
       cuda.lookup("cuMemcpyDtoH").get(), MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class, long.class),
         FunctionDescriptor.of(C_INT, C_POINTER, C_POINTER, C_LONG));
 
-  private final VarHandle addressHandle = MemoryHandles.varHandle(MemoryAddress.class, ByteOrder.nativeOrder());
+  private final VarHandle longHandle = MemoryHandles.varHandle(long.class, ByteOrder.nativeOrder());
 
   protected CudaBLAS() {
     try {
@@ -265,7 +265,7 @@ public final class CudaBLAS extends AbstractBLAS {
           if ((CublasStatus)allocHandle.invoke(source.byteSize() / 8, 8, devicePtrC.address()) != CublasStatus.Success) {
             throw new RuntimeException("Failed to allocate device memory");
           }
-          this.devicePtr = (MemoryAddress)addressHandle.get(devicePtrC);
+          this.devicePtr = (MemoryAddress)longHandle.get(devicePtrC);
         }
         if ((CudaError)memcpyHtoDHandle.invoke(this.devicePtr, source.address(), source.byteSize()) != CudaError.Success) {
           throw new RuntimeException("Failed to copy host memory to device memory");
