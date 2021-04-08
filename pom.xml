@@ -50,9 +50,9 @@ information or have any questions.
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/luhenry/vectorizedblas.git</connection>
-    <developerConnection>scm:git:ssh://github.com:luhenry/vectorizedblas.git</developerConnection>
-    <url>http://github.com/luhenry/vectorizedblas/tree/master</url>
+    <connection>scm:git:git://github.com/luhenry/netlib.git</connection>
+    <developerConnection>scm:git:ssh://github.com:luhenry/netlib.git</developerConnection>
+    <url>http://github.com/luhenry/netlib/tree/master</url>
   </scm>
 
   <modules>
