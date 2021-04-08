@@ -43,12 +43,23 @@ public class BLASTest {
   final static BLAS f2j = NetlibF2jBLAS.getInstance();
 
   private static Stream<Arguments> BLASImplementations() {
-    return Stream.of(
+    Stream instances = Stream.of(
       Arguments.of(NetlibF2jBLAS.getInstance()),
-      Arguments.of(JavaBLAS.getInstance()),
-      Arguments.of(VectorizedBLAS.getInstance()),
-      Arguments.of(NativeBLAS.getInstance())
+      Arguments.of(JavaBLAS.getInstance())
     );
+
+    try {
+      instances = Stream.concat(instances, Stream.of(VectorizedBLAS.getInstance()));
+    } catch (NoClassDefFoundError e) {
+    }
+
+    try {
+      instances = Stream.concat(instances, Stream.of(NativeBLAS.getInstance()));
+    } catch (ExceptionInInitializerError e) {
+    } catch (NoClassDefFoundError e) {
+    }
+
+    return instances;
   }
 
   protected static final double[] readArray(String name) {
