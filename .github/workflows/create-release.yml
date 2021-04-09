@@ -12,6 +12,9 @@ jobs:
   build:
     name: Create Release
     runs-on: ubuntu-latest
+    # Map step output to job output
+    outputs:
+      release_upload_url: ${{ steps.create_release.outputs.upload_url  }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -71,7 +74,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ needs.build.steps.create_release.outputs.upload_url }}
+        upload_url: ${{ needs.build.outputs.release_upload_url }}
         asset_path: jmh-results-${{ matrix.level }}.csv
         asset_name: jmh-results-${{ matrix.level }}.csv
         asset_content_type: text/csv
@@ -80,7 +83,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ needs.build.steps.create_release.outputs.upload_url }}
+        upload_url: ${{ needs.build.outputs.release_upload_url }}
         asset_path: jmh-${{ matrix.level }}.out
         asset_name: jmh-${{ matrix.level }}.out
         asset_content_type: text/plain
