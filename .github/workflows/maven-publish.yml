@@ -9,8 +9,22 @@ on:
 
 jobs:
   build:
-
+    name: Publish Release
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Sonatype OSSRH
+      uses: actions/setup-java@v1
+      with: # running setup-java again overwrites the settings.xml
+        java-version: 16
+        server-id: ossrh
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_PASSWORD
+        gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+    - name: Publish to Sonatype OSSRH
+      run: mvn --batch-mode deploy
+      env:
+        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
