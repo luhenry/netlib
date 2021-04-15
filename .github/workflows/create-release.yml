@@ -65,7 +65,7 @@ jobs:
       with:
         java-version: ${{ matrix.jdk }}
     - name: Build
-      run: mvn --batch-mode package
+      run: mvn --batch-mode -Dmaven.test.skip=true -Dmaven.javadoc.skip=true package
     - name: Run benchmark
       run: java -jar benchmarks/target/netlib-benchmarks.jar -f 1 -wi 15 -i 3 -p implementation=${{ matrix.implementation }} -jvmArgs "${{ matrix.jvmArgs }}" -rf csv -rff jmh-results-jdk${{ matrix.jdk }}.csv | tee jmh-jdk${{ matrix.jdk }}.out
     - name: Upload JMH results
