@@ -27,13 +27,13 @@ information or have any questions.
   <parent>
     <groupId>dev.ludovic.netlib</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>dev.ludovic.netlib</groupId>
   <artifactId>blas</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <packaging>jar</packaging>
 
   <properties>
