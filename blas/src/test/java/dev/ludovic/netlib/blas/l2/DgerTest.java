@@ -33,19 +33,19 @@ public class DgerTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         double[] expected, dgeAcopy;
 
         f2j.dger(M, N, 2.0, dX, 1, dY, 1, expected = dgeA.clone(), M);
-        blas.dger(M, N, 2.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
+        getImpl(blas).dger(M, N, 2.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
         assertArrayEquals(expected, dgeAcopy, depsilon);
 
         f2j.dger(M, N, 0.0, dX, 1, dY, 1, expected = dgeA.clone(), M);
-        blas.dger(M, N, 0.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
+        getImpl(blas).dger(M, N, 0.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
         assertArrayEquals(expected, dgeAcopy, depsilon);
 
         f2j.dger(M, N, -1.0, dX, 1, dY, 1, expected = dgeA.clone(), M);
-        blas.dger(M, N, -1.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
+        getImpl(blas).dger(M, N, -1.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
         assertArrayEquals(expected, dgeAcopy, depsilon);
     }
 }

@@ -33,15 +33,15 @@ public class DsyrTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         double[] expected, dsyAcopy;
 
         f2j.dsyr("U", M, 2.0, dX, 1, expected = dsyA.clone(), M);
-        blas.dsyr("U", M, 2.0, dX, 1, dsyAcopy = dsyA.clone(), M);
+        getImpl(blas).dsyr("U", M, 2.0, dX, 1, dsyAcopy = dsyA.clone(), M);
         assertArrayEquals(expected, dsyAcopy, depsilon);
 
         f2j.dsyr("L", M, 2.0, dX, 1, expected = dsyA.clone(), M);
-        blas.dsyr("L", M, 2.0, dX, 1, dsyAcopy = dsyA.clone(), M);
+        getImpl(blas).dsyr("L", M, 2.0, dX, 1, dsyAcopy = dsyA.clone(), M);
         assertArrayEquals(expected, dsyAcopy, depsilon);
     }
 }

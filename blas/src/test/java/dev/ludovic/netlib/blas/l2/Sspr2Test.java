@@ -33,15 +33,15 @@ public class Sspr2Test extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         float[] expected, sgeAcopy;
 
         f2j.sspr2("U", M, 2.0f, sX, 1, sY, 1, expected = sgeAU.clone());
-        blas.sspr2("U", M, 2.0f, sX, 1, sY, 1, sgeAcopy = sgeAU.clone());
+        getImpl(blas).sspr2("U", M, 2.0f, sX, 1, sY, 1, sgeAcopy = sgeAU.clone());
         assertArrayEquals(expected, sgeAcopy, sepsilon);
 
         f2j.sspr2("L", M, 2.0f, sX, 1, sY, 1, expected = sgeAL.clone());
-        blas.sspr2("L", M, 2.0f, sX, 1, sY, 1, sgeAcopy = sgeAL.clone());
+        getImpl(blas).sspr2("L", M, 2.0f, sX, 1, sY, 1, sgeAcopy = sgeAL.clone());
         assertArrayEquals(expected, sgeAcopy, sepsilon);
     }
 }

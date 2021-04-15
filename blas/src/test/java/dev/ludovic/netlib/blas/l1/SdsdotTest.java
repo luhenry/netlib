@@ -33,7 +33,7 @@ public class SdsdotTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
-        assertEquals(f2j.sdsdot(M, 3.0f, sX, 1, sY, 1), blas.sdsdot(M, 3.0f, sX, 1, sY, 1));
+    void testSanity(String blas) {
+        assertEquals(f2j.sdsdot(M, 3.0f, sX, 1, sY, 1), getImpl(blas).sdsdot(M, 3.0f, sX, 1, sY, 1));
     }
 }

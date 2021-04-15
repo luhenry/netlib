@@ -33,7 +33,7 @@ public class DasumTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
-        assertEquals(f2j.dasum(M, dX, 1), blas.dasum(M, dX, 1), depsilon);
+    void testSanity(String blas) {
+        assertEquals(f2j.dasum(M, dX, 1), getImpl(blas).dasum(M, dX, 1), depsilon);
     }
 }

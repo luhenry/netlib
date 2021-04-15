@@ -33,15 +33,15 @@ public class SsyrTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         float[] expected, ssyAcopy;
 
         f2j.ssyr("U", M, 2.0f, sX, 1, expected = ssyA.clone(), M);
-        blas.ssyr("U", M, 2.0f, sX, 1, ssyAcopy = ssyA.clone(), M);
+        getImpl(blas).ssyr("U", M, 2.0f, sX, 1, ssyAcopy = ssyA.clone(), M);
         assertArrayEquals(expected, ssyAcopy, sepsilon);
 
         f2j.ssyr("L", M, 2.0f, sX, 1, expected = ssyA.clone(), M);
-        blas.ssyr("L", M, 2.0f, sX, 1, ssyAcopy = ssyA.clone(), M);
+        getImpl(blas).ssyr("L", M, 2.0f, sX, 1, ssyAcopy = ssyA.clone(), M);
         assertArrayEquals(expected, ssyAcopy, sepsilon);
     }
 }

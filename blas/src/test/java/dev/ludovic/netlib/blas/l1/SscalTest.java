@@ -33,19 +33,19 @@ public class SscalTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         float[] expected, sXcopy;
 
         f2j.sscal(M, 2.0f, expected = sX.clone(), 1);
-        blas.sscal(M, 2.0f, sXcopy = sX.clone(), 1);
+        getImpl(blas).sscal(M, 2.0f, sXcopy = sX.clone(), 1);
         assertArrayEquals(expected, sXcopy, sepsilon);
 
         f2j.sscal(M, 1.0f, expected = sX.clone(), 1);
-        blas.sscal(M, 1.0f, sXcopy = sX.clone(), 1);
+        getImpl(blas).sscal(M, 1.0f, sXcopy = sX.clone(), 1);
         assertArrayEquals(expected, sXcopy, sepsilon);
 
         f2j.sscal(M, 0.0f, expected = sX.clone(), 1);
-        blas.sscal(M, 0.0f, sXcopy = sX.clone(), 1);
+        getImpl(blas).sscal(M, 0.0f, sXcopy = sX.clone(), 1);
         assertArrayEquals(expected, sXcopy, sepsilon);
     }
 }

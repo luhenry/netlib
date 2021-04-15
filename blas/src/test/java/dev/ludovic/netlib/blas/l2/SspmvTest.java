@@ -33,31 +33,31 @@ public class SspmvTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         float[] expected, sYcopy;
 
         f2j.sspmv("U", M, 2.0f, sgeAU, sX, 1, 2.0f, expected = sY.clone(), 1);
-        blas.sspmv("U", M, 2.0f, sgeAU, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        getImpl(blas).sspmv("U", M, 2.0f, sgeAU, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.sspmv("U", M, 2.0f, sgeAU, sX, 1, 1.0f, expected = sY.clone(), 1);
-        blas.sspmv("U", M, 2.0f, sgeAU, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        getImpl(blas).sspmv("U", M, 2.0f, sgeAU, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.sspmv("U", M, 0.0f, sgeAU, sX, 1, 2.0f, expected = sY.clone(), 1);
-        blas.sspmv("U", M, 0.0f, sgeAU, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        getImpl(blas).sspmv("U", M, 0.0f, sgeAU, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.sspmv("L", M, 2.0f, sgeAL, sX, 1, 2.0f, expected = sY.clone(), 1);
-        blas.sspmv("L", M, 2.0f, sgeAL, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        getImpl(blas).sspmv("L", M, 2.0f, sgeAL, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.sspmv("L", M, 2.0f, sgeAL, sX, 1, 1.0f, expected = sY.clone(), 1);
-        blas.sspmv("L", M, 2.0f, sgeAL, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        getImpl(blas).sspmv("L", M, 2.0f, sgeAL, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.sspmv("L", M, 0.0f, sgeAL, sX, 1, 2.0f, expected = sY.clone(), 1);
-        blas.sspmv("L", M, 0.0f, sgeAL, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        getImpl(blas).sspmv("L", M, 0.0f, sgeAL, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
 }

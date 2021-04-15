@@ -43,23 +43,22 @@ public class BLASTest {
   final static BLAS f2j = NetlibF2jBLAS.getInstance();
 
   private static Stream<Arguments> BLASImplementations() {
-    Stream instances = Stream.of(
-      Arguments.of(NetlibF2jBLAS.getInstance()),
-      Arguments.of(JavaBLAS.getInstance())
+    return Stream.of(
+      Arguments.of("f2j"),
+      Arguments.of("java"),
+      Arguments.of("vector"),
+      Arguments.of("native")
     );
+  }
 
-    try {
-      instances = Stream.concat(instances, Stream.of(VectorizedBLAS.getInstance()));
-    } catch (NoClassDefFoundError e) {
+  protected static BLAS getImpl(String name) {
+    switch (name) {
+      case "f2j": return NetlibF2jBLAS.getInstance();
+      case "java": return JavaBLAS.getInstance();
+      case "vector": return VectorizedBLAS.getInstance();
+      case "native": return NativeBLAS.getInstance();
+      default: throw new IllegalArgumentException("Unknown implementation = " + name);
     }
-
-    try {
-      instances = Stream.concat(instances, Stream.of(NativeBLAS.getInstance()));
-    } catch (ExceptionInInitializerError e) {
-    } catch (NoClassDefFoundError e) {
-    }
-
-    return instances;
   }
 
   protected static final double[] readArray(String name) {

@@ -33,23 +33,23 @@ public class DgemvTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         double[] expected, dYcopy;
 
-        blas.dgemv("N", M, N, 1.0, dgeA, M, dX, 1, 2.0, expected = dY.clone(), 1);
-        blas.dgemv("N", M, N, 1.0, dgeA, M, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dgemv("N", M, N, 1.0, dgeA, M, dX, 1, 2.0, expected = dY.clone(), 1);
+        getImpl(blas).dgemv("N", M, N, 1.0, dgeA, M, dX, 1, 2.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
-        blas.dgemv("T", N, M, 1.0, dgeAT, N, dX, 1, 2.0, expected = dY.clone(), 1);
-        blas.dgemv("T", N, M, 1.0, dgeAT, N, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dgemv("T", N, M, 1.0, dgeAT, N, dX, 1, 2.0, expected = dY.clone(), 1);
+        getImpl(blas).dgemv("T", N, M, 1.0, dgeAT, N, dX, 1, 2.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
-        blas.dgemv("N", M, N, 2.0, dgeA, M, dX, 1, 2.0, expected = dY.clone(), 1);
-        blas.dgemv("N", M, N, 2.0, dgeA, M, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dgemv("N", M, N, 2.0, dgeA, M, dX, 1, 2.0, expected = dY.clone(), 1);
+        getImpl(blas).dgemv("N", M, N, 2.0, dgeA, M, dX, 1, 2.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
-        blas.dgemv("T", N, M, 2.0, dgeAT, N, dX, 1, 2.0, expected = dY.clone(), 1);
-        blas.dgemv("T", N, M, 2.0, dgeAT, N, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dgemv("T", N, M, 2.0, dgeAT, N, dX, 1, 2.0, expected = dY.clone(), 1);
+        getImpl(blas).dgemv("T", N, M, 2.0, dgeAT, N, dX, 1, 2.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
     }
 }

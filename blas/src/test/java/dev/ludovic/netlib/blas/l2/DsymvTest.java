@@ -33,63 +33,63 @@ public class DsymvTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         double[] expected, dYcopy;
 
         f2j.dsymv("U", M,  1.0, dsyA, M, dX, 1,  1.0, expected = dY.clone(), 1);
-        blas.dsymv("U", M,  1.0, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("U", M,  1.0, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("U", M,  0.5, dsyA, M, dX, 1,  1.0, expected = dY.clone(), 1);
-        blas.dsymv("U", M,  0.5, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("U", M,  0.5, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("U", M, -0.5, dsyA, M, dX, 1,  1.0, expected = dY.clone(), 1);
-        blas.dsymv("U", M, -0.5, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("U", M, -0.5, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("U", M,  0.0, dsyA, M, dX, 1,  1.0, expected = dY.clone(), 1);
-        blas.dsymv("U", M,  0.0, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("U", M,  0.0, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("U", M,  1.0, dsyA, M, dX, 1,  0.5, expected = dY.clone(), 1);
-        blas.dsymv("U", M,  1.0, dsyA, M, dX, 1,  0.5, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("U", M,  1.0, dsyA, M, dX, 1,  0.5, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("U", M,  1.0, dsyA, M, dX, 1, -0.5, expected = dY.clone(), 1);
-        blas.dsymv("U", M,  1.0, dsyA, M, dX, 1, -0.5, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("U", M,  1.0, dsyA, M, dX, 1, -0.5, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("U", M,  1.0, dsyA, M, dX, 1,  0.0, expected = dY.clone(), 1);
-        blas.dsymv("U", M,  1.0, dsyA, M, dX, 1,  0.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("U", M,  1.0, dsyA, M, dX, 1,  0.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("L", M,  1.0, dsyA, M, dX, 1,  1.0, expected = dY.clone(), 1);
-        blas.dsymv("L", M,  1.0, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("L", M,  1.0, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("L", M,  0.5, dsyA, M, dX, 1,  1.0, expected = dY.clone(), 1);
-        blas.dsymv("L", M,  0.5, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("L", M,  0.5, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("L", M, -0.5, dsyA, M, dX, 1,  1.0, expected = dY.clone(), 1);
-        blas.dsymv("L", M, -0.5, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("L", M, -0.5, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("L", M,  0.0, dsyA, M, dX, 1,  1.0, expected = dY.clone(), 1);
-        blas.dsymv("L", M,  0.0, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("L", M,  0.0, dsyA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("L", M,  1.0, dsyA, M, dX, 1,  0.5, expected = dY.clone(), 1);
-        blas.dsymv("L", M,  1.0, dsyA, M, dX, 1,  0.5, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("L", M,  1.0, dsyA, M, dX, 1,  0.5, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("L", M,  1.0, dsyA, M, dX, 1, -0.5, expected = dY.clone(), 1);
-        blas.dsymv("L", M,  1.0, dsyA, M, dX, 1, -0.5, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("L", M,  1.0, dsyA, M, dX, 1, -0.5, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dsymv("L", M,  1.0, dsyA, M, dX, 1,  0.0, expected = dY.clone(), 1);
-        blas.dsymv("L", M,  1.0, dsyA, M, dX, 1,  0.0, dYcopy = dY.clone(), 1);
+        getImpl(blas).dsymv("L", M,  1.0, dsyA, M, dX, 1,  0.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
     }
 }

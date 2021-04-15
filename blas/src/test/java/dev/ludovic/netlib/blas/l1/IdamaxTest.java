@@ -33,7 +33,7 @@ public class IdamaxTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
-        assertEquals(f2j.idamax(M, dX, 1), blas.idamax(M, dX, 1), depsilon);
+    void testSanity(String blas) {
+        assertEquals(f2j.idamax(M, dX, 1), getImpl(blas).idamax(M, dX, 1), depsilon);
     }
 }

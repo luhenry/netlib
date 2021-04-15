@@ -33,11 +33,11 @@ public class DswapTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         double[] expectedX, expectedY, dXcopy, dYcopy;
 
         f2j.dswap(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1);
-        blas.dswap(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1);
+        getImpl(blas).dswap(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1);
         assertArrayEquals(expectedX, dXcopy, depsilon);
         assertArrayEquals(expectedY, dYcopy, depsilon);
     }

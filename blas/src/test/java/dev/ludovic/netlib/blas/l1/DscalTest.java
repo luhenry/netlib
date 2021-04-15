@@ -33,19 +33,19 @@ public class DscalTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         double[] expected, dXcopy;
 
         f2j.dscal(M, 2.0, expected = dX.clone(), 1);
-        blas.dscal(M, 2.0, dXcopy = dX.clone(), 1);
+        getImpl(blas).dscal(M, 2.0, dXcopy = dX.clone(), 1);
         assertArrayEquals(expected, dXcopy, depsilon);
 
         f2j.dscal(M, 1.0, expected = dX.clone(), 1);
-        blas.dscal(M, 1.0, dXcopy = dX.clone(), 1);
+        getImpl(blas).dscal(M, 1.0, dXcopy = dX.clone(), 1);
         assertArrayEquals(expected, dXcopy, depsilon);
 
         f2j.dscal(M, 0.0, expected = dX.clone(), 1);
-        blas.dscal(M, 0.0, dXcopy = dX.clone(), 1);
+        getImpl(blas).dscal(M, 0.0, dXcopy = dX.clone(), 1);
         assertArrayEquals(expected, dXcopy, depsilon);
     }
 }

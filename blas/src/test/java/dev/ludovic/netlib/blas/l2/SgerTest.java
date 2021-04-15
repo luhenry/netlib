@@ -33,19 +33,19 @@ public class SgerTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         float[] expected, sgeAcopy;
 
         f2j.sger(M, N, 2.0f, sX, 1, sY, 1, expected = sgeA.clone(), M);
-        blas.sger(M, N, 2.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
+        getImpl(blas).sger(M, N, 2.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
         assertArrayEquals(expected, sgeAcopy, sepsilon);
 
         f2j.sger(M, N, 0.0f, sX, 1, sY, 1, expected = sgeA.clone(), M);
-        blas.sger(M, N, 0.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
+        getImpl(blas).sger(M, N, 0.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
         assertArrayEquals(expected, sgeAcopy, sepsilon);
 
         f2j.sger(M, N, -1.0f, sX, 1, sY, 1, expected = sgeA.clone(), M);
-        blas.sger(M, N, -1.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
+        getImpl(blas).sger(M, N, -1.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
         assertArrayEquals(expected, sgeAcopy, sepsilon);
     }
 }

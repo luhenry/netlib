@@ -33,55 +33,55 @@ public class DsymmTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         double[] expected, dgeCcopy;
 
         f2j.dsymm("L", "U", M, N, 1.0, dsyA, M, dgeB, K, 2.0, expected = dgeC.clone(), M);
-        blas.dsymm("L", "U", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("L", "U", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("L", "L", M, N, 1.0, dsyA, M, dgeB, K, 2.0, expected = dgeC.clone(), M);
-        blas.dsymm("L", "L", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("L", "L", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("R", "U", M, N, 1.0, dsyA, M, dgeB, K, 2.0, expected = dgeC.clone(), M);
-        blas.dsymm("R", "U", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("R", "U", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("R", "L", M, N, 1.0, dsyA, M, dgeB, K, 2.0, expected = dgeC.clone(), M);
-        blas.dsymm("R", "L", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("R", "L", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("L", "U", M, N, 1.0, dsyA, M, dgeB, K, 0.0, expected = dgeC.clone(), M);
-        blas.dsymm("L", "U", M, N, 1.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("L", "U", M, N, 1.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("L", "L", M, N, 1.0, dsyA, M, dgeB, K, 0.0, expected = dgeC.clone(), M);
-        blas.dsymm("L", "L", M, N, 1.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("L", "L", M, N, 1.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("R", "U", M, N, 1.0, dsyA, M, dgeB, K, 0.0, expected = dgeC.clone(), M);
-        blas.dsymm("R", "U", M, N, 1.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("R", "U", M, N, 1.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("R", "L", M, N, 1.0, dsyA, M, dgeB, K, 0.0, expected = dgeC.clone(), M);
-        blas.dsymm("R", "L", M, N, 1.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("R", "L", M, N, 1.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("L", "U", M, N, 0.0, dsyA, M, dgeB, K, 1.0, expected = dgeC.clone(), M);
-        blas.dsymm("L", "U", M, N, 0.0, dsyA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("L", "U", M, N, 0.0, dsyA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("L", "L", M, N, 0.0, dsyA, M, dgeB, K, 1.0, expected = dgeC.clone(), M);
-        blas.dsymm("L", "L", M, N, 0.0, dsyA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("L", "L", M, N, 0.0, dsyA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("R", "U", M, N, 0.0, dsyA, M, dgeB, K, 1.0, expected = dgeC.clone(), M);
-        blas.dsymm("R", "U", M, N, 0.0, dsyA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("R", "U", M, N, 0.0, dsyA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
 
         f2j.dsymm("R", "L", M, N, 0.0, dsyA, M, dgeB, K, 1.0, expected = dgeC.clone(), M);
-        blas.dsymm("R", "L", M, N, 0.0, dsyA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
+        getImpl(blas).dsymm("R", "L", M, N, 0.0, dsyA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
     }
 }

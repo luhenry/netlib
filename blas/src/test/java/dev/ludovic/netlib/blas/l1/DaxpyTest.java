@@ -33,19 +33,19 @@ public class DaxpyTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(BLAS blas) {
+    void testSanity(String blas) {
         double[] expected, dYcopy;
 
         f2j.daxpy(M, 2.0, dX, 1, expected = dY.clone(), 1);
-        blas.daxpy(M, 2.0, dX, 1, dYcopy = dY.clone(), 1);
+        getImpl(blas).daxpy(M, 2.0, dX, 1, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.daxpy(M, 0.0, dX, 1, expected = dY.clone(), 1);
-        blas.daxpy(M, 0.0, dX, 1, dYcopy = dY.clone(), 1);
+        getImpl(blas).daxpy(M, 0.0, dX, 1, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.daxpy(M, -1.0, dX, 1, expected = dY.clone(), 1);
-        blas.daxpy(M, -1.0, dX, 1, dYcopy = dY.clone(), 1);
+        getImpl(blas).daxpy(M, -1.0, dX, 1, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
     }
 }
