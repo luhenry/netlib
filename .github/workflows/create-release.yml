@@ -60,12 +60,17 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: Set up JDK 16
+      uses: actions/setup-java@v1
+      with:
+        java-version: 16
+    - name: Build
+      run: mvn --batch-mode -Dmaven.test.skip=true -Dmaven.javadoc.skip=true package
+
     - name: Set up JDK ${{ matrix.jdk }}
       uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.jdk }}
-    - name: Build
-      run: mvn --batch-mode -Dmaven.test.skip=true -Dmaven.javadoc.skip=true package
     - name: Run benchmark
       run: java -jar benchmarks/target/netlib-benchmarks.jar -f 1 -wi 15 -i 3 -p implementation=${{ matrix.implementation }} -jvmArgs "${{ matrix.jvmArgs }}" -rf csv -rff jmh-results-jdk${{ matrix.jdk }}.csv | tee jmh-jdk${{ matrix.jdk }}.out
     - name: Upload JMH results
