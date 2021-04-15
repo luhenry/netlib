@@ -47,7 +47,7 @@ public final class NativeBLAS extends AbstractBLAS {
 
   private static final NativeBLAS instance = new NativeBLAS();
 
-  private final LibraryLookup blas = LibraryLookup.ofLibrary("blas");
+  private final LibraryLookup blas = LibraryLookup.ofLibrary(System.getProperty("dev.ludovic.netlib.blas.nativeLib", "blas"));
 
   protected NativeBLAS() {}
 
