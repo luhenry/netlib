@@ -72,7 +72,7 @@ jobs:
       with:
         java-version: ${{ matrix.jdk }}
     - name: Run benchmark
-      run: java -jar benchmarks/target/netlib-benchmarks.jar -f 1 -wi 15 -i 3 -p implementation=${{ matrix.implementation }} -jvmArgs "${{ matrix.jvmArgs }}" -rf csv -rff jmh-results-jdk${{ matrix.jdk }}.csv | tee jmh-jdk${{ matrix.jdk }}.out
+      run: java -jar benchmarks/target/netlib-benchmarks.jar -p implementation=${{ matrix.implementation }} -jvmArgs "${{ matrix.jvmArgs }}" -rf csv -rff jmh-results-jdk${{ matrix.jdk }}.csv | tee jmh-jdk${{ matrix.jdk }}.out
     - name: Upload JMH results
       uses: actions/upload-release-asset@v1
       env:
