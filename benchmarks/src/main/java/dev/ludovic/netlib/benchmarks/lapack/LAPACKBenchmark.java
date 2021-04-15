@@ -42,10 +42,10 @@ public abstract class LAPACKBenchmark {
     public void setupImplementation() {
         switch (implementation) {
         case "f2j":
-            lapack = dev.ludovic.netlib.lapack.NetlibWrapper.wrap(new com.github.fommil.netlib.F2jLAPACK());
+            lapack = dev.ludovic.netlib.lapack.NetlibF2jLAPACK.getInstance();
             break;
         case "native":
-            lapack = dev.ludovic.netlib.lapack.NetlibWrapper.wrap(com.github.fommil.netlib.LAPACK.getInstance());
+            lapack = dev.ludovic.netlib.lapack.NetlibNativeLAPACK.getInstance();
             break;
         case "java":
             lapack = dev.ludovic.netlib.lapack.JavaLAPACK.getInstance();

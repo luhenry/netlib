@@ -22,22 +22,23 @@
  * information or have any questions.
  */
 
-import java.util.stream.Stream;
+package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.provider.Arguments;
+import dev.ludovic.netlib.LAPACK;
 
-public class LAPACKTest {
+public final class NetlibF2jLAPACK extends NetlibWrapper {
 
-  final static double depsilon = 1e-15d;
-  final static float sepsilon = 1e-6f;
+  private static final NetlibF2jLAPACK instance;
 
-  private static Stream<Arguments> LAPACKImplementations() {
-    Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.lapack.NetlibF2jLAPACK.getInstance()),
-      Arguments.of(dev.ludovic.netlib.lapack.JavaLAPACK.getInstance())
-    );
+  static {
+    instance = new NetlibF2jLAPACK(new com.github.fommil.netlib.F2jLAPACK());
+  }
 
-    return instances;
+  protected NetlibF2jLAPACK(com.github.fommil.netlib.LAPACK _lapack) {
+    super(_lapack);
+  }
+
+  public static LAPACK getInstance() {
+    return instance;
   }
 }

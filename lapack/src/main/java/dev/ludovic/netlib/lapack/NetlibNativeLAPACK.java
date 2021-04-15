@@ -22,22 +22,27 @@
  * information or have any questions.
  */
 
-import java.util.stream.Stream;
+package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.provider.Arguments;
+import dev.ludovic.netlib.LAPACK;
 
-public class LAPACKTest {
+public final class NetlibNativeLAPACK extends NetlibWrapper {
 
-  final static double depsilon = 1e-15d;
-  final static float sepsilon = 1e-6f;
+  private static final NetlibNativeLAPACK instance;
 
-  private static Stream<Arguments> LAPACKImplementations() {
-    Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.lapack.NetlibF2jLAPACK.getInstance()),
-      Arguments.of(dev.ludovic.netlib.lapack.JavaLAPACK.getInstance())
-    );
+  static {
+    com.github.fommil.netlib.LAPACK lapack = com.github.fommil.netlib.LAPACK.getInstance();
+    if (lapack instanceof com.github.fommil.netlib.F2jLAPACK) {
+        throw new RuntimeException("Unable to load native implementation");
+    }
+    instance = new NetlibNativeLAPACK(lapack);
+  }
 
-    return instances;
+  protected NetlibNativeLAPACK(com.github.fommil.netlib.LAPACK _lapack) {
+    super(_lapack);
+  }
+
+  public static LAPACK getInstance() {
+    return instance;
   }
 }
