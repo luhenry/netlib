@@ -49,34 +49,33 @@ jobs:
     needs: [build]
     strategy:
       matrix:
-        level: [l1, l2, l3]
+        jdk: [11, 16]
         include:
-        - level: l1
-          wi: 15
-        - level: l2
-          wi: 6
-        - level: l3
-          wi: 3
+        - jdk: 11
+          implementation: "f2j,java"
+          jvmArgs: ""
+        - jdk: 16
+          implementation: "f2j,java,vector,native"
+          jvmArgs: "--add-modules=jdk.incubator.vector,jdk.incubator.foreign -Dforeign.restricted=permit"
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Set up JDK 17
+    - name: Set up JDK ${{ matrix.jdk }}
       uses: actions/setup-java@v1
       with:
-        java-version: 17-ea
+        java-version: ${{ matrix.jdk }}
     - name: Build
       run: mvn --batch-mode package
-
-    - name: Run ${{ matrix.level }} benchmark
-      run: java -jar benchmarks/target/netlib-benchmarks.jar 'dev.ludovic.netlib.benchmarks.blas.${{ matrix.level }}.*' -f 1 -wi ${{ matrix.wi }} -i 3 -p implementation=f2j,java,vector -rf csv -rff jmh-results-${{ matrix.level }}.csv | tee jmh-${{ matrix.level }}.out
+    - name: Run benchmark
+      run: java -jar benchmarks/target/netlib-benchmarks.jar -f 1 -wi 15 -i 3 -p implementation=${{ matrix.implementation }} -jvmArgs "${{ matrix.jvmArgs }}" -rf csv -rff jmh-results-jdk${{ matrix.jdk }}.csv | tee jmh-jdk${{ matrix.jdk }}.out
     - name: Upload JMH results
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.build.outputs.release_upload_url }}
-        asset_path: jmh-results-${{ matrix.level }}.csv
-        asset_name: jmh-results-${{ matrix.level }}.csv
+        asset_path: jmh-results-jdk${{ matrix.jdk }}.csv
+        asset_name: jmh-results-jdk${{ matrix.jdk }}.csv
         asset_content_type: text/csv
     - name: Upload JMH output
       uses: actions/upload-release-asset@v1
@@ -84,6 +83,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.build.outputs.release_upload_url }}
-        asset_path: jmh-${{ matrix.level }}.out
-        asset_name: jmh-${{ matrix.level }}.out
+        asset_path: jmh-jdk${{ matrix.jdk }}.out
+        asset_name: jmh-jdk${{ matrix.jdk }}.out
         asset_content_type: text/plain

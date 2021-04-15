@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
-@Fork(value = 1, jvmArgsPrepend = {"--add-modules=jdk.incubator.foreign,jdk.incubator.vector", "-Dforeign.restricted=permit"})
+@Fork(value = 1)
 public abstract class BLASBenchmark {
 
     public BLAS blas;
