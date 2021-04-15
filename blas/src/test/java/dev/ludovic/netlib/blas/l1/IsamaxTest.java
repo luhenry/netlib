@@ -33,7 +33,7 @@ public class IsamaxTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
-        assertEquals(f2j.isamax(M, sX, 1), getImpl(blas).isamax(M, sX, 1), sepsilon);
+    void testSanity(BLAS blas) {
+        assertEquals(f2j.isamax(M, sX, 1), blas.isamax(M, sX, 1), sepsilon);
     }
 }

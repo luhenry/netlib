@@ -33,19 +33,19 @@ public class SaxpyTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
+    void testSanity(BLAS blas) {
         float[] expected, sYcopy;
 
         f2j.saxpy(M, 2.0f, sX, 1, expected = sY.clone(), 1);
-        getImpl(blas).saxpy(M, 2.0f, sX, 1, sYcopy = sY.clone(), 1);
+        blas.saxpy(M, 2.0f, sX, 1, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.saxpy(M, 0.0f, sX, 1, expected = sY.clone(), 1);
-        getImpl(blas).saxpy(M, 0.0f, sX, 1, sYcopy = sY.clone(), 1);
+        blas.saxpy(M, 0.0f, sX, 1, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.saxpy(M, -1.0f, sX, 1, expected = sY.clone(), 1);
-        getImpl(blas).saxpy(M, -1.0f, sX, 1, sYcopy = sY.clone(), 1);
+        blas.saxpy(M, -1.0f, sX, 1, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
 }

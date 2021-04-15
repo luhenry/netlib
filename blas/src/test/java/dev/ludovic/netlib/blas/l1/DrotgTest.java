@@ -35,13 +35,13 @@ public class DrotgTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
+    void testSanity(BLAS blas) {
         doubleW da = new doubleW(2.0);
         doubleW db = new doubleW(3.0);
         doubleW c = new doubleW(0.0);
         doubleW s = new doubleW(0.0);
 
-        getImpl(blas).drotg(da, db, c, s);
+        blas.drotg(da, db, c, s);
         assertEquals(3.6055512754639896, da.val);
         assertEquals(1.8027756377319950, db.val);
         assertEquals(0.5547001962252290, c.val);
@@ -50,13 +50,13 @@ public class DrotgTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testZeros(String blas) {
+    void testZeros(BLAS blas) {
         doubleW da = new doubleW(0.0);
         doubleW db = new doubleW(0.0);
         doubleW c = new doubleW(0.0);
         doubleW s = new doubleW(0.0);
 
-        getImpl(blas).drotg(da, db, c, s);
+        blas.drotg(da, db, c, s);
         assertEquals(0.0, da.val);
         assertEquals(0.0, db.val);
         assertEquals(1.0, c.val);

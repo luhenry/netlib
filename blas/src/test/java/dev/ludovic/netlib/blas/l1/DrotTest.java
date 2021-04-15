@@ -33,26 +33,26 @@ public class DrotTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
+    void testSanity(BLAS blas) {
         double[] expectedX, expectedY, dXcopy, dYcopy;
 
         f2j.drot(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, 2.0, 3.0);
-        getImpl(blas).drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 2.0, 3.0);
+        blas.drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 2.0, 3.0);
         assertArrayEquals(expectedX, dXcopy, depsilon);
         assertArrayEquals(expectedY, dYcopy, depsilon);
 
         f2j.drot(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, 0.0, 3.0);
-        getImpl(blas).drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 0.0, 3.0);
+        blas.drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 0.0, 3.0);
         assertArrayEquals(expectedX, dXcopy, depsilon);
         assertArrayEquals(expectedY, dYcopy, depsilon);
 
         f2j.drot(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, 2.0, 0.0);
-        getImpl(blas).drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 2.0, 0.0);
+        blas.drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 2.0, 0.0);
         assertArrayEquals(expectedX, dXcopy, depsilon);
         assertArrayEquals(expectedY, dYcopy, depsilon);
 
         f2j.drot(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, 0.0, 0.0);
-        getImpl(blas).drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 0.0, 0.0);
+        blas.drot(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, 0.0, 0.0);
         assertArrayEquals(expectedX, dXcopy, depsilon);
         assertArrayEquals(expectedY, dYcopy, depsilon);
     }

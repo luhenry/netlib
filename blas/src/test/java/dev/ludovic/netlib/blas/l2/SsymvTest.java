@@ -33,63 +33,63 @@ public class SsymvTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
+    void testSanity(BLAS blas) {
         float[] expected, sYcopy;
 
         f2j.ssymv("U", M,  1.0f, ssyA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("U", M,  1.0f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("U", M,  1.0f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("U", M,  0.5f, ssyA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("U", M,  0.5f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("U", M,  0.5f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("U", M, -0.5f, ssyA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("U", M, -0.5f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("U", M, -0.5f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("U", M,  0.0f, ssyA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("U", M,  0.0f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("U", M,  0.0f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("U", M,  1.0f, ssyA, M, sX, 1,  0.5f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("U", M,  1.0f, ssyA, M, sX, 1,  0.5f, sYcopy = sY.clone(), 1);
+        blas.ssymv("U", M,  1.0f, ssyA, M, sX, 1,  0.5f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("U", M,  1.0f, ssyA, M, sX, 1, -0.5f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("U", M,  1.0f, ssyA, M, sX, 1, -0.5f, sYcopy = sY.clone(), 1);
+        blas.ssymv("U", M,  1.0f, ssyA, M, sX, 1, -0.5f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("U", M,  1.0f, ssyA, M, sX, 1,  0.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("U", M,  1.0f, ssyA, M, sX, 1,  0.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("U", M,  1.0f, ssyA, M, sX, 1,  0.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("L", M,  1.0f, ssyA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("L", M,  1.0f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("L", M,  1.0f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("L", M,  0.5f, ssyA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("L", M,  0.5f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("L", M,  0.5f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("L", M, -0.5f, ssyA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("L", M, -0.5f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("L", M, -0.5f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("L", M,  0.0f, ssyA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("L", M,  0.0f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("L", M,  0.0f, ssyA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("L", M,  1.0f, ssyA, M, sX, 1,  0.5f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("L", M,  1.0f, ssyA, M, sX, 1,  0.5f, sYcopy = sY.clone(), 1);
+        blas.ssymv("L", M,  1.0f, ssyA, M, sX, 1,  0.5f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("L", M,  1.0f, ssyA, M, sX, 1, -0.5f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("L", M,  1.0f, ssyA, M, sX, 1, -0.5f, sYcopy = sY.clone(), 1);
+        blas.ssymv("L", M,  1.0f, ssyA, M, sX, 1, -0.5f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
         f2j.ssymv("L", M,  1.0f, ssyA, M, sX, 1,  0.0f, expected = sY.clone(), 1);
-        getImpl(blas).ssymv("L", M,  1.0f, ssyA, M, sX, 1,  0.0f, sYcopy = sY.clone(), 1);
+        blas.ssymv("L", M,  1.0f, ssyA, M, sX, 1,  0.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
 }

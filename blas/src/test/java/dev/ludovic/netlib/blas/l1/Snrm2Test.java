@@ -33,7 +33,7 @@ public class Snrm2Test extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
-        assertEquals(f2j.snrm2(M, sX, 1), getImpl(blas).snrm2(M, sX, 1), sepsilon);
+    void testSanity(BLAS blas) {
+        assertEquals(f2j.snrm2(M, sX, 1), blas.snrm2(M, sX, 1), sepsilon);
     }
 }

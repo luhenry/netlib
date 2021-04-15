@@ -33,45 +33,45 @@ public class DdotTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
-        assertEquals(f2j.ddot(M, dX, 1, dY, 1), getImpl(blas).ddot(M, dX, 1, dY, 1), depsilon);
+    void testSanity(BLAS blas) {
+        assertEquals(f2j.ddot(M, dX, 1, dY, 1), blas.ddot(M, dX, 1, dY, 1), depsilon);
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testOutOfBound(String blas) {
+    void testOutOfBound(BLAS blas) {
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            getImpl(blas).ddot(M + 1, dX, 1, dY, 1);
+            blas.ddot(M + 1, dX, 1, dY, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testOutOfBoundBecauseOfOffset(String blas) {
+    void testOutOfBoundBecauseOfOffset(BLAS blas) {
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            getImpl(blas).ddot(M, dX, 1, 1, dY, 1, 1);
+            blas.ddot(M, dX, 1, 1, dY, 1, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testOutOfBoundOnlyForX(String blas) {
+    void testOutOfBoundOnlyForX(BLAS blas) {
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            getImpl(blas).ddot(M, dX, 2, dY, 1);
+            blas.ddot(M, dX, 2, dY, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testXAndYAreNullAndNIsZero(String blas) {
-        assertEquals(0.0, getImpl(blas).ddot(0, null, 1, null, 1));
+    void testXAndYAreNullAndNIsZero(BLAS blas) {
+        assertEquals(0.0, blas.ddot(0, null, 1, null, 1));
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testXAndYAreNullAndNIsOne(String blas) {
+    void testXAndYAreNullAndNIsOne(BLAS blas) {
         assertThrows(java.lang.NullPointerException.class, () -> {
-            getImpl(blas).ddot(M, null, 1, null, 1);
+            blas.ddot(M, null, 1, null, 1);
         });
     }
 }

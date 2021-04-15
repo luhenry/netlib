@@ -33,7 +33,7 @@ public class Dnrm2Test extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
-        assertEquals(f2j.dnrm2(M, dX, 1), getImpl(blas).dnrm2(M, dX, 1), depsilon);
+    void testSanity(BLAS blas) {
+        assertEquals(f2j.dnrm2(M, dX, 1), blas.dnrm2(M, dX, 1), depsilon);
     }
 }

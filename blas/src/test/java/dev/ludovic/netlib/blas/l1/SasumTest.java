@@ -33,7 +33,7 @@ public class SasumTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
-        assertEquals(f2j.sasum(M, sX, 1), getImpl(blas).sasum(M, sX, 1), sepsilon);
+    void testSanity(BLAS blas) {
+        assertEquals(f2j.sasum(M, sX, 1), blas.sasum(M, sX, 1), sepsilon);
     }
 }

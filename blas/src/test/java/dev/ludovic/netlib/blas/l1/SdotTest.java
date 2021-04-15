@@ -33,45 +33,45 @@ public class SdotTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
-        assertEquals(f2j.sdot(M, sX, 1, sY, 1), getImpl(blas).sdot(M, sX, 1, sY, 1), sepsilon);
+    void testSanity(BLAS blas) {
+        assertEquals(f2j.sdot(M, sX, 1, sY, 1), blas.sdot(M, sX, 1, sY, 1), sepsilon);
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testOutOfBound(String blas) {
+    void testOutOfBound(BLAS blas) {
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            getImpl(blas).sdot(M + 1, sX, 1, sY, 1);
+            blas.sdot(M + 1, sX, 1, sY, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testOutOfBoundBecauseOfOffset(String blas) {
+    void testOutOfBoundBecauseOfOffset(BLAS blas) {
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            getImpl(blas).sdot(M, sX, 2, 1, sY, 2, 1);
+            blas.sdot(M, sX, 2, 1, sY, 2, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testOutOfBoundOnlyForX(String blas) {
+    void testOutOfBoundOnlyForX(BLAS blas) {
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            getImpl(blas).sdot(M, sX, 2, sY, 1);
+            blas.sdot(M, sX, 2, sY, 1);
         });
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testXAndYAreNullAndNIsZero(String blas) {
-        assertEquals(0.0f, getImpl(blas).sdot(0, null, 1, null, 1));
+    void testXAndYAreNullAndNIsZero(BLAS blas) {
+        assertEquals(0.0f, blas.sdot(0, null, 1, null, 1));
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testXAndYAreNullAndNIsOne(String blas) {
+    void testXAndYAreNullAndNIsOne(BLAS blas) {
         assertThrows(java.lang.NullPointerException.class, () -> {
-            getImpl(blas).sdot(1, null, 1, null, 1);
+            blas.sdot(1, null, 1, null, 1);
         });
     }
 }

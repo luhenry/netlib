@@ -33,23 +33,23 @@ public class SgemvTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
+    void testSanity(BLAS blas) {
         float[] expected, sYcopy;
 
-        getImpl(blas).sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 2.0f, expected = sY.clone(), 1);
-        getImpl(blas).sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        blas.sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
-        getImpl(blas).sgemv("T", N, M, 1.0f, sgeAT, N, sX, 1, 2.0f, expected = sY.clone(), 1);
-        getImpl(blas).sgemv("T", N, M, 1.0f, sgeAT, N, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        blas.sgemv("T", N, M, 1.0f, sgeAT, N, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgemv("T", N, M, 1.0f, sgeAT, N, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
-        getImpl(blas).sgemv("N", M, N, 2.0f, sgeA, M, sX, 1, 2.0f, expected = sY.clone(), 1);
-        getImpl(blas).sgemv("N", M, N, 2.0f, sgeA, M, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        blas.sgemv("N", M, N, 2.0f, sgeA, M, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N, 2.0f, sgeA, M, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
-        getImpl(blas).sgemv("T", N, M, 2.0f, sgeAT, N, sX, 1, 2.0f, expected = sY.clone(), 1);
-        getImpl(blas).sgemv("T", N, M, 2.0f, sgeAT, N, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        blas.sgemv("T", N, M, 2.0f, sgeAT, N, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgemv("T", N, M, 2.0f, sgeAT, N, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
 }

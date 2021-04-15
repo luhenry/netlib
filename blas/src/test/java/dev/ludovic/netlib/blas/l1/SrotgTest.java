@@ -35,13 +35,13 @@ public class SrotgTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
+    void testSanity(BLAS blas) {
         floatW sa = new floatW(2.0f);
         floatW sb = new floatW(3.0f);
         floatW c = new floatW(0.0f);
         floatW s = new floatW(0.0f);
 
-        getImpl(blas).srotg(sa, sb, c, s);
+        blas.srotg(sa, sb, c, s);
         assertEquals(3.6055514812469482f, sa.val);
         assertEquals(1.8027758598327637f, sb.val);
         assertEquals(0.5547001361846924f, c.val);
@@ -50,13 +50,13 @@ public class SrotgTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testZeros(String blas) {
+    void testZeros(BLAS blas) {
         floatW da = new floatW(0.0f);
         floatW db = new floatW(0.0f);
         floatW c = new floatW(0.0f);
         floatW s = new floatW(0.0f);
 
-        getImpl(blas).srotg(da, db, c, s);
+        blas.srotg(da, db, c, s);
         assertEquals(0.0f, da.val);
         assertEquals(0.0f, db.val);
         assertEquals(1.0f, c.val);

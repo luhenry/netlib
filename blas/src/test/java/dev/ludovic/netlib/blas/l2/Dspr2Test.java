@@ -33,15 +33,15 @@ public class Dspr2Test extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
+    void testSanity(BLAS blas) {
         double[] expected, dgeAcopy;
 
         f2j.dspr2("U", M, 2.0, dX, 1, dY, 1, expected = dgeAU.clone());
-        getImpl(blas).dspr2("U", M, 2.0, dX, 1, dY, 1, dgeAcopy = dgeAU.clone());
+        blas.dspr2("U", M, 2.0, dX, 1, dY, 1, dgeAcopy = dgeAU.clone());
         assertArrayEquals(expected, dgeAcopy, depsilon);
 
         f2j.dspr2("L", M, 2.0, dX, 1, dY, 1, expected = dgeAL.clone());
-        getImpl(blas).dspr2("L", M, 2.0, dX, 1, dY, 1, dgeAcopy = dgeAL.clone());
+        blas.dspr2("L", M, 2.0, dX, 1, dY, 1, dgeAcopy = dgeAL.clone());
         assertArrayEquals(expected, dgeAcopy, depsilon);
     }
 }

@@ -33,31 +33,31 @@ public class DspmvTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testSanity(String blas) {
+    void testSanity(BLAS blas) {
         double[] expected, dYcopy;
 
         f2j.dspmv("U", M, 2.0, dgeAU, dX, 1, 2.0, expected = dY.clone(), 1);
-        getImpl(blas).dspmv("U", M, 2.0, dgeAU, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        blas.dspmv("U", M, 2.0, dgeAU, dX, 1, 2.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dspmv("U", M, 2.0, dgeAU, dX, 1, 1.0, expected = dY.clone(), 1);
-        getImpl(blas).dspmv("U", M, 2.0, dgeAU, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        blas.dspmv("U", M, 2.0, dgeAU, dX, 1, 1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dspmv("U", M, 0.0, dgeAU, dX, 1, 2.0, expected = dY.clone(), 1);
-        getImpl(blas).dspmv("U", M, 0.0, dgeAU, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        blas.dspmv("U", M, 0.0, dgeAU, dX, 1, 2.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dspmv("L", M, 2.0, dgeAL, dX, 1, 2.0, expected = dY.clone(), 1);
-        getImpl(blas).dspmv("L", M, 2.0, dgeAL, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        blas.dspmv("L", M, 2.0, dgeAL, dX, 1, 2.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dspmv("L", M, 2.0, dgeAL, dX, 1, 1.0, expected = dY.clone(), 1);
-        getImpl(blas).dspmv("L", M, 2.0, dgeAL, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        blas.dspmv("L", M, 2.0, dgeAL, dX, 1, 1.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dspmv("L", M, 0.0, dgeAL, dX, 1, 2.0, expected = dY.clone(), 1);
-        getImpl(blas).dspmv("L", M, 0.0, dgeAL, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        blas.dspmv("L", M, 0.0, dgeAL, dX, 1, 2.0, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
     }
 }
