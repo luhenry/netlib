@@ -22,22 +22,27 @@
  * information or have any questions.
  */
 
-import java.util.stream.Stream;
+package dev.ludovic.netlib.arpack;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.provider.Arguments;
+import dev.ludovic.netlib.ARPACK;
 
-public class ARPACKTest {
+public final class NetlibNativeARPACK extends NetlibWrapper {
 
-  final static double depsilon = 1e-15d;
-  final static float sepsilon = 1e-6f;
+  private static final NetlibNativeARPACK instance;
 
-  private static Stream<Arguments> ARPACKImplementations() {
-    Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.arpack.NetlibF2jARPACK.getInstance()),
-      Arguments.of(dev.ludovic.netlib.arpack.JavaARPACK.getInstance())
-    );
+  static {
+    com.github.fommil.netlib.ARPACK arpack = com.github.fommil.netlib.ARPACK.getInstance();
+    if (arpack instanceof com.github.fommil.netlib.F2jARPACK) {
+        throw new RuntimeException("Unable to load native implementation");
+    }
+    instance = new NetlibNativeARPACK(arpack);
+  }
 
-    return instances;
+  protected NetlibNativeARPACK(com.github.fommil.netlib.ARPACK _arpack) {
+    super(_arpack);
+  }
+
+  public static ARPACK getInstance() {
+    return instance;
   }
 }

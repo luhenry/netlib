@@ -42,10 +42,10 @@ public abstract class ARPACKBenchmark {
     public void setupImplementation() {
         switch (implementation) {
         case "f2j":
-            arpack = dev.ludovic.netlib.arpack.NetlibWrapper.wrap(new com.github.fommil.netlib.F2jARPACK());
+            arpack = dev.ludovic.netlib.arpack.NetlibF2jARPACK.getInstance();
             break;
         case "native":
-            arpack = dev.ludovic.netlib.arpack.NetlibWrapper.wrap(com.github.fommil.netlib.ARPACK.getInstance());
+            arpack = dev.ludovic.netlib.arpack.NetlibNativeARPACK.getInstance();
             break;
         case "java":
             arpack = dev.ludovic.netlib.arpack.JavaARPACK.getInstance();
