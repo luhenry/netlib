@@ -32,7 +32,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.netlib.util.doubleW;
 
 @State(Scope.Thread)
-public class DrotgBenchmark extends BLASBenchmark {
+public class DrotgBenchmark extends L1Benchmark {
 
     public doubleW sa, saclone;
     public doubleW sb, sbclone;

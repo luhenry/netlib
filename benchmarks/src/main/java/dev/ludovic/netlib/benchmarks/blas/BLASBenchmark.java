@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 @Fork(value = 1)
+@Measurement(iterations = 3)
 public abstract class BLASBenchmark {
 
     public BLAS blas;

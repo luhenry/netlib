@@ -30,7 +30,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
-public class IsamaxBenchmark extends BLASBenchmark {
+public class IsamaxBenchmark extends L1Benchmark {
 
     @Param({"10", "1000000"})
     public int n;

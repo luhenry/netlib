@@ -30,7 +30,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
-public class SgemvBenchmark extends BLASBenchmark {
+public class SgemvBenchmark extends L2Benchmark {
 
     @Param({"N", "T"})
     public String trans;

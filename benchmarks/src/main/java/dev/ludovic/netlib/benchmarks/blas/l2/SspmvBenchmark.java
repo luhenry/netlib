@@ -30,7 +30,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
-public class SspmvBenchmark extends BLASBenchmark {
+public class SspmvBenchmark extends L2Benchmark {
 
     @Param({"U", "L"})
     public String uplo;

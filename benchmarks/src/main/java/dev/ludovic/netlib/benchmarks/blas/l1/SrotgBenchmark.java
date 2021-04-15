@@ -32,7 +32,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.netlib.util.floatW;
 
 @State(Scope.Thread)
-public class SrotgBenchmark extends BLASBenchmark {
+public class SrotgBenchmark extends L1Benchmark {
 
     public floatW sa, saclone;
     public floatW sb, sbclone;

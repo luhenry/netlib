@@ -22,43 +22,12 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib.benchmarks.blas.l2;
+package dev.ludovic.netlib.benchmarks.blas.l1;
 
 import dev.ludovic.netlib.benchmarks.blas.BLASBenchmark;
 
 import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.infra.Blackhole;
 
-@State(Scope.Thread)
-public class SgerBenchmark extends L2Benchmark {
-
-    @Param({"10", "1000"})
-    public int m;
-
-    @Param({"10", "1000"})
-    public int n;
-
-    public float alpha;
-    public float[] a, aclone;
-    public float[] x;
-    public float[] y;
-
-    @Setup(Level.Trial)
-    public void setup() {
-        alpha = randomFloat();
-        a = randomFloatArray(m * n);
-        x = randomFloatArray(m);
-        y = randomFloatArray(n);
-    }
-
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        aclone = a.clone();
-    }
-
-    @Benchmark
-    public void blas(Blackhole bh) {
-        blas.sger(m, n, alpha, x, 1, y, 1, aclone, n);
-        bh.consume(aclone);
-    }
+@Warmup(iterations = 15)
+public class L1Benchmark extends BLASBenchmark {
 }

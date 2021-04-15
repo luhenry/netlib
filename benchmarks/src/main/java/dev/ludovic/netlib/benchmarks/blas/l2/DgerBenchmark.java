@@ -30,7 +30,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
-public class DgerBenchmark extends BLASBenchmark {
+public class DgerBenchmark extends L2Benchmark {
 
     @Param({"10", "1000"})
     public int m;

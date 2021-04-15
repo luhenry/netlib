@@ -30,7 +30,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
-public class SsymmBenchmark extends BLASBenchmark {
+public class SsymmBenchmark extends L3Benchmark {
 
     @Param({"L", "R"})
     public String side;
