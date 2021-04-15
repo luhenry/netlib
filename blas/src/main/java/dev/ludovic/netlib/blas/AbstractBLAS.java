@@ -30,8 +30,6 @@ import dev.ludovic.netlib.BLAS;
 
 abstract class AbstractBLAS implements BLAS {
 
-  protected AbstractBLAS() {}
-
   protected int loopAlign(int index, int max, int size) {
     return Math.min(loopBound(index + size - 1, size), max);
   }
