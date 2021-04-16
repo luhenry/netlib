@@ -33,13 +33,19 @@ jobs:
     strategy:
       matrix:
         jdk: [11, 16]
-        include:
+        implementation: ["f2j", "java", "vector", "native"]
+        exclude:
         - jdk: 11
-          implementation: "f2j,java"
-          jvmArgs: ""
+          implementation: "vector"
+        - jdk: 11
+          implementation: "native"
+        include:
         - jdk: 16
-          implementation: "f2j,java,vector,native"
-          jvmArgs: "--add-modules=jdk.incubator.vector,jdk.incubator.foreign -Dforeign.restricted=permit"
+          implementation: "vector"
+          jvmArgs: "--add-modules=jdk.incubator.vector"
+        - jdk: 16
+          implementation: "native"
+          jvmArgs: "--add-modules=jdk.incubator.foreign -Dforeign.restricted=permit"
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -55,15 +61,15 @@ jobs:
       with:
         java-version: ${{ matrix.jdk }}
     - name: Run benchmark
-      run: java -jar benchmarks/target/netlib-benchmarks.jar -p implementation=${{ matrix.implementation }} -jvmArgs "${{ matrix.jvmArgs }}" -rf csv -rff jmh-results-jdk${{ matrix.jdk }}.csv | tee jmh-jdk${{ matrix.jdk }}.out
+      run: java -jar benchmarks/target/netlib-benchmarks.jar -p implementation=${{ matrix.implementation }} -jvmArgs "${{ matrix.jvmArgs }}" -rf csv -rff jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.csv | tee jmh-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.out
     - name: Upload JMH results
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.build.outputs.release_upload_url }}
-        asset_path: jmh-results-jdk${{ matrix.jdk }}.csv
-        asset_name: jmh-results-jdk${{ matrix.jdk }}.csv
+        asset_path: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.csv
+        asset_name: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.csv
         asset_content_type: text/csv
     - name: Upload JMH output
       uses: actions/upload-release-asset@v1
@@ -71,6 +77,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.build.outputs.release_upload_url }}
-        asset_path: jmh-jdk${{ matrix.jdk }}.out
-        asset_name: jmh-jdk${{ matrix.jdk }}.out
+        asset_path: jmh-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.out
+        asset_name: jmh-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.out
         asset_content_type: text/plain
