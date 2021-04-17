@@ -27,13 +27,13 @@ information or have any questions.
   <parent>
     <groupId>dev.ludovic.netlib</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>dev.ludovic.netlib</groupId>
   <artifactId>benchmarks</artifactId>
-  <version>1.0.8</version>
+  <version>1.0.9</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -45,17 +45,17 @@ information or have any questions.
     <dependency>
       <groupId>dev.ludovic.netlib</groupId>
       <artifactId>blas</artifactId>
-      <version>1.0.8</version>
+      <version>1.0.9</version>
     </dependency>
     <dependency>
       <groupId>dev.ludovic.netlib</groupId>
       <artifactId>arpack</artifactId>
-      <version>1.0.8</version>
+      <version>1.0.9</version>
     </dependency>
     <dependency>
       <groupId>dev.ludovic.netlib</groupId>
       <artifactId>lapack</artifactId>
-      <version>1.0.8</version>
+      <version>1.0.9</version>
     </dependency>
 
     <dependency>
