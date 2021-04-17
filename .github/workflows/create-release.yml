@@ -33,12 +33,7 @@ jobs:
     strategy:
       matrix:
         jdk: [11, 16]
-        implementation: ["f2j", "java", "vector", "native"]
-        exclude:
-        - jdk: 11
-          implementation: "vector"
-        - jdk: 11
-          implementation: "native"
+        implementation: ["f2j", "java"]
         include:
         - jdk: 16
           implementation: "vector"
@@ -54,23 +49,23 @@ jobs:
       with:
         java-version: 16
     - name: Build
-      run: mvn --batch-mode package
+      run: mvn --batch-mode -Dmaven.test.skip=true -Dmaven.javadoc.skip=true package
 
     - name: Set up JDK ${{ matrix.jdk }}
       uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.jdk }}
     - name: Run benchmark
-      run: java -jar benchmarks/target/netlib-benchmarks.jar -p implementation=${{ matrix.implementation }} -jvmArgs "${{ matrix.jvmArgs }}" -rf csv -rff jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.csv | tee jmh-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.out
+      run: java -jar benchmarks/target/netlib-benchmarks.jar -p implementation=${{ matrix.implementation }} -jvmArgs "${{ matrix.jvmArgs }}" -rf json -rff jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.json | tee jmh-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.out
     - name: Upload JMH results
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.build.outputs.release_upload_url }}
-        asset_path: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.csv
-        asset_name: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.csv
-        asset_content_type: text/csv
+        asset_path: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.json
+        asset_name: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.json
+        asset_content_type: application/json
     - name: Upload JMH output
       uses: actions/upload-release-asset@v1
       env:
