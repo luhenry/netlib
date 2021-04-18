@@ -16,6 +16,19 @@ jobs:
     outputs:
       release_upload_url: ${{ steps.create_release.outputs.upload_url  }}
     steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 16
+      uses: actions/setup-java@v1
+      with:
+        java-version: 16
+    - name: Build
+      run: mvn --batch-mode package
+    - name: Upload Benchmarks
+      uses: actions/upload-artifact@v2
+      with:
+        name: benchmarks
+        path: benchmarks/target/netlib-benchmarks.jar
+        if-no-files-found: error
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -34,37 +47,52 @@ jobs:
       matrix:
         jdk: [11, 16]
         implementation: ["f2j", "java"]
+        filter: ["dev.ludovic.netlib.benchmarks.blas.l1", "dev.ludovic.netlib.benchmarks.blas.l2", "dev.ludovic.netlib.benchmarks.blas.l3"]
         include:
         - jdk: 16
           implementation: "vector"
+          filter: "dev.ludovic.netlib.benchmarks.blas.l1"
+          jvmArgs: "--add-modules=jdk.incubator.vector"
+        - jdk: 16
+          implementation: "vector"
+          filter: "dev.ludovic.netlib.benchmarks.blas.l2"
+          jvmArgs: "--add-modules=jdk.incubator.vector"
+        - jdk: 16
+          implementation: "vector"
+          filter: "dev.ludovic.netlib.benchmarks.blas.l3"
           jvmArgs: "--add-modules=jdk.incubator.vector"
         - jdk: 16
           implementation: "native"
+          filter: "dev.ludovic.netlib.benchmarks.blas.l1"
+          jvmArgs: "--add-modules=jdk.incubator.foreign -Dforeign.restricted=permit"
+        - jdk: 16
+          implementation: "native"
+          filter: "dev.ludovic.netlib.benchmarks.blas.l2"
+          jvmArgs: "--add-modules=jdk.incubator.foreign -Dforeign.restricted=permit"
+        - jdk: 16
+          implementation: "native"
+          filter: "dev.ludovic.netlib.benchmarks.blas.l3"
           jvmArgs: "--add-modules=jdk.incubator.foreign -Dforeign.restricted=permit"
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Set up JDK 16
-      uses: actions/setup-java@v1
-      with:
-        java-version: 16
-    - name: Build
-      run: mvn --batch-mode -Dmaven.test.skip=true -Dmaven.javadoc.skip=true package
-
     - name: Set up JDK ${{ matrix.jdk }}
       uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.jdk }}
+    - name: Download Benchmarks
+      id: download_benchmarks
+      uses: actions/download-artifact@v2
+      with:
+        name: benchmarks
     - name: Run benchmark
-      run: java -jar benchmarks/target/netlib-benchmarks.jar -p implementation=${{ matrix.implementation }} -jvmArgs "-XX:+UseParallelGC ${{ matrix.jvmArgs }}" -rf json -rff jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.json | tee jmh-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.out
+      run: java -jar "${{steps.download_benchmarks.outputs.download-path}}/netlib-benchmarks.jar" ${{ matrix.filter }} -p implementation=${{ matrix.implementation }} -jvmArgs "-XX:+UseParallelGC ${{ matrix.jvmArgs }}" -rf json -rff jmh-results-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.json | tee jmh-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.out
     - name: Upload JMH results
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.build.outputs.release_upload_url }}
-        asset_path: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.json
-        asset_name: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.json
+        asset_path: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.json
+        asset_name: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.json
         asset_content_type: application/json
     - name: Upload JMH output
       uses: actions/upload-release-asset@v1
@@ -72,6 +100,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.build.outputs.release_upload_url }}
-        asset_path: jmh-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.out
-        asset_name: jmh-jdk${{ matrix.jdk }}-${{ matrix.implementation }}.out
+        asset_path: jmh-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.out
+        asset_name: jmh-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.out
         asset_content_type: text/plain
