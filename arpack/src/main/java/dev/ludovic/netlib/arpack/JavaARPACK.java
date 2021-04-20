@@ -270,5 +270,4 @@ public class JavaARPACK extends AbstractARPACK {
   protected void secondK(org.netlib.util.floatW t) {
     f2j.second(t);
   }
-
 }
