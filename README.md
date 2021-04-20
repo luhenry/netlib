@@ -2,20 +2,20 @@
 
 ## Requirements
 
-- JDK 16+. It rely on the Vector API which has been integrated in JDK 16
+- JDK 16+. It rely on the Vector API and Foreign Linker API which have been integrated in JDK 16
 
 ## Commands
 
 ```
-$> JAVA_HOME=/usr/lib/jvm/jdk-17+1 mvn clean package
+$> mvn clean package
 ```
 
-# Run
+# Run benchmarks
 
-You've a set of benchmarks in [benchmarks/src/main/java](https://github.com/luhenry/blas/tree/master/benchmarks/src/main/java/). You can run them with:
+You've a set of benchmarks in [benchmarks/src/main/java/dev/ludovic/netlib/benchmarks/](https://github.com/luhenry/netlib/tree/master/benchmarks/src/main/java/dev/ludovic/netlib/benchmarks/). You can run them with:
 
 ```
-$> /usr/lib/jvm/jdk-17+1/bin/java -jar benchmarks/target/netlib-benchmarks.jar
+$> java -jar benchmarks/target/netlib-benchmarks.jar
 ```
 
 # Contribution
