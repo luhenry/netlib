@@ -31,6 +31,7 @@ import java.util.function.Supplier;
 import dev.ludovic.netlib.BLAS;
 
 import java.lang.invoke.MethodType;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jdk.incubator.foreign.CLinker;
@@ -47,7 +48,10 @@ public final class NativeBLAS extends AbstractBLAS {
 
   private static final NativeBLAS instance = new NativeBLAS();
 
-  private final LibraryLookup blas = LibraryLookup.ofLibrary(System.getProperty("dev.ludovic.netlib.blas.nativeLib", "blas"));
+  private final LibraryLookup blas =
+    System.getProperty("dev.ludovic.netlib.blas.nativeLibPath") != null ?
+      LibraryLookup.ofPath(Paths.get(System.getProperty("dev.ludovic.netlib.blas.nativeLibPath"))) :
+      LibraryLookup.ofLibrary(System.getProperty("dev.ludovic.netlib.blas.nativeLib", "blas"));
 
   protected NativeBLAS() {}
 
