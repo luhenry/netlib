@@ -58,7 +58,7 @@ public class DgerBenchmark extends L2Benchmark {
 
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dger(m, n, alpha, x, 1, y, 1, aclone, n);
+        blas.dger(m, n, alpha, x, 1, y, 1, aclone, m);
         bh.consume(aclone);
     }
 }
