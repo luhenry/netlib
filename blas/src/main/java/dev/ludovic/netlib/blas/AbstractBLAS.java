@@ -42,6 +42,13 @@ abstract class AbstractBLAS implements BLAS {
     return new IllegalArgumentException(String.format("** On entry to '%s' parameter number %d had an illegal value", method, arg));
   }
 
+  private void checkIndex(int index, int length) {
+    //FIXME: switch to Objects.checkIndex when the minimum version becomes JDK 11
+    if (index < 0 || index >= length) {
+      throw new IndexOutOfBoundsException(index);
+    }
+  }
+
   public double dasum(int n, double[] x, int incx) {
     return dasum(n, x, 0, incx);
   }
@@ -51,7 +58,7 @@ abstract class AbstractBLAS implements BLAS {
       return 0.0;
     }
     Objects.requireNonNull(x);
-    Objects.checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     return dasumK(n, x, offsetx, incx);
   }
 
@@ -66,7 +73,7 @@ abstract class AbstractBLAS implements BLAS {
       return 0.0f;
     }
     Objects.requireNonNull(x);
-    Objects.checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     return sasumK(n, x, offsetx, incx);
   }
 
@@ -86,8 +93,8 @@ abstract class AbstractBLAS implements BLAS {
     }
     Objects.requireNonNull(x);
     Objects.requireNonNull(y);
-    Objects.checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
-    Objects.checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     daxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
   }
 
@@ -107,8 +114,8 @@ abstract class AbstractBLAS implements BLAS {
     }
     Objects.requireNonNull(x);
     Objects.requireNonNull(y);
-    Objects.checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
-    Objects.checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     saxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
   }
 
@@ -124,8 +131,8 @@ abstract class AbstractBLAS implements BLAS {
     }
     Objects.requireNonNull(x);
     Objects.requireNonNull(y);
-    Objects.checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
-    Objects.checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     dcopyK(n, x, offsetx, incx, y, offsety, incy);
   }
 
@@ -141,8 +148,8 @@ abstract class AbstractBLAS implements BLAS {
     }
     Objects.requireNonNull(x);
     Objects.requireNonNull(y);
-    Objects.checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
-    Objects.checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     scopyK(n, x, offsetx, incx, y, offsety, incy);
   }
 
@@ -159,8 +166,8 @@ abstract class AbstractBLAS implements BLAS {
     }
     Objects.requireNonNull(x);
     Objects.requireNonNull(y);
-    Objects.checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
-    Objects.checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     return ddotK(n, x, offsetx, incx, y, offsety, incy);
   }
 
@@ -177,8 +184,8 @@ abstract class AbstractBLAS implements BLAS {
     }
     Objects.requireNonNull(x);
     Objects.requireNonNull(y);
-    Objects.checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
-    Objects.checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     return sdotK(n, x, offsetx, incx, y, offsety, incy);
   }
 

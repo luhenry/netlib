@@ -139,7 +139,7 @@ public class BLASTest {
 
   protected static final void dumpArray(String name, double[] arr) {
     System.out.print(name + ": ");
-    for(var e : arr) {
+    for(double e : arr) {
       System.out.print(String.format("%.3f,", e));
     }
     System.out.println();

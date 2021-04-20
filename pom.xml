@@ -64,8 +64,8 @@ information or have any questions.
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <javac.target>11</javac.target>
-    <jvm.options>--add-modules=jdk.incubator.vector,jdk.incubator.foreign</jvm.options>
+    <javac.target>8</javac.target>
+    <jvm.modules>jdk.incubator.vector,jdk.incubator.foreign</jvm.modules>
   </properties>
 
   <build>
@@ -130,9 +130,6 @@ information or have any questions.
             <compilerVersion>${javac.target}</compilerVersion>
             <source>${javac.target}</source>
             <target>${javac.target}</target>
-            <compilerArgs>
-              <arg>${jvm.options}</arg>
-            </compilerArgs>
           </configuration>
         </plugin>
         <plugin>
@@ -152,7 +149,7 @@ information or have any questions.
           <version>3.2.0</version>
           <configuration>
             <additionalJOptions>
-              <additionalJOption>${jvm.options}</additionalJOption>
+              <additionalJOption>--add-modules=${jvm.modules}</additionalJOption>
             </additionalJOptions>
           </configuration>
         </plugin>
@@ -177,7 +174,7 @@ information or have any questions.
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.0.0-M5</version>
           <configuration>
-            <argLine>${jvm.options} -Dforeign.restricted=permit</argLine>
+            <argLine>--add-modules=${jvm.modules} -Dforeign.restricted=permit</argLine>
           </configuration>
         </plugin>
         <plugin>
