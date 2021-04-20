@@ -26,14 +26,12 @@ package dev.ludovic.netlib.blas;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
-import java.util.function.Supplier;
-
-import dev.ludovic.netlib.BLAS;
-
 import java.lang.invoke.MethodType;
 import java.nio.file.Paths;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.FunctionDescriptor;
 import jdk.incubator.foreign.LibraryLookup;
@@ -41,6 +39,8 @@ import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemorySegment;
 
 import static jdk.incubator.foreign.CLinker.*;
+
+import dev.ludovic.netlib.BLAS;
 
 public final class NativeBLAS extends AbstractBLAS {
 
