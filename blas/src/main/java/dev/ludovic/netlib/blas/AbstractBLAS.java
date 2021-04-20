@@ -38,8 +38,10 @@ abstract class AbstractBLAS implements BLAS {
     return index - (index % size);
   }
 
-  protected IllegalArgumentException illegalArgument(String method, int arg) {
-    return new IllegalArgumentException(String.format("** On entry to '%s' parameter number %d had an illegal value", method, arg));
+  private void checkArgument(String method, int arg, boolean check) {
+    if (!check) {
+      throw new IllegalArgumentException(String.format("** On entry to '%s' parameter number %d had an illegal value", method, arg));
+    }
   }
 
   private void checkIndex(int index, int length) {
@@ -232,30 +234,14 @@ abstract class AbstractBLAS implements BLAS {
 
   // c = alpha * a * b + beta * c
   public void dgemm(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    if (!lsame("T", transa) && !lsame("N", transa) && !lsame("C", transa)) {
-      throw illegalArgument("DGEMM", 1);
-    }
-    if (!lsame("T", transb) && !lsame("N", transb) && !lsame("C", transb)) {
-      throw illegalArgument("DGEMM", 2);
-    }
-    if (m < 0) {
-      throw illegalArgument("DGEMM", 3);
-    }
-    if (n < 0) {
-      throw illegalArgument("DGEMM", 4);
-    }
-    if (k < 0) {
-      throw illegalArgument("DGEMM", 5);
-    }
-    if (lda < Math.max(1, lsame("N", transa) ? m : k)) {
-      throw illegalArgument("DGEMM", 8);
-    }
-    if (ldb < Math.max(1, lsame("N", transb) ? k : n)) {
-      throw illegalArgument("DGEMM", 10);
-    }
-    if (ldc < Math.max(1, m)) {
-      throw illegalArgument("DGEMM", 13);
-    }
+    checkArgument("DGEMM", 1, lsame("T", transa) || lsame("N", transa) || lsame("C", transa));
+    checkArgument("DGEMM", 2, lsame("T", transb) || lsame("N", transb) || lsame("C", transb));
+    checkArgument("DGEMM", 3, m >= 0);
+    checkArgument("DGEMM", 4, n >= 0);
+    checkArgument("DGEMM", 5, k >= 0);
+    checkArgument("DGEMM", 8, lda >= Math.max(1, lsame("N", transa) ? m : k));
+    checkArgument("DGEMM", 10, ldb >= Math.max(1, lsame("N", transb) ? k : n));
+    checkArgument("DGEMM", 13, ldc >= Math.max(1, m));
     if (m == 0 || n == 0 || ((alpha == 0.0 || k == 0) && beta == 1.0)) {
       return;
     }
@@ -270,30 +256,14 @@ abstract class AbstractBLAS implements BLAS {
 
   // c = alpha * a * b + beta * c
   public void sgemm(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    if (!lsame("T", transa) && !lsame("N", transa) && !lsame("C", transa)) {
-      throw illegalArgument("SGEMM", 1);
-    }
-    if (!lsame("T", transb) && !lsame("N", transb) && !lsame("C", transb)) {
-      throw illegalArgument("SGEMM", 2);
-    }
-    if (m < 0) {
-      throw illegalArgument("SGEMM", 3);
-    }
-    if (n < 0) {
-      throw illegalArgument("SGEMM", 4);
-    }
-    if (k < 0) {
-      throw illegalArgument("SGEMM", 5);
-    }
-    if (lda < Math.max(1, lsame("N", transa) ? m : k)) {
-      throw illegalArgument("SGEMM", 8);
-    }
-    if (ldb < Math.max(1, lsame("N", transb) ? k : n)) {
-      throw illegalArgument("SGEMM", 10);
-    }
-    if (ldc < Math.max(1, m)) {
-      throw illegalArgument("SGEMM", 13);
-    }
+    checkArgument("SGEMM", 1, lsame("T", transa) || lsame("N", transa) || lsame("C", transa));
+    checkArgument("SGEMM", 2, lsame("T", transb) || lsame("N", transb) || lsame("C", transb));
+    checkArgument("SGEMM", 3, m >= 0);
+    checkArgument("SGEMM", 4, n >= 0);
+    checkArgument("SGEMM", 5, k >= 0);
+    checkArgument("SGEMM", 8, lda >= Math.max(1, lsame("N", transa) ? m : k));
+    checkArgument("SGEMM", 10, ldb >= Math.max(1, lsame("N", transb) ? k : n));
+    checkArgument("SGEMM", 13, ldc >= Math.max(1, m));
     if (m == 0 || n == 0 || ((alpha == 0.0f || k == 0) && beta == 1.0f)) {
       return;
     }
@@ -308,24 +278,12 @@ abstract class AbstractBLAS implements BLAS {
 
   // y = alpha * A * x + beta * y
   public void dgemv(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    if (!lsame("N", trans) && !lsame("T", trans) && !lsame("C", trans)) {
-      throw illegalArgument("DGEMV", 1);
-    }
-    if (m < 0) {
-      throw illegalArgument("DGEMV", 2);
-    }
-    if (n < 0) {
-      throw illegalArgument("DGEMV", 3);
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("DGEMV", 6);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DGEMV", 8);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DGEMV", 11);
-    }
+    checkArgument("DGEMV", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DGEMV", 2, m >= 0);
+    checkArgument("DGEMV", 3, n >= 0);
+    checkArgument("DGEMV", 6, lda >= Math.max(1, m));
+    checkArgument("DGEMV", 8, incx != 0);
+    checkArgument("DGEMV", 11, incy != 0);
     if (m == 0 || n == 0) {
       return;
     }
@@ -340,24 +298,12 @@ abstract class AbstractBLAS implements BLAS {
 
   // y = alpha * A * x + beta * y
   public void sgemv(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    if (!lsame("N", trans) && !lsame("T", trans) && !lsame("C", trans)) {
-      throw illegalArgument("SGEMV", 1);
-    }
-    if (m < 0) {
-      throw illegalArgument("SGEMV", 2);
-    }
-    if (n < 0) {
-      throw illegalArgument("SGEMV", 3);
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("SGEMV", 6);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SGEMV", 8);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SGEMV", 11);
-    }
+    checkArgument("SGEMV", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("SGEMV", 2, m >= 0);
+    checkArgument("SGEMV", 3, n >= 0);
+    checkArgument("SGEMV", 6, lda >= Math.max(1, m));
+    checkArgument("SGEMV", 8, incx != 0);
+    checkArgument("SGEMV", 11, incy != 0);
     if (m == 0 || n == 0) {
       return;
     }
@@ -372,21 +318,11 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void dger(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
-    if (m < 0) {
-      throw illegalArgument("DGER", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DGER", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DGER", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DGER", 7);
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("DGER", 9);
-    }
+    checkArgument("DGER", 1, m >= 0);
+    checkArgument("DGER", 2, n >= 0);
+    checkArgument("DGER", 5, incx != 0);
+    checkArgument("DGER", 7, incy != 0);
+    checkArgument("DGER", 9, lda >= Math.max(1, m));
     if (m == 0 || n == 0) {
       return;
     }
@@ -402,21 +338,11 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void sger(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
-    if (m < 0) {
-      throw illegalArgument("SGER", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SGER", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SGER", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SGER", 7);
-    }
-    if (lda < Math.max(1, m)) {
-      throw illegalArgument("SGER", 9);
-    }
+    checkArgument("SGER", 1, m >= 0);
+    checkArgument("SGER", 2, n >= 0);
+    checkArgument("SGER", 5, incx != 0);
+    checkArgument("SGER", 7, incy != 0);
+    checkArgument("SGER", 9, lda >= Math.max(1, m));
     if (m == 0 || n == 0) {
       return;
     }
@@ -649,18 +575,10 @@ abstract class AbstractBLAS implements BLAS {
 
   // y = alpha * a * x + beta * y
   public void dspmv(String uplo, int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSPMV", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSPMV", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSPMV", 6);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DSPMV", 9);
-    }
+    checkArgument("DSPMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSPMV", 2, n >= 0);
+    checkArgument("DSPMV", 6, incx != 0);
+    checkArgument("DSPMV", 9, incy != 0);
     if (n == 0) {
       return;
     }
@@ -674,18 +592,10 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void sspmv(String uplo, int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSPMV", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSPMV", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSPMV", 6);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SSPMV", 9);
-    }
+    checkArgument("SSPMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSPMV", 2, n >= 0);
+    checkArgument("SSPMV", 6, incx != 0);
+    checkArgument("SSPMV", 9, incy != 0);
     if (n == 0) {
       return;
     }
@@ -700,15 +610,9 @@ abstract class AbstractBLAS implements BLAS {
 
   // a += alpha * x * x.t
   public void dspr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSPR", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSPR", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSPR", 5);
-    }
+    checkArgument("DSPR", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSPR", 2, n >= 0);
+    checkArgument("DSPR", 5, incx != 0);
     if (n == 0) {
       return;
     }
@@ -723,15 +627,9 @@ abstract class AbstractBLAS implements BLAS {
 
   // a += alpha * x * x.t
   public void sspr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSPR", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSPR", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSPR", 5);
-    }
+    checkArgument("SSPR", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSPR", 2, n >= 0);
+    checkArgument("SSPR", 5, incx != 0);
     if (n == 0) {
       return;
     }
@@ -746,18 +644,10 @@ abstract class AbstractBLAS implements BLAS {
 
   // a += alpha * x * y.t + alpha * y * x.t
   public void dspr2(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSPR2", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSPR2", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSPR2", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DSPR2", 7);
-    }
+    checkArgument("DSPR2", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSPR2", 2, n >= 0);
+    checkArgument("DSPR2", 5, incx != 0);
+    checkArgument("DSPR2", 7, incy != 0);
     if (n == 0) {
       return;
     }
@@ -772,18 +662,10 @@ abstract class AbstractBLAS implements BLAS {
 
   // a += alpha * x * y.t + alpha * y * x.t
   public void sspr2(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSPR2", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSPR2", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSPR2", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SSPR2", 7);
-    }
+    checkArgument("SSPR2", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSPR2", 2, n >= 0);
+    checkArgument("SSPR2", 5, incx != 0);
+    checkArgument("SSPR2", 7, incy != 0);
     if (n == 0) {
       return;
     }
@@ -823,27 +705,13 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void dsymm(String side, String uplo, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    if (!lsame("L", side) && !lsame("R", side)) {
-      throw illegalArgument("DSYMM", 1);
-    }
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSYMM", 2);
-    }
-    if (m < 0) {
-      throw illegalArgument("DSYMM", 3);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSYMM", 4);
-    }
-    if (lda < Math.max(1, lsame("L", side) ? m : n)) {
-      throw illegalArgument("DSYMM", 7);
-    }
-    if (ldb < Math.max(1, m)) {
-      throw illegalArgument("DSYMM", 9);
-    }
-    if (ldc < Math.max(1, m)) {
-      throw illegalArgument("DSYMM", 12);
-    }
+    checkArgument("DSYMM", 1, lsame("L", side) || lsame("R", side));
+    checkArgument("DSYMM", 2, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSYMM", 3, m >= 0);
+    checkArgument("DSYMM", 4, n >= 0);
+    checkArgument("DSYMM", 7, lda >= Math.max(1, lsame("L", side) ? m : n));
+    checkArgument("DSYMM", 9, ldb >= Math.max(1, m));
+    checkArgument("DSYMM", 12, ldc >= Math.max(1, m));
     if (m == 0 || n == 0 || (alpha == 0.0 && beta == 1.0)) {
       return;
     }
@@ -857,27 +725,13 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void ssymm(String side, String uplo, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    if (!lsame("L", side) && !lsame("R", side)) {
-      throw illegalArgument("SSYMM", 1);
-    }
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSYMM", 2);
-    }
-    if (m < 0) {
-      throw illegalArgument("SSYMM", 3);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSYMM", 4);
-    }
-    if (lda < Math.max(1, lsame("L", side) ? m : n)) {
-      throw illegalArgument("SSYMM", 7);
-    }
-    if (ldb < Math.max(1, m)) {
-      throw illegalArgument("SSYMM", 9);
-    }
-    if (ldc < Math.max(1, m)) {
-      throw illegalArgument("SSYMM", 12);
-    }
+    checkArgument("SSYMM", 1, lsame("L", side) || lsame("R", side));
+    checkArgument("SSYMM", 2, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSYMM", 3, m >= 0);
+    checkArgument("SSYMM", 4, n >= 0);
+    checkArgument("SSYMM", 7, lda >= Math.max(1, lsame("L", side) ? m : n));
+    checkArgument("SSYMM", 9, ldb >= Math.max(1, m));
+    checkArgument("SSYMM", 12, ldc >= Math.max(1, m));
     if (m == 0 || n == 0 || (alpha == 0.0f && beta == 1.0f)) {
       return;
     }
@@ -891,21 +745,11 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void dsymv(String uplo, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSYMV", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSYMV", 2);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("DSYMV", 5);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSYMV", 7);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DSYMV", 10);
-    }
+    checkArgument("DSYMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSYMV", 2, n >= 0);
+    checkArgument("DSYMV", 5, lda >= Math.max(1, n));
+    checkArgument("DSYMV", 7, incx != 0);
+    checkArgument("DSYMV", 10, incy != 0);
     if (n == 0) {
       return;
     }
@@ -919,21 +763,11 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void ssymv(String uplo, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSYMV", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSYMV", 2);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("SSYMV", 5);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSYMV", 7);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SSYMV", 10);
-    }
+    checkArgument("SSYMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSYMV", 2, n >= 0);
+    checkArgument("SSYMV", 5, lda >= Math.max(1, n));
+    checkArgument("SSYMV", 7, incx != 0);
+    checkArgument("SSYMV", 10, incy != 0);
     if (n == 0) {
       return;
     }
@@ -948,18 +782,10 @@ abstract class AbstractBLAS implements BLAS {
 
   // a += alpha * x * x.t
   public void dsyr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSYR", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSYR", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSYR", 5);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("DSYR", 7);
-    }
+    checkArgument("DSYR", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSYR", 2, n >= 0);
+    checkArgument("DSYR", 5, incx != 0);
+    checkArgument("DSYR", 7, lda >= Math.max(1, n));
     if (n == 0) {
       return;
     }
@@ -973,18 +799,10 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void ssyr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSYR", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSYR", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSYR", 5);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("SSYR", 7);
-    }
+    checkArgument("SSYR", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSYR", 2, n >= 0);
+    checkArgument("SSYR", 5, incx != 0);
+    checkArgument("SSYR", 7, lda >= Math.max(1, n));
     if (n == 0) {
       return;
     }
@@ -998,21 +816,11 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void dsyr2(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("DSYR2", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("DSYR2", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("DSYR2", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("DSYR2", 7);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("DSYR2", 9);
-    }
+    checkArgument("DSYR2", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSYR2", 2, n >= 0);
+    checkArgument("DSYR2", 5, incx != 0);
+    checkArgument("DSYR2", 7, incy != 0);
+    checkArgument("DSYR2", 9, lda >= Math.max(1, n));
     if (n == 0) {
       return;
     }
@@ -1026,21 +834,11 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   public void ssyr2(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
-    if (!lsame("U", uplo) && !lsame("L", uplo)) {
-      throw illegalArgument("SSYR2", 1);
-    }
-    if (n < 0) {
-      throw illegalArgument("SSYR2", 2);
-    }
-    if (incx == 0) {
-      throw illegalArgument("SSYR2", 5);
-    }
-    if (incy == 0) {
-      throw illegalArgument("SSYR2", 7);
-    }
-    if (lda < Math.max(1, n)) {
-      throw illegalArgument("SSYR2", 9);
-    }
+    checkArgument("SSYR2", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSYR2", 2, n >= 0);
+    checkArgument("SSYR2", 5, incx != 0);
+    checkArgument("SSYR2", 7, incy != 0);
+    checkArgument("SSYR2", 9, lda >= Math.max(1, n));
     if (n == 0) {
       return;
     }
