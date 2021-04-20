@@ -28,6 +28,7 @@ import dev.ludovic.netlib.benchmarks.blas.BLASBenchmark;
 
 import org.openjdk.jmh.annotations.*;
 
-@Warmup(iterations = 21)
+@Warmup(iterations = 6)
+@Measurement(iterations = 12)
 public class L1Benchmark extends BLASBenchmark {
 }
