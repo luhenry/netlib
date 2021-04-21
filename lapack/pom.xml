@@ -47,9 +47,8 @@ information or have any questions.
   <dependencies>
     <dependency>
       <groupId>com.github.fommil.netlib</groupId>
-      <artifactId>all</artifactId>
+      <artifactId>core</artifactId>
       <version>${netlib.java.version}</version>
-      <type>pom</type>
     </dependency>
 
     <dependency>
