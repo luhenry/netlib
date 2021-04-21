@@ -32,9 +32,16 @@ public class LAPACKTest {
 
   private static Stream<Arguments> LAPACKImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.lapack.NetlibF2jLAPACK.getInstance()),
-      Arguments.of(dev.ludovic.netlib.lapack.JavaLAPACK.getInstance())
+      Arguments.of(dev.ludovic.netlib.lapack.NetlibF2jLAPACK.getInstance())
     );
+
+    try {
+      instances = Stream.concat(instances, Stream.of(
+        dev.ludovic.netlib.lapack.NetlibNativeLAPACK.getInstance()
+      ));
+    } catch (ExceptionInInitializerError e) {
+    } catch (NoClassDefFoundError e) {
+    }
 
     return instances;
   }

@@ -27,7 +27,7 @@ package dev.ludovic.netlib.lapack;
 
 import dev.ludovic.netlib.LAPACK;
 
-public final class NetlibNativeLAPACK extends NetlibWrapper {
+public final class NetlibNativeLAPACK extends NetlibWrapper implements dev.ludovic.netlib.NativeLAPACK {
 
   private static final NetlibNativeLAPACK instance;
 
@@ -43,7 +43,7 @@ public final class NetlibNativeLAPACK extends NetlibWrapper {
     super(_lapack);
   }
 
-  public static LAPACK getInstance() {
+  public static dev.ludovic.netlib.NativeLAPACK getInstance() {
     return instance;
   }
 }

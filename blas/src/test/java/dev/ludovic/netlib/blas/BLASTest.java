@@ -31,28 +31,40 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 
 import dev.ludovic.netlib.BLAS;
-import dev.ludovic.netlib.blas.*;
 
 public class BLASTest {
 
   final static double depsilon = 1e-11d;
   final static float sepsilon = 1e-3f;
 
-  final static BLAS f2j = NetlibF2jBLAS.getInstance();
+  final static BLAS f2j = dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance();
 
   private static Stream<Arguments> BLASImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(NetlibF2jBLAS.getInstance()),
-      Arguments.of(JavaBLAS.getInstance())
+      Arguments.of(dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance()),
+      Arguments.of(dev.ludovic.netlib.blas.JavaBLAS.getInstance())
     );
 
     try {
-      instances = Stream.concat(instances, Stream.of(VectorizedBLAS.getInstance()));
+      instances = Stream.concat(instances, Stream.of(
+        Arguments.of(dev.ludovic.netlib.blas.NetlibNativeBLAS.getInstance())
+      ));
+    } catch (ExceptionInInitializerError e) {
     } catch (NoClassDefFoundError e) {
     }
 
     try {
-      instances = Stream.concat(instances, Stream.of(NativeBLAS.getInstance()));
+      instances = Stream.concat(instances, Stream.of(
+        Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance())
+      ));
+    } catch (ExceptionInInitializerError e) {
+    } catch (NoClassDefFoundError e) {
+    }
+
+    try {
+      instances = Stream.concat(instances, Stream.of(
+        Arguments.of(dev.ludovic.netlib.blas.ForeignBLAS.getInstance())
+      ));
     } catch (ExceptionInInitializerError e) {
     } catch (NoClassDefFoundError e) {
     }

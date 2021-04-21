@@ -32,7 +32,7 @@ import jdk.incubator.vector.FloatVector;
 import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.VectorSpecies;
 
-public class VectorizedBLAS extends JavaBLAS {
+public class VectorizedBLAS extends JavaBLAS implements dev.ludovic.netlib.JavaBLAS {
 
   private static final VectorSpecies<Float>  FMAX = FloatVector.SPECIES_MAX;
   private static final VectorSpecies<Double> DMAX = DoubleVector.SPECIES_MAX;
@@ -41,7 +41,7 @@ public class VectorizedBLAS extends JavaBLAS {
 
   protected VectorizedBLAS() {}
 
-  public static BLAS getInstance() {
+  public static dev.ludovic.netlib.JavaBLAS getInstance() {
     return instance;
   }
 

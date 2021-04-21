@@ -40,7 +40,7 @@ public abstract class BLASBenchmark {
 
     public BLAS blas;
 
-    @Param({"f2j", "native", "java", "vector"})
+    @Param({"f2j", "java", "native"})
     public String implementation;
 
     @Setup
@@ -50,13 +50,10 @@ public abstract class BLASBenchmark {
             blas = dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance();
             break;
         case "java":
-            blas = dev.ludovic.netlib.blas.JavaBLAS.getInstance();
-            break;
-        case "vector":
-            blas = dev.ludovic.netlib.blas.VectorizedBLAS.getInstance();
+            blas = dev.ludovic.netlib.JavaBLAS.getInstance();
             break;
         case "native":
-            blas = dev.ludovic.netlib.blas.NativeBLAS.getInstance();
+            blas = dev.ludovic.netlib.NativeBLAS.getInstance();
             break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }

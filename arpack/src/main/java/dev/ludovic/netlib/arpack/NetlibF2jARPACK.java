@@ -27,7 +27,7 @@ package dev.ludovic.netlib.arpack;
 
 import dev.ludovic.netlib.ARPACK;
 
-public final class NetlibF2jARPACK extends NetlibWrapper {
+public final class NetlibF2jARPACK extends NetlibWrapper implements dev.ludovic.netlib.JavaARPACK {
 
   private static final NetlibF2jARPACK instance;
 
@@ -39,7 +39,7 @@ public final class NetlibF2jARPACK extends NetlibWrapper {
     super(_arpack);
   }
 
-  public static ARPACK getInstance() {
+  public static dev.ludovic.netlib.JavaARPACK getInstance() {
     return instance;
   }
 }

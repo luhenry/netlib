@@ -32,9 +32,16 @@ public class ARPACKTest {
 
   private static Stream<Arguments> ARPACKImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.arpack.NetlibF2jARPACK.getInstance()),
-      Arguments.of(dev.ludovic.netlib.arpack.JavaARPACK.getInstance())
+      Arguments.of(dev.ludovic.netlib.arpack.NetlibF2jARPACK.getInstance())
     );
+
+    try {
+      instances = Stream.concat(instances, Stream.of(
+        dev.ludovic.netlib.arpack.NetlibNativeARPACK.getInstance()
+      ));
+    } catch (ExceptionInInitializerError e) {
+    } catch (NoClassDefFoundError e) {
+    }
 
     return instances;
   }

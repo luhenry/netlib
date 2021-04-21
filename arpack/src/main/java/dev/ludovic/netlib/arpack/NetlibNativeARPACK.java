@@ -27,7 +27,7 @@ package dev.ludovic.netlib.arpack;
 
 import dev.ludovic.netlib.ARPACK;
 
-public final class NetlibNativeARPACK extends NetlibWrapper {
+public final class NetlibNativeARPACK extends NetlibWrapper implements dev.ludovic.netlib.NativeARPACK {
 
   private static final NetlibNativeARPACK instance;
 
@@ -43,7 +43,7 @@ public final class NetlibNativeARPACK extends NetlibWrapper {
     super(_arpack);
   }
 
-  public static ARPACK getInstance() {
+  public static dev.ludovic.netlib.NativeARPACK getInstance() {
     return instance;
   }
 }

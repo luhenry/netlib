@@ -36,7 +36,7 @@ public abstract class LAPACKBenchmark {
 
     public LAPACK lapack;
 
-    @Param({"f2j", "native", "java"})
+    @Param({"f2j", "java", "native"})
     public String implementation;
 
     @Setup
@@ -45,11 +45,11 @@ public abstract class LAPACKBenchmark {
         case "f2j":
             lapack = dev.ludovic.netlib.lapack.NetlibF2jLAPACK.getInstance();
             break;
-        case "native":
-            lapack = dev.ludovic.netlib.lapack.NetlibNativeLAPACK.getInstance();
-            break;
         case "java":
-            lapack = dev.ludovic.netlib.lapack.JavaLAPACK.getInstance();
+            lapack = dev.ludovic.netlib.JavaLAPACK.getInstance();
+            break;
+        case "native":
+            lapack = dev.ludovic.netlib.NativeLAPACK.getInstance();
             break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }

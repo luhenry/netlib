@@ -27,7 +27,7 @@ package dev.ludovic.netlib.blas;
 
 import dev.ludovic.netlib.BLAS;
 
-public final class NetlibF2jBLAS extends NetlibWrapper {
+public final class NetlibF2jBLAS extends NetlibWrapper implements dev.ludovic.netlib.JavaBLAS {
 
   private static final NetlibF2jBLAS instance;
 
@@ -39,7 +39,7 @@ public final class NetlibF2jBLAS extends NetlibWrapper {
     super(_blas);
   }
 
-  public static BLAS getInstance() {
+  public static dev.ludovic.netlib.JavaBLAS getInstance() {
     return instance;
   }
 

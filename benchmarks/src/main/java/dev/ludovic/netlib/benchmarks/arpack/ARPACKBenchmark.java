@@ -36,7 +36,7 @@ public abstract class ARPACKBenchmark {
 
     public ARPACK arpack;
 
-    @Param({"f2j", "native", "java"})
+    @Param({"f2j", "java", "native"})
     public String implementation;
 
     @Setup
@@ -45,11 +45,11 @@ public abstract class ARPACKBenchmark {
         case "f2j":
             arpack = dev.ludovic.netlib.arpack.NetlibF2jARPACK.getInstance();
             break;
-        case "native":
-            arpack = dev.ludovic.netlib.arpack.NetlibNativeARPACK.getInstance();
-            break;
         case "java":
-            arpack = dev.ludovic.netlib.arpack.JavaARPACK.getInstance();
+            arpack = dev.ludovic.netlib.JavaARPACK.getInstance();
+            break;
+        case "native":
+            arpack = dev.ludovic.netlib.NativeARPACK.getInstance();
             break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }

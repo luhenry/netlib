@@ -27,7 +27,7 @@ package dev.ludovic.netlib.blas;
 
 import dev.ludovic.netlib.BLAS;
 
-public class JavaBLAS extends AbstractBLAS {
+public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLAS {
 
   //FIXME: remove dependency on F2jBLAS
   private static final com.github.fommil.netlib.F2jBLAS f2j = new com.github.fommil.netlib.F2jBLAS();
@@ -36,7 +36,7 @@ public class JavaBLAS extends AbstractBLAS {
 
   protected JavaBLAS() {}
 
-  public static BLAS getInstance() {
+  public static dev.ludovic.netlib.JavaBLAS getInstance() {
     return instance;
   }
 

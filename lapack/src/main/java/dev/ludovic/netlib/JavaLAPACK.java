@@ -23,23 +23,11 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib.lapack;
+package dev.ludovic.netlib;
 
-import dev.ludovic.netlib.LAPACK;
+public interface JavaLAPACK extends LAPACK {
 
-public final class NetlibF2jLAPACK extends NetlibWrapper implements dev.ludovic.netlib.JavaLAPACK {
-
-  private static final NetlibF2jLAPACK instance;
-
-  static {
-    instance = new NetlibF2jLAPACK(new com.github.fommil.netlib.F2jLAPACK());
-  }
-
-  protected NetlibF2jLAPACK(com.github.fommil.netlib.LAPACK _lapack) {
-    super(_lapack);
-  }
-
-  public static dev.ludovic.netlib.JavaLAPACK getInstance() {
-    return instance;
+  public static JavaLAPACK getInstance() {
+    return dev.ludovic.netlib.lapack.NetlibF2jLAPACK.getInstance();
   }
 }

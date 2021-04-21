@@ -27,7 +27,7 @@ package dev.ludovic.netlib.blas;
 
 import dev.ludovic.netlib.BLAS;
 
-public final class NetlibNativeBLAS extends NetlibWrapper {
+public final class NetlibNativeBLAS extends NetlibWrapper implements dev.ludovic.netlib.NativeBLAS {
 
   private static final NetlibNativeBLAS instance;
 
@@ -43,7 +43,7 @@ public final class NetlibNativeBLAS extends NetlibWrapper {
     super(_blas);
   }
 
-  public static BLAS getInstance() {
+  public static dev.ludovic.netlib.NativeBLAS getInstance() {
     return instance;
   }
 }

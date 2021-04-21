@@ -25,19 +25,7 @@
 
 package dev.ludovic.netlib;
 
-import dev.ludovic.netlib.blas.JavaBLAS;
-import dev.ludovic.netlib.blas.VectorizedBLAS;
-
 public interface BLAS {
-
-  public static BLAS getInstance() {
-    try {
-      return VectorizedBLAS.getInstance();
-    } catch (Throwable t) {
-      // ignore exception
-    }
-    return JavaBLAS.getInstance();
-  }
 
   public double dasum(int n, double[] x, int incx);
   public double dasum(int n, double[] x, int offsetx, int incx);
