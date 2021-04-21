@@ -54,14 +54,9 @@ public class SsymvBenchmark extends L2Benchmark {
         y = randomFloatArray(n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        yclone = y.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.ssymv(uplo, n, alpha, a, n, x, 1, beta, yclone, 1);
+        blas.ssymv(uplo, n, alpha, a, n, x, 1, beta, yclone = y.clone(), 1);
         bh.consume(yclone);
     }
 }

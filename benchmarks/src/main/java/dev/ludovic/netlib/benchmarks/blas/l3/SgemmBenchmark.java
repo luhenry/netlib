@@ -63,14 +63,9 @@ public class SgemmBenchmark extends L3Benchmark {
         c = randomFloatArray(m * n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        cclone = c.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.sgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, cclone, m);
+        blas.sgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, cclone = c.clone(), m);
         bh.consume(cclone);
     }
 }

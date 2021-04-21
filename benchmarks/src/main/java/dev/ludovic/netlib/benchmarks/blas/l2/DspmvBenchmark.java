@@ -54,14 +54,9 @@ public class DspmvBenchmark extends L2Benchmark {
         y = randomDoubleArray(n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        yclone = y.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dspmv(uplo, n, alpha, a, x, 1, beta, yclone, 1);
+        blas.dspmv(uplo, n, alpha, a, x, 1, beta, yclone = y.clone(), 1);
         bh.consume(yclone);
     }
 }

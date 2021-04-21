@@ -40,7 +40,7 @@ public class SsprBenchmark extends L2Benchmark {
     public int n;
 
     public float alpha;
-    public float[] a, aclone;
+    public float[] a, aclone = a.clone();
     public float[] x;
 
     @Setup(Level.Trial)
@@ -50,14 +50,9 @@ public class SsprBenchmark extends L2Benchmark {
         x = randomFloatArray(n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        aclone = a.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.sspr(uplo, n, alpha, x, 1, aclone);
+        blas.sspr(uplo, n, alpha, x, 1, aclone = a.clone());
         bh.consume(aclone);
     }
 }

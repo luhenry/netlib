@@ -63,14 +63,9 @@ public class DgemmBenchmark extends L3Benchmark {
         c = randomDoubleArray(m * n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        cclone = c.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, cclone, m);
+        blas.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, cclone = c.clone(), m);
         bh.consume(cclone);
     }
 }

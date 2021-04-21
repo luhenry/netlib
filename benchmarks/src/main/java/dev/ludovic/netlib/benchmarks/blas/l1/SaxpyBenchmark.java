@@ -47,14 +47,9 @@ public class SaxpyBenchmark extends L1Benchmark {
         y = randomFloatArray(n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        yclone = y.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.saxpy(n, alpha, x, 1, yclone, 1);
+        blas.saxpy(n, alpha, x, 1, yclone = y.clone(), 1);
         bh.consume(yclone);
     }
 }

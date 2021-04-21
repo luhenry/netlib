@@ -40,7 +40,7 @@ public class Dspr2Benchmark extends L2Benchmark {
     public int n;
 
     public double alpha;
-    public double[] a, aclone;
+    public double[] a, aclone = a.clone();
     public double[] x;
     public double[] y;
 
@@ -52,14 +52,9 @@ public class Dspr2Benchmark extends L2Benchmark {
         y = randomDoubleArray(n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        aclone = a.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dspr2(uplo, n, alpha, x, 1, y, 1, aclone);
+        blas.dspr2(uplo, n, alpha, x, 1, y, 1, aclone = a.clone());
         bh.consume(aclone);
     }
 }

@@ -45,15 +45,9 @@ public class DswapBenchmark extends L1Benchmark {
         y = randomDoubleArray(n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        xclone = x.clone();
-        yclone = y.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dswap(n, xclone, 1, yclone, 1);
+        blas.dswap(n, xclone = x.clone(), 1, yclone = y.clone(), 1);
         bh.consume(xclone);
         bh.consume(yclone);
     }

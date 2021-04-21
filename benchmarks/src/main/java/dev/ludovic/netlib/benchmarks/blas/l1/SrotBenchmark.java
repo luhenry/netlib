@@ -49,15 +49,9 @@ public class SrotBenchmark extends L1Benchmark {
         s = randomFloat();
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        xclone = x.clone();
-        yclone = y.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.srot(n, xclone, 1, yclone, 1, c, s);
+        blas.srot(n, xclone = x.clone(), 1, yclone = y.clone(), 1, c, s);
         bh.consume(xclone);
         bh.consume(yclone);
     }

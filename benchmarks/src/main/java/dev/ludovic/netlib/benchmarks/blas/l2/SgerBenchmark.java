@@ -40,7 +40,7 @@ public class SgerBenchmark extends L2Benchmark {
     public int n;
 
     public float alpha;
-    public float[] a, aclone;
+    public float[] a, aclone = a.clone();
     public float[] x;
     public float[] y;
 
@@ -52,14 +52,9 @@ public class SgerBenchmark extends L2Benchmark {
         y = randomFloatArray(n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        aclone = a.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.sger(m, n, alpha, x, 1, y, 1, aclone, m);
+        blas.sger(m, n, alpha, x, 1, y, 1, aclone = a.clone(), m);
         bh.consume(aclone);
     }
 }

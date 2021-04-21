@@ -61,14 +61,9 @@ public class DsymmBenchmark extends L3Benchmark {
         c = randomDoubleArray(m * n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        cclone = c.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dsymm(side, uplo, m, n, alpha, a, side.equals("L") ? m : n, b, m, beta, cclone, m);
+        blas.dsymm(side, uplo, m, n, alpha, a, side.equals("L") ? m : n, b, m, beta, cclone = c.clone(), m);
         bh.consume(cclone);
     }
 }

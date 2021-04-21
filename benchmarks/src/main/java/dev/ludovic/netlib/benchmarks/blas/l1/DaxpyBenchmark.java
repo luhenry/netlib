@@ -47,14 +47,9 @@ public class DaxpyBenchmark extends L1Benchmark {
         y = randomDoubleArray(n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        yclone = y.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.daxpy(n, alpha, x, 1, yclone, 1);
+        blas.daxpy(n, alpha, x, 1, yclone = y.clone(), 1);
         bh.consume(yclone);
     }
 }

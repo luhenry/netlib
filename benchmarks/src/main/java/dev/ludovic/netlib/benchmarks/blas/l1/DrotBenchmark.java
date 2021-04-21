@@ -49,15 +49,9 @@ public class DrotBenchmark extends L1Benchmark {
         s = randomDouble();
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        xclone = x.clone();
-        yclone = y.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.drot(n, xclone, 1, yclone, 1, c, s);
+        blas.drot(n, xclone = x.clone(), 1, yclone = y.clone(), 1, c, s);
         bh.consume(xclone);
         bh.consume(yclone);
     }

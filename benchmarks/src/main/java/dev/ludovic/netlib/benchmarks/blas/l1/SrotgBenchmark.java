@@ -33,6 +33,8 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.netlib.util.floatW;
 
 @State(Scope.Thread)
+@Warmup(iterations = 3)
+@Measurement(iterations = 3)
 public class SrotgBenchmark extends L1Benchmark {
 
     public floatW sa, saclone;
@@ -48,17 +50,9 @@ public class SrotgBenchmark extends L1Benchmark {
         s = new floatW(randomFloat());
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        saclone = new floatW(sa.val);
-        sbclone = new floatW(sb.val);
-        cclone = new floatW(c.val);
-        sclone = new floatW(s.val);
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.srotg(saclone, sbclone, cclone, sclone);
+        blas.srotg(saclone = new floatW(sa.val), sbclone = new floatW(sb.val), cclone = new floatW(c.val), sclone = new floatW(s.val));
         bh.consume(saclone);
         bh.consume(sbclone);
         bh.consume(cclone);

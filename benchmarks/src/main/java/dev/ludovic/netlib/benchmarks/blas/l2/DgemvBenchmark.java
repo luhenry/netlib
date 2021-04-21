@@ -57,14 +57,9 @@ public class DgemvBenchmark extends L2Benchmark {
         y = randomDoubleArray(trans.equals("T") ? n : m);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        yclone = y.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dgemv(trans, m, n, alpha, a, m, x, 1, beta, yclone, 1);
+        blas.dgemv(trans, m, n, alpha, a, m, x, 1, beta, yclone = y.clone(), 1);
         bh.consume(yclone);
     }
 }

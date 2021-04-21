@@ -33,6 +33,8 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.netlib.util.doubleW;
 
 @State(Scope.Thread)
+@Warmup(iterations = 3)
+@Measurement(iterations = 3)
 public class DrotgBenchmark extends L1Benchmark {
 
     public doubleW sa, saclone;
@@ -48,17 +50,9 @@ public class DrotgBenchmark extends L1Benchmark {
         s = new doubleW(randomDouble());
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        saclone = new doubleW(sa.val);
-        sbclone = new doubleW(sb.val);
-        cclone = new doubleW(c.val);
-        sclone = new doubleW(s.val);
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.drotg(saclone, sbclone, cclone, sclone);
+        blas.drotg(saclone = new doubleW(sa.val), sbclone = new doubleW(sb.val), cclone = new doubleW(c.val), sclone = new doubleW(s.val));
         bh.consume(saclone);
         bh.consume(sbclone);
         bh.consume(cclone);

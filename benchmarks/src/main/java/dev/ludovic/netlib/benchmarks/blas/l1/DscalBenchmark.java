@@ -45,14 +45,9 @@ public class DscalBenchmark extends L1Benchmark {
         x = randomDoubleArray(n);
     }
 
-    @Setup(Level.Invocation)
-    public void setupIteration() {
-        xclone = x.clone();
-    }
-
     @Benchmark
     public void blas(Blackhole bh) {
-        blas.dscal(n, alpha, xclone, 1);
+        blas.dscal(n, alpha, xclone = x.clone(), 1);
         bh.consume(xclone);
     }
 }
