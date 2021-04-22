@@ -38,8 +38,8 @@ information or have any questions.
 
   <licenses>
     <license>
-      <name>GPLv2 with Classpath Exception</name>
-      <url>https://openjdk.java.net/legal/gplv2+ce.html</url>
+      <name>MIT</name>
+      <url>https://opensource.org/licenses/mit-license.php</url>
     </license>
   </licenses>
 
