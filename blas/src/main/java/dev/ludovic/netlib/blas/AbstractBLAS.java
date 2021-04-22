@@ -48,7 +48,7 @@ abstract class AbstractBLAS<T> implements BLAS {
   private void checkIndex(int index, int length) {
     //FIXME: switch to Objects.checkIndex when the minimum version becomes JDK 11
     if (index < 0 || index >= length) {
-      throw new IndexOutOfBoundsException(index);
+      throw new IndexOutOfBoundsException(String.format("Index %s out of bounds for length %s", index, length));
     }
   }
 

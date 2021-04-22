@@ -41,8 +41,7 @@ public class BLASTest {
 
   private static Stream<Arguments> BLASImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance()),
-      Arguments.of(dev.ludovic.netlib.blas.JavaBLAS.getInstance())
+      Arguments.of(dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance())
     );
 
     try {
@@ -53,20 +52,22 @@ public class BLASTest {
     } catch (NoClassDefFoundError e) {
     }
 
-    try {
+    String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 2);
+    int major = Integer.parseInt(fullVersion[0]);
+    if (major >= 11) {
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance())
+        Arguments.of(dev.ludovic.netlib.blas.Java11BLAS.getInstance())
       ));
-    } catch (ExceptionInInitializerError e) {
-    } catch (NoClassDefFoundError e) {
-    }
-
-    try {
+    } else {
       instances = Stream.concat(instances, Stream.of(
+        Arguments.of(dev.ludovic.netlib.blas.JavaBLAS.getInstance())
+      ));
+    }
+    if (major >= 16) {
+      instances = Stream.concat(instances, Stream.of(
+        Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance()),
         Arguments.of(dev.ludovic.netlib.blas.ForeignBLAS.getInstance())
       ));
-    } catch (ExceptionInInitializerError e) {
-    } catch (NoClassDefFoundError e) {
     }
 
     return instances;

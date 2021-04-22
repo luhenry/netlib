@@ -11,10 +11,15 @@ jobs:
   build:
     name: Publish Release
     runs-on: ubuntu-latest
+    env:
+      LD_LIBRARY_PATH: "/usr/lib/x86_64-linux-gnu"
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
+    - name: Install dependencies
+      run: |
+        sudo apt-get -y update
+        sudo apt-get -y install libopenblas-dev
     - name: Set up Sonatype OSSRH
       uses: actions/setup-java@v1
       with: # running setup-java again overwrites the settings.xml

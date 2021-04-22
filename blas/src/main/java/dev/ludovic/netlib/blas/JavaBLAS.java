@@ -356,9 +356,9 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (int i = is; i < ie; i += 1) {
           double a0 = a[offseta + i + (row + 0) * lda];
           double b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
+          sum00 = a0 * b0 + sum00;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
       }
       for (; row < loopBound(rowe, Trow); row += Trow) {
         double sum00 = 0.0;
@@ -369,22 +369,22 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double a1 = a[offseta + i + (row + 1) * lda];
           double a2 = a[offseta + i + (row + 2) * lda];
           double b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum10 = Math.fma(a1, b0, sum10);
-          sum20 = Math.fma(a2, b0, sum20);
+          sum00 = a0 * b0 + sum00;
+          sum10 = a1 * b0 + sum10;
+          sum20 = a2 * b0 + sum20;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
-        c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+        c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + c[offsetc + (row + 1) + (col + 0) * ldc];
+        c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + c[offsetc + (row + 2) + (col + 0) * ldc];
       }
       for (; row < rowe; row += 1) {
         double sum00 = 0.0;
         for (int i = is; i < ie; i += 1) {
           double a0 = a[offseta + i + (row + 0) * lda];
           double b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
+          sum00 = a0 * b0 + sum00;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
       }
     }
     for (; col < loopBound(cole, Tcol); col += Tcol) {
@@ -399,13 +399,13 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b0 = b[offsetb + i + (col + 0) * ldb];
           double b1 = b[offsetb + i + (col + 1) * ldb];
           double b2 = b[offsetb + i + (col + 2) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum01 = Math.fma(a0, b1, sum01);
-          sum02 = Math.fma(a0, b2, sum02);
+          sum00 = a0 * b0 + sum00;
+          sum01 = a0 * b1 + sum01;
+          sum02 = a0 * b2 + sum02;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
-        c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+        c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + c[offsetc + (row + 0) + (col + 1) * ldc];
+        c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + c[offsetc + (row + 0) + (col + 2) * ldc];
       }
       for (; row < loopBound(rowe, Trow); row += Trow) {
         dgepdotTN(m, row, row + Trow, n, col, col + Tcol, k, is, ie, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
@@ -419,13 +419,13 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b0 = b[offsetb + i + (col + 0) * ldb];
           double b1 = b[offsetb + i + (col + 1) * ldb];
           double b2 = b[offsetb + i + (col + 2) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum01 = Math.fma(a0, b1, sum01);
-          sum02 = Math.fma(a0, b2, sum02);
+          sum00 = a0 * b0 + sum00;
+          sum01 = a0 * b1 + sum01;
+          sum02 = a0 * b2 + sum02;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
-        c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+        c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + c[offsetc + (row + 0) + (col + 1) * ldc];
+        c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + c[offsetc + (row + 0) + (col + 2) * ldc];
       }
     }
     for (; col < cole; col += 1) {
@@ -435,9 +435,9 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (int i = is; i < ie; i += 1) {
           double a0 = a[offseta + i + (row + 0) * lda];
           double b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
+          sum00 = a0 * b0 + sum00;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
       }
       for (; row < loopBound(rowe, Trow); row += Trow) {
         double sum00 = 0.0;
@@ -448,22 +448,22 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double a1 = a[offseta + i + (row + 1) * lda];
           double a2 = a[offseta + i + (row + 2) * lda];
           double b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum10 = Math.fma(a1, b0, sum10);
-          sum20 = Math.fma(a2, b0, sum20);
+          sum00 = a0 * b0 + sum00;
+          sum10 = a1 * b0 + sum10;
+          sum20 = a2 * b0 + sum20;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
-        c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+        c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + c[offsetc + (row + 1) + (col + 0) * ldc];
+        c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + c[offsetc + (row + 2) + (col + 0) * ldc];
       }
       for (; row < rowe; row += 1) {
         double sum00 = 0.0;
         for (int i = is; i < ie; i += 1) {
           double a0 = a[offseta + i + (row + 0) * lda];
           double b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
+          sum00 = a0 * b0 + sum00;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
       }
     }
   }
@@ -491,76 +491,76 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
       double a1 = a[offseta + i + (row + 1) * lda];
       double a2 = a[offseta + i + (row + 2) * lda];
       double b0 = b[offsetb + i + (col + 0) * ldb];
-      sum00 = Math.fma(a0, b0, sum00);
-      sum10 = Math.fma(a1, b0, sum10);
-      sum20 = Math.fma(a2, b0, sum20);
+      sum00 = a0 * b0 + sum00;
+      sum10 = a1 * b0 + sum10;
+      sum20 = a2 * b0 + sum20;
       double b1 = b[offsetb + i + (col + 1) * ldb];
-      sum01 = Math.fma(a0, b1, sum01);
-      sum11 = Math.fma(a1, b1, sum11);
-      sum21 = Math.fma(a2, b1, sum21);
+      sum01 = a0 * b1 + sum01;
+      sum11 = a1 * b1 + sum11;
+      sum21 = a2 * b1 + sum21;
       double b2 = b[offsetb + i + (col + 2) * ldb];
-      sum02 = Math.fma(a0, b2, sum02);
-      sum12 = Math.fma(a1, b2, sum12);
-      sum22 = Math.fma(a2, b2, sum22);
+      sum02 = a0 * b2 + sum02;
+      sum12 = a1 * b2 + sum12;
+      sum22 = a2 * b2 + sum22;
     }
     for (; i < loopBound(ie, Ti); i += Ti) {
       double a00 = a[offseta + (i + 0) + (row + 0) * lda];
       double a01 = a[offseta + (i + 0) + (row + 1) * lda];
       double a02 = a[offseta + (i + 0) + (row + 2) * lda];
       double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-      sum00 = Math.fma(a00, b00, sum00);
-      sum10 = Math.fma(a01, b00, sum10);
-      sum20 = Math.fma(a02, b00, sum20);
+      sum00 = a00 * b00 + sum00;
+      sum10 = a01 * b00 + sum10;
+      sum20 = a02 * b00 + sum20;
       double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
-      sum01 = Math.fma(a00, b01, sum01);
-      sum11 = Math.fma(a01, b01, sum11);
-      sum21 = Math.fma(a02, b01, sum21);
+      sum01 = a00 * b01 + sum01;
+      sum11 = a01 * b01 + sum11;
+      sum21 = a02 * b01 + sum21;
       double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-      sum02 = Math.fma(a00, b02, sum02);
-      sum12 = Math.fma(a01, b02, sum12);
-      sum22 = Math.fma(a02, b02, sum22);
+      sum02 = a00 * b02 + sum02;
+      sum12 = a01 * b02 + sum12;
+      sum22 = a02 * b02 + sum22;
       double a10 = a[offseta + (i + 1) + (row + 0) * lda];
       double a11 = a[offseta + (i + 1) + (row + 1) * lda];
       double a12 = a[offseta + (i + 1) + (row + 2) * lda];
       double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-      sum00 = Math.fma(a10, b10, sum00);
-      sum10 = Math.fma(a11, b10, sum10);
-      sum20 = Math.fma(a12, b10, sum20);
+      sum00 = a10 * b10 + sum00;
+      sum10 = a11 * b10 + sum10;
+      sum20 = a12 * b10 + sum20;
       double b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
-      sum01 = Math.fma(a10, b11, sum01);
-      sum11 = Math.fma(a11, b11, sum11);
-      sum21 = Math.fma(a12, b11, sum21);
+      sum01 = a10 * b11 + sum01;
+      sum11 = a11 * b11 + sum11;
+      sum21 = a12 * b11 + sum21;
       double b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-      sum02 = Math.fma(a10, b12, sum02);
-      sum12 = Math.fma(a11, b12, sum12);
-      sum22 = Math.fma(a12, b12, sum22);
+      sum02 = a10 * b12 + sum02;
+      sum12 = a11 * b12 + sum12;
+      sum22 = a12 * b12 + sum22;
     }
     for (; i < ie; i += 1) {
       double a0 = a[offseta + i + (row + 0) * lda];
       double a1 = a[offseta + i + (row + 1) * lda];
       double a2 = a[offseta + i + (row + 2) * lda];
       double b0 = b[offsetb + i + (col + 0) * ldb];
-      sum00 = Math.fma(a0, b0, sum00);
-      sum10 = Math.fma(a1, b0, sum10);
-      sum20 = Math.fma(a2, b0, sum20);
+      sum00 = a0 * b0 + sum00;
+      sum10 = a1 * b0 + sum10;
+      sum20 = a2 * b0 + sum20;
       double b1 = b[offsetb + i + (col + 1) * ldb];
-      sum01 = Math.fma(a0, b1, sum01);
-      sum11 = Math.fma(a1, b1, sum11);
-      sum21 = Math.fma(a2, b1, sum21);
+      sum01 = a0 * b1 + sum01;
+      sum11 = a1 * b1 + sum11;
+      sum21 = a2 * b1 + sum21;
       double b2 = b[offsetb + i + (col + 2) * ldb];
-      sum02 = Math.fma(a0, b2, sum02);
-      sum12 = Math.fma(a1, b2, sum12);
-      sum22 = Math.fma(a2, b2, sum22);
+      sum02 = a0 * b2 + sum02;
+      sum12 = a1 * b2 + sum12;
+      sum22 = a2 * b2 + sum22;
     }
-    c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-    c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
-    c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
-    c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
-    c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, c[offsetc + (row + 1) + (col + 1) * ldc]);
-    c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, c[offsetc + (row + 1) + (col + 2) * ldc]);
-    c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
-    c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, c[offsetc + (row + 2) + (col + 1) * ldc]);
-    c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, c[offsetc + (row + 2) + (col + 2) * ldc]);
+    c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+    c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + c[offsetc + (row + 0) + (col + 1) * ldc];
+    c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + c[offsetc + (row + 0) + (col + 2) * ldc];
+    c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + c[offsetc + (row + 1) + (col + 0) * ldc];
+    c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + c[offsetc + (row + 1) + (col + 1) * ldc];
+    c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + c[offsetc + (row + 1) + (col + 2) * ldc];
+    c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + c[offsetc + (row + 2) + (col + 0) * ldc];
+    c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + c[offsetc + (row + 2) + (col + 1) * ldc];
+    c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + c[offsetc + (row + 2) + (col + 2) * ldc];
   }
 
   protected void dgemmNN(int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
@@ -587,30 +587,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum12 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum12 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
           double a01 = a[offseta + (row + 0) + (i + 1) * lda];
           double a11 = a[offseta + (row + 1) + (i + 1) * lda];
           double a21 = a[offseta + (row + 2) + (i + 1) * lda];
           double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
           double b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
           double b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum12 = Math.fma(a11, b12, sum12);
-          sum20 = Math.fma(a21, b10, sum20);
-          sum21 = Math.fma(a21, b11, sum21);
-          sum22 = Math.fma(a21, b12, sum22);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
+          sum10 = a11 * b10 + sum10;
+          sum11 = a11 * b11 + sum11;
+          sum12 = a11 * b12 + sum12;
+          sum20 = a21 * b10 + sum20;
+          sum21 = a21 * b11 + sum21;
+          sum22 = a21 * b12 + sum22;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
@@ -619,26 +619,26 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum12 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum12 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, beta * c[offsetc + (row + 1) + (col + 1) * ldc]);
-          c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, beta * c[offsetc + (row + 1) + (col + 2) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, beta * c[offsetc + (row + 2) + (col + 1) * ldc]);
-          c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, beta * c[offsetc + (row + 2) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -661,30 +661,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
           double a01 = a[offseta + (row + 0) + (i + 1) * lda];
           double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
           double b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
           double b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -704,30 +704,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double a10 = a[offseta + (row + 1) + (i + 0) * lda];
           double a20 = a[offseta + (row + 2) + (i + 0) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
           double a01 = a[offseta + (row + 0) + (i + 1) * lda];
           double a11 = a[offseta + (row + 1) + (i + 1) * lda];
           double a21 = a[offseta + (row + 2) + (i + 1) * lda];
           double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a21, b10, sum20);
+          sum00 = a01 * b10 + sum00;
+          sum10 = a11 * b10 + sum10;
+          sum20 = a21 * b10 + sum20;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
           double a10 = a[offseta + (row + 1) + (i + 0) * lda];
           double a20 = a[offseta + (row + 2) + (i + 0) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
@@ -740,18 +740,18 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (; i < loopBound(k, Ti); i += Ti) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
           double a01 = a[offseta + (row + 0) + (i + 1) * lda];
           double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
+          sum00 = a01 * b10 + sum00;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
         }
@@ -782,30 +782,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           double b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           double b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum12 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum12 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
           double a01 = a[offseta + (row + 0) + (i + 1) * lda];
           double a11 = a[offseta + (row + 1) + (i + 1) * lda];
           double a21 = a[offseta + (row + 2) + (i + 1) * lda];
           double b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
           double b11 = b[offsetb + (col + 1) + (i + 1) * ldb];
           double b12 = b[offsetb + (col + 2) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum12 = Math.fma(a11, b12, sum12);
-          sum20 = Math.fma(a21, b10, sum20);
-          sum21 = Math.fma(a21, b11, sum21);
-          sum22 = Math.fma(a21, b12, sum22);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
+          sum10 = a11 * b10 + sum10;
+          sum11 = a11 * b11 + sum11;
+          sum12 = a11 * b12 + sum12;
+          sum20 = a21 * b10 + sum20;
+          sum21 = a21 * b11 + sum21;
+          sum22 = a21 * b12 + sum22;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
@@ -814,26 +814,26 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           double b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           double b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum12 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum12 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, beta * c[offsetc + (row + 1) + (col + 1) * ldc]);
-          c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, beta * c[offsetc + (row + 1) + (col + 2) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, beta * c[offsetc + (row + 2) + (col + 1) * ldc]);
-          c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, beta * c[offsetc + (row + 2) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -856,30 +856,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           double b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           double b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
           double a01 = a[offseta + (row + 0) + (i + 1) * lda];
           double b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
           double b11 = b[offsetb + (col + 1) + (i + 1) * ldb];
           double b12 = b[offsetb + (col + 2) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           double b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           double b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -899,30 +899,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double a10 = a[offseta + (row + 1) + (i + 0) * lda];
           double a20 = a[offseta + (row + 2) + (i + 0) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
           double a01 = a[offseta + (row + 0) + (i + 1) * lda];
           double a11 = a[offseta + (row + 1) + (i + 1) * lda];
           double a21 = a[offseta + (row + 2) + (i + 1) * lda];
           double b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a21, b10, sum20);
+          sum00 = a01 * b10 + sum00;
+          sum10 = a11 * b10 + sum10;
+          sum20 = a21 * b10 + sum20;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
           double a10 = a[offseta + (row + 1) + (i + 0) * lda];
           double a20 = a[offseta + (row + 2) + (i + 0) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
@@ -935,18 +935,18 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (; i < loopBound(k, Ti); i += Ti) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
           double a01 = a[offseta + (row + 0) + (i + 1) * lda];
           double b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
+          sum00 = a01 * b10 + sum00;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (row + 0) + (i + 0) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
         }
@@ -978,30 +978,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum12 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum12 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
           double a01 = a[offseta + (i + 1) + (row + 0) * lda];
           double a11 = a[offseta + (i + 1) + (row + 1) * lda];
           double a21 = a[offseta + (i + 1) + (row + 2) * lda];
           double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
           double b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
           double b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum12 = Math.fma(a11, b12, sum12);
-          sum20 = Math.fma(a21, b10, sum20);
-          sum21 = Math.fma(a21, b11, sum21);
-          sum22 = Math.fma(a21, b12, sum22);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
+          sum10 = a11 * b10 + sum10;
+          sum11 = a11 * b11 + sum11;
+          sum12 = a11 * b12 + sum12;
+          sum20 = a21 * b10 + sum20;
+          sum21 = a21 * b11 + sum21;
+          sum22 = a21 * b12 + sum22;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
@@ -1010,26 +1010,26 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum12 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum12 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, beta * c[offsetc + (row + 1) + (col + 1) * ldc]);
-          c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, beta * c[offsetc + (row + 1) + (col + 2) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, beta * c[offsetc + (row + 2) + (col + 1) * ldc]);
-          c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, beta * c[offsetc + (row + 2) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -1052,30 +1052,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
           double a01 = a[offseta + (i + 1) + (row + 0) * lda];
           double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
           double b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
           double b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           double b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           double b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -1095,30 +1095,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double a10 = a[offseta + (i + 0) + (row + 1) * lda];
           double a20 = a[offseta + (i + 0) + (row + 2) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
           double a01 = a[offseta + (i + 1) + (row + 0) * lda];
           double a11 = a[offseta + (i + 1) + (row + 1) * lda];
           double a21 = a[offseta + (i + 1) + (row + 2) * lda];
           double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a21, b10, sum20);
+          sum00 = a01 * b10 + sum00;
+          sum10 = a11 * b10 + sum10;
+          sum20 = a21 * b10 + sum20;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
           double a10 = a[offseta + (i + 0) + (row + 1) * lda];
           double a20 = a[offseta + (i + 0) + (row + 2) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
@@ -1131,18 +1131,18 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (; i < loopBound(k, Ti); i += Ti) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
           double a01 = a[offseta + (i + 1) + (row + 0) * lda];
           double b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
+          sum00 = a01 * b10 + sum00;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
           double b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
         }
@@ -1174,30 +1174,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           double b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           double b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum12 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum12 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
           double a01 = a[offseta + (i + 1) + (row + 0) * lda];
           double a11 = a[offseta + (i + 1) + (row + 1) * lda];
           double a21 = a[offseta + (i + 1) + (row + 2) * lda];
           double b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
           double b11 = b[offsetb + (col + 1) + (i + 1) * ldb];
           double b12 = b[offsetb + (col + 2) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum12 = Math.fma(a11, b12, sum12);
-          sum20 = Math.fma(a21, b10, sum20);
-          sum21 = Math.fma(a21, b11, sum21);
-          sum22 = Math.fma(a21, b12, sum22);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
+          sum10 = a11 * b10 + sum10;
+          sum11 = a11 * b11 + sum11;
+          sum12 = a11 * b12 + sum12;
+          sum20 = a21 * b10 + sum20;
+          sum21 = a21 * b11 + sum21;
+          sum22 = a21 * b12 + sum22;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
@@ -1206,26 +1206,26 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           double b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           double b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum12 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum12 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, beta * c[offsetc + (row + 1) + (col + 1) * ldc]);
-          c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, beta * c[offsetc + (row + 1) + (col + 2) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, beta * c[offsetc + (row + 2) + (col + 1) * ldc]);
-          c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, beta * c[offsetc + (row + 2) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -1248,30 +1248,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           double b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           double b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
           double a01 = a[offseta + (i + 1) + (row + 0) * lda];
           double b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
           double b11 = b[offsetb + (col + 1) + (i + 1) * ldb];
           double b12 = b[offsetb + (col + 2) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           double b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           double b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -1291,30 +1291,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           double a10 = a[offseta + (i + 0) + (row + 1) * lda];
           double a20 = a[offseta + (i + 0) + (row + 2) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
           double a01 = a[offseta + (i + 1) + (row + 0) * lda];
           double a11 = a[offseta + (i + 1) + (row + 1) * lda];
           double a21 = a[offseta + (i + 1) + (row + 2) * lda];
           double b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a21, b10, sum20);
+          sum00 = a01 * b10 + sum00;
+          sum10 = a11 * b10 + sum10;
+          sum20 = a21 * b10 + sum20;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
           double a10 = a[offseta + (i + 0) + (row + 1) * lda];
           double a20 = a[offseta + (i + 0) + (row + 2) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
@@ -1327,18 +1327,18 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (; i < loopBound(k, Ti); i += Ti) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
           double a01 = a[offseta + (i + 1) + (row + 0) * lda];
           double b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
+          sum00 = a01 * b10 + sum00;
         }
         for (; i < k; i += 1) {
           double a00 = a[offseta + (i + 0) + (row + 0) * lda];
           double b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
         }
         if (beta != 0.0) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
         }
@@ -1555,9 +1555,9 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (int i = is; i < ie; i += 1) {
           float a0 = a[offseta + i + (row + 0) * lda];
           float b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
+          sum00 = a0 * b0 + sum00;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
       }
       for (; row < loopBound(rowe, Trow); row += Trow) {
         float sum00 = 0.0f;
@@ -1568,22 +1568,22 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float a1 = a[offseta + i + (row + 1) * lda];
           float a2 = a[offseta + i + (row + 2) * lda];
           float b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum10 = Math.fma(a1, b0, sum10);
-          sum20 = Math.fma(a2, b0, sum20);
+          sum00 = a0 * b0 + sum00;
+          sum10 = a1 * b0 + sum10;
+          sum20 = a2 * b0 + sum20;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
-        c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+        c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + c[offsetc + (row + 1) + (col + 0) * ldc];
+        c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + c[offsetc + (row + 2) + (col + 0) * ldc];
       }
       for (; row < rowe; row += 1) {
         float sum00 = 0.0f;
         for (int i = is; i < ie; i += 1) {
           float a0 = a[offseta + i + (row + 0) * lda];
           float b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
+          sum00 = a0 * b0 + sum00;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
       }
     }
     for (; col < loopBound(cole, Tcol); col += Tcol) {
@@ -1598,13 +1598,13 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b0 = b[offsetb + i + (col + 0) * ldb];
           float b1 = b[offsetb + i + (col + 1) * ldb];
           float b2 = b[offsetb + i + (col + 2) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum01 = Math.fma(a0, b1, sum01);
-          sum02 = Math.fma(a0, b2, sum02);
+          sum00 = a0 * b0 + sum00;
+          sum01 = a0 * b1 + sum01;
+          sum02 = a0 * b2 + sum02;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
-        c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+        c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + c[offsetc + (row + 0) + (col + 1) * ldc];
+        c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + c[offsetc + (row + 0) + (col + 2) * ldc];
       }
       for (; row < loopBound(rowe, Trow); row += Trow) {
         sgepdotTN(m, row, row + Trow, n, col, col + Tcol, k, is, ie, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
@@ -1618,13 +1618,13 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b0 = b[offsetb + i + (col + 0) * ldb];
           float b1 = b[offsetb + i + (col + 1) * ldb];
           float b2 = b[offsetb + i + (col + 2) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum01 = Math.fma(a0, b1, sum01);
-          sum02 = Math.fma(a0, b2, sum02);
+          sum00 = a0 * b0 + sum00;
+          sum01 = a0 * b1 + sum01;
+          sum02 = a0 * b2 + sum02;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
-        c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+        c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + c[offsetc + (row + 0) + (col + 1) * ldc];
+        c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + c[offsetc + (row + 0) + (col + 2) * ldc];
       }
     }
     for (; col < cole; col += 1) {
@@ -1634,9 +1634,9 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (int i = is; i < ie; i += 1) {
           float a0 = a[offseta + i + (row + 0) * lda];
           float b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
+          sum00 = a0 * b0 + sum00;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
       }
       for (; row < loopBound(rowe, Trow); row += Trow) {
         float sum00 = 0.0f;
@@ -1647,22 +1647,22 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float a1 = a[offseta + i + (row + 1) * lda];
           float a2 = a[offseta + i + (row + 2) * lda];
           float b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
-          sum10 = Math.fma(a1, b0, sum10);
-          sum20 = Math.fma(a2, b0, sum20);
+          sum00 = a0 * b0 + sum00;
+          sum10 = a1 * b0 + sum10;
+          sum20 = a2 * b0 + sum20;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-        c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
-        c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+        c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + c[offsetc + (row + 1) + (col + 0) * ldc];
+        c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + c[offsetc + (row + 2) + (col + 0) * ldc];
       }
       for (; row < rowe; row += 1) {
         float sum00 = 0.0f;
         for (int i = is; i < ie; i += 1) {
           float a0 = a[offseta + i + (row + 0) * lda];
           float b0 = b[offsetb + i + (col + 0) * ldb];
-          sum00 = Math.fma(a0, b0, sum00);
+          sum00 = a0 * b0 + sum00;
         }
-        c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
+        c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
       }
     }
   }
@@ -1690,76 +1690,76 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
       float a1 = a[offseta + i + (row + 1) * lda];
       float a2 = a[offseta + i + (row + 2) * lda];
       float b0 = b[offsetb + i + (col + 0) * ldb];
-      sum00 = Math.fma(a0, b0, sum00);
-      sum10 = Math.fma(a1, b0, sum10);
-      sum20 = Math.fma(a2, b0, sum20);
+      sum00 = a0 * b0 + sum00;
+      sum10 = a1 * b0 + sum10;
+      sum20 = a2 * b0 + sum20;
       float b1 = b[offsetb + i + (col + 1) * ldb];
-      sum01 = Math.fma(a0, b1, sum01);
-      sum11 = Math.fma(a1, b1, sum11);
-      sum21 = Math.fma(a2, b1, sum21);
+      sum01 = a0 * b1 + sum01;
+      sum11 = a1 * b1 + sum11;
+      sum21 = a2 * b1 + sum21;
       float b2 = b[offsetb + i + (col + 2) * ldb];
-      sum02 = Math.fma(a0, b2, sum02);
-      sum12 = Math.fma(a1, b2, sum12);
-      sum22 = Math.fma(a2, b2, sum22);
+      sum02 = a0 * b2 + sum02;
+      sum12 = a1 * b2 + sum12;
+      sum22 = a2 * b2 + sum22;
     }
     for (; i < loopBound(ie, Ti); i += Ti) {
       float a00 = a[offseta + (i + 0) + (row + 0) * lda];
       float a01 = a[offseta + (i + 0) + (row + 1) * lda];
       float a02 = a[offseta + (i + 0) + (row + 2) * lda];
       float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-      sum00 = Math.fma(a00, b00, sum00);
-      sum10 = Math.fma(a01, b00, sum10);
-      sum20 = Math.fma(a02, b00, sum20);
+      sum00 = a00 * b00 + sum00;
+      sum10 = a01 * b00 + sum10;
+      sum20 = a02 * b00 + sum20;
       float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
-      sum01 = Math.fma(a00, b01, sum01);
-      sum11 = Math.fma(a01, b01, sum11);
-      sum21 = Math.fma(a02, b01, sum21);
+      sum01 = a00 * b01 + sum01;
+      sum11 = a01 * b01 + sum11;
+      sum21 = a02 * b01 + sum21;
       float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-      sum02 = Math.fma(a00, b02, sum02);
-      sum12 = Math.fma(a01, b02, sum12);
-      sum22 = Math.fma(a02, b02, sum22);
+      sum02 = a00 * b02 + sum02;
+      sum12 = a01 * b02 + sum12;
+      sum22 = a02 * b02 + sum22;
       float a10 = a[offseta + (i + 1) + (row + 0) * lda];
       float a11 = a[offseta + (i + 1) + (row + 1) * lda];
       float a12 = a[offseta + (i + 1) + (row + 2) * lda];
       float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-      sum00 = Math.fma(a10, b10, sum00);
-      sum10 = Math.fma(a11, b10, sum10);
-      sum20 = Math.fma(a12, b10, sum20);
+      sum00 = a10 * b10 + sum00;
+      sum10 = a11 * b10 + sum10;
+      sum20 = a12 * b10 + sum20;
       float b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
-      sum01 = Math.fma(a10, b11, sum01);
-      sum11 = Math.fma(a11, b11, sum11);
-      sum21 = Math.fma(a12, b11, sum21);
+      sum01 = a10 * b11 + sum01;
+      sum11 = a11 * b11 + sum11;
+      sum21 = a12 * b11 + sum21;
       float b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-      sum02 = Math.fma(a10, b12, sum02);
-      sum12 = Math.fma(a11, b12, sum12);
-      sum22 = Math.fma(a12, b12, sum22);
+      sum02 = a10 * b12 + sum02;
+      sum12 = a11 * b12 + sum12;
+      sum22 = a12 * b12 + sum22;
     }
     for (; i < ie; i += 1) {
       float a0 = a[offseta + i + (row + 0) * lda];
       float a1 = a[offseta + i + (row + 1) * lda];
       float a2 = a[offseta + i + (row + 2) * lda];
       float b0 = b[offsetb + i + (col + 0) * ldb];
-      sum00 = Math.fma(a0, b0, sum00);
-      sum10 = Math.fma(a1, b0, sum10);
-      sum20 = Math.fma(a2, b0, sum20);
+      sum00 = a0 * b0 + sum00;
+      sum10 = a1 * b0 + sum10;
+      sum20 = a2 * b0 + sum20;
       float b1 = b[offsetb + i + (col + 1) * ldb];
-      sum01 = Math.fma(a0, b1, sum01);
-      sum11 = Math.fma(a1, b1, sum11);
-      sum21 = Math.fma(a2, b1, sum21);
+      sum01 = a0 * b1 + sum01;
+      sum11 = a1 * b1 + sum11;
+      sum21 = a2 * b1 + sum21;
       float b2 = b[offsetb + i + (col + 2) * ldb];
-      sum02 = Math.fma(a0, b2, sum02);
-      sum12 = Math.fma(a1, b2, sum12);
-      sum22 = Math.fma(a2, b2, sum22);
+      sum02 = a0 * b2 + sum02;
+      sum12 = a1 * b2 + sum12;
+      sum22 = a2 * b2 + sum22;
     }
-    c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, c[offsetc + (row + 0) + (col + 0) * ldc]);
-    c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, c[offsetc + (row + 0) + (col + 1) * ldc]);
-    c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, c[offsetc + (row + 0) + (col + 2) * ldc]);
-    c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, c[offsetc + (row + 1) + (col + 0) * ldc]);
-    c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, c[offsetc + (row + 1) + (col + 1) * ldc]);
-    c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, c[offsetc + (row + 1) + (col + 2) * ldc]);
-    c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, c[offsetc + (row + 2) + (col + 0) * ldc]);
-    c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, c[offsetc + (row + 2) + (col + 1) * ldc]);
-    c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, c[offsetc + (row + 2) + (col + 2) * ldc]);
+    c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + c[offsetc + (row + 0) + (col + 0) * ldc];
+    c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + c[offsetc + (row + 0) + (col + 1) * ldc];
+    c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + c[offsetc + (row + 0) + (col + 2) * ldc];
+    c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + c[offsetc + (row + 1) + (col + 0) * ldc];
+    c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + c[offsetc + (row + 1) + (col + 1) * ldc];
+    c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + c[offsetc + (row + 1) + (col + 2) * ldc];
+    c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + c[offsetc + (row + 2) + (col + 0) * ldc];
+    c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + c[offsetc + (row + 2) + (col + 1) * ldc];
+    c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + c[offsetc + (row + 2) + (col + 2) * ldc];
   }
 
   protected void sgemmNN(int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
@@ -1786,30 +1786,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum11 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
           float a01 = a[offseta + (row + 0) + (i + 1) * lda];
           float a11 = a[offseta + (row + 1) + (i + 1) * lda];
           float a21 = a[offseta + (row + 2) + (i + 1) * lda];
           float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
           float b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
           float b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum11 = Math.fma(a11, b12, sum12);
-          sum20 = Math.fma(a21, b10, sum20);
-          sum21 = Math.fma(a21, b11, sum21);
-          sum22 = Math.fma(a21, b12, sum22);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
+          sum10 = a11 * b10 + sum10;
+          sum11 = a11 * b11 + sum11;
+          sum11 = a11 * b12 + sum12;
+          sum20 = a21 * b10 + sum20;
+          sum21 = a21 * b11 + sum21;
+          sum22 = a21 * b12 + sum22;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
@@ -1818,26 +1818,26 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum11 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, beta * c[offsetc + (row + 1) + (col + 1) * ldc]);
-          c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, beta * c[offsetc + (row + 1) + (col + 2) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, beta * c[offsetc + (row + 2) + (col + 1) * ldc]);
-          c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, beta * c[offsetc + (row + 2) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -1860,30 +1860,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
           float a01 = a[offseta + (row + 0) + (i + 1) * lda];
           float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
           float b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
           float b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -1903,30 +1903,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float a10 = a[offseta + (row + 1) + (i + 0) * lda];
           float a20 = a[offseta + (row + 2) + (i + 0) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
           float a01 = a[offseta + (row + 0) + (i + 1) * lda];
           float a11 = a[offseta + (row + 1) + (i + 1) * lda];
           float a21 = a[offseta + (row + 2) + (i + 1) * lda];
           float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a21, b10, sum20);
+          sum00 = a01 * b10 + sum00;
+          sum10 = a11 * b10 + sum10;
+          sum20 = a21 * b10 + sum20;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
           float a10 = a[offseta + (row + 1) + (i + 0) * lda];
           float a20 = a[offseta + (row + 2) + (i + 0) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
@@ -1939,18 +1939,18 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (; i < loopBound(k, Ti); i += Ti) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
           float a01 = a[offseta + (row + 0) + (i + 1) * lda];
           float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
+          sum00 = a01 * b10 + sum00;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
         }
@@ -1981,30 +1981,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           float b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           float b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum11 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
           float a01 = a[offseta + (row + 0) + (i + 1) * lda];
           float a11 = a[offseta + (row + 1) + (i + 1) * lda];
           float a21 = a[offseta + (row + 2) + (i + 1) * lda];
           float b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
           float b11 = b[offsetb + (col + 1) + (i + 1) * ldb];
           float b12 = b[offsetb + (col + 2) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum11 = Math.fma(a11, b12, sum12);
-          sum20 = Math.fma(a21, b10, sum20);
-          sum21 = Math.fma(a21, b11, sum21);
-          sum22 = Math.fma(a21, b12, sum22);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
+          sum10 = a11 * b10 + sum10;
+          sum11 = a11 * b11 + sum11;
+          sum11 = a11 * b12 + sum12;
+          sum20 = a21 * b10 + sum20;
+          sum21 = a21 * b11 + sum21;
+          sum22 = a21 * b12 + sum22;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
@@ -2013,26 +2013,26 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           float b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           float b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum11 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, beta * c[offsetc + (row + 1) + (col + 1) * ldc]);
-          c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, beta * c[offsetc + (row + 1) + (col + 2) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, beta * c[offsetc + (row + 2) + (col + 1) * ldc]);
-          c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, beta * c[offsetc + (row + 2) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -2055,30 +2055,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           float b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           float b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
           float a01 = a[offseta + (row + 0) + (i + 1) * lda];
           float b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
           float b11 = b[offsetb + (col + 1) + (i + 1) * ldb];
           float b12 = b[offsetb + (col + 2) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           float b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           float b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -2098,30 +2098,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float a10 = a[offseta + (row + 1) + (i + 0) * lda];
           float a20 = a[offseta + (row + 2) + (i + 0) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
           float a01 = a[offseta + (row + 0) + (i + 1) * lda];
           float a11 = a[offseta + (row + 1) + (i + 1) * lda];
           float a21 = a[offseta + (row + 2) + (i + 1) * lda];
           float b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a21, b10, sum20);
+          sum00 = a01 * b10 + sum00;
+          sum10 = a11 * b10 + sum10;
+          sum20 = a21 * b10 + sum20;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
           float a10 = a[offseta + (row + 1) + (i + 0) * lda];
           float a20 = a[offseta + (row + 2) + (i + 0) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
@@ -2134,18 +2134,18 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (; i < loopBound(k, Ti); i += Ti) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
           float a01 = a[offseta + (row + 0) + (i + 1) * lda];
           float b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
+          sum00 = a01 * b10 + sum00;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (row + 0) + (i + 0) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
         }
@@ -2177,30 +2177,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum11 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
           float a01 = a[offseta + (i + 1) + (row + 0) * lda];
           float a11 = a[offseta + (i + 1) + (row + 1) * lda];
           float a21 = a[offseta + (i + 1) + (row + 2) * lda];
           float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
           float b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
           float b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum11 = Math.fma(a11, b12, sum12);
-          sum20 = Math.fma(a21, b10, sum20);
-          sum21 = Math.fma(a21, b11, sum21);
-          sum22 = Math.fma(a21, b12, sum22);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
+          sum10 = a11 * b10 + sum10;
+          sum11 = a11 * b11 + sum11;
+          sum11 = a11 * b12 + sum12;
+          sum20 = a21 * b10 + sum20;
+          sum21 = a21 * b11 + sum21;
+          sum22 = a21 * b12 + sum22;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
@@ -2209,26 +2209,26 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum11 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, beta * c[offsetc + (row + 1) + (col + 1) * ldc]);
-          c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, beta * c[offsetc + (row + 1) + (col + 2) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, beta * c[offsetc + (row + 2) + (col + 1) * ldc]);
-          c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, beta * c[offsetc + (row + 2) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -2251,30 +2251,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
           float a01 = a[offseta + (i + 1) + (row + 0) * lda];
           float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
           float b11 = b[offsetb + (i + 1) + (col + 1) * ldb];
           float b12 = b[offsetb + (i + 1) + (col + 2) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
           float b01 = b[offsetb + (i + 0) + (col + 1) * ldb];
           float b02 = b[offsetb + (i + 0) + (col + 2) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -2294,30 +2294,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float a10 = a[offseta + (i + 0) + (row + 1) * lda];
           float a20 = a[offseta + (i + 0) + (row + 2) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
           float a01 = a[offseta + (i + 1) + (row + 0) * lda];
           float a11 = a[offseta + (i + 1) + (row + 1) * lda];
           float a21 = a[offseta + (i + 1) + (row + 2) * lda];
           float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a21, b10, sum20);
+          sum00 = a01 * b10 + sum00;
+          sum10 = a11 * b10 + sum10;
+          sum20 = a21 * b10 + sum20;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
           float a10 = a[offseta + (i + 0) + (row + 1) * lda];
           float a20 = a[offseta + (i + 0) + (row + 2) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
@@ -2330,18 +2330,18 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (; i < loopBound(k, Ti); i += Ti) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
           float a01 = a[offseta + (i + 1) + (row + 0) * lda];
           float b10 = b[offsetb + (i + 1) + (col + 0) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
+          sum00 = a01 * b10 + sum00;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
           float b00 = b[offsetb + (i + 0) + (col + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
         }
@@ -2373,30 +2373,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           float b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           float b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum11 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
           float a01 = a[offseta + (i + 1) + (row + 0) * lda];
           float a11 = a[offseta + (i + 1) + (row + 1) * lda];
           float a21 = a[offseta + (i + 1) + (row + 2) * lda];
           float b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
           float b11 = b[offsetb + (col + 1) + (i + 1) * ldb];
           float b12 = b[offsetb + (col + 2) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum11 = Math.fma(a11, b11, sum11);
-          sum11 = Math.fma(a11, b12, sum12);
-          sum20 = Math.fma(a21, b10, sum20);
-          sum21 = Math.fma(a21, b11, sum21);
-          sum22 = Math.fma(a21, b12, sum22);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
+          sum10 = a11 * b10 + sum10;
+          sum11 = a11 * b11 + sum11;
+          sum11 = a11 * b12 + sum12;
+          sum20 = a21 * b10 + sum20;
+          sum21 = a21 * b11 + sum21;
+          sum22 = a21 * b12 + sum22;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
@@ -2405,26 +2405,26 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           float b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           float b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
-          sum20 = Math.fma(a20, b00, sum20);
-          sum21 = Math.fma(a20, b01, sum21);
-          sum22 = Math.fma(a20, b02, sum22);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
+          sum10 = a10 * b00 + sum10;
+          sum11 = a10 * b01 + sum11;
+          sum11 = a10 * b02 + sum12;
+          sum20 = a20 * b00 + sum20;
+          sum21 = a20 * b01 + sum21;
+          sum22 = a20 * b02 + sum22;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 1) * ldc] = Math.fma(alpha, sum11, beta * c[offsetc + (row + 1) + (col + 1) * ldc]);
-          c[offsetc + (row + 1) + (col + 2) * ldc] = Math.fma(alpha, sum12, beta * c[offsetc + (row + 1) + (col + 2) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 1) * ldc] = Math.fma(alpha, sum21, beta * c[offsetc + (row + 2) + (col + 1) * ldc]);
-          c[offsetc + (row + 2) + (col + 2) * ldc] = Math.fma(alpha, sum22, beta * c[offsetc + (row + 2) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 1) * ldc] = alpha * sum11 + beta * c[offsetc + (row + 1) + (col + 1) * ldc];
+          c[offsetc + (row + 1) + (col + 2) * ldc] = alpha * sum12 + beta * c[offsetc + (row + 1) + (col + 2) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 1) * ldc] = alpha * sum21 + beta * c[offsetc + (row + 2) + (col + 1) * ldc];
+          c[offsetc + (row + 2) + (col + 2) * ldc] = alpha * sum22 + beta * c[offsetc + (row + 2) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -2447,30 +2447,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           float b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           float b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
           float a01 = a[offseta + (i + 1) + (row + 0) * lda];
           float b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
           float b11 = b[offsetb + (col + 1) + (i + 1) * ldb];
           float b12 = b[offsetb + (col + 2) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum01 = Math.fma(a01, b11, sum01);
-          sum02 = Math.fma(a01, b12, sum02);
+          sum00 = a01 * b10 + sum00;
+          sum01 = a01 * b11 + sum01;
+          sum02 = a01 * b12 + sum02;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
           float b01 = b[offsetb + (col + 1) + (i + 0) * ldb];
           float b02 = b[offsetb + (col + 2) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum01 = Math.fma(a00, b01, sum01);
-          sum02 = Math.fma(a00, b02, sum02);
+          sum00 = a00 * b00 + sum00;
+          sum01 = a00 * b01 + sum01;
+          sum02 = a00 * b02 + sum02;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 0) + (col + 1) * ldc] = Math.fma(alpha, sum01, beta * c[offsetc + (row + 0) + (col + 1) * ldc]);
-          c[offsetc + (row + 0) + (col + 2) * ldc] = Math.fma(alpha, sum02, beta * c[offsetc + (row + 0) + (col + 2) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01 + beta * c[offsetc + (row + 0) + (col + 1) * ldc];
+          c[offsetc + (row + 0) + (col + 2) * ldc] = alpha * sum02 + beta * c[offsetc + (row + 0) + (col + 2) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 0) + (col + 1) * ldc] = alpha * sum01;
@@ -2490,30 +2490,30 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
           float a10 = a[offseta + (i + 0) + (row + 1) * lda];
           float a20 = a[offseta + (i + 0) + (row + 2) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
           float a01 = a[offseta + (i + 1) + (row + 0) * lda];
           float a11 = a[offseta + (i + 1) + (row + 1) * lda];
           float a21 = a[offseta + (i + 1) + (row + 2) * lda];
           float b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
-          sum10 = Math.fma(a11, b10, sum10);
-          sum20 = Math.fma(a21, b10, sum20);
+          sum00 = a01 * b10 + sum00;
+          sum10 = a11 * b10 + sum10;
+          sum20 = a21 * b10 + sum20;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
           float a10 = a[offseta + (i + 0) + (row + 1) * lda];
           float a20 = a[offseta + (i + 0) + (row + 2) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
-          sum10 = Math.fma(a10, b00, sum10);
-          sum20 = Math.fma(a20, b00, sum20);
+          sum00 = a00 * b00 + sum00;
+          sum10 = a10 * b00 + sum10;
+          sum20 = a20 * b00 + sum20;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
-          c[offsetc + (row + 1) + (col + 0) * ldc] = Math.fma(alpha, sum10, beta * c[offsetc + (row + 1) + (col + 0) * ldc]);
-          c[offsetc + (row + 2) + (col + 0) * ldc] = Math.fma(alpha, sum20, beta * c[offsetc + (row + 2) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
+          c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10 + beta * c[offsetc + (row + 1) + (col + 0) * ldc];
+          c[offsetc + (row + 2) + (col + 0) * ldc] = alpha * sum20 + beta * c[offsetc + (row + 2) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
           c[offsetc + (row + 1) + (col + 0) * ldc] = alpha * sum10;
@@ -2526,18 +2526,18 @@ public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLA
         for (; i < loopBound(k, Ti); i += Ti) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
           float a01 = a[offseta + (i + 1) + (row + 0) * lda];
           float b10 = b[offsetb + (col + 0) + (i + 1) * ldb];
-          sum00 = Math.fma(a01, b10, sum00);
+          sum00 = a01 * b10 + sum00;
         }
         for (; i < k; i += 1) {
           float a00 = a[offseta + (i + 0) + (row + 0) * lda];
           float b00 = b[offsetb + (col + 0) + (i + 0) * ldb];
-          sum00 = Math.fma(a00, b00, sum00);
+          sum00 = a00 * b00 + sum00;
         }
         if (beta != 0.0f) {
-          c[offsetc + (row + 0) + (col + 0) * ldc] = Math.fma(alpha, sum00, beta * c[offsetc + (row + 0) + (col + 0) * ldc]);
+          c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00 + beta * c[offsetc + (row + 0) + (col + 0) * ldc];
         } else {
           c[offsetc + (row + 0) + (col + 0) * ldc] = alpha * sum00;
         }

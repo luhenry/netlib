@@ -31,11 +31,19 @@ import java.util.logging.Logger;
 public interface JavaBLAS extends BLAS {
 
   public static JavaBLAS getInstance() {
-    try {
-      return dev.ludovic.netlib.blas.VectorizedBLAS.getInstance();
-    } catch (Throwable t) {
-      Logger.getLogger(JavaBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.VectorizedBLAS");
+    String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 2);
+    int major = Integer.parseInt(fullVersion[0]);
+    if (major >= 16) {
+      try {
+        return dev.ludovic.netlib.blas.VectorizedBLAS.getInstance();
+      } catch (Throwable t) {
+        Logger.getLogger(JavaBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.VectorizedBLAS");
+      }
     }
-    return dev.ludovic.netlib.blas.JavaBLAS.getInstance();
+    if (major >= 11) {
+      return dev.ludovic.netlib.blas.Java11BLAS.getInstance();
+    } else {
+      return dev.ludovic.netlib.blas.JavaBLAS.getInstance();
+    }
   }
 }
