@@ -84,7 +84,7 @@ jobs:
       with:
         name: benchmarks
     - name: Run benchmark
-      run: java -jar "${{steps.download_benchmarks.outputs.download-path}}/netlib-benchmarks.jar" ${{ matrix.filter }} -p implementation=${{ matrix.implementation }} -jvmArgs "-XX:+UseParallelGC ${{ matrix.jvmArgs }}" -rf json -rff jmh-results-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.json
+      run: java -jar "${{steps.download_benchmarks.outputs.download-path}}/netlib-benchmarks.jar" "${{ matrix.filter }}" -p "implementation=${{ matrix.implementation }}" -jvmArgs "-XX:+UseParallelGC ${{ matrix.jvmArgs }}" -rf json -rff "jmh-results-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.json"
     - name: Upload JMH results
       uses: actions/upload-release-asset@v1
       env:
