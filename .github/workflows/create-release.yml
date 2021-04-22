@@ -84,7 +84,7 @@ jobs:
       with:
         name: benchmarks
     - name: Run benchmark
-      run: java -jar "${{steps.download_benchmarks.outputs.download-path}}/netlib-benchmarks.jar" ${{ matrix.filter }} -p implementation=${{ matrix.implementation }} -jvmArgs "-XX:+UseParallelGC ${{ matrix.jvmArgs }}" -rf json -rff jmh-results-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.json | tee jmh-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.out
+      run: java -jar "${{steps.download_benchmarks.outputs.download-path}}/netlib-benchmarks.jar" ${{ matrix.filter }} -p implementation=${{ matrix.implementation }} -jvmArgs "-XX:+UseParallelGC ${{ matrix.jvmArgs }}" -rf json -rff jmh-results-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.json
     - name: Upload JMH results
       uses: actions/upload-release-asset@v1
       env:
@@ -94,12 +94,3 @@ jobs:
         asset_path: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.json
         asset_name: jmh-results-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.json
         asset_content_type: application/json
-    - name: Upload JMH output
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.build.outputs.release_upload_url }}
-        asset_path: jmh-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.out
-        asset_name: jmh-jdk${{ matrix.jdk }}-${{ matrix.filter }}-${{ matrix.implementation }}.out
-        asset_content_type: text/plain
