@@ -25,18 +25,21 @@
 
 package dev.ludovic.netlib;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public interface NativeBLAS extends BLAS {
 
   public static NativeBLAS getInstance() {
     try {
-      return dev.ludovic.netlib.blas.ForeignBLAS.getInstance();
-    } catch (Throwable t) {
-      // ignore exception
-    }
-    try {
       return dev.ludovic.netlib.blas.NetlibNativeBLAS.getInstance();
     } catch (Throwable t) {
-      // ignore exception
+      Logger.getLogger(NativeBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.NetlibNativeBLAS");
+    }
+    try {
+      return dev.ludovic.netlib.blas.ForeignBLAS.getInstance();
+    } catch (Throwable t) {
+      Logger.getLogger(NativeBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.ForeignBLAS");
     }
     throw new RuntimeException("Unable to load native implementation");
   }

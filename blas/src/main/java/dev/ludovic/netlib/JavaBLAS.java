@@ -25,13 +25,16 @@
 
 package dev.ludovic.netlib;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public interface JavaBLAS extends BLAS {
 
   public static JavaBLAS getInstance() {
     try {
       return dev.ludovic.netlib.blas.VectorizedBLAS.getInstance();
     } catch (Throwable t) {
-      // ignore exception
+      Logger.getLogger(JavaBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.VectorizedBLAS");
     }
     return dev.ludovic.netlib.blas.JavaBLAS.getInstance();
   }

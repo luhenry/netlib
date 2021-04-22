@@ -25,13 +25,16 @@
 
 package dev.ludovic.netlib;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public interface NativeARPACK extends ARPACK {
 
   public static NativeARPACK getInstance() {
     try {
       return dev.ludovic.netlib.arpack.NetlibNativeARPACK.getInstance();
     } catch (Throwable t) {
-      // ignore exception
+      Logger.getLogger(NativeARPACK.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.arpack.NetlibNativeARPACK");
     }
     throw new RuntimeException("Unable to load native implementation");
   }
