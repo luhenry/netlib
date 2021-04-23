@@ -66,7 +66,7 @@ public class BLASTest {
     if (major >= 16) {
       instances = Stream.concat(instances, Stream.of(
         Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance()),
-        Arguments.of(dev.ludovic.netlib.blas.ForeignBLAS.getInstance())
+        Arguments.of(dev.ludovic.netlib.blas.ForeignLinkerBLAS.getInstance())
       ));
     }
 

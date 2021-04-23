@@ -43,18 +43,18 @@ import static jdk.incubator.foreign.CLinker.*;
 
 import dev.ludovic.netlib.BLAS;
 
-public final class ForeignBLAS extends AbstractBLAS implements dev.ludovic.netlib.NativeBLAS {
+public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic.netlib.NativeBLAS {
 
-  private static final Logger LOGGER = Logger.getLogger(ForeignBLAS.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(ForeignLinkerBLAS.class.getName());
 
-  private static final ForeignBLAS instance = new ForeignBLAS();
+  private static final ForeignLinkerBLAS instance = new ForeignLinkerBLAS();
 
   private final LibraryLookup blas =
     System.getProperty("dev.ludovic.netlib.blas.nativeLibPath") != null ?
       LibraryLookup.ofPath(Paths.get(System.getProperty("dev.ludovic.netlib.blas.nativeLibPath"))) :
       LibraryLookup.ofLibrary(System.getProperty("dev.ludovic.netlib.blas.nativeLib", "blas"));
 
-  protected ForeignBLAS() {}
+  protected ForeignLinkerBLAS() {}
 
   public static dev.ludovic.netlib.NativeBLAS getInstance() {
     return instance;
