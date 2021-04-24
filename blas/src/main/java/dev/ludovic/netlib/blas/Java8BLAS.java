@@ -27,14 +27,14 @@ package dev.ludovic.netlib.blas;
 
 import dev.ludovic.netlib.BLAS;
 
-public class JavaBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLAS {
+public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLAS {
 
   //FIXME: remove dependency on F2jBLAS
   private static final com.github.fommil.netlib.F2jBLAS f2j = new com.github.fommil.netlib.F2jBLAS();
 
-  private static final JavaBLAS instance = new JavaBLAS();
+  private static final Java8BLAS instance = new Java8BLAS();
 
-  protected JavaBLAS() {}
+  protected Java8BLAS() {}
 
   public static dev.ludovic.netlib.JavaBLAS getInstance() {
     return instance;

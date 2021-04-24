@@ -60,7 +60,7 @@ public class BLASTest {
       ));
     } else {
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of(dev.ludovic.netlib.blas.JavaBLAS.getInstance())
+        Arguments.of(dev.ludovic.netlib.blas.Java8BLAS.getInstance())
       ));
     }
     if (major >= 16) {
