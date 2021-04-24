@@ -43,7 +43,7 @@ public interface JavaBLAS extends BLAS {
     if (major >= 11) {
       return dev.ludovic.netlib.blas.Java11BLAS.getInstance();
     } else {
-      return dev.ludovic.netlib.blas.JavaBLAS.getInstance();
+      return dev.ludovic.netlib.blas.Java8BLAS.getInstance();
     }
   }
 }
