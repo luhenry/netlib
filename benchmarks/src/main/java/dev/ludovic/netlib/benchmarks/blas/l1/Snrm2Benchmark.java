@@ -33,7 +33,7 @@ import org.openjdk.jmh.infra.Blackhole;
 @State(Scope.Thread)
 public class Snrm2Benchmark extends L1Benchmark {
 
-    @Param({"10", "1000000"})
+    @Param({"10", "100000000"})
     public int n;
 
     public float[] x;
