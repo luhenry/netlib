@@ -42,37 +42,61 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
 
   protected double dasumK(int n, double[] x, int offsetx, int incx) {
     double sum = 0.0;
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
-      sum += Math.abs(x[offsetx + ix]);
+    if (incx == 1) {
+      for (int ix = 0; ix < n; ix++) {
+        sum += Math.abs(x[offsetx + ix]);
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
+        sum += Math.abs(x[offsetx + ix]);
+      }
     }
     return sum;
   }
 
   protected float sasumK(int n, float[] x, int offsetx, int incx) {
     float sum = 0.0f;
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
-      sum += Math.abs(x[offsetx + ix]);
+    if (incx == 1) {
+      for (int ix = 0; ix < n; ix++) {
+        sum += Math.abs(x[offsetx + ix]);
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
+        sum += Math.abs(x[offsetx + ix]);
+      }
     }
     return sum;
   }
 
   protected void daxpyK(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-             iy = incy < 0 ? (n - 1) * -incy : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx)
-          && (incy < 0 ? iy >= 0 : iy < n * incy);
-         ix += incx, iy += incy) {
-      y[offsety + iy] += alpha * x[offsetx + ix];
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        y[offsety + iy] += alpha * x[offsetx + ix];
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+             && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        y[offsety + iy] += alpha * x[offsetx + ix];
+      }
     }
   }
 
   protected void saxpyK(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-             iy = incy < 0 ? (n - 1) * -incy : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx)
-          && (incy < 0 ? iy >= 0 : iy < n * incy);
-         ix += incx, iy += incy) {
-      y[offsety + iy] += alpha * x[offsetx + ix];
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        y[offsety + iy] += alpha * x[offsetx + ix];
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+             && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        y[offsety + iy] += alpha * x[offsetx + ix];
+      }
     }
   }
 
@@ -106,36 +130,54 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
 
   protected double ddotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     double sum = 0.0;
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-             iy = incy < 0 ? (n - 1) * -incy : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx)
-          && (incy < 0 ? iy >= 0 : iy < n * incy);
-         ix += incx, iy += incy) {
-      sum += x[offsetx + ix] * y[offsety + iy];
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        sum += x[offsetx + ix] * y[offsety + iy];
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+              iy = incy < 0 ? (n - 1) * -incy : 0;
+          (incx < 0 ? ix >= 0 : ix < n * incx)
+            && (incy < 0 ? iy >= 0 : iy < n * incy);
+          ix += incx, iy += incy) {
+        sum += x[offsetx + ix] * y[offsety + iy];
+      }
     }
     return sum;
   }
 
   protected float sdotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     float sum = 0.0f;
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-             iy = incy < 0 ? (n - 1) * -incy : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx)
-          && (incy < 0 ? iy >= 0 : iy < n * incy);
-         ix += incx, iy += incy) {
-      sum += x[offsetx + ix] * y[offsety + iy];
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        sum += x[offsetx + ix] * y[offsety + iy];
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+              iy = incy < 0 ? (n - 1) * -incy : 0;
+          (incx < 0 ? ix >= 0 : ix < n * incx)
+            && (incy < 0 ? iy >= 0 : iy < n * incy);
+          ix += incx, iy += incy) {
+        sum += x[offsetx + ix] * y[offsety + iy];
+      }
     }
     return sum;
   }
 
   protected float sdsdotK(int n, float sb, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     double sum = sb;
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-             iy = incy < 0 ? (n - 1) * -incy : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx)
-          && (incy < 0 ? iy >= 0 : iy < n * incy);
-         ix += incx, iy += incy) {
-      sum += (double)(x[offsetx + ix]) * (double)(y[offsety + iy]);
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        sum += (double)(x[offsetx + ix]) * (double)(y[offsety + iy]);
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+            && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        sum += (double)(x[offsetx + ix]) * (double)(y[offsety + iy]);
+      }
     }
     return (float)sum;
   }
@@ -2814,28 +2856,46 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   }
 
   protected void drotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double c, double s) {
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-             iy = incy < 0 ? (n - 1) * -incy : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx)
-          && (incy < 0 ? iy >= 0 : iy < n * incy);
-         ix += incx, iy += incy) {
-      double x0 = x[offsetx + ix];
-      double y0 = y[offsety + iy];
-      x[offsetx + ix] = c * x0 + s * y0;
-      y[offsety + iy] = c * y0 - s * x0;
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        double x0 = x[offsetx + ix];
+        double y0 = y[offsety + iy];
+        x[offsetx + ix] = c * x0 + s * y0;
+        y[offsety + iy] = c * y0 - s * x0;
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+            && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        double x0 = x[offsetx + ix];
+        double y0 = y[offsety + iy];
+        x[offsetx + ix] = c * x0 + s * y0;
+        y[offsety + iy] = c * y0 - s * x0;
+      }
     }
   }
 
   protected void srotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float c, float s) {
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-             iy = incy < 0 ? (n - 1) * -incy : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx)
-          && (incy < 0 ? iy >= 0 : iy < n * incy);
-         ix += incx, iy += incy) {
-      float x0 = x[offsetx + ix];
-      float y0 = y[offsety + iy];
-      x[offsetx + ix] = c * x0 + s * y0;
-      y[offsety + iy] = c * y0 - s * x0;
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        float x0 = x[offsetx + ix];
+        float y0 = y[offsety + iy];
+        x[offsetx + ix] = c * x0 + s * y0;
+        y[offsety + iy] = c * y0 - s * x0;
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+            && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        float x0 = x[offsetx + ix];
+        float y0 = y[offsety + iy];
+        x[offsetx + ix] = c * x0 + s * y0;
+        y[offsety + iy] = c * y0 - s * x0;
+      }
     }
   }
 
@@ -2864,14 +2924,26 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   }
 
   protected void dscalK(int n, double alpha, double[] x, int offsetx, int incx) {
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
-      x[offsetx + ix] *= alpha;
+    if (incx == 1) {
+      for (int ix = 0; ix < n; ix++) {
+        x[offsetx + ix] *= alpha;
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
+        x[offsetx + ix] *= alpha;
+      }
     }
   }
 
   protected void sscalK(int n, float alpha, float[] x, int offsetx, int incx) {
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
-      x[offsetx + ix] *= alpha;
+    if (incx == 1) {
+      for (int ix = 0; ix < n; ix++) {
+        x[offsetx + ix] *= alpha;
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
+        x[offsetx + ix] *= alpha;
+      }
     }
   }
 
@@ -3268,26 +3340,42 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   }
 
   protected void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-             iy = incy < 0 ? (n - 1) * -incy : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx)
-          && (incy < 0 ? iy >= 0 : iy < n * incy);
-         ix += incx, iy += incy) {
-      double tmp = y[offsety + iy];
-      y[offsety + iy] = x[offsetx + ix];
-      x[offsetx + ix] = tmp;
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        double tmp = y[offsety + iy];
+        y[offsety + iy] = x[offsetx + ix];
+        x[offsetx + ix] = tmp;
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+            && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        double tmp = y[offsety + iy];
+        y[offsety + iy] = x[offsetx + ix];
+        x[offsetx + ix] = tmp;
+      }
     }
   }
 
   protected void sswapK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
-    for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-             iy = incy < 0 ? (n - 1) * -incy : 0;
-         (incx < 0 ? ix >= 0 : ix < n * incx)
-          && (incy < 0 ? iy >= 0 : iy < n * incy);
-         ix += incx, iy += incy) {
-      float tmp = y[offsety + iy];
-      y[offsety + iy] = x[offsetx + ix];
-      x[offsetx + ix] = tmp;
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        float tmp = y[offsety + iy];
+        y[offsety + iy] = x[offsetx + ix];
+        x[offsetx + ix] = tmp;
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+            && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        float tmp = y[offsety + iy];
+        y[offsety + iy] = x[offsetx + ix];
+        x[offsetx + ix] = tmp;
+      }
     }
   }
 
@@ -4947,11 +5035,21 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   protected int idamaxK(int n, double[] x, int offsetx, int incx) {
     int imax = 0;
     double max = x[offsetx];
-    for (int i = 1, ix = incx; ix < n * incx; i += 1, ix += incx) {
-      double val = Math.abs(x[offsetx + ix]);
-      if (val > max) {
-        imax = i;
-        max = val;
+    if (incx == 1) {
+      for (int ix = 1; ix < n; ix++) {
+        double val = Math.abs(x[offsetx + ix]);
+        if (val > max) {
+          imax = ix;
+          max = val;
+        }
+      }
+    } else {
+      for (int ix = incx; ix < n * incx; ix += incx) {
+        double val = Math.abs(x[offsetx + ix]);
+        if (val > max) {
+          imax = ix / incx;
+          max = val;
+        }
       }
     }
     return imax;
@@ -4960,11 +5058,21 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   protected int isamaxK(int n, float[] x, int offsetx, int incx) {
     int imax = 0;
     float max = x[offsetx];
-    for (int i = 1, ix = incx; ix < n * incx; i += 1, ix += incx) {
-      float val = Math.abs(x[offsetx + ix]);
-      if (val > max) {
-        imax = i;
-        max = val;
+    if (incx == 1) {
+      for (int ix = 1; ix < n; ix++) {
+        float val = Math.abs(x[offsetx + ix]);
+        if (val > max) {
+          imax = ix;
+          max = val;
+        }
+      }
+    } else {
+      for (int ix = incx; ix < n * incx; ix += incx) {
+        float val = Math.abs(x[offsetx + ix]);
+        if (val > max) {
+          imax = ix / incx;
+          max = val;
+        }
       }
     }
     return imax;

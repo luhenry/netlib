@@ -37,6 +37,92 @@ public class Java11BLAS extends Java8BLAS {
     return instance;
   }
 
+  protected void daxpyK(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        y[offsety + iy] = Math.fma(alpha, x[offsetx + ix], y[offsety + iy]);
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+             && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        y[offsety + iy] = Math.fma(alpha, x[offsetx + ix], y[offsety + iy]);
+      }
+    }
+  }
+
+  protected void saxpyK(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        y[offsety + iy] = Math.fma(alpha, x[offsetx + ix], y[offsety + iy]);
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+             && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        y[offsety + iy] = Math.fma(alpha, x[offsetx + ix], y[offsety + iy]);
+      }
+    }
+  }
+
+  protected double ddotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
+    double sum = 0.0;
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        sum = Math.fma(x[offsetx + ix], y[offsety + iy], sum);
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+              iy = incy < 0 ? (n - 1) * -incy : 0;
+          (incx < 0 ? ix >= 0 : ix < n * incx)
+            && (incy < 0 ? iy >= 0 : iy < n * incy);
+          ix += incx, iy += incy) {
+        sum = Math.fma(x[offsetx + ix], y[offsety + iy], sum);
+      }
+    }
+    return sum;
+  }
+
+  protected float sdotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
+    float sum = 0.0f;
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        sum = Math.fma(x[offsetx + ix], y[offsety + iy], sum);
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+             && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        sum = Math.fma(x[offsetx + ix], y[offsety + iy], sum);
+      }
+    }
+    return sum;
+  }
+
+  protected float sdsdotK(int n, float sb, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
+    double sum = sb;
+    if (incx == 1 && incy == 1) {
+      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+        sum = Math.fma((double)(x[offsetx + ix]), (double)(y[offsety + iy]), sum);
+      }
+    } else {
+      for (int ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+            && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
+        sum = Math.fma((double)(x[offsetx + ix]), (double)(y[offsety + iy]), sum);
+      }
+    }
+    return (float)sum;
+  }
+
   protected void dgebpTN(int m, int rows, int rowe, int n, int cols, int cole, int k, int is, int ie, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
     final int Tcol = 3, Trow = 3;
 
@@ -2037,5 +2123,33 @@ public class Java11BLAS extends Java8BLAS {
         }
       }
     }
+  }
+
+  protected double dnrm2K(int n, double[] x, int offsetx, int incx) {
+    double sum = 0.0;
+    if (incx == 1) {
+      for (int ix = 0; ix < n; ix++) {
+        sum = Math.fma(x[offsetx + ix], x[offsetx + ix], sum);
+      }
+    } else {
+      for (int ix = 0; ix < n * incx; ix += incx) {
+        sum = Math.fma(x[offsetx + ix], x[offsetx + ix], sum);
+      }
+    }
+    return Math.sqrt(sum);
+  }
+
+  protected float snrm2K(int n, float[] x, int offsetx, int incx) {
+    float sum = 0.0f;
+    if (incx == 1) {
+      for (int ix = 0; ix < n; ix++) {
+        sum = Math.fma(x[offsetx + ix], x[offsetx + ix], sum);
+      }
+    } else {
+      for (int ix = 0; ix < n * incx; ix += incx) {
+        sum = Math.fma(x[offsetx + ix], x[offsetx + ix], sum);
+      }
+    }
+    return (float)Math.sqrt(sum);
   }
 }

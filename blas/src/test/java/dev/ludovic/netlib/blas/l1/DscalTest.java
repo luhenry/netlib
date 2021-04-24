@@ -38,12 +38,24 @@ public class DscalTest extends BLASTest {
         blas.dscal(M, 2.0, dXcopy = dX.clone(), 1);
         assertArrayEquals(expected, dXcopy, depsilon);
 
+        f2j.dscal(M, 2.0, expected = dX.clone(), -1);
+        blas.dscal(M, 2.0, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
         f2j.dscal(M, 1.0, expected = dX.clone(), 1);
         blas.dscal(M, 1.0, dXcopy = dX.clone(), 1);
         assertArrayEquals(expected, dXcopy, depsilon);
 
+        f2j.dscal(M, 1.0, expected = dX.clone(), -1);
+        blas.dscal(M, 1.0, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
         f2j.dscal(M, 0.0, expected = dX.clone(), 1);
         blas.dscal(M, 0.0, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        f2j.dscal(M, 0.0, expected = dX.clone(), -1);
+        blas.dscal(M, 0.0, dXcopy = dX.clone(), -1);
         assertArrayEquals(expected, dXcopy, depsilon);
     }
 }
