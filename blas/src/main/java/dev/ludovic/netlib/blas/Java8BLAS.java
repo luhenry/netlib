@@ -43,7 +43,19 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   protected double dasumK(int n, double[] x, int offsetx, int incx) {
     double sum = 0.0;
     if (incx == 1) {
-      for (int ix = 0; ix < n; ix++) {
+      int ix = 0;
+      double sum0 = 0.0;
+      double sum1 = 0.0;
+      double sum2 = 0.0;
+      double sum3 = 0.0;
+      for (; ix < loopBound(n, 4); ix += 4) {
+        sum0 += Math.abs(x[offsetx + ix + 0]);
+        sum1 += Math.abs(x[offsetx + ix + 1]);
+        sum2 += Math.abs(x[offsetx + ix + 2]);
+        sum3 += Math.abs(x[offsetx + ix + 3]);
+      }
+      sum += sum0 + sum1 + sum2 + sum3;
+      for (; ix < n; ix += 1) {
         sum += Math.abs(x[offsetx + ix]);
       }
     } else {
@@ -57,7 +69,19 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   protected float sasumK(int n, float[] x, int offsetx, int incx) {
     float sum = 0.0f;
     if (incx == 1) {
-      for (int ix = 0; ix < n; ix++) {
+      int ix = 0;
+      float sum0 = 0.0f;
+      float sum1 = 0.0f;
+      float sum2 = 0.0f;
+      float sum3 = 0.0f;
+      for (; ix < loopBound(n, 4); ix += 4) {
+        sum0 += Math.abs(x[offsetx + ix + 0]);
+        sum1 += Math.abs(x[offsetx + ix + 1]);
+        sum2 += Math.abs(x[offsetx + ix + 2]);
+        sum3 += Math.abs(x[offsetx + ix + 3]);
+      }
+      sum += sum0 + sum1 + sum2 + sum3;
+      for (; ix < n; ix += 1) {
         sum += Math.abs(x[offsetx + ix]);
       }
     } else {
@@ -70,7 +94,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
 
   protected void daxpyK(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     if (incx == 1 && incy == 1) {
-      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+      for (int ix = 0, iy = 0; ix < n && iy < n; ix += 1, iy += 1) {
         y[offsety + iy] += alpha * x[offsetx + ix];
       }
     } else {
@@ -86,7 +110,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
 
   protected void saxpyK(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (incx == 1 && incy == 1) {
-      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+      for (int ix = 0, iy = 0; ix < n && iy < n; ix += 1, iy += 1) {
         y[offsety + iy] += alpha * x[offsetx + ix];
       }
     } else {
@@ -131,7 +155,19 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   protected double ddotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     double sum = 0.0;
     if (incx == 1 && incy == 1) {
-      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+      int ix = 0, iy = 0;
+      double sum0 = 0.0;
+      double sum1 = 0.0;
+      double sum2 = 0.0;
+      double sum3 = 0.0;
+      for (; ix < loopBound(n, 4) && iy < loopBound(n, 4); ix += 4, iy += 4) {
+        sum0 += x[offsetx + ix + 0] * y[offsety + iy + 0];
+        sum1 += x[offsetx + ix + 1] * y[offsety + iy + 1];
+        sum2 += x[offsetx + ix + 2] * y[offsety + iy + 2];
+        sum3 += x[offsetx + ix + 3] * y[offsety + iy + 3];
+      }
+      sum += sum0 + sum1 + sum2 + sum3;
+      for (; ix < n && iy < n; ix += 1, iy += 1) {
         sum += x[offsetx + ix] * y[offsety + iy];
       }
     } else {
@@ -149,15 +185,27 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   protected float sdotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     float sum = 0.0f;
     if (incx == 1 && incy == 1) {
-      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+      int ix = 0, iy = 0;
+      float sum0 = 0.0f;
+      float sum1 = 0.0f;
+      float sum2 = 0.0f;
+      float sum3 = 0.0f;
+      for (; ix < loopBound(n, 4) && iy < loopBound(n, 4); ix += 4, iy += 4) {
+        sum0 += x[offsetx + ix + 0] * y[offsety + iy + 0];
+        sum1 += x[offsetx + ix + 1] * y[offsety + iy + 1];
+        sum2 += x[offsetx + ix + 2] * y[offsety + iy + 2];
+        sum3 += x[offsetx + ix + 3] * y[offsety + iy + 3];
+      }
+      sum += sum0 + sum1 + sum2 + sum3;
+      for (; ix < n && iy < n; ix += 1, iy += 1) {
         sum += x[offsetx + ix] * y[offsety + iy];
       }
     } else {
       for (int ix = incx < 0 ? (n - 1) * -incx : 0,
-              iy = incy < 0 ? (n - 1) * -incy : 0;
-          (incx < 0 ? ix >= 0 : ix < n * incx)
-            && (incy < 0 ? iy >= 0 : iy < n * incy);
-          ix += incx, iy += incy) {
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           (incx < 0 ? ix >= 0 : ix < n * incx)
+             && (incy < 0 ? iy >= 0 : iy < n * incy);
+           ix += incx, iy += incy) {
         sum += x[offsetx + ix] * y[offsety + iy];
       }
     }
@@ -167,7 +215,19 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   protected float sdsdotK(int n, float sb, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     double sum = sb;
     if (incx == 1 && incy == 1) {
-      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+      int ix = 0, iy = 0;
+      double sum0 = 0.0;
+      double sum1 = 0.0;
+      double sum2 = 0.0;
+      double sum3 = 0.0;
+      for (; ix < loopBound(n, 4) && iy < loopBound(n, 4); ix += 4, iy += 4) {
+        sum0 += (double)x[offsetx + ix + 0] * (double)y[offsety + iy + 0];
+        sum1 += (double)x[offsetx + ix + 1] * (double)y[offsety + iy + 1];
+        sum2 += (double)x[offsetx + ix + 2] * (double)y[offsety + iy + 2];
+        sum3 += (double)x[offsetx + ix + 3] * (double)y[offsety + iy + 3];
+      }
+      sum += sum0 + sum1 + sum2 + sum3;
+      for (; ix < n && iy < n; ix += 1, iy += 1) {
         sum += (double)(x[offsetx + ix]) * (double)(y[offsety + iy]);
       }
     } else {
@@ -2840,24 +2900,82 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   }
 
   protected double dnrm2K(int n, double[] x, int offsetx, int incx) {
-    double sum = 0.0;
-    for (int ix = 0; ix < n * incx; ix += incx) {
-      sum += Math.pow(x[offsetx + ix], 2);
+    int ix = 0;
+    double sum0 = 0.0;
+    double sum1 = 0.0;
+    double sum2 = 0.0;
+    double sum3 = 0.0;
+    if (incx == 1) {
+      for (; ix < loopBound(n, 4); ix += 4) {
+        double x0 = x[offsetx + ix + 0];
+        double x1 = x[offsetx + ix + 1];
+        double x2 = x[offsetx + ix + 2];
+        double x3 = x[offsetx + ix + 3];
+        sum0 += x0 * x0;
+        sum1 += x1 * x1;
+        sum2 += x2 * x2;
+        sum3 += x3 * x3;
+      }
+    } else {
+      for (; ix < loopBound(n, 4) * incx; ix += 4 * incx) {
+        double x0 = x[offsetx + ix + (0 * incx)];
+        double x1 = x[offsetx + ix + (1 * incx)];
+        double x2 = x[offsetx + ix + (2 * incx)];
+        double x3 = x[offsetx + ix + (3 * incx)];
+        sum0 += x0 * x0;
+        sum1 += x1 * x1;
+        sum2 += x2 * x2;
+        sum3 += x3 * x3;
+      }
+    }
+    double sum = sum0 + sum1 + sum2 + sum3;
+    for (; ix < n * incx; ix += incx) {
+      double x0 = x[offsetx + ix + 0];
+      sum += x0 * x0;
     }
     return Math.sqrt(sum);
   }
 
   protected float snrm2K(int n, float[] x, int offsetx, int incx) {
-    float sum = 0.0f;
-    for (int ix = 0; ix < n * incx; ix += incx) {
-      sum += (float)Math.pow(x[offsetx + ix], 2);
+    int ix = 0;
+    float sum0 = 0.0f;
+    float sum1 = 0.0f;
+    float sum2 = 0.0f;
+    float sum3 = 0.0f;
+    if (incx == 1) {
+      for (; ix < loopBound(n, 4); ix += 4) {
+        float x0 = x[offsetx + ix + 0];
+        float x1 = x[offsetx + ix + 1];
+        float x2 = x[offsetx + ix + 2];
+        float x3 = x[offsetx + ix + 3];
+        sum0 += x0 * x0;
+        sum1 += x1 * x1;
+        sum2 += x2 * x2;
+        sum3 += x3 * x3;
+      }
+    } else {
+      for (; ix < loopBound(n, 4) * incx; ix += 4 * incx) {
+        float x0 = x[offsetx + ix + (0 * incx)];
+        float x1 = x[offsetx + ix + (1 * incx)];
+        float x2 = x[offsetx + ix + (2 * incx)];
+        float x3 = x[offsetx + ix + (3 * incx)];
+        sum0 += x0 * x0;
+        sum1 += x1 * x1;
+        sum2 += x2 * x2;
+        sum3 += x3 * x3;
+      }
+    }
+    float sum = sum0 + sum1 + sum2 + sum3;
+    for (; ix < n * incx; ix += incx) {
+      float x0 = x[offsetx + ix + 0];
+      sum += x0 * x0;
     }
     return (float)Math.sqrt(sum);
   }
 
   protected void drotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double c, double s) {
     if (incx == 1 && incy == 1) {
-      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+      for (int ix = 0, iy = 0; ix < n && iy < n; ix += 1, iy += 1) {
         double x0 = x[offsetx + ix];
         double y0 = y[offsety + iy];
         x[offsetx + ix] = c * x0 + s * y0;
@@ -2879,7 +2997,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
 
   protected void srotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float c, float s) {
     if (incx == 1 && incy == 1) {
-      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+      for (int ix = 0, iy = 0; ix < n && iy < n; ix += 1, iy += 1) {
         float x0 = x[offsetx + ix];
         float y0 = y[offsety + iy];
         x[offsetx + ix] = c * x0 + s * y0;
@@ -2925,7 +3043,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
 
   protected void dscalK(int n, double alpha, double[] x, int offsetx, int incx) {
     if (incx == 1) {
-      for (int ix = 0; ix < n; ix++) {
+      for (int ix = 0; ix < n; ix += 1) {
         x[offsetx + ix] *= alpha;
       }
     } else {
@@ -2937,7 +3055,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
 
   protected void sscalK(int n, float alpha, float[] x, int offsetx, int incx) {
     if (incx == 1) {
-      for (int ix = 0; ix < n; ix++) {
+      for (int ix = 0; ix < n; ix += 1) {
         x[offsetx + ix] *= alpha;
       }
     } else {
@@ -3341,7 +3459,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
 
   protected void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     if (incx == 1 && incy == 1) {
-      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+      for (int ix = 0, iy = 0; ix < n && iy < n; ix += 1, iy += 1) {
         double tmp = y[offsety + iy];
         y[offsety + iy] = x[offsetx + ix];
         x[offsetx + ix] = tmp;
@@ -3361,7 +3479,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
 
   protected void sswapK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (incx == 1 && incy == 1) {
-      for (int ix = 0, iy = 0; (ix < n) && (iy < n); ix++, iy++) {
+      for (int ix = 0, iy = 0; ix < n && iy < n; ix += 1, iy += 1) {
         float tmp = y[offsety + iy];
         y[offsety + iy] = x[offsetx + ix];
         x[offsetx + ix] = tmp;
