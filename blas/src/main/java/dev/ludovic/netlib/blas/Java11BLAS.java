@@ -2161,6 +2161,224 @@ public class Java11BLAS extends Java8BLAS {
     }
   }
 
+  protected void dgemvN(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    if (beta != 1.0) {
+      int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
+      for (; row < m; row += 1, iy += incy) {
+        if (beta != 0.0) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0;
+        }
+      }
+    }
+    int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
+    for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
+      int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
+      double alphax0 = alpha * x[offsetx + ix + incx * 0];
+      double alphax1 = alpha * x[offsetx + ix + incx * 1];
+      double alphax2 = alpha * x[offsetx + ix + incx * 2];
+      double alphax3 = alpha * x[offsetx + ix + incx * 3];
+      for (; row < m; row += 1, iy += incy) {
+        y[offsety + iy] = Math.fma(alphax0, a[offseta + row + (col + 0) * lda],
+                          Math.fma(alphax1, a[offseta + row + (col + 1) * lda],
+                          Math.fma(alphax2, a[offseta + row + (col + 2) * lda],
+                          Math.fma(alphax3, a[offseta + row + (col + 3) * lda], y[offsety + iy]))));
+      }
+    }
+    for (; col < n; col += 1, ix += incx) {
+      int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
+      double alphax = alpha * x[offsetx + ix];
+      for (; row < m; row += 1, iy += incy) {
+        y[offsety + iy] = Math.fma(alphax, a[offseta + row + col * lda], y[offsety + iy]);
+      }
+    }
+  }
+
+  protected void dgemvT(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+    for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
+      int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0;
+      double sum0 = 0.0;
+      double sum1 = 0.0;
+      double sum2 = 0.0;
+      double sum3 = 0.0;
+      for (; row < m; row += 1, ix += incx) {
+        double xix = x[offsetx + ix];
+        sum0 = Math.fma(xix, a[offseta + row + (col + 0) * lda], sum0);
+        sum1 = Math.fma(xix, a[offseta + row + (col + 1) * lda], sum1);
+        sum2 = Math.fma(xix, a[offseta + row + (col + 2) * lda], sum2);
+        sum3 = Math.fma(xix, a[offseta + row + (col + 3) * lda], sum3);
+      }
+      if (beta != 0.0) {
+        y[offsety + iy + incy * 0] = alpha * sum0 + beta * y[offsety + iy + incy * 0];
+        y[offsety + iy + incy * 1] = alpha * sum1 + beta * y[offsety + iy + incy * 1];
+        y[offsety + iy + incy * 2] = alpha * sum2 + beta * y[offsety + iy + incy * 2];
+        y[offsety + iy + incy * 3] = alpha * sum3 + beta * y[offsety + iy + incy * 3];
+      } else {
+        y[offsety + iy + incy * 0] = alpha * sum0;
+        y[offsety + iy + incy * 1] = alpha * sum1;
+        y[offsety + iy + incy * 2] = alpha * sum2;
+        y[offsety + iy + incy * 3] = alpha * sum3;
+      }
+    }
+    for (; col < n; col += 1, iy += incy) {
+      int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0;
+      double sum = 0.0;
+      for (; row < m; row += 1, ix += incx) {
+        sum = Math.fma(x[offsetx + ix], a[offseta + row + col * lda], sum);
+      }
+      if (beta != 0.0) {
+        y[offsety + iy] = alpha * sum + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sum;
+      }
+    }
+  }
+
+  protected void sgemvN(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+    // y = beta * y
+    for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+      if (beta != 0.0f) {
+        y[offsety + iy] = beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = 0.0f;
+      }
+    }
+    // y += alpha * A * x
+    int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
+    for (; col < loopBound(n, 8); col += 8, ix += incx * 8) {
+      float alphax0 = alpha * x[offsetx + ix + incx * 0];
+      float alphax1 = alpha * x[offsetx + ix + incx * 1];
+      float alphax2 = alpha * x[offsetx + ix + incx * 2];
+      float alphax3 = alpha * x[offsetx + ix + incx * 3];
+      float alphax4 = alpha * x[offsetx + ix + incx * 4];
+      float alphax5 = alpha * x[offsetx + ix + incx * 5];
+      float alphax6 = alpha * x[offsetx + ix + incx * 6];
+      float alphax7 = alpha * x[offsetx + ix + incx * 7];
+      for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+        y[offsety + iy] = Math.fma(alphax0, a[offseta + row + (col + 0) * lda],
+                          Math.fma(alphax1, a[offseta + row + (col + 1) * lda],
+                          Math.fma(alphax2, a[offseta + row + (col + 2) * lda],
+                          Math.fma(alphax3, a[offseta + row + (col + 3) * lda],
+                          Math.fma(alphax4, a[offseta + row + (col + 4) * lda],
+                          Math.fma(alphax5, a[offseta + row + (col + 5) * lda],
+                          Math.fma(alphax6, a[offseta + row + (col + 6) * lda],
+                          Math.fma(alphax7, a[offseta + row + (col + 7) * lda], y[offsety + iy]))))))));
+      }
+    }
+    for (; col < n; col += 1, ix += incx) {
+      float alphax = alpha * x[offsetx + ix];
+      for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+        y[offsety + iy] = Math.fma(alphax, a[offseta + row + col * lda], y[offsety + iy]);
+      }
+    }
+  }
+
+  protected void sgemvT(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+    int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+    for (; col < loopBound(n, 8); col += 8, iy += incy * 8) {
+      float sum0 = 0.0f;
+      float sum1 = 0.0f;
+      float sum2 = 0.0f;
+      float sum3 = 0.0f;
+      float sum4 = 0.0f;
+      float sum5 = 0.0f;
+      float sum6 = 0.0f;
+      float sum7 = 0.0f;
+      for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
+        sum0 = Math.fma(x[offsetx + ix], a[offseta + row + (col + 0) * lda], sum0);
+        sum1 = Math.fma(x[offsetx + ix], a[offseta + row + (col + 1) * lda], sum1);
+        sum2 = Math.fma(x[offsetx + ix], a[offseta + row + (col + 2) * lda], sum2);
+        sum3 = Math.fma(x[offsetx + ix], a[offseta + row + (col + 3) * lda], sum3);
+        sum4 = Math.fma(x[offsetx + ix], a[offseta + row + (col + 4) * lda], sum4);
+        sum5 = Math.fma(x[offsetx + ix], a[offseta + row + (col + 5) * lda], sum5);
+        sum6 = Math.fma(x[offsetx + ix], a[offseta + row + (col + 6) * lda], sum6);
+        sum7 = Math.fma(x[offsetx + ix], a[offseta + row + (col + 7) * lda], sum7);
+      }
+      if (beta != 0.0f) {
+        y[offsety + iy + incy * 0] = alpha * sum0 + beta * y[offsety + iy + incy * 0];
+        y[offsety + iy + incy * 1] = alpha * sum1 + beta * y[offsety + iy + incy * 1];
+        y[offsety + iy + incy * 2] = alpha * sum2 + beta * y[offsety + iy + incy * 2];
+        y[offsety + iy + incy * 3] = alpha * sum3 + beta * y[offsety + iy + incy * 3];
+        y[offsety + iy + incy * 4] = alpha * sum4 + beta * y[offsety + iy + incy * 4];
+        y[offsety + iy + incy * 5] = alpha * sum5 + beta * y[offsety + iy + incy * 5];
+        y[offsety + iy + incy * 6] = alpha * sum6 + beta * y[offsety + iy + incy * 6];
+        y[offsety + iy + incy * 7] = alpha * sum7 + beta * y[offsety + iy + incy * 7];
+      } else {
+        y[offsety + iy + incy * 0] = alpha * sum0;
+        y[offsety + iy + incy * 1] = alpha * sum1;
+        y[offsety + iy + incy * 2] = alpha * sum2;
+        y[offsety + iy + incy * 3] = alpha * sum3;
+        y[offsety + iy + incy * 4] = alpha * sum4;
+        y[offsety + iy + incy * 5] = alpha * sum5;
+        y[offsety + iy + incy * 6] = alpha * sum6;
+        y[offsety + iy + incy * 7] = alpha * sum7;
+      }
+    }
+    for (; col < n; col += 1, iy += incy) {
+      float sum = 0.0f;
+      for (int row = 0, ix = incx < 0 ? (m - 1) * -incx : 0; row < m; row += 1, ix += incx) {
+        sum = Math.fma(x[offsetx + ix], a[offseta + row + col * lda], sum);
+      }
+      if (beta != 0.0f) {
+        y[offsety + iy] = alpha * sum + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sum;
+      }
+    }
+  }
+
+  protected void dgerK(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
+    int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+    for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
+      double alphayiy0 = alpha * y[offsety + iy + incy * 0];
+      double alphayiy1 = alpha * y[offsety + iy + incy * 1];
+      double alphayiy2 = alpha * y[offsety + iy + incy * 2];
+      double alphayiy3 = alpha * y[offsety + iy + incy * 3];
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+      for (; row < m; row += 1, jx += incx) {
+        double xjx = x[offsetx + jx];
+        a[offseta + row + (col + 0) * lda] = Math.fma(alphayiy0, xjx, a[offseta + row + (col + 0) * lda]);
+        a[offseta + row + (col + 1) * lda] = Math.fma(alphayiy1, xjx, a[offseta + row + (col + 1) * lda]);
+        a[offseta + row + (col + 2) * lda] = Math.fma(alphayiy2, xjx, a[offseta + row + (col + 2) * lda]);
+        a[offseta + row + (col + 3) * lda] = Math.fma(alphayiy3, xjx, a[offseta + row + (col + 3) * lda]);
+      }
+    }
+    for (; col < n; col += 1, iy += incy) {
+      double alphayiy = alpha * y[offsety + iy];
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+      for (; row < m; row += 1, jx += incx) {
+        a[offseta + row + col * lda] = Math.fma(alphayiy, x[offsetx + jx], a[offseta + row + col * lda]);
+      }
+    }
+  }
+
+  protected void sgerK(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
+    int col = 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+    for (; col < loopBound(n, 4); col += 4, iy += incy * 4) {
+      float alphayiy0 = alpha * y[offsety + iy + incy * 0];
+      float alphayiy1 = alpha * y[offsety + iy + incy * 1];
+      float alphayiy2 = alpha * y[offsety + iy + incy * 2];
+      float alphayiy3 = alpha * y[offsety + iy + incy * 3];
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+      for (; row < m; row += 1, jx += incx) {
+        float xjx = x[offsetx + jx];
+        a[offseta + row + (col + 0) * lda] = Math.fma(alphayiy0, xjx, a[offseta + row + (col + 0) * lda]);
+        a[offseta + row + (col + 1) * lda] = Math.fma(alphayiy1, xjx, a[offseta + row + (col + 1) * lda]);
+        a[offseta + row + (col + 2) * lda] = Math.fma(alphayiy2, xjx, a[offseta + row + (col + 2) * lda]);
+        a[offseta + row + (col + 3) * lda] = Math.fma(alphayiy3, xjx, a[offseta + row + (col + 3) * lda]);
+      }
+    }
+    for (; col < n; col += 1, iy += incy) {
+      float alphayiy = alpha * y[offsety + iy];
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0;
+      for (; row < m; row += 1, jx += incx) {
+        a[offseta + row + col * lda] = Math.fma(alphayiy, x[offsetx + jx], a[offseta + row + col * lda]);
+      }
+    }
+  }
+
   protected double dnrm2K(int n, double[] x, int offsetx, int incx) {
     int ix = 0;
     double sum0 = 0.0;
