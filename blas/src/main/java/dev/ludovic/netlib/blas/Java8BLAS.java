@@ -5151,48 +5151,12 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   }
 
   protected int idamaxK(int n, double[] x, int offsetx, int incx) {
-    int imax = 0;
-    double max = x[offsetx];
-    if (incx == 1) {
-      for (int ix = 1; ix < n; ix++) {
-        double val = Math.abs(x[offsetx + ix]);
-        if (val > max) {
-          imax = ix;
-          max = val;
-        }
-      }
-    } else {
-      for (int ix = incx; ix < n * incx; ix += incx) {
-        double val = Math.abs(x[offsetx + ix]);
-        if (val > max) {
-          imax = ix / incx;
-          max = val;
-        }
-      }
-    }
-    return imax;
+    //FIXME: figure out why f2j is faster than previous implementation
+    return f2j.idamax(n, x, offsetx, incx) - 1;
   }
 
   protected int isamaxK(int n, float[] x, int offsetx, int incx) {
-    int imax = 0;
-    float max = x[offsetx];
-    if (incx == 1) {
-      for (int ix = 1; ix < n; ix++) {
-        float val = Math.abs(x[offsetx + ix]);
-        if (val > max) {
-          imax = ix;
-          max = val;
-        }
-      }
-    } else {
-      for (int ix = incx; ix < n * incx; ix += incx) {
-        float val = Math.abs(x[offsetx + ix]);
-        if (val > max) {
-          imax = ix / incx;
-          max = val;
-        }
-      }
-    }
-    return imax;
+    //FIXME: figure out why f2j is faster than previous implementation
+    return f2j.isamax(n, x, offsetx, incx) - 1;
   }
 }
