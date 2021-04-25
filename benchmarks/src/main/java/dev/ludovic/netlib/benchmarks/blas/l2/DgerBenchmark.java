@@ -40,7 +40,7 @@ public class DgerBenchmark extends L2Benchmark {
     public int n;
 
     public double alpha;
-    public double[] a, aclone = a.clone();
+    public double[] a, aclone;
     public double[] x;
     public double[] y;
 

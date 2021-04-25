@@ -40,7 +40,7 @@ public class Ssyr2Benchmark extends L2Benchmark {
     public int n;
 
     public float alpha;
-    public float[] a, aclone = a.clone();
+    public float[] a, aclone;
     public float[] x;
     public float[] y;
 
