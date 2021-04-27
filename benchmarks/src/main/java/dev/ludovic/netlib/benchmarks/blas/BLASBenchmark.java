@@ -57,6 +57,7 @@ public abstract class BLASBenchmark {
             break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }
+        System.out.println("implementation = " + blas.getClass().getName());
     }
 
     private final Random rand = new Random(0);
