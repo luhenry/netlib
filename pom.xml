@@ -145,6 +145,9 @@ information or have any questions.
             <compilerVersion>${javac.target}</compilerVersion>
             <source>${javac.target}</source>
             <target>${javac.target}</target>
+            <compilerArgs>
+              <arg>-h</arg><arg>${project.build.directory}/include</arg>
+            </compilerArgs>
           </configuration>
         </plugin>
         <plugin>
@@ -167,10 +170,6 @@ information or have any questions.
               <additionalJOption>${jvm.modules}</additionalJOption>
             </additionalJOptions>
           </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
@@ -196,6 +195,64 @@ information or have any questions.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
           <version>1.5</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>3.0.0</version>
+          <executions>
+            <execution>
+              <phase>compile</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+                <target>
+                  <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                    <arg line="INPUTS='jni.c'"/>
+                    <arg line="OUTPUT='${project.build.directory}/native/Linux-amd64/libnetlib${project.artifactId}jni.so'"/>
+                    <arg line="OBJDIR='${project.build.directory}/objs/Linux-amd64'"/>
+                    <arg line="CC='x86_64-linux-gnu-gcc'"/>
+                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-function -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
+                    <arg line="LD='x86_64-linux-gnu-gcc'"/>
+                    <arg line="LDFLAGS='-shared'"/>
+                    <arg line="all"/>
+                  </exec>
+                  <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                    <arg line="INPUTS='jni.c'"/>
+                    <arg line="OUTPUT='${project.build.directory}/native/Linux-aarch64/libnetlib${project.artifactId}jni.so'"/>
+                    <arg line="OBJDIR='${project.build.directory}/objs/Linux-aarch64'"/>
+                    <arg line="CC='aarch64-linux-gnu-gcc'"/>
+                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-function -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
+                    <arg line="LD='aarch64-linux-gnu-gcc'"/>
+                    <arg line="LDFLAGS='-shared'"/>
+                    <arg line="all"/>
+                  </exec>
+                </target>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.2.0</version>
+          <executions>
+            <execution>
+              <id>copy-resources</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.outputDirectory}/resources/native</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>${project.build.directory}/native</directory>
+                    <filtering>false</filtering>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>

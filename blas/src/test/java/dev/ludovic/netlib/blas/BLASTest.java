@@ -52,6 +52,10 @@ public class BLASTest {
     } catch (NoClassDefFoundError e) {
     }
 
+    instances = Stream.concat(instances, Stream.of(
+      Arguments.of(dev.ludovic.netlib.blas.JNIBLAS.getInstance())
+    ));
+
     String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 2);
     int major = Integer.parseInt(fullVersion[0]);
     if (major >= 11) {
@@ -64,8 +68,12 @@ public class BLASTest {
       ));
     }
     if (major >= 16) {
+      /* FIXME: enabling VectorizedBLAS breaks JNI... */
+      // instances = Stream.concat(instances, Stream.of(
+      //   Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance()),
+      //   Arguments.of(dev.ludovic.netlib.blas.ForeignLinkerBLAS.getInstance())
+      // ));
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance()),
         Arguments.of(dev.ludovic.netlib.blas.ForeignLinkerBLAS.getInstance())
       ));
     }

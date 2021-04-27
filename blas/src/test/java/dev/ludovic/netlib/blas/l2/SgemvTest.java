@@ -34,20 +34,60 @@ public class SgemvTest extends BLASTest {
     void testSanity(BLAS blas) {
         float[] expected, sYcopy;
 
-        blas.sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 2.0f, expected = sY.clone(), 1);
-        blas.sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        f2j.sgemv("N", M, N,  1.0f, sgeA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N,  1.0f, sgeA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
-        blas.sgemv("T", N, M, 1.0f, sgeAT, N, sX, 1, 2.0f, expected = sY.clone(), 1);
-        blas.sgemv("T", N, M, 1.0f, sgeAT, N, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        f2j.sgemv("N", M, N,  0.5f, sgeA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N,  0.5f, sgeA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
-        blas.sgemv("N", M, N, 2.0f, sgeA, M, sX, 1, 2.0f, expected = sY.clone(), 1);
-        blas.sgemv("N", M, N, 2.0f, sgeA, M, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        f2j.sgemv("N", M, N, -0.5f, sgeA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N, -0.5f, sgeA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
 
-        blas.sgemv("T", N, M, 2.0f, sgeAT, N, sX, 1, 2.0f, expected = sY.clone(), 1);
-        blas.sgemv("T", N, M, 2.0f, sgeAT, N, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        f2j.sgemv("N", M, N,  0.0f, sgeA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N,  0.0f, sgeA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("N", M, N,  1.0f, sgeA, M, sX, 1,  0.5f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N,  1.0f, sgeA, M, sX, 1,  0.5f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("N", M, N,  1.0f, sgeA, M, sX, 1, -0.5f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N,  1.0f, sgeA, M, sX, 1, -0.5f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("N", M, N,  1.0f, sgeA, M, sX, 1,  0.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N,  1.0f, sgeA, M, sX, 1,  0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("T", M, N,  1.0f, sgeA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
+        blas.sgemv("T", M, N,  1.0f, sgeA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("T", M, N,  0.5f, sgeA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
+        blas.sgemv("T", M, N,  0.5f, sgeA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("T", M, N, -0.5f, sgeA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
+        blas.sgemv("T", M, N, -0.5f, sgeA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("T", M, N,  0.0f, sgeA, M, sX, 1,  1.0f, expected = sY.clone(), 1);
+        blas.sgemv("T", M, N,  0.0f, sgeA, M, sX, 1,  1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("T", M, N,  1.0f, sgeA, M, sX, 1,  0.5f, expected = sY.clone(), 1);
+        blas.sgemv("T", M, N,  1.0f, sgeA, M, sX, 1,  0.5f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("T", M, N,  1.0f, sgeA, M, sX, 1, -0.5f, expected = sY.clone(), 1);
+        blas.sgemv("T", M, N,  1.0f, sgeA, M, sX, 1, -0.5f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgemv("T", M, N,  1.0f, sgeA, M, sX, 1,  0.0f, expected = sY.clone(), 1);
+        blas.sgemv("T", M, N,  1.0f, sgeA, M, sX, 1,  0.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
 }
