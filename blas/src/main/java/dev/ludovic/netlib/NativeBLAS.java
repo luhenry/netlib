@@ -32,11 +32,6 @@ public interface NativeBLAS extends BLAS {
 
   public static NativeBLAS getInstance() {
     try {
-      return dev.ludovic.netlib.blas.NetlibNativeBLAS.getInstance();
-    } catch (Throwable t) {
-      Logger.getLogger(NativeBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.NetlibNativeBLAS");
-    }
-    try {
       return dev.ludovic.netlib.blas.JNIBLAS.getInstance();
     } catch (Throwable t) {
       Logger.getLogger(NativeBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.JNIBLAS");

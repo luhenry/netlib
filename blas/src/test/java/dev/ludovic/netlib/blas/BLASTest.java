@@ -37,24 +37,13 @@ public class BLASTest {
   final static double depsilon = 1e-11d;
   final static float sepsilon = 1e-3f;
 
-  final static BLAS f2j = dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance();
+  final static BLAS f2j = dev.ludovic.netlib.blas.F2jBLAS.getInstance();
 
   private static Stream<Arguments> BLASImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance())
-    );
-
-    try {
-      instances = Stream.concat(instances, Stream.of(
-        Arguments.of(dev.ludovic.netlib.blas.NetlibNativeBLAS.getInstance())
-      ));
-    } catch (ExceptionInInitializerError e) {
-    } catch (NoClassDefFoundError e) {
-    }
-
-    instances = Stream.concat(instances, Stream.of(
+      Arguments.of(dev.ludovic.netlib.blas.F2jBLAS.getInstance()),
       Arguments.of(dev.ludovic.netlib.blas.JNIBLAS.getInstance())
-    ));
+    );
 
     String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 2);
     int major = Integer.parseInt(fullVersion[0]);
