@@ -81,6 +81,15 @@ information or have any questions.
         <jvm.modules>--add-modules=jdk.incubator.vector,jdk.incubator.foreign</jvm.modules>
       </properties>
     </profile>
+    <profile>
+      <id>jdk17</id>
+      <activation>
+        <jdk>17</jdk>
+      </activation>
+      <properties>
+        <jvm.modules>--add-modules=jdk.incubator.vector,jdk.incubator.foreign</jvm.modules>
+      </properties>
+    </profile>
   </profiles>
 
   <build>
