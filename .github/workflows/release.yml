@@ -8,7 +8,7 @@ on:
       - '!v*-SNAPSHOT' # But not v*-SNAPSHOT, i.e. v2-SNAPSHOT
   workflow_dispatch:
 
-name: Create Release
+name: Release
 
 jobs:
   build:
