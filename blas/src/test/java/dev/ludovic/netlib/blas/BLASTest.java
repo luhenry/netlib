@@ -68,9 +68,9 @@ public class BLASTest {
       ));
     }
     if (major >= 16) {
-      /* FIXME: enabling VectorizedBLAS breaks JNI... */
+      /* FIXME: enabling VectorBLAS breaks JNI... */
       // instances = Stream.concat(instances, Stream.of(
-      //   Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance()),
+      //   Arguments.of(dev.ludovic.netlib.blas.VectorBLAS.getInstance()),
       //   Arguments.of(dev.ludovic.netlib.blas.ForeignLinkerBLAS.getInstance())
       // ));
       instances = Stream.concat(instances, Stream.of(
