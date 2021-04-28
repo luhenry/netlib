@@ -64,30 +64,65 @@ public class DgemvTest extends BLASTest {
 
         f2j.dgemv("T", M, N,  1.0, dgeA, M, dX, 1,  1.0, expected = dY.clone(), 1);
         blas.dgemv("T", M, N,  1.0, dgeA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        // for (int i = 0; i < M; i++) {
+        //     if (Math.abs(expected[i] - dYcopy[i]) > depsilon) {
+        //         System.err.print(String.format("(0) %f != %f at %d\n", expected[i], dYcopy[i], i));
+        //     }
+        // }
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dgemv("T", M, N,  0.5, dgeA, M, dX, 1,  1.0, expected = dY.clone(), 1);
         blas.dgemv("T", M, N,  0.5, dgeA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        // for (int i = 0; i < M; i++) {
+        //     if (Math.abs(expected[i] - dYcopy[i]) > depsilon) {
+        //         System.err.print(String.format("(1) %f != %f at %d\n", expected[i], dYcopy[i], i));
+        //     }
+        // }
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dgemv("T", M, N, -0.5, dgeA, M, dX, 1,  1.0, expected = dY.clone(), 1);
         blas.dgemv("T", M, N, -0.5, dgeA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        // for (int i = 0; i < M; i++) {
+        //     if (Math.abs(expected[i] - dYcopy[i]) > depsilon) {
+        //         System.err.print(String.format("(2) %f != %f at %d\n", expected[i], dYcopy[i], i));
+        //     }
+        // }
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dgemv("T", M, N,  0.0, dgeA, M, dX, 1,  1.0, expected = dY.clone(), 1);
         blas.dgemv("T", M, N,  0.0, dgeA, M, dX, 1,  1.0, dYcopy = dY.clone(), 1);
+        // for (int i = 0; i < M; i++) {
+        //     if (Math.abs(expected[i] - dYcopy[i]) > depsilon) {
+        //         System.err.print(String.format("(3) %f != %f at %d\n", expected[i], dYcopy[i], i));
+        //     }
+        // }
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dgemv("T", M, N,  1.0, dgeA, M, dX, 1,  0.5, expected = dY.clone(), 1);
         blas.dgemv("T", M, N,  1.0, dgeA, M, dX, 1,  0.5, dYcopy = dY.clone(), 1);
+        // for (int i = 0; i < M; i++) {
+        //     if (Math.abs(expected[i] - dYcopy[i]) > depsilon) {
+        //         System.err.print(String.format("(4) %f != %f at %d\n", expected[i], dYcopy[i], i));
+        //     }
+        // }
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dgemv("T", M, N,  1.0, dgeA, M, dX, 1, -0.5, expected = dY.clone(), 1);
         blas.dgemv("T", M, N,  1.0, dgeA, M, dX, 1, -0.5, dYcopy = dY.clone(), 1);
+        // for (int i = 0; i < M; i++) {
+        //     if (Math.abs(expected[i] - dYcopy[i]) > depsilon) {
+        //         System.err.print(String.format("(5) %f != %f at %d\n", expected[i], dYcopy[i], i));
+        //     }
+        // }
         assertArrayEquals(expected, dYcopy, depsilon);
 
         f2j.dgemv("T", M, N,  1.0, dgeA, M, dX, 1,  0.0, expected = dY.clone(), 1);
         blas.dgemv("T", M, N,  1.0, dgeA, M, dX, 1,  0.0, dYcopy = dY.clone(), 1);
+        // for (int i = 0; i < M; i++) {
+        //     if (Math.abs(expected[i] - dYcopy[i]) > depsilon) {
+        //         System.err.print(String.format("(6) %f != %f at %d\n", expected[i], dYcopy[i], i));
+        //     }
+        // }
         assertArrayEquals(expected, dYcopy, depsilon);
     }
 }
