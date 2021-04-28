@@ -6,6 +6,7 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
       - '!v*-SNAPSHOT' # But not v*-SNAPSHOT, i.e. v2-SNAPSHOT
+  workflow_dispatch:
 
 name: Create Release
 
