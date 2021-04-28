@@ -8,7 +8,7 @@ on:
       - '!v*-SNAPSHOT' # But not v*-SNAPSHOT, i.e. v2-SNAPSHOT
   workflow_dispatch:
 
-name: Create Release
+name: Release
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get -y update
-        sudo apt-get -y install libopenblas-dev
+        sudo apt-get -y install libopenblas-dev gcc-aarch64-linux-gnu gcc-x86-64-linux-gnu
     # Build with JDK 16
     - name: Set up JDK 16
       uses: actions/setup-java@v1
