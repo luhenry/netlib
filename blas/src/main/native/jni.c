@@ -34,6 +34,14 @@
 #define TRUE 1
 #define FALSE 0
 
+static jfieldID booleanW_val_fieldID;
+static jfieldID intW_val_fieldID;
+static jfieldID floatW_val_fieldID;
+static jfieldID doubleW_val_fieldID;
+static jfieldID StringW_val_fieldID;
+
+static void *blas;
+
 static void throwOOM(JNIEnv *env) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
@@ -1173,12 +1181,17 @@ fail:
   goto done;
 }
 
-static void *blas;
-
-jstring get_system_property(JNIEnv *env, jstring key, jstring def) {
-  jclass klass = (*env)->FindClass(env, "java/lang/System");
-  jmethodID method = (*env)->GetStaticMethodID(env, klass, "getProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
-  return (jstring)(*env)->CallStaticObjectMethod(env, klass, method, key, def);
+jboolean get_system_property(JNIEnv *env, jstring key, jstring def, jstring *res) {
+  jclass System_class = (*env)->FindClass(env, "java/lang/System");
+  if (!System_class) {
+    return FALSE;
+  }
+  jmethodID System_getProperty_methodID = (*env)->GetStaticMethodID(env, System_class, "getProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+  if (!System_getProperty_methodID) {
+    return FALSE;
+  }
+  *res = (jstring)(*env)->CallStaticObjectMethod(env, System_class, System_getProperty_methodID, key, def);
+  return TRUE;
 }
 
 jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
@@ -1187,19 +1200,71 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
     return -1;
   }
 
+  jclass booleanW_class = (*env)->FindClass(env, "org/netlib/util/booleanW");
+  if (!booleanW_class) {
+    return -1;
+  }
+  booleanW_val_fieldID = (*env)->GetFieldID(env, booleanW_class, "val", "Z");
+  if (!booleanW_val_fieldID) {
+    return -1;
+  }
+
+  jclass intW_class = (*env)->FindClass(env, "org/netlib/util/intW");
+  if (!intW_class) {
+    return -1;
+  }
+  intW_val_fieldID = (*env)->GetFieldID(env, intW_class, "val", "I");
+  if (!intW_val_fieldID) {
+    return -1;
+  }
+
+  jclass floatW_class = (*env)->FindClass(env, "org/netlib/util/floatW");
+  if (!floatW_class) {
+    return -1;
+  }
+  floatW_val_fieldID = (*env)->GetFieldID(env, floatW_class, "val", "F");
+  if (!floatW_val_fieldID) {
+    return -1;
+  }
+
+  jclass doubleW_class = (*env)->FindClass(env, "org/netlib/util/doubleW");
+  if (!doubleW_class) {
+    return -1;
+  }
+  doubleW_val_fieldID = (*env)->GetFieldID(env, doubleW_class, "val", "D");
+  if (!doubleW_val_fieldID) {
+    return -1;
+  }
+
+  jclass StringW_class = (*env)->FindClass(env, "org/netlib/util/StringW");
+  if (!StringW_class) {
+    return -1;
+  }
+  StringW_val_fieldID = (*env)->GetFieldID(env, StringW_class, "val", "Ljava/lang/String;");
+  if (!StringW_val_fieldID) {
+    return -1;
+  }
+
+  jstring property_nativeLibPath;
+  if (!get_system_property(env, (*env)->NewStringUTF(env, "dev.ludovic.netlib.blas.nativeLibPath"), NULL, &property_nativeLibPath)) {
+    return -1;
+  }
+  jstring property_nativeLib;
+  if (!get_system_property(env, (*env)->NewStringUTF(env, "dev.ludovic.netlib.blas.nativeLib"), (*env)->NewStringUTF(env, "blas"), &property_nativeLib)) {
+    return -1;
+  }
+
   char blas_name[1024];
-  jstring native_lib_path = get_system_property(env, (*env)->NewStringUTF(env, "dev.ludovic.netlib.blas.nativeLibPath"), NULL);
-  jstring native_lib = get_system_property(env, (*env)->NewStringUTF(env, "dev.ludovic.netlib.blas.nativeLib"), (*env)->NewStringUTF(env, "blas"));
-  if (native_lib_path) {
-    const char *utf = (*env)->GetStringUTFChars(env, native_lib_path, NULL);
+  if (property_nativeLibPath) {
+    const char *utf = (*env)->GetStringUTFChars(env, property_nativeLibPath, NULL);
     snprintf(blas_name, sizeof(blas_name), "%s", utf);
-    (*env)->ReleaseStringUTFChars(env, native_lib_path, utf);
-  } else if (native_lib) {
-    const char *utf = (*env)->GetStringUTFChars(env, native_lib, NULL);
+    (*env)->ReleaseStringUTFChars(env, property_nativeLibPath, utf);
+  } else if (property_nativeLib) {
+    const char *utf = (*env)->GetStringUTFChars(env, property_nativeLib, NULL);
     snprintf(blas_name, sizeof(blas_name), "lib%s.so", utf);
-    (*env)->ReleaseStringUTFChars(env, native_lib, utf);
+    (*env)->ReleaseStringUTFChars(env, property_nativeLib, utf);
   } else {
-    /* native_lib should always be non-NULL */
+    /* either property_nativeLibPath or property_nativeLib should always be non-NULL */
     return -1;
   }
 
