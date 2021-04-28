@@ -84,7 +84,7 @@ jobs:
     strategy:
       matrix:
         jdk: [8, 11, 16]
-        implementation: ["f2j", "java"]
+        implementation: ["f2j", "java", "native"]
         filter: ["dev.ludovic.netlib.benchmarks.blas.l1", "dev.ludovic.netlib.benchmarks.blas.l2", "dev.ludovic.netlib.benchmarks.blas.l3"]
         include:
         - jdk: 16
@@ -99,18 +99,6 @@ jobs:
           implementation: "java"
           filter: "dev.ludovic.netlib.benchmarks.blas.l3"
           jvmArgs: "--add-modules=jdk.incubator.vector"
-        - jdk: 16
-          implementation: "native"
-          filter: "dev.ludovic.netlib.benchmarks.blas.l1"
-          jvmArgs: "--add-modules=jdk.incubator.foreign -Dforeign.restricted=permit"
-        - jdk: 16
-          implementation: "native"
-          filter: "dev.ludovic.netlib.benchmarks.blas.l2"
-          jvmArgs: "--add-modules=jdk.incubator.foreign -Dforeign.restricted=permit"
-        - jdk: 16
-          implementation: "native"
-          filter: "dev.ludovic.netlib.benchmarks.blas.l3"
-          jvmArgs: "--add-modules=jdk.incubator.foreign -Dforeign.restricted=permit"
     steps:
     - name: Set up JDK ${{ matrix.jdk }}
       uses: actions/setup-java@v1
