@@ -576,6 +576,7 @@ static int *(*disnan_)(double *din);
 jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_disnanK(JNIEnv *env, UNUSED jobject obj,
     jdouble din) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*dlabad_)(/*FIXME*/void *small, /*FIXME*/void *large);
@@ -814,6 +815,7 @@ static int *(*dlaisnan_)(double *din1, double *din2);
 jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaisnanK(JNIEnv *env, UNUSED jobject obj,
     jdouble din1, jdouble din2) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*dlaln2_)(int *ltrans, int *na, int *nw, double *smin, double *ca, double *a, int *lda, double *d1, double *d2, double *b, int *ldb, double *wr, double *wi, double *x, int *ldx, /*FIXME*/void *scale, /*FIXME*/void *xnorm, /*FIXME*/void *info);
@@ -856,6 +858,7 @@ static int (*dlaneg_)(int *n, double *d, int *offsetd, double *lld, int *offsetl
 jint Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanegK(JNIEnv *env, UNUSED jobject obj,
     jint n, jdoubleArray d, jint offsetd, jdoubleArray lld, jint offsetlld, jdouble sigma, jdouble pivmin, jint r) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlangb_)(char *norm, int *n, int *kl, int *ku, double *ab, int *offsetab, int *ldab, double *work, int *offsetwork);
@@ -863,6 +866,7 @@ static double (*dlangb_)(char *norm, int *n, int *kl, int *ku, double *ab, int *
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlangbK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint n, jint kl, jint ku, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlange_)(char *norm, int *m, int *n, double *a, int *offseta, int *lda, double *work, int *offsetwork);
@@ -870,6 +874,7 @@ static double (*dlange_)(char *norm, int *m, int *n, double *a, int *offseta, in
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlangeK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlangt_)(char *norm, int *n, double *dl, int *offsetdl, double *d, int *offsetd, double *du, int *offsetdu);
@@ -877,6 +882,7 @@ static double (*dlangt_)(char *norm, int *n, double *dl, int *offsetdl, double *
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlangtK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint n, jdoubleArray dl, jint offsetdl, jdoubleArray d, jint offsetd, jdoubleArray du, jint offsetdu) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlanhs_)(char *norm, int *n, double *a, int *offseta, int *lda, double *work, int *offsetwork);
@@ -884,6 +890,7 @@ static double (*dlanhs_)(char *norm, int *n, double *a, int *offseta, int *lda, 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanhsK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlansb_)(char *norm, const char *uplo, int *n, int *k, double *ab, int *offsetab, int *ldab, double *work, int *offsetwork);
@@ -891,6 +898,7 @@ static double (*dlansb_)(char *norm, const char *uplo, int *n, int *k, double *a
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlansbK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jint n, jint k, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlansp_)(char *norm, const char *uplo, int *n, double *ap, int *offsetap, double *work, int *offsetwork);
@@ -898,6 +906,7 @@ static double (*dlansp_)(char *norm, const char *uplo, int *n, double *ap, int *
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanspK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlanst_)(char *norm, int *n, double *d, int *offsetd, double *e, int *offsete);
@@ -905,6 +914,7 @@ static double (*dlanst_)(char *norm, int *n, double *d, int *offsetd, double *e,
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanstK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlansy_)(char *norm, const char *uplo, int *n, double *a, int *offseta, int *lda, double *work, int *offsetwork);
@@ -912,6 +922,7 @@ static double (*dlansy_)(char *norm, const char *uplo, int *n, double *a, int *o
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlansyK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlantb_)(char *norm, const char *uplo, char *diag, int *n, int *k, double *ab, int *offsetab, int *ldab, double *work, int *offsetwork);
@@ -919,6 +930,7 @@ static double (*dlantb_)(char *norm, const char *uplo, char *diag, int *n, int *
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlantbK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jstring diag, jint n, jint k, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlantp_)(char *norm, const char *uplo, char *diag, int *n, double *ap, int *offsetap, double *work, int *offsetwork);
@@ -926,6 +938,7 @@ static double (*dlantp_)(char *norm, const char *uplo, char *diag, int *n, doubl
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlantpK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jstring diag, jint n, jdoubleArray ap, jint offsetap, jdoubleArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlantr_)(char *norm, const char *uplo, char *diag, int *m, int *n, double *a, int *offseta, int *lda, double *work, int *offsetwork);
@@ -933,6 +946,7 @@ static double (*dlantr_)(char *norm, const char *uplo, char *diag, int *m, int *
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlantrK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jstring diag, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*dlanv2_)(/*FIXME*/void *a, /*FIXME*/void *b, /*FIXME*/void *c, /*FIXME*/void *d, /*FIXME*/void *rt1r, /*FIXME*/void *rt1i, /*FIXME*/void *rt2r, /*FIXME*/void *rt2i, /*FIXME*/void *cs, /*FIXME*/void *sn);
@@ -961,6 +975,7 @@ static double (*dlapy2_)(double *x, double *y);
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlapy2K(JNIEnv *env, UNUSED jobject obj,
     jdouble x, jdouble y) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static double (*dlapy3_)(double *x, double *y, double *z);
@@ -968,6 +983,7 @@ static double (*dlapy3_)(double *x, double *y, double *z);
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlapy3K(JNIEnv *env, UNUSED jobject obj,
     jdouble x, jdouble y, jdouble z) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*dlaqgb_)(int *m, int *n, int *kl, int *ku, double *ab, int *ldab, double *r, double *c, double *rowcnd, double *colcnd, double *amax, jstring *equed);
@@ -1887,7 +1903,7 @@ static void (*dpptri_)(const char *uplo, int *n, double *ap, int *info);
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpptriK(JNIEnv *env, UNUSED jobject obj,
     jstring uplo, jint n, jdoubleArray ap, jint offsetap, jobject info) {
   jboolean failedOOM = FALSE;
-  const char *nuplo = NULL; double *nap = NULL, *nb = NULL; int ninfo = 0;
+  const char *nuplo = NULL; double *nap = NULL; int ninfo = 0;
   ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto failOOM;
   if (!(nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) goto failOOM;
@@ -2545,6 +2561,7 @@ static int (*ieeeck_)(int *ispec, float *zero, float *one);
 jint Java_dev_ludovic_netlib_lapack_JNILAPACK_ieeeckK(JNIEnv *env, UNUSED jobject obj,
     jint ispec, jfloat zero, jfloat one) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static int (*ilaenv_)(int *ispec, char *name, char *opts, int *n1, int *n2, int *n3, int *n4);
@@ -2552,6 +2569,7 @@ static int (*ilaenv_)(int *ispec, char *name, char *opts, int *n1, int *n2, int 
 jint Java_dev_ludovic_netlib_lapack_JNILAPACK_ilaenvK(JNIEnv *env, UNUSED jobject obj,
     jint ispec, jstring name, jstring opts, jint n1, jint n2, jint n3, jint n4) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*ilaver_)(/*FIXME*/void *vers_major, /*FIXME*/void *vers_minor, /*FIXME*/void *vers_patch);
@@ -2566,6 +2584,7 @@ static int (*iparmq_)(int *ispec, char *name, char *opts, int *n, int *ilo, int 
 jint Java_dev_ludovic_netlib_lapack_JNILAPACK_iparmqK(JNIEnv *env, UNUSED jobject obj,
     jint ispec, jstring name, jstring opts, jint n, jint ilo, jint ihi, jint lwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static int *(*lsamen_)(int *n, char *ca, char *cb);
@@ -2573,6 +2592,7 @@ static int *(*lsamen_)(int *n, char *ca, char *cb);
 jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_lsamenK(JNIEnv *env, UNUSED jobject obj,
     jint n, jstring ca, jstring cb) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*sbdsdc_)(const char *uplo, char *compq, int *n, float *d, float *e, float *u, int *ldu, float *vt, int *ldvt, float *q, int * iq, float *work, int *iwork, int *info);
@@ -3105,6 +3125,7 @@ static int *(*sisnan_)(float *sin);
 jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_sisnanK(JNIEnv *env, UNUSED jobject obj,
     jfloat sin) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*slabad_)(/*FIXME*/void *small, /*FIXME*/void *large);
@@ -3343,6 +3364,7 @@ static int *(*slaisnan_)(float *sin1, float *sin2);
 jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_slaisnanK(JNIEnv *env, UNUSED jobject obj,
     jfloat sin1, jfloat sin2) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*slaln2_)(int *ltrans, int *na, int *nw, float *smin, float *ca, float *a, int *lda, float *d1, float *d2, float *b, int *ldb, float *wr, float *wi, float *x, int *ldx, /*FIXME*/void *scale, /*FIXME*/void *xnorm, /*FIXME*/void *info);
@@ -3385,6 +3407,7 @@ static int (*slaneg_)(int *n, float *d, int *offsetd, float *lld, int *offsetlld
 jint Java_dev_ludovic_netlib_lapack_JNILAPACK_slanegK(JNIEnv *env, UNUSED jobject obj,
     jint n, jfloatArray d, jint offsetd, jfloatArray lld, jint offsetlld, jfloat sigma, jfloat pivmin, jint r) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slangb_)(char *norm, int *n, int *kl, int *ku, float *ab, int *offsetab, int *ldab, float *work, int *offsetwork);
@@ -3392,6 +3415,7 @@ static float (*slangb_)(char *norm, int *n, int *kl, int *ku, float *ab, int *of
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slangbK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint n, jint kl, jint ku, jfloatArray ab, jint offsetab, jint ldab, jfloatArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slange_)(char *norm, int *m, int *n, float *a, int *offseta, int *lda, float *work, int *offsetwork);
@@ -3399,6 +3423,7 @@ static float (*slange_)(char *norm, int *m, int *n, float *a, int *offseta, int 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slangeK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slangt_)(char *norm, int *n, float *dl, int *offsetdl, float *d, int *offsetd, float *du, int *offsetdu);
@@ -3406,6 +3431,7 @@ static float (*slangt_)(char *norm, int *n, float *dl, int *offsetdl, float *d, 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slangtK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint n, jfloatArray dl, jint offsetdl, jfloatArray d, jint offsetd, jfloatArray du, jint offsetdu) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slanhs_)(char *norm, int *n, float *a, int *offseta, int *lda, float *work, int *offsetwork);
@@ -3413,6 +3439,7 @@ static float (*slanhs_)(char *norm, int *n, float *a, int *offseta, int *lda, fl
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slanhsK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slansb_)(char *norm, const char *uplo, int *n, int *k, float *ab, int *offsetab, int *ldab, float *work, int *offsetwork);
@@ -3420,6 +3447,7 @@ static float (*slansb_)(char *norm, const char *uplo, int *n, int *k, float *ab,
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slansbK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jint n, jint k, jfloatArray ab, jint offsetab, jint ldab, jfloatArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slansp_)(char *norm, const char *uplo, int *n, float *ap, int *offsetap, float *work, int *offsetwork);
@@ -3427,6 +3455,7 @@ static float (*slansp_)(char *norm, const char *uplo, int *n, float *ap, int *of
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slanspK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slanst_)(char *norm, int *n, float *d, int *offsetd, float *e, int *offsete);
@@ -3434,6 +3463,7 @@ static float (*slanst_)(char *norm, int *n, float *d, int *offsetd, float *e, in
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slanstK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slansy_)(char *norm, const char *uplo, int *n, float *a, int *offseta, int *lda, float *work, int *offsetwork);
@@ -3441,6 +3471,7 @@ static float (*slansy_)(char *norm, const char *uplo, int *n, float *a, int *off
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slansyK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slantb_)(char *norm, const char *uplo, char *diag, int *n, int *k, float *ab, int *offsetab, int *ldab, float *work, int *offsetwork);
@@ -3448,6 +3479,7 @@ static float (*slantb_)(char *norm, const char *uplo, char *diag, int *n, int *k
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slantbK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jstring diag, jint n, jint k, jfloatArray ab, jint offsetab, jint ldab, jfloatArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slantp_)(char *norm, const char *uplo, char *diag, int *n, float *ap, int *offsetap, float *work, int *offsetwork);
@@ -3455,6 +3487,7 @@ static float (*slantp_)(char *norm, const char *uplo, char *diag, int *n, float 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slantpK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jstring diag, jint n, jfloatArray ap, jint offsetap, jfloatArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slantr_)(char *norm, const char *uplo, char *diag, int *m, int *n, float *a, int *offseta, int *lda, float *work, int *offsetwork);
@@ -3462,6 +3495,7 @@ static float (*slantr_)(char *norm, const char *uplo, char *diag, int *m, int *n
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slantrK(JNIEnv *env, UNUSED jobject obj,
     jstring norm, jstring uplo, jstring diag, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray work, jint offsetwork) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*slanv2_)(/*FIXME*/void *a, /*FIXME*/void *b, /*FIXME*/void *c, /*FIXME*/void *d, /*FIXME*/void *rt1r, /*FIXME*/void *rt1i, /*FIXME*/void *rt2r, /*FIXME*/void *rt2i, /*FIXME*/void *cs, /*FIXME*/void *sn);
@@ -3490,6 +3524,7 @@ static float (*slapy2_)(float *x, float *y);
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slapy2K(JNIEnv *env, UNUSED jobject obj,
     jfloat x, jfloat y) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*slapy3_)(float *x, float *y, float *z);
@@ -3497,6 +3532,7 @@ static float (*slapy3_)(float *x, float *y, float *z);
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slapy3K(JNIEnv *env, UNUSED jobject obj,
     jfloat x, jfloat y, jfloat z) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static void (*slaqgb_)(int *m, int *n, int *kl, int *ku, float *ab, int *ldab, float *r, float *c, float *rowcnd, float *colcnd, float *amax, jstring *equed);
@@ -5037,6 +5073,7 @@ static double (*dlamch_)(char *cmach);
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlamchK(JNIEnv *env, UNUSED jobject obj,
     jstring cmach) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 // static void (*dlamc1_)(/*FIXME*/void *beta, /*FIXME*/void *t, /*FIXME*/void *rnd, /*FIXME*/void *ieee1);
@@ -5058,6 +5095,7 @@ static double (*dlamc3_)(double *a, double *b);
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlamc3K(JNIEnv *env, UNUSED jobject obj,
     jdouble a, jdouble b) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 // static void (*dlamc4_)(/*FIXME*/void *emin, double *start, int *base);
@@ -5078,6 +5116,7 @@ static double (*dsecnd_)(void);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dsecndK(JNIEnv *env, UNUSED jobject obj) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static int *(*lsame_)(char *ca, char *cb);
@@ -5085,12 +5124,14 @@ static int *(*lsame_)(char *ca, char *cb);
 jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_lsameK(JNIEnv *env, UNUSED jobject obj,
     jstring ca, jstring cb) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 static float (*second_)(void);
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_secondK(JNIEnv *env, UNUSED jobject obj) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 
@@ -5099,6 +5140,7 @@ static float (*slamch_)(char *cmach);
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slamchK(JNIEnv *env, UNUSED jobject obj,
     jstring cmach) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 // static void (*slamc1_)(/*FIXME*/void *beta, /*FIXME*/void *t, /*FIXME*/void *rnd, /*FIXME*/void *ieee1);
@@ -5120,6 +5162,7 @@ static float (*slamc3_)(float *a, float *b);
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slamc3K(JNIEnv *env, UNUSED jobject obj,
     jfloat a, jfloat b) {
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  return 0;
 }
 
 // static void (*slamc4_)(/*FIXME*/void *emin, float *start, int *base);
