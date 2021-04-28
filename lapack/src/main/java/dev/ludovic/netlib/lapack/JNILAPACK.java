@@ -25,13 +25,39 @@
 
 package dev.ludovic.netlib.lapack;
 
-import dev.ludovic.netlib.LAPACK;
+import java.io.InputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermissions;
 
 public final class JNILAPACK extends AbstractLAPACK implements dev.ludovic.netlib.NativeLAPACK {
 
   private static final JNILAPACK instance = new JNILAPACK();
 
-  protected JNILAPACK() {}
+  protected JNILAPACK() {
+    String osName = System.getProperty("os.name");
+    if (osName == null || osName.isEmpty()) {
+        throw new RuntimeException("Unable to load native implementation");
+    }
+    String osArch = System.getProperty("os.arch");
+    if (osArch == null || osArch.isEmpty()) {
+        throw new RuntimeException("Unable to load native implementation");
+    }
+
+    Path temp;
+    try (InputStream resource = this.getClass().getClassLoader().getResourceAsStream(
+            String.format("resources/native/%s-%s/libnetliblapackjni.so", osName, osArch))) {
+      assert resource != null;
+      Files.copy(resource, temp = Files.createTempFile("libnetliblapackjni.so", "",
+                                    PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-x---"))),
+                  StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to load native implementation", e);
+    }
+
+    System.load(temp.toString());}
 
   public static dev.ludovic.netlib.NativeLAPACK getInstance() {
     return instance;
