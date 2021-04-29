@@ -521,29 +521,93 @@ fail:
 static void (*drotmg_)(double *dd1, double *dd2, double *dx1, double *dy1, double *dparam);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_drotmgK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jobject dd1, UNUSED jobject dd2, UNUSED jobject dx1, UNUSED jdouble dy1, UNUSED jdoubleArray dparam, UNUSED jint offsetdparam) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jobject dd1, jobject dd2, jobject dx1, jdouble dy1, jdoubleArray dparam, jint offsetdparam) {
+  jboolean failed = FALSE;
+  double ndd1 = 0, ndd2 = 0, ndx1 = 0; double *ndparam = NULL;
+  ndd1 = (*env)->GetDoubleField(env, dd1, doubleW_val_fieldID);
+  ndd2 = (*env)->GetDoubleField(env, dd2, doubleW_val_fieldID);
+  ndx1 = (*env)->GetDoubleField(env, dx1, doubleW_val_fieldID);
+  if (!(ndparam = (*env)->GetPrimitiveArrayCritical(env, dparam, NULL))) goto fail;
+  drotmg_(&ndd1, &ndd2, &ndx1, &dy1, ndparam + offsetdparam);
+done:
+  if (ndparam) (*env)->ReleasePrimitiveArrayCritical(env, dparam, ndparam, 0);
+  (*env)->SetDoubleField(env, dx1, doubleW_val_fieldID, ndx1);
+  (*env)->SetDoubleField(env, dd2, doubleW_val_fieldID, ndd2);
+  (*env)->SetDoubleField(env, dd1, doubleW_val_fieldID, ndd1);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*srotmg_)(float *sd1, float *sd2, float *sx1, float *sy1, float *sparam);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_srotmgK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jobject sd1, UNUSED jobject sd2, UNUSED jobject sx1, UNUSED jfloat sy1, UNUSED jfloatArray sparam, UNUSED jint offsetsparam) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jobject sd1, jobject sd2, jobject sx1, jfloat sy1, jfloatArray sparam, jint offsetsparam) {
+  jboolean failed = FALSE;
+  float nsd1 = 0, nsd2 = 0, nsx1 = 0; float *nsparam = NULL;
+  nsd1 = (*env)->GetFloatField(env, sd1, floatW_val_fieldID);
+  nsd2 = (*env)->GetFloatField(env, sd2, floatW_val_fieldID);
+  nsx1 = (*env)->GetFloatField(env, sx1, floatW_val_fieldID);
+  if (!(nsparam = (*env)->GetPrimitiveArrayCritical(env, sparam, NULL))) goto fail;
+  srotmg_(&nsd1, &nsd2, &nsx1, &sy1, nsparam + offsetsparam);
+done:
+  if (nsparam) (*env)->ReleasePrimitiveArrayCritical(env, sparam, nsparam, 0);
+  (*env)->SetFloatField(env, sx1, floatW_val_fieldID, nsx1);
+  (*env)->SetFloatField(env, sd2, floatW_val_fieldID, nsd2);
+  (*env)->SetFloatField(env, sd1, floatW_val_fieldID, nsd1);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*dsbmv_)(const char *uplo, int *n, int *k, double *alpha, double *a, int *lda, double *x, int *incx, double *beta, double *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dsbmvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jint n, UNUSED jint k, UNUSED jdouble alpha, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx, UNUSED jdouble beta, UNUSED jdoubleArray y, UNUSED jint offsety, UNUSED jint incy) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jstring uplo, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+  jboolean failed = FALSE;
+  const char *nuplo = NULL; double *na = NULL, *nx = NULL, *ny = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  dsbmv_(nuplo, &n, &k, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+done:
+  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, 0);
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*ssbmv_)(const char *uplo, int *n, int *k, float *alpha, float *a, int *lda, float *x, int *incx, float *beta, float *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_ssbmvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jint n, UNUSED jint k, UNUSED jfloat alpha, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx, UNUSED jfloat beta, UNUSED jfloatArray y, UNUSED jint offsety, UNUSED jint incy) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jstring uplo, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+  jboolean failed = FALSE;
+  const char *nuplo = NULL; float *na = NULL, *nx = NULL, *ny = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  ssbmv_(nuplo, &n, &k, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+done:
+  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, 0);
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*dscal_)(int *n, double *alpha, double *x, int *incx);
