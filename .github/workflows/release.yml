@@ -24,9 +24,9 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.m2/repository
-        key: ${{ matrix.jdk }}-m2-${{ hashFiles('**/pom.xml') }}
+        key: m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
-          ${{ matrix.jdk }}-m2-
+          m2-
     - name: Install dependencies
       run: |
         sudo apt-get -y update
@@ -59,9 +59,9 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.m2/repository
-        key: 16-m2-${{ hashFiles('**/pom.xml') }}
+        key: m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
-          16-m2-
+          m2-
     - name: Install dependencies
       run: |
         sudo apt-get -y update
