@@ -35,14 +35,5 @@ public class DppsvTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        double[] dgeAUexpected, dgeAUobtained, dgeBexpected, dgeBobtained;
-        org.netlib.util.intW infoexpected, infoobtained;
-
-        f2j.dppsv("U", N, M, dgeAUexpected = dgeAU.clone(), dgeBexpected = dgeB.clone(), N, infoexpected = new org.netlib.util.intW(0));
-        lapack.dppsv("U", N, M, dgeAUobtained = dgeAU.clone(), dgeBobtained = dgeB.clone(), N, infoobtained = new org.netlib.util.intW(0));
-        assertEquals(2, infoexpected.val);
-        assertEquals(2, infoobtained.val);
-        assertArrayEquals(dgeAUexpected, dgeAUobtained, depsilon);
-        assertArrayEquals(dgeBexpected, dgeBobtained, depsilon);
     }
 }
