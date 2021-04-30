@@ -24,8 +24,10 @@
  */
 
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
+
 #include <dlfcn.h>
+#include <string.h>
 
 #include "dev_ludovic_netlib_blas_JNIBLAS.h"
 
@@ -1098,113 +1100,409 @@ fail:
 static void (*dtbmv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, double *a, int *lda, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtbmvK(UNUSED JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jint k, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jstring uplo, jstring trans, jstring diag, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtbmv_(nuplo, ntrans, ndiag, &n, &k, na + offseta, &lda, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*stbmv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, float *a, int *lda, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_stbmvK(UNUSED JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jint k, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jstring uplo, jstring trans, jstring diag, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  stbmv_(nuplo, ntrans, ndiag, &n, &k, na + offseta, &lda, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*dtbsv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, double *a, int *lda, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtbsvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jint k, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jstring uplo, jstring trans, jstring diag, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtbsv_(nuplo, ntrans, ndiag, &n, &k, na + offseta, &lda, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*stbsv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, float *a, int *lda, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_stbsvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jint k, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jstring uplo, jstring trans, jstring diag, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  stbsv_(nuplo, ntrans, ndiag, &n, &k, na + offseta, &lda, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*dtpmv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtpmvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jdoubleArray x, jint offsetx, jint incx) {
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtpmv_(nuplo, ntrans, ndiag, &n, na + offseta, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*stpmv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_stpmvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+    jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jfloatArray x, jint offsetx, jint incx) {
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  stpmv_(nuplo, ntrans, ndiag, &n, na + offseta, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*dtpsv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtpsvK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtpsv_(nuplo, ntrans, ndiag, &n, na + offseta, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*stpsv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_stpsvK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  stpsv_(nuplo, ntrans, ndiag, &n, na + offseta, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*dtrmm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrmmK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring side, UNUSED jstring uplo, UNUSED jstring transa, UNUSED jstring diag, UNUSED jint m, UNUSED jint n, UNUSED jdouble alpha, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray b, UNUSED jint offsetb, UNUSED jint ldb) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nside = NULL, *nuplo = NULL, *ntransa = NULL, *ndiag = NULL; double *na = NULL, *nb = NULL;
+  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  dtrmm_(nside, nuplo, ntransa, ndiag, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb);
+done:
+  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*strmm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, float *alpha, float *a, int *lda, float *b, int *ldb);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_strmmK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring side, UNUSED jstring uplo, UNUSED jstring transa, UNUSED jstring diag, UNUSED jint m, UNUSED jint n, UNUSED jfloat alpha, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray b, UNUSED jint offsetb, UNUSED jint ldb) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nside = NULL, *nuplo = NULL, *ntransa = NULL, *ndiag = NULL; float *na = NULL, *nb = NULL;
+  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  strmm_(nside, nuplo, ntransa, ndiag, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb);
+done:
+  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*dtrmv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, int *lda, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrmvK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtrmv_(nuplo, ntrans, ndiag, &n, na + offseta, &lda, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*strmv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, int *lda, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_strmvK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  strmv_(nuplo, ntrans, ndiag, &n, na + offseta, &lda, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*dtrsm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrsmK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring side, UNUSED jstring uplo, UNUSED jstring transa, UNUSED jstring diag, UNUSED jint m, UNUSED jint n, UNUSED jdouble alpha, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray b, UNUSED jint offsetb, UNUSED jint ldb) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nside = NULL, *nuplo = NULL, *ntransa = NULL, *ndiag = NULL; double *na = NULL, *nb = NULL;
+  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  dtrsm_(nside, nuplo, ntransa, ndiag, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb);
+done:
+  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*strsm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, float *alpha, float *a, int *lda, float *b, int *ldb);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_strsmK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring side, UNUSED jstring uplo, UNUSED jstring transa, UNUSED jstring diag, UNUSED jint m, UNUSED jint n, UNUSED jfloat alpha, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray b, UNUSED jint offsetb, UNUSED jint ldb) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nside = NULL, *nuplo = NULL, *ntransa = NULL, *ndiag = NULL; float *na = NULL, *nb = NULL;
+  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  strsm_(nside, nuplo, ntransa, ndiag, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb);
+done:
+  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*dtrsv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, int *lda, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrsvK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtrsv_(nuplo, ntrans, ndiag, &n, na + offseta, &lda, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static void (*strsv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, int *lda, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_strsvK(JNIEnv *env, UNUSED jobject obj,
     UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx) {
-  (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
+  jboolean failed = FALSE;
+  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
+  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  strsv_(nuplo, ntrans, ndiag, &n, na + offseta, &lda, nx + offsetx, &incx);
+done:
+  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
+  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
+  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (failed) throwOOM(env);
+  return;
+fail:
+  failed = TRUE;
+  goto done;
 }
 
 static int (*idamax_)(int *n, double *dx, int *incdx);
@@ -1215,7 +1513,7 @@ jint Java_dev_ludovic_netlib_blas_JNIBLAS_idamaxK(JNIEnv *env, UNUSED jobject ob
   jboolean failed = FALSE;
   double *ndx = NULL;
   if (!(ndx = (*env)->GetPrimitiveArrayCritical(env, dx, NULL))) goto fail;
-  // It returns 1-based index because that's how Fortran works
+  /* It returns 1-based index because that's how Fortran works */
   ret = idamax_(&n, ndx + offsetdx, &incdx) - 1;
 done:
   if (ndx) (*env)->ReleasePrimitiveArrayCritical(env, dx, ndx, JNI_ABORT);
@@ -1234,7 +1532,7 @@ jint Java_dev_ludovic_netlib_blas_JNIBLAS_isamaxK(JNIEnv *env, UNUSED jobject ob
   jboolean failed = FALSE;
   float *nsx = NULL;
   if (!(nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) goto fail;
-  // It returns 1-based index because that's how Fortran works
+  /* It returns 1-based index because that's how Fortran works */
   ret = isamax_(&n, nsx + offsetsx, &incsx) - 1;
 done:
   if (nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, nsx, JNI_ABORT);
