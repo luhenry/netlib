@@ -23,27 +23,17 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib.arpack;
-
 import dev.ludovic.netlib.ARPACK;
 
-public final class NetlibNativeARPACK extends NetlibWrapper implements dev.ludovic.netlib.NativeARPACK {
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.*;
 
-  private static final NetlibNativeARPACK instance;
+public class DseupdTest extends ARPACKTest {
 
-  static {
-    com.github.fommil.netlib.ARPACK arpack = com.github.fommil.netlib.ARPACK.getInstance();
-    if (arpack instanceof com.github.fommil.netlib.F2jARPACK) {
-        throw new RuntimeException("Unable to load native implementation");
+    @ParameterizedTest
+    @MethodSource("ARPACKImplementations")
+    void testSanity(ARPACK arpack) {
     }
-    instance = new NetlibNativeARPACK(arpack);
-  }
-
-  protected NetlibNativeARPACK(com.github.fommil.netlib.ARPACK _arpack) {
-    super(_arpack);
-  }
-
-  public static dev.ludovic.netlib.NativeARPACK getInstance() {
-    return instance;
-  }
 }

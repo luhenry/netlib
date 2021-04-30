@@ -23,23 +23,17 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib.arpack;
-
 import dev.ludovic.netlib.ARPACK;
 
-public final class NetlibF2jARPACK extends NetlibWrapper implements dev.ludovic.netlib.JavaARPACK {
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.*;
 
-  private static final NetlibF2jARPACK instance;
+public class DsaupdTest extends ARPACKTest {
 
-  static {
-    instance = new NetlibF2jARPACK(new com.github.fommil.netlib.F2jARPACK());
-  }
-
-  protected NetlibF2jARPACK(com.github.fommil.netlib.ARPACK _arpack) {
-    super(_arpack);
-  }
-
-  public static dev.ludovic.netlib.JavaARPACK getInstance() {
-    return instance;
-  }
+    @ParameterizedTest
+    @MethodSource("ARPACKImplementations")
+    void testSanity(ARPACK arpack) {
+    }
 }

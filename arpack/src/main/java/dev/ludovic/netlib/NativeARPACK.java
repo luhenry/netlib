@@ -32,9 +32,9 @@ public interface NativeARPACK extends ARPACK {
 
   public static NativeARPACK getInstance() {
     try {
-      return dev.ludovic.netlib.arpack.NetlibNativeARPACK.getInstance();
+      return dev.ludovic.netlib.arpack.JNIARPACK.getInstance();
     } catch (Throwable t) {
-      Logger.getLogger(NativeARPACK.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.arpack.NetlibNativeARPACK");
+      Logger.getLogger(NativeARPACK.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.arpack.JNIARPACK");
     }
     throw new RuntimeException("Unable to load native implementation");
   }

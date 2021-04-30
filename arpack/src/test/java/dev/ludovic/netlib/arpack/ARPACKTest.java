@@ -18,6 +18,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
+ * Please contact git@ludovic.dev or visit ludovic.dev if you need additional
+ * information or have any questions.
  */
 
 import java.util.stream.Stream;
@@ -32,16 +35,9 @@ public class ARPACKTest {
 
   private static Stream<Arguments> ARPACKImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.arpack.NetlibF2jARPACK.getInstance())
+      Arguments.of(dev.ludovic.netlib.arpack.F2jARPACK.getInstance()),
+      Arguments.of(dev.ludovic.netlib.arpack.JNIARPACK.getInstance())
     );
-
-    try {
-      instances = Stream.concat(instances, Stream.of(
-        dev.ludovic.netlib.arpack.NetlibNativeARPACK.getInstance()
-      ));
-    } catch (ExceptionInInitializerError e) {
-    } catch (NoClassDefFoundError e) {
-    }
 
     return instances;
   }
