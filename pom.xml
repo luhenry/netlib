@@ -69,6 +69,7 @@ information or have any questions.
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javac.target>8</javac.target>
     <jvm.modules></jvm.modules>
+    <argLine></argLine><!-- used by jacoco -->
   </properties>
 
   <profiles>
