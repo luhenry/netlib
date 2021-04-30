@@ -47,22 +47,19 @@ public class BLASTest {
 
     String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 2);
     int major = Integer.parseInt(fullVersion[0]);
-    if (major >= 11) {
-      instances = Stream.concat(instances, Stream.of(
-        Arguments.of(dev.ludovic.netlib.blas.Java11BLAS.getInstance())
-      ));
-    } else {
+    if (major >= 8) {
       instances = Stream.concat(instances, Stream.of(
         Arguments.of(dev.ludovic.netlib.blas.Java8BLAS.getInstance())
       ));
     }
-    if (major >= 16) {
-      /* FIXME: enabling VectorBLAS breaks JNI... */
-      // instances = Stream.concat(instances, Stream.of(
-      //   Arguments.of(dev.ludovic.netlib.blas.VectorBLAS.getInstance()),
-      //   Arguments.of(dev.ludovic.netlib.blas.ForeignLinkerBLAS.getInstance())
-      // ));
+    if (major >= 11) {
       instances = Stream.concat(instances, Stream.of(
+        Arguments.of(dev.ludovic.netlib.blas.Java11BLAS.getInstance())
+      ));
+    }
+    if (major >= 16) {
+      instances = Stream.concat(instances, Stream.of(
+        Arguments.of(dev.ludovic.netlib.blas.VectorBLAS.getInstance()),
         Arguments.of(dev.ludovic.netlib.blas.ForeignLinkerBLAS.getInstance())
       ));
     }

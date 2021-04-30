@@ -467,7 +467,7 @@ public class VectorBLAS extends Java11BLAS implements dev.ludovic.netlib.JavaBLA
           y[offsety + (col + 3)] = alpha * sum3;
         }
       }
-      for (; col < loopBound(n, 4); col += 4) {
+      for (; col < n; col += 1) {
         int row = 0;
         DoubleVector vsum0 = DoubleVector.zero(DMAX);
         for (; row < DMAX.loopBound(m); row += DMAX.length()) {
@@ -608,7 +608,7 @@ public class VectorBLAS extends Java11BLAS implements dev.ludovic.netlib.JavaBLA
           y[offsety + (col + 3)] = alpha * sum3;
         }
       }
-      for (; col < loopBound(n, 4); col += 4) {
+      for (; col < n; col += 1) {
         int row = 0;
         FloatVector vsum0 = FloatVector.zero(FMAX);
         for (; row < FMAX.loopBound(m); row += FMAX.length()) {
