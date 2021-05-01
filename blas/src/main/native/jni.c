@@ -50,17 +50,16 @@ static void throwOOM(JNIEnv *env) {
 
 static double (*dasum_)(int *n, double *x, int *incx);
 
-jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_dasumK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdoubleArray x, jint offsetx, jint incx) {
-  jdouble ret;
+jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_dasumK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx) {
+  jdouble __ret;
   jboolean failed = FALSE;
-  double *nx = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  ret = dasum_(&n, nx + offsetx, &incx);
+  double *__nx = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  __ret = dasum_(&n, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
-  return ret;
+  return __ret;
 fail:
   failed = TRUE;
   goto done;
@@ -68,17 +67,16 @@ fail:
 
 static float (*sasum_)(int *n, float *x, int *incx);
 
-jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sasumK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloatArray x, jint offsetx, jint incx) {
-  jfloat ret;
+jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sasumK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx) {
+  jfloat __ret;
   jboolean failed = FALSE;
-  float *nx = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  ret = sasum_(&n, nx + offsetx, &incx);
+  float *__nx = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  __ret = sasum_(&n, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
-  return ret;
+  return __ret;
 fail:
   failed = TRUE;
   goto done;
@@ -86,16 +84,15 @@ fail:
 
 static void (*daxpy_)(int *n, double *alpha, double *x, int *incx, double *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_daxpyK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_daxpyK(JNIEnv *env, UNUSED jobject obj, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  double *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  daxpy_(&n, &alpha, nx + offsetx, &incx, ny + offsety, &incy);
+  double *__nx = NULL; double *__ny = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  daxpy_(&n, &alpha, __nx + offsetx, &incx, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -105,16 +102,15 @@ fail:
 
 static void (*saxpy_)(int *n, float *alpha, float *x, int *incx, float *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_saxpyK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_saxpyK(JNIEnv *env, UNUSED jobject obj, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  float *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  saxpy_(&n, &alpha, nx + offsetx, &incx, ny + offsety, &incy);
+  float *__nx = NULL; float *__ny = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  saxpy_(&n, &alpha, __nx + offsetx, &incx, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -124,16 +120,15 @@ fail:
 
 static void (*dcopy_)(int *n, double *x, int *incx, double *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dcopyK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dcopyK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  double *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  dcopy_(&n, nx + offsetx, &incx, ny + offsety, &incy);
+  double *__nx = NULL; double *__ny = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  dcopy_(&n, __nx + offsetx, &incx, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -143,16 +138,15 @@ fail:
 
 static void (*scopy_)(int *n, float *x, int *incx, float *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_scopyK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_scopyK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  float *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  scopy_(&n, nx + offsetx, &incx, ny + offsety, &incy);
+  float *__nx = NULL; float *__ny = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  scopy_(&n, __nx + offsetx, &incx, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -162,19 +156,18 @@ fail:
 
 static double (*ddot_)(int *n, double *x, int *incx, double *y, int *incy);
 
-jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_ddotK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
+jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_ddotK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
+  jdouble __ret;
   jboolean failed = FALSE;
-  jdouble ret;
-  double *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  ret = ddot_(&n, nx + offsetx, &incx, ny + offsety, &incy);
+  double *__nx = NULL; double *__ny = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  __ret = ddot_(&n, __nx + offsetx, &incx, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, JNI_ABORT);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
-  return ret;
+  return __ret;
 fail:
   failed = TRUE;
   goto done;
@@ -182,19 +175,18 @@ fail:
 
 static float (*sdot_)(int *n, float *x, int *incx, float *y, int *incy);
 
-jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sdotK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
-  jfloat ret;
+jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sdotK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
+  jfloat __ret;
   jboolean failed = FALSE;
-  float *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  ret = sdot_(&n, nx + offsetx, &incx, ny + offsety, &incy);
+  float *__nx = NULL; float *__ny = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  __ret = sdot_(&n, __nx + offsetx, &incx, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, JNI_ABORT);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
-  return ret;
+  return __ret;
 fail:
   failed = TRUE;
   goto done;
@@ -202,19 +194,18 @@ fail:
 
 static float (*sdsdot_)(int *n, float *sb, float *sx, int *incsx, float *sy, int *incsy);
 
-jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sdsdotK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloat sb, jfloatArray sx, jint offsetsx, jint incsx, jfloatArray sy, jint offsetsy, jint incsy) {
-  jfloat ret;
+jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sdsdotK(JNIEnv *env, UNUSED jobject obj, jint n, jfloat sb, jfloatArray sx, jint offsetsx, jint incsx, jfloatArray sy, jint offsetsy, jint incsy) {
+  jfloat __ret;
   jboolean failed = FALSE;
-  float *nsx = NULL, *nsy = NULL;
-  if (!(nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) goto fail;
-  if (!(nsy = (*env)->GetPrimitiveArrayCritical(env, sy, NULL))) goto fail;
-  ret = sdsdot_(&n, &sb, nsx + offsetsx, &incsx, nsy + offsetsy, &incsy);
+  float *__nsx = NULL; float *__nsy = NULL;
+  if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) goto fail;
+  if (!(__nsy = (*env)->GetPrimitiveArrayCritical(env, sy, NULL))) goto fail;
+  __ret = sdsdot_(&n, &sb, __nsx + offsetsx, &incsx, __nsy + offsetsy, &incsy);
 done:
-  if (nsy) (*env)->ReleasePrimitiveArrayCritical(env, sy, nsy, JNI_ABORT);
-  if (nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, nsx, JNI_ABORT);
+  if (__nsy) (*env)->ReleasePrimitiveArrayCritical(env, sy, __nsy, JNI_ABORT);
+  if (__nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, __nsx, JNI_ABORT);
   if (failed) throwOOM(env);
-  return ret;
+  return __ret;
 fail:
   failed = TRUE;
   goto done;
@@ -222,20 +213,19 @@ fail:
 
 static void (*dgbmv_)(const char *trans, int *m, int *n, int *kl, int *ku, double *alpha, double *a, int *lda, double *x, int *incx, double *beta, double *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dgbmvK(JNIEnv *env, UNUSED jobject obj,
-    jstring trans, jint m, jint n, jint kl, jint ku, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dgbmvK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jint kl, jint ku, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *ntrans = NULL; double *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  dgbmv_(ntrans, &m, &n, &kl, &ku, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__ntrans = NULL; double *__na = NULL; double *__nx = NULL; double *__ny = NULL;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  dgbmv_(__ntrans, &m, &n, &kl, &ku, &alpha, __na + offseta, &lda, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -245,20 +235,19 @@ fail:
 
 static void (*sgbmv_)(const char *trans, int *m, int *n, int *kl, int *ku, float *alpha, float *a, int *lda, float *x, int *incx, float *beta, float *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_sgbmvK(JNIEnv *env, UNUSED jobject obj,
-    jstring trans, jint m, jint n, jint kl, jint ku, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_sgbmvK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jint kl, jint ku, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *ntrans = NULL; float *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  sgbmv_(ntrans, &m, &n, &kl, &ku, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__ntrans = NULL; float *__na = NULL; float *__nx = NULL; float *__ny = NULL;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  sgbmv_(__ntrans, &m, &n, &kl, &ku, &alpha, __na + offseta, &lda, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -268,22 +257,21 @@ fail:
 
 static void (*dgemm_)(const char *transa, const char *transb, int *m, int *n, int *k, double *alpha, double *a, int *lda, double *b, int *ldb, double *beta, double *c, int *ldc);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dgemmK(JNIEnv *env, UNUSED jobject obj,
-    jstring transa, jstring transb, jint m, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dgemmK(JNIEnv *env, UNUSED jobject obj, jstring transa, jstring transb, jint m, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
   jboolean failed = FALSE;
-  const char *ntransa = NULL, *ntransb = NULL; double *na = NULL, *nb = NULL, *nc = NULL;
-  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
-  if (!(ntransb = (*env)->GetStringUTFChars(env, transb, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  if (!(nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
-  dgemm_(ntransa, ntransb, &m, &n, &k, &alpha, na + offseta, &lda, nb + offsetb, &ldb, &beta, nc + offsetc, &ldc);
+  const char *__ntransa = NULL; const char *__ntransb = NULL; double *__na = NULL; double *__nb = NULL; double *__nc = NULL;
+  if (!(__ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(__ntransb = (*env)->GetStringUTFChars(env, transb, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
+  dgemm_(__ntransa, __ntransb, &m, &n, &k, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb, &beta, __nc + offsetc, &ldc);
 done:
-  if (nc) (*env)->ReleasePrimitiveArrayCritical(env, c, nc, failed ? JNI_ABORT : 0);
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ntransb) (*env)->ReleaseStringUTFChars(env, transb, ntransb);
-  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
+  if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, failed ? JNI_ABORT : 0);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntransb) (*env)->ReleaseStringUTFChars(env, transb, __ntransb);
+  if (__ntransa) (*env)->ReleaseStringUTFChars(env, transa, __ntransa);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -293,22 +281,21 @@ fail:
 
 static void (*sgemm_)(const char *transa, const char *transb, int *m, int *n, int *k, float *alpha, float *a, int *lda, float *b, int *ldb, float *beta, float *c, int *ldc);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_sgemmK(JNIEnv *env, UNUSED jobject obj,
-    jstring transa, jstring transb, jint m, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_sgemmK(JNIEnv *env, UNUSED jobject obj, jstring transa, jstring transb, jint m, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
   jboolean failed = FALSE;
-  const char *ntransa = NULL, *ntransb = NULL; float *na = NULL, *nb = NULL, *nc = NULL;
-  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
-  if (!(ntransb = (*env)->GetStringUTFChars(env, transb, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  if (!(nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
-  sgemm_(ntransa, ntransb, &m, &n, &k, &alpha, na + offseta, &lda, nb + offsetb, &ldb, &beta, nc + offsetc, &ldc);
+  const char *__ntransa = NULL; const char *__ntransb = NULL; float *__na = NULL; float *__nb = NULL; float *__nc = NULL;
+  if (!(__ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(__ntransb = (*env)->GetStringUTFChars(env, transb, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
+  sgemm_(__ntransa, __ntransb, &m, &n, &k, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb, &beta, __nc + offsetc, &ldc);
 done:
-  if (nc) (*env)->ReleasePrimitiveArrayCritical(env, c, nc, failed ? JNI_ABORT : 0);
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ntransb) (*env)->ReleaseStringUTFChars(env, transb, ntransb);
-  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
+  if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, failed ? JNI_ABORT : 0);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntransb) (*env)->ReleaseStringUTFChars(env, transb, __ntransb);
+  if (__ntransa) (*env)->ReleaseStringUTFChars(env, transa, __ntransa);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -318,20 +305,19 @@ fail:
 
 static void (*dgemv_)(const char *trans, int *m, int *n, double *alpha, double *a, int *lda, double *x, int *incx, double *beta, double *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dgemvK(JNIEnv *env, UNUSED jobject obj,
-    jstring trans, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dgemvK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *ntrans = NULL; jdouble *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  dgemv_(ntrans, &m, &n, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__ntrans = NULL; double *__na = NULL; double *__nx = NULL; double *__ny = NULL;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  dgemv_(__ntrans, &m, &n, &alpha, __na + offseta, &lda, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -341,20 +327,19 @@ fail:
 
 static void (*sgemv_)(const char *trans, int *m, int *n, float *alpha, float *a, int *lda, float *x, int *incx, float *beta, float *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_sgemvK(JNIEnv *env, UNUSED jobject obj,
-    jstring trans, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_sgemvK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *ntrans = NULL; float *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  sgemv_(ntrans, &m, &n, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__ntrans = NULL; float *__na = NULL; float *__nx = NULL; float *__ny = NULL;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  sgemv_(__ntrans, &m, &n, &alpha, __na + offseta, &lda, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -364,18 +349,17 @@ fail:
 
 static void (*dger_)(int *m, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a, int *lda);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dgerK(JNIEnv *env, UNUSED jobject obj,
-    jint m, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy, jdoubleArray a, jint offseta, jint lda) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dgerK(JNIEnv *env, UNUSED jobject obj, jint m, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy, jdoubleArray a, jint offseta, jint lda) {
   jboolean failed = FALSE;
-  double *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  dger_(&m, &n, &alpha, nx + offsetx, &incx, ny + offsety, &incy, na + offseta, &lda);
+  double *__nx = NULL; double *__ny = NULL; double *__na = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  dger_(&m, &n, &alpha, __nx + offsetx, &incx, __ny + offsety, &incy, __na + offseta, &lda);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, JNI_ABORT);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -385,18 +369,17 @@ fail:
 
 static void (*sger_)(int *m, int *n, float *alpha, float *x, int *incx, float *y, int *incy, float *a, int *lda);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_sgerK(JNIEnv *env, UNUSED jobject obj,
-    jint m, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy, jfloatArray a, jint offseta, jint lda) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_sgerK(JNIEnv *env, UNUSED jobject obj, jint m, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy, jfloatArray a, jint offseta, jint lda) {
   jboolean failed = FALSE;
-  float *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  sger_(&m, &n, &alpha, nx + offsetx, &incx, ny + offsety, &incy, na + offseta, &lda);
+  float *__nx = NULL; float *__ny = NULL; float *__na = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  sger_(&m, &n, &alpha, __nx + offsetx, &incx, __ny + offsety, &incy, __na + offseta, &lda);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, JNI_ABORT);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -406,17 +389,16 @@ fail:
 
 static double (*dnrm2_)(int *n, double *x, int *incx);
 
-jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_dnrm2K(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdoubleArray x, jint offsetx, jint incx) {
-  jdouble ret;
+jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_dnrm2K(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx) {
+  jdouble __ret;
   jboolean failed = FALSE;
-  double *nx = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  ret = dnrm2_(&n, nx + offsetx, &incx);
+  double *__nx = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  __ret = dnrm2_(&n, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
-  return ret;
+  return __ret;
 fail:
   failed = TRUE;
   goto done;
@@ -424,17 +406,16 @@ fail:
 
 static float (*snrm2_)(int *n, float *x, int *incx);
 
-jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_snrm2K(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloatArray x, jint offsetx, jint incx) {
-  jfloat ret;
+jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_snrm2K(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx) {
+  jfloat __ret;
   jboolean failed = FALSE;
-  float *nx = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  ret = snrm2_(&n, nx + offsetx, &incx);
+  float *__nx = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  __ret = snrm2_(&n, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
   if (failed) throwOOM(env);
-  return ret;
+  return __ret;
 fail:
   failed = TRUE;
   goto done;
@@ -442,16 +423,15 @@ fail:
 
 static void (*drot_)(int *n, double *dx, int *incx, double *dy, int *incy, double *c, double *s);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_drotK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdoubleArray dx, jint offsetdx, jint incx, jdoubleArray dy, jint offsetdy, jint incy, jdouble c, jdouble s) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_drotK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray dx, jint offsetdx, jint incx, jdoubleArray dy, jint offsetdy, jint incy, jdouble c, jdouble s) {
   jboolean failed = FALSE;
-  double *ndx = NULL, *ndy = NULL;
-  if (!(ndx = (*env)->GetPrimitiveArrayCritical(env, dx, NULL))) goto fail;
-  if (!(ndy = (*env)->GetPrimitiveArrayCritical(env, dy, NULL))) goto fail;
-  drot_(&n, ndx + offsetdx, &incx, ndy + offsetdy, &incy, &c, &s);
+  double *__ndx = NULL; double *__ndy = NULL;
+  if (!(__ndx = (*env)->GetPrimitiveArrayCritical(env, dx, NULL))) goto fail;
+  if (!(__ndy = (*env)->GetPrimitiveArrayCritical(env, dy, NULL))) goto fail;
+  drot_(&n, __ndx + offsetdx, &incx, __ndy + offsetdy, &incy, &c, &s);
 done:
-  if (ndy) (*env)->ReleasePrimitiveArrayCritical(env, dy, ndy, failed ? JNI_ABORT : 0);
-  if (ndx) (*env)->ReleasePrimitiveArrayCritical(env, dx, ndx, failed ? JNI_ABORT : 0);
+  if (__ndy) (*env)->ReleasePrimitiveArrayCritical(env, dy, __ndy, failed ? JNI_ABORT : 0);
+  if (__ndx) (*env)->ReleasePrimitiveArrayCritical(env, dx, __ndx, failed ? JNI_ABORT : 0);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -461,16 +441,15 @@ fail:
 
 static void (*srot_)(int *n, float *sx, int *incx, float *sy, int *incy, float *c, float *s);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_srotK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloatArray sx, jint offsetsx, jint incx, jfloatArray sy, jint offsetsy, jint incy, jfloat c, jfloat s) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_srotK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray sx, jint offsetsx, jint incx, jfloatArray sy, jint offsetsy, jint incy, jfloat c, jfloat s) {
   jboolean failed = FALSE;
-  float *nsx = NULL, *nsy = NULL;
-  if (!(nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) goto fail;
-  if (!(nsy = (*env)->GetPrimitiveArrayCritical(env, sy, NULL))) goto fail;
-  srot_(&n, nsx + offsetsx, &incx, nsy + offsetsy, &incy, &c, &s);
+  float *__nsx = NULL; float *__nsy = NULL;
+  if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) goto fail;
+  if (!(__nsy = (*env)->GetPrimitiveArrayCritical(env, sy, NULL))) goto fail;
+  srot_(&n, __nsx + offsetsx, &incx, __nsy + offsetsy, &incy, &c, &s);
 done:
-  if (nsy) (*env)->ReleasePrimitiveArrayCritical(env, sy, nsy, failed ? JNI_ABORT : 0);
-  if (nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, nsx, failed ? JNI_ABORT : 0);
+  if (__nsy) (*env)->ReleasePrimitiveArrayCritical(env, sy, __nsy, failed ? JNI_ABORT : 0);
+  if (__nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, __nsx, failed ? JNI_ABORT : 0);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -480,18 +459,17 @@ fail:
 
 static void (*drotm_)(int *n, double *dx, int *incx, double *dy, int *incy, double *dparam);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_drotmK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdoubleArray dx, jint offsetdx, jint incx, jdoubleArray dy, jint offsetdy, jint incy, jdoubleArray dparam, jint offsetdparam) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_drotmK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray dx, jint offsetdx, jint incx, jdoubleArray dy, jint offsetdy, jint incy, jdoubleArray dparam, jint offsetdparam) {
   jboolean failed = FALSE;
-  double *ndx = NULL, *ndy = NULL, *ndparam = NULL;
-  if (!(ndx = (*env)->GetPrimitiveArrayCritical(env, dx, NULL))) goto fail;
-  if (!(ndy = (*env)->GetPrimitiveArrayCritical(env, dy, NULL))) goto fail;
-  if (!(ndparam = (*env)->GetPrimitiveArrayCritical(env, dparam, NULL))) goto fail;
-  drotm_(&n, ndx + offsetdx, &incx, ndy + offsetdy, &incy, ndparam + offsetdparam);
+  double *__ndx = NULL; double *__ndy = NULL; double *__ndparam = NULL;
+  if (!(__ndx = (*env)->GetPrimitiveArrayCritical(env, dx, NULL))) goto fail;
+  if (!(__ndy = (*env)->GetPrimitiveArrayCritical(env, dy, NULL))) goto fail;
+  if (!(__ndparam = (*env)->GetPrimitiveArrayCritical(env, dparam, NULL))) goto fail;
+  drotm_(&n, __ndx + offsetdx, &incx, __ndy + offsetdy, &incy, __ndparam + offsetdparam);
 done:
-  if (ndparam) (*env)->ReleasePrimitiveArrayCritical(env, dparam, ndparam, JNI_ABORT);
-  if (ndy) (*env)->ReleasePrimitiveArrayCritical(env, dy, ndy, failed ? JNI_ABORT : 0);
-  if (ndx) (*env)->ReleasePrimitiveArrayCritical(env, dx, ndx, JNI_ABORT);
+  if (__ndparam) (*env)->ReleasePrimitiveArrayCritical(env, dparam, __ndparam, JNI_ABORT);
+  if (__ndy) (*env)->ReleasePrimitiveArrayCritical(env, dy, __ndy, failed ? JNI_ABORT : 0);
+  if (__ndx) (*env)->ReleasePrimitiveArrayCritical(env, dx, __ndx, JNI_ABORT);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -501,18 +479,17 @@ fail:
 
 static void (*srotm_)(int *n, float *sx, int *incx, float *sy, int *incy, float *sparam);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_srotmK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloatArray sx, jint offsetsx, jint incx, jfloatArray sy, jint offsetsy, jint incy, jfloatArray sparam, jint offsetsparam) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_srotmK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray sx, jint offsetsx, jint incx, jfloatArray sy, jint offsetsy, jint incy, jfloatArray sparam, jint offsetsparam) {
   jboolean failed = FALSE;
-  float *nsx = NULL, *nsy = NULL, *nsparam = NULL;
-  if (!(nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) goto fail;
-  if (!(nsy = (*env)->GetPrimitiveArrayCritical(env, sy, NULL))) goto fail;
-  if (!(nsparam = (*env)->GetPrimitiveArrayCritical(env, sparam, NULL))) goto fail;
-  srotm_(&n, nsx + offsetsx, &incx, nsy + offsetsy, &incy, nsparam + offsetsparam);
+  float *__nsx = NULL; float *__nsy = NULL; float *__nsparam = NULL;
+  if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) goto fail;
+  if (!(__nsy = (*env)->GetPrimitiveArrayCritical(env, sy, NULL))) goto fail;
+  if (!(__nsparam = (*env)->GetPrimitiveArrayCritical(env, sparam, NULL))) goto fail;
+  srotm_(&n, __nsx + offsetsx, &incx, __nsy + offsetsy, &incy, __nsparam + offsetsparam);
 done:
-  if (nsparam) (*env)->ReleasePrimitiveArrayCritical(env, sparam, nsparam, JNI_ABORT);
-  if (nsy) (*env)->ReleasePrimitiveArrayCritical(env, sy, nsy, failed ? JNI_ABORT : 0);
-  if (nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, nsx, JNI_ABORT);
+  if (__nsparam) (*env)->ReleasePrimitiveArrayCritical(env, sparam, __nsparam, JNI_ABORT);
+  if (__nsy) (*env)->ReleasePrimitiveArrayCritical(env, sy, __nsy, failed ? JNI_ABORT : 0);
+  if (__nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, __nsx, JNI_ABORT);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -522,20 +499,19 @@ fail:
 
 static void (*drotmg_)(double *dd1, double *dd2, double *dx1, double *dy1, double *dparam);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_drotmgK(JNIEnv *env, UNUSED jobject obj,
-    jobject dd1, jobject dd2, jobject dx1, jdouble dy1, jdoubleArray dparam, jint offsetdparam) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_drotmgK(JNIEnv *env, UNUSED jobject obj, jobject dd1, jobject dd2, jobject dx1, jdouble dy1, jdoubleArray dparam, jint offsetdparam) {
   jboolean failed = FALSE;
-  double ndd1 = 0, ndd2 = 0, ndx1 = 0; double *ndparam = NULL;
-  ndd1 = (*env)->GetDoubleField(env, dd1, doubleW_val_fieldID);
-  ndd2 = (*env)->GetDoubleField(env, dd2, doubleW_val_fieldID);
-  ndx1 = (*env)->GetDoubleField(env, dx1, doubleW_val_fieldID);
-  if (!(ndparam = (*env)->GetPrimitiveArrayCritical(env, dparam, NULL))) goto fail;
-  drotmg_(&ndd1, &ndd2, &ndx1, &dy1, ndparam + offsetdparam);
+  double __ndd1 = 0; double __ndd2 = 0; double __ndx1 = 0; double *__ndparam = NULL;
+  __ndd1 = (*env)->GetDoubleField(env, dd1, doubleW_val_fieldID);
+  __ndd2 = (*env)->GetDoubleField(env, dd2, doubleW_val_fieldID);
+  __ndx1 = (*env)->GetDoubleField(env, dx1, doubleW_val_fieldID);
+  if (!(__ndparam = (*env)->GetPrimitiveArrayCritical(env, dparam, NULL))) goto fail;
+  drotmg_(&__ndd1, &__ndd2, &__ndx1, &dy1, __ndparam + offsetdparam);
 done:
-  if (ndparam) (*env)->ReleasePrimitiveArrayCritical(env, dparam, ndparam, 0);
-  (*env)->SetDoubleField(env, dx1, doubleW_val_fieldID, ndx1);
-  (*env)->SetDoubleField(env, dd2, doubleW_val_fieldID, ndd2);
-  (*env)->SetDoubleField(env, dd1, doubleW_val_fieldID, ndd1);
+  if (__ndparam) (*env)->ReleasePrimitiveArrayCritical(env, dparam, __ndparam, JNI_ABORT);
+  if (!failed) (*env)->SetDoubleField(env, dx1, doubleW_val_fieldID, __ndx1);
+  if (!failed) (*env)->SetDoubleField(env, dd2, doubleW_val_fieldID, __ndd2);
+  if (!failed) (*env)->SetDoubleField(env, dd1, doubleW_val_fieldID, __ndd1);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -545,20 +521,19 @@ fail:
 
 static void (*srotmg_)(float *sd1, float *sd2, float *sx1, float *sy1, float *sparam);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_srotmgK(JNIEnv *env, UNUSED jobject obj,
-    jobject sd1, jobject sd2, jobject sx1, jfloat sy1, jfloatArray sparam, jint offsetsparam) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_srotmgK(JNIEnv *env, UNUSED jobject obj, jobject sd1, jobject sd2, jobject sx1, jfloat sy1, jfloatArray sparam, jint offsetsparam) {
   jboolean failed = FALSE;
-  float nsd1 = 0, nsd2 = 0, nsx1 = 0; float *nsparam = NULL;
-  nsd1 = (*env)->GetFloatField(env, sd1, floatW_val_fieldID);
-  nsd2 = (*env)->GetFloatField(env, sd2, floatW_val_fieldID);
-  nsx1 = (*env)->GetFloatField(env, sx1, floatW_val_fieldID);
-  if (!(nsparam = (*env)->GetPrimitiveArrayCritical(env, sparam, NULL))) goto fail;
-  srotmg_(&nsd1, &nsd2, &nsx1, &sy1, nsparam + offsetsparam);
+  float __nsd1 = 0; float __nsd2 = 0; float __nsx1 = 0; float *__nsparam = NULL;
+  __nsd1 = (*env)->GetFloatField(env, sd1, floatW_val_fieldID);
+  __nsd2 = (*env)->GetFloatField(env, sd2, floatW_val_fieldID);
+  __nsx1 = (*env)->GetFloatField(env, sx1, floatW_val_fieldID);
+  if (!(__nsparam = (*env)->GetPrimitiveArrayCritical(env, sparam, NULL))) goto fail;
+  srotmg_(&__nsd1, &__nsd2, &__nsx1, &sy1, __nsparam + offsetsparam);
 done:
-  if (nsparam) (*env)->ReleasePrimitiveArrayCritical(env, sparam, nsparam, 0);
-  (*env)->SetFloatField(env, sx1, floatW_val_fieldID, nsx1);
-  (*env)->SetFloatField(env, sd2, floatW_val_fieldID, nsd2);
-  (*env)->SetFloatField(env, sd1, floatW_val_fieldID, nsd1);
+  if (__nsparam) (*env)->ReleasePrimitiveArrayCritical(env, sparam, __nsparam, JNI_ABORT);
+  if (!failed) (*env)->SetFloatField(env, sx1, floatW_val_fieldID, __nsx1);
+  if (!failed) (*env)->SetFloatField(env, sd2, floatW_val_fieldID, __nsd2);
+  if (!failed) (*env)->SetFloatField(env, sd1, floatW_val_fieldID, __nsd1);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -568,20 +543,19 @@ fail:
 
 static void (*dsbmv_)(const char *uplo, int *n, int *k, double *alpha, double *a, int *lda, double *x, int *incx, double *beta, double *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dsbmvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dsbmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; double *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  dsbmv_(nuplo, &n, &k, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__nuplo = NULL; double *__na = NULL; double *__nx = NULL; double *__ny = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  dsbmv_(__nuplo, &n, &k, &alpha, __na + offseta, &lda, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -591,20 +565,19 @@ fail:
 
 static void (*ssbmv_)(const char *uplo, int *n, int *k, float *alpha, float *a, int *lda, float *x, int *incx, float *beta, float *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_ssbmvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_ssbmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; float *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  ssbmv_(nuplo, &n, &k, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__nuplo = NULL; float *__na = NULL; float *__nx = NULL; float *__ny = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  ssbmv_(__nuplo, &n, &k, &alpha, __na + offseta, &lda, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -614,14 +587,13 @@ fail:
 
 static void (*dscal_)(int *n, double *alpha, double *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dscalK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dscalK(JNIEnv *env, UNUSED jobject obj, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  double *nx = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  dscal_(&n, &alpha, nx + offsetx, &incx);
+  double *__nx = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dscal_(&n, &alpha, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -631,14 +603,13 @@ fail:
 
 static void (*sscal_)(int *n, float *alpha, float *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_sscalK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_sscalK(JNIEnv *env, UNUSED jobject obj, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  float *nx = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  sscal_(&n, &alpha, nx + offsetx, &incx);
+  float *__nx = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  sscal_(&n, &alpha, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -648,20 +619,19 @@ fail:
 
 static void (*dspmv_)(const char *uplo, int *n, double *alpha, double *a, double *x, int *incx, double *beta, double *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dspmvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jdouble alpha, jdoubleArray a, jint offseta, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dspmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray a, jint offseta, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; double *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  dspmv_(nuplo, &n, &alpha, na + offseta, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__nuplo = NULL; double *__na = NULL; double *__nx = NULL; double *__ny = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  dspmv_(__nuplo, &n, &alpha, __na + offseta, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -671,20 +641,19 @@ fail:
 
 static void (*sspmv_)(const char *uplo, int *n, float *alpha, float *a, float *x, int *incx, float *beta, float *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_sspmvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jfloat alpha, jfloatArray a, jint offseta, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_sspmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray a, jint offseta, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; float *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  sspmv_(nuplo, &n, &alpha, na + offseta, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__nuplo = NULL; float *__na = NULL; float *__nx = NULL; float *__ny = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  sspmv_(__nuplo, &n, &alpha, __na + offseta, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -694,18 +663,17 @@ fail:
 
 static void (*dspr_)(const char *uplo, int *n, double *alpha, double *x, int *incx, double *a);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dsprK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray a, jint offseta) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dsprK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray a, jint offseta) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; double *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  dspr_(nuplo, &n, &alpha, nx + offsetx, &incx, na + offseta);
+  const char *__nuplo = NULL; double *__nx = NULL; double *__na = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  dspr_(__nuplo, &n, &alpha, __nx + offsetx, &incx, __na + offseta);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -715,18 +683,17 @@ fail:
 
 static void (*sspr_)(const char *uplo, int *n, float *alpha, float *x, int *incx, float *a);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_ssprK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray a, jint offseta) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_ssprK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray a, jint offseta) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; float *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  sspr_(nuplo, &n, &alpha, nx + offsetx, &incx, na + offseta);
+  const char *__nuplo = NULL; float *__nx = NULL; float *__na = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  sspr_(__nuplo, &n, &alpha, __nx + offsetx, &incx, __na + offseta);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -736,20 +703,19 @@ fail:
 
 static void (*dspr2_)(const char *uplo, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dspr2K(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy, jdoubleArray a, jint offseta) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dspr2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy, jdoubleArray a, jint offseta) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; double *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  dspr2_(nuplo, &n, &alpha, nx + offsetx, &incx, ny + offsety, &incy, na + offseta);
+  const char *__nuplo = NULL; double *__nx = NULL; double *__ny = NULL; double *__na = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  dspr2_(__nuplo, &n, &alpha, __nx + offsetx, &incx, __ny + offsety, &incy, __na + offseta);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, JNI_ABORT);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -759,20 +725,19 @@ fail:
 
 static void (*sspr2_)(const char *uplo, int *n, float *alpha, float *x, int *incx, float *y, int *incy, float *a);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_sspr2K(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy, jfloatArray a, jint offseta) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_sspr2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy, jfloatArray a, jint offseta) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; float *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  sspr2_(nuplo, &n, &alpha, nx + offsetx, &incx, ny + offsety, &incy, na + offseta);
+  const char *__nuplo = NULL; float *__nx = NULL; float *__ny = NULL; float *__na = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  sspr2_(__nuplo, &n, &alpha, __nx + offsetx, &incx, __ny + offsety, &incy, __na + offseta);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, JNI_ABORT);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -782,16 +747,15 @@ fail:
 
 static void (*dswap_)(int *n, double *x, int *incx, double *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dswapK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dswapK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  double *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  dswap_(&n, nx + offsetx, &incx, ny + offsety, &incy);
+  double *__nx = NULL; double *__ny = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  dswap_(&n, __nx + offsetx, &incx, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -801,16 +765,15 @@ fail:
 
 static void (*sswap_)(int *n, float *x, int *incx, float *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_sswapK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_sswapK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  float *nx = NULL, *ny = NULL;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  sswap_(&n, nx + offsetx, &incx, ny + offsety, &incy);
+  float *__nx = NULL; float *__ny = NULL;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  sswap_(&n, __nx + offsetx, &incx, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -820,22 +783,21 @@ fail:
 
 static void (*dsymm_)(const char *side, const char *uplo, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb, double *beta, double *c, int *ldc);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dsymmK(JNIEnv *env, UNUSED jobject obj,
-    jstring side, jstring uplo, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dsymmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
   jboolean failed = FALSE;
-  const char *nside = NULL, *nuplo = NULL; double *na = NULL, *nb = NULL, *nc = NULL;
-  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  if (!(nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
-  dsymm_(nside, nuplo, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb, &beta, nc + offsetc, &ldc);
+  const char *__nside = NULL; const char *__nuplo = NULL; double *__na = NULL; double *__nb = NULL; double *__nc = NULL;
+  if (!(__nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
+  dsymm_(__nside, __nuplo, &m, &n, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb, &beta, __nc + offsetc, &ldc);
 done:
-  if (nc) (*env)->ReleasePrimitiveArrayCritical(env, c, nc, failed ? JNI_ABORT : 0);
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
-  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, failed ? JNI_ABORT : 0);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
+  if (__nside) (*env)->ReleaseStringUTFChars(env, side, __nside);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -845,22 +807,21 @@ fail:
 
 static void (*ssymm_)(const char *side, const char *uplo, int *m, int *n, float *alpha, float *a, int *lda, float *b, int *ldb, float *beta, float *c, int *ldc);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_ssymmK(JNIEnv *env, UNUSED jobject obj,
-    jstring side, jstring uplo, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_ssymmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
   jboolean failed = FALSE;
-  const char *nside = NULL, *nuplo = NULL; float *na = NULL, *nb = NULL, *nc = NULL;
-  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  if (!(nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
-  ssymm_(nside, nuplo, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb, &beta, nc + offsetc, &ldc);
+  const char *__nside = NULL; const char *__nuplo = NULL; float *__na = NULL; float *__nb = NULL; float *__nc = NULL;
+  if (!(__nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
+  ssymm_(__nside, __nuplo, &m, &n, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb, &beta, __nc + offsetc, &ldc);
 done:
-  if (nc) (*env)->ReleasePrimitiveArrayCritical(env, c, nc, failed ? JNI_ABORT : 0);
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
-  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, failed ? JNI_ABORT : 0);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
+  if (__nside) (*env)->ReleaseStringUTFChars(env, side, __nside);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -870,20 +831,19 @@ fail:
 
 static void (*dsymv_)(const char *uplo, int *n, double *alpha, double *a, int *lda, double *x, int *incx, double *beta, double *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dsymvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dsymvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; double *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  dsymv_(nuplo, &n, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__nuplo = NULL; double *__na = NULL; double *__nx = NULL; double *__ny = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  dsymv_(__nuplo, &n, &alpha, __na + offseta, &lda, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -893,20 +853,19 @@ fail:
 
 static void (*ssymv_)(const char *uplo, int *n, float *alpha, float *a, int *lda, float *x, int *incx, float *beta, float *y, int *incy);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_ssymvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_ssymvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; float *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  ssymv_(nuplo, &n, &alpha, na + offseta, &lda, nx + offsetx, &incx, &beta, ny + offsety, &incy);
+  const char *__nuplo = NULL; float *__na = NULL; float *__nx = NULL; float *__ny = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  ssymv_(__nuplo, &n, &alpha, __na + offseta, &lda, __nx + offsetx, &incx, &beta, __ny + offsety, &incy);
 done:
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -916,18 +875,17 @@ fail:
 
 static void (*dsyr_)(const char *uplo, int *n, double *alpha, double *x, int *incx, double *a, int *lda);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyrK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray a, jint offseta, jint lda) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray a, jint offseta, jint lda) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; double *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  dsyr_(nuplo, &n, &alpha, nx + offsetx, &incx, na + offseta, &lda);
+  const char *__nuplo = NULL; double *__nx = NULL; double *__na = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  dsyr_(__nuplo, &n, &alpha, __nx + offsetx, &incx, __na + offseta, &lda);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -937,18 +895,17 @@ fail:
 
 static void (*ssyr_)(const char *uplo, int *n, float *alpha, float *x, int *incx, float *a, int *lda);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyrK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray a, jint offseta, jint lda) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray a, jint offseta, jint lda) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; float *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  ssyr_(nuplo, &n, &alpha, nx + offsetx, &incx, na + offseta, &lda);
+  const char *__nuplo = NULL; float *__nx = NULL; float *__na = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  ssyr_(__nuplo, &n, &alpha, __nx + offsetx, &incx, __na + offseta, &lda);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -958,20 +915,19 @@ fail:
 
 static void (*dsyr2_)(const char *uplo, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a, int *lda);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyr2K(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy, jdoubleArray a, jint offseta, jint lda) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyr2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy, jdoubleArray a, jint offseta, jint lda) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; double *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  dsyr2_(nuplo, &n, &alpha, nx + offsetx, &incx, ny + offsety, &incy, na + offseta, &lda);
+  const char *__nuplo = NULL; double *__nx = NULL; double *__ny = NULL; double *__na = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  dsyr2_(__nuplo, &n, &alpha, __nx + offsetx, &incx, __ny + offsety, &incy, __na + offseta, &lda);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, JNI_ABORT);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -981,20 +937,19 @@ fail:
 
 static void (*ssyr2_)(const char *uplo, int *n, float *alpha, float *x, int *incx, float *y, int *incy, float *a, int *lda);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyr2K(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy, jfloatArray a, jint offseta, jint lda) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyr2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy, jfloatArray a, jint offseta, jint lda) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL; float *na = NULL, *nx = NULL, *ny = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  if (!(ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  ssyr2_(nuplo, &n, &alpha, nx + offsetx, &incx, ny + offsety, &incy, na + offseta, &lda);
+  const char *__nuplo = NULL; float *__nx = NULL; float *__ny = NULL; float *__na = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  ssyr2_(__nuplo, &n, &alpha, __nx + offsetx, &incx, __ny + offsety, &incy, __na + offseta, &lda);
 done:
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, failed ? JNI_ABORT : 0);
-  if (ny) (*env)->ReleasePrimitiveArrayCritical(env, y, ny, JNI_ABORT);
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, failed ? JNI_ABORT : 0);
+  if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, JNI_ABORT);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, JNI_ABORT);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1004,21 +959,21 @@ fail:
 
 static void (*dsyr2k_)(const char *uplo, const char *trans, int *n, int *k, double *alpha, double *a, int *lda, double *b, int *ldb, double *beta, double *c, int *ldc);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyr2kK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyr2kK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL; double *na = NULL, *nb = NULL, *nc = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  if (!(nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
-  dsyr2k_(nuplo, ntrans, &n, &k, &alpha, na + offseta, &lda, nb + offsetb, &ldb, &beta, nc + offsetc, &ldc);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; double *__na = NULL; double *__nb = NULL; double *__nc = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
+  dsyr2k_(__nuplo, __ntrans, &n, &k, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb, &beta, __nc + offsetc, &ldc);
 done:
-  if (nc) (*env)->ReleasePrimitiveArrayCritical(env, c, nc, failed ? JNI_ABORT : 0);
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, failed ? JNI_ABORT : 0);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1028,22 +983,21 @@ fail:
 
 static void (*ssyr2k_)(const char *uplo, const char *trans, int *n, int *k, float *alpha, float *a, int *lda, float *b, int *ldb, float *beta, float *c, int *ldc);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyr2kK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyr2kK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL; float *na = NULL, *nb = NULL, *nc = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  if (!(nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
-  ssyr2k_(nuplo, ntrans, &n, &k, &alpha, na + offseta, &lda, nb + offsetb, &ldb, &beta, nc + offsetc, &ldc);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; float *__na = NULL; float *__nb = NULL; float *__nc = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
+  ssyr2k_(__nuplo, __ntrans, &n, &k, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb, &beta, __nc + offsetc, &ldc);
 done:
-  if (nc) (*env)->ReleasePrimitiveArrayCritical(env, c, nc, failed ? JNI_ABORT : 0);
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, JNI_ABORT);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, failed ? JNI_ABORT : 0);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, JNI_ABORT);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1053,20 +1007,19 @@ fail:
 
 static void (*dsyrk_)(const char *uplo, const char *trans, int *n, int *k, double *alpha, double *a, int *lda, double *beta, double *c, int *ldc);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyrkK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyrkK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL; double *na = NULL, *nc = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
-  dsyrk_(nuplo, ntrans, &n, &k, &alpha, na + offseta, &lda, &beta, nc + offsetc, &ldc);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; double *__na = NULL; double *__nc = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
+  dsyrk_(__nuplo, __ntrans, &n, &k, &alpha, __na + offseta, &lda, &beta, __nc + offsetc, &ldc);
 done:
-  if (nc) (*env)->ReleasePrimitiveArrayCritical(env, c, nc, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1076,20 +1029,19 @@ fail:
 
 static void (*ssyrk_)(const char *uplo, const char *trans, int *n, int *k, float *alpha, float *a, int *lda, float *beta, float *c, int *ldc);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyrkK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyrkK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL; float *na = NULL, *nc = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
-  ssyrk_(nuplo, ntrans, &n, &k, &alpha, na + offseta, &lda, &beta, nc + offsetc, &ldc);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; float *__na = NULL; float *__nc = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) goto fail;
+  ssyrk_(__nuplo, __ntrans, &n, &k, &alpha, __na + offseta, &lda, &beta, __nc + offsetc, &ldc);
 done:
-  if (nc) (*env)->ReleasePrimitiveArrayCritical(env, c, nc, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1099,22 +1051,21 @@ fail:
 
 static void (*dtbmv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, double *a, int *lda, double *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dtbmvK(UNUSED JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jstring diag, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dtbmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  dtbmv_(nuplo, ntrans, ndiag, &n, &k, na + offseta, &lda, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; double *__na = NULL; double *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtbmv_(__nuplo, __ntrans, __ndiag, &n, &k, __na + offseta, &lda, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1124,22 +1075,21 @@ fail:
 
 static void (*stbmv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, float *a, int *lda, float *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_stbmvK(UNUSED JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jstring diag, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_stbmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  stbmv_(nuplo, ntrans, ndiag, &n, &k, na + offseta, &lda, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; float *__na = NULL; float *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  stbmv_(__nuplo, __ntrans, __ndiag, &n, &k, __na + offseta, &lda, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1149,22 +1099,21 @@ fail:
 
 static void (*dtbsv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, double *a, int *lda, double *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dtbsvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jstring diag, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dtbsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  dtbsv_(nuplo, ntrans, ndiag, &n, &k, na + offseta, &lda, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; double *__na = NULL; double *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtbsv_(__nuplo, __ntrans, __ndiag, &n, &k, __na + offseta, &lda, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1174,22 +1123,21 @@ fail:
 
 static void (*stbsv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, float *a, int *lda, float *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_stbsvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jstring diag, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_stbsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  stbsv_(nuplo, ntrans, ndiag, &n, &k, na + offseta, &lda, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; float *__na = NULL; float *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  stbsv_(__nuplo, __ntrans, __ndiag, &n, &k, __na + offseta, &lda, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1199,22 +1147,21 @@ fail:
 
 static void (*dtpmv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, double *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dtpmvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jdoubleArray x, jint offsetx, jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dtpmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jdoubleArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  dtpmv_(nuplo, ntrans, ndiag, &n, na + offseta, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; double *__na = NULL; double *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtpmv_(__nuplo, __ntrans, __ndiag, &n, __na + offseta, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1224,22 +1171,21 @@ fail:
 
 static void (*stpmv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, float *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_stpmvK(JNIEnv *env, UNUSED jobject obj,
-    jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jfloatArray x, jint offsetx, jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_stpmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jfloatArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  stpmv_(nuplo, ntrans, ndiag, &n, na + offseta, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; float *__na = NULL; float *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  stpmv_(__nuplo, __ntrans, __ndiag, &n, __na + offseta, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1249,22 +1195,21 @@ fail:
 
 static void (*dtpsv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, double *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dtpsvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dtpsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jdoubleArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  dtpsv_(nuplo, ntrans, ndiag, &n, na + offseta, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; double *__na = NULL; double *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtpsv_(__nuplo, __ntrans, __ndiag, &n, __na + offseta, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1274,22 +1219,21 @@ fail:
 
 static void (*stpsv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, float *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_stpsvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_stpsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jfloatArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  stpsv_(nuplo, ntrans, ndiag, &n, na + offseta, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; float *__na = NULL; float *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  stpsv_(__nuplo, __ntrans, __ndiag, &n, __na + offseta, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1299,24 +1243,23 @@ fail:
 
 static void (*dtrmm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrmmK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring side, UNUSED jstring uplo, UNUSED jstring transa, UNUSED jstring diag, UNUSED jint m, UNUSED jint n, UNUSED jdouble alpha, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray b, UNUSED jint offsetb, UNUSED jint ldb) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrmmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring transa, jstring diag, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb) {
   jboolean failed = FALSE;
-  const char *nside = NULL, *nuplo = NULL, *ntransa = NULL, *ndiag = NULL; double *na = NULL, *nb = NULL;
-  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  dtrmm_(nside, nuplo, ntransa, ndiag, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb);
+  const char *__nside = NULL; const char *__nuplo = NULL; const char *__ntransa = NULL; const char *__ndiag = NULL; double *__na = NULL; double *__nb = NULL;
+  if (!(__nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  dtrmm_(__nside, __nuplo, __ntransa, __ndiag, &m, &n, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb);
 done:
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
-  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntransa) (*env)->ReleaseStringUTFChars(env, transa, __ntransa);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
+  if (__nside) (*env)->ReleaseStringUTFChars(env, side, __nside);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1326,24 +1269,23 @@ fail:
 
 static void (*strmm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, float *alpha, float *a, int *lda, float *b, int *ldb);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_strmmK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring side, UNUSED jstring uplo, UNUSED jstring transa, UNUSED jstring diag, UNUSED jint m, UNUSED jint n, UNUSED jfloat alpha, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray b, UNUSED jint offsetb, UNUSED jint ldb) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_strmmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring transa, jstring diag, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb) {
   jboolean failed = FALSE;
-  const char *nside = NULL, *nuplo = NULL, *ntransa = NULL, *ndiag = NULL; float *na = NULL, *nb = NULL;
-  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  strmm_(nside, nuplo, ntransa, ndiag, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb);
+  const char *__nside = NULL; const char *__nuplo = NULL; const char *__ntransa = NULL; const char *__ndiag = NULL; float *__na = NULL; float *__nb = NULL;
+  if (!(__nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  strmm_(__nside, __nuplo, __ntransa, __ndiag, &m, &n, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb);
 done:
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
-  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntransa) (*env)->ReleaseStringUTFChars(env, transa, __ntransa);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
+  if (__nside) (*env)->ReleaseStringUTFChars(env, side, __nside);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1353,22 +1295,21 @@ fail:
 
 static void (*dtrmv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, int *lda, double *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrmvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  dtrmv_(nuplo, ntrans, ndiag, &n, na + offseta, &lda, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; double *__na = NULL; double *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtrmv_(__nuplo, __ntrans, __ndiag, &n, __na + offseta, &lda, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1378,22 +1319,21 @@ fail:
 
 static void (*strmv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, int *lda, float *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_strmvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_strmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  strmv_(nuplo, ntrans, ndiag, &n, na + offseta, &lda, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; float *__na = NULL; float *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  strmv_(__nuplo, __ntrans, __ndiag, &n, __na + offseta, &lda, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1403,24 +1343,23 @@ fail:
 
 static void (*dtrsm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrsmK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring side, UNUSED jstring uplo, UNUSED jstring transa, UNUSED jstring diag, UNUSED jint m, UNUSED jint n, UNUSED jdouble alpha, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray b, UNUSED jint offsetb, UNUSED jint ldb) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrsmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring transa, jstring diag, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb) {
   jboolean failed = FALSE;
-  const char *nside = NULL, *nuplo = NULL, *ntransa = NULL, *ndiag = NULL; double *na = NULL, *nb = NULL;
-  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  dtrsm_(nside, nuplo, ntransa, ndiag, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb);
+  const char *__nside = NULL; const char *__nuplo = NULL; const char *__ntransa = NULL; const char *__ndiag = NULL; double *__na = NULL; double *__nb = NULL;
+  if (!(__nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  dtrsm_(__nside, __nuplo, __ntransa, __ndiag, &m, &n, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb);
 done:
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
-  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntransa) (*env)->ReleaseStringUTFChars(env, transa, __ntransa);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
+  if (__nside) (*env)->ReleaseStringUTFChars(env, side, __nside);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1430,24 +1369,23 @@ fail:
 
 static void (*strsm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, float *alpha, float *a, int *lda, float *b, int *ldb);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_strsmK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring side, UNUSED jstring uplo, UNUSED jstring transa, UNUSED jstring diag, UNUSED jint m, UNUSED jint n, UNUSED jfloat alpha, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray b, UNUSED jint offsetb, UNUSED jint ldb) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_strsmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring transa, jstring diag, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb) {
   jboolean failed = FALSE;
-  const char *nside = NULL, *nuplo = NULL, *ntransa = NULL, *ndiag = NULL; float *na = NULL, *nb = NULL;
-  if (!(nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
-  strsm_(nside, nuplo, ntransa, ndiag, &m, &n, &alpha, na + offseta, &lda, nb + offsetb, &ldb);
+  const char *__nside = NULL; const char *__nuplo = NULL; const char *__ntransa = NULL; const char *__ndiag = NULL; float *__na = NULL; float *__nb = NULL;
+  if (!(__nside = (*env)->GetStringUTFChars(env, side, NULL))) goto fail;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntransa = (*env)->GetStringUTFChars(env, transa, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) goto fail;
+  strsm_(__nside, __nuplo, __ntransa, __ndiag, &m, &n, &alpha, __na + offseta, &lda, __nb + offsetb, &ldb);
 done:
-  if (nb) (*env)->ReleasePrimitiveArrayCritical(env, b, nb, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntransa) (*env)->ReleaseStringUTFChars(env, transa, ntransa);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
-  if (nside) (*env)->ReleaseStringUTFChars(env, side, nside);
+  if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntransa) (*env)->ReleaseStringUTFChars(env, transa, __ntransa);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
+  if (__nside) (*env)->ReleaseStringUTFChars(env, side, __nside);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1457,22 +1395,21 @@ fail:
 
 static void (*dtrsv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, int *lda, double *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrsvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jdoubleArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jdoubleArray x, UNUSED jint offsetx, UNUSED jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; double *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  dtrsv_(nuplo, ntrans, ndiag, &n, na + offseta, &lda, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; double *__na = NULL; double *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  dtrsv_(__nuplo, __ntrans, __ndiag, &n, __na + offseta, &lda, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1482,22 +1419,21 @@ fail:
 
 static void (*strsv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, int *lda, float *x, int *incx);
 
-void Java_dev_ludovic_netlib_blas_JNIBLAS_strsvK(JNIEnv *env, UNUSED jobject obj,
-    UNUSED jstring uplo, UNUSED jstring trans, UNUSED jstring diag, UNUSED jint n, UNUSED jfloatArray a, UNUSED jint offseta, UNUSED jint lda, UNUSED jfloatArray x, UNUSED jint offsetx, UNUSED jint incx) {
+void Java_dev_ludovic_netlib_blas_JNIBLAS_strsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
   jboolean failed = FALSE;
-  const char *nuplo = NULL, *ntrans = NULL, *ndiag = NULL; float *na = NULL, *nx = NULL;
-  if (!(nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
-  if (!(ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
-  if (!(ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
-  if (!(na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
-  if (!(nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
-  strsv_(nuplo, ntrans, ndiag, &n, na + offseta, &lda, nx + offsetx, &incx);
+  const char *__nuplo = NULL; const char *__ntrans = NULL; const char *__ndiag = NULL; float *__na = NULL; float *__nx = NULL;
+  if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) goto fail;
+  if (!(__ntrans = (*env)->GetStringUTFChars(env, trans, NULL))) goto fail;
+  if (!(__ndiag = (*env)->GetStringUTFChars(env, diag, NULL))) goto fail;
+  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) goto fail;
+  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) goto fail;
+  strsv_(__nuplo, __ntrans, __ndiag, &n, __na + offseta, &lda, __nx + offsetx, &incx);
 done:
-  if (nx) (*env)->ReleasePrimitiveArrayCritical(env, x, nx, failed ? JNI_ABORT : 0);
-  if (na) (*env)->ReleasePrimitiveArrayCritical(env, a, na, JNI_ABORT);
-  if (ndiag) (*env)->ReleaseStringUTFChars(env, diag, ndiag);
-  if (ntrans) (*env)->ReleaseStringUTFChars(env, trans, ntrans);
-  if (nuplo) (*env)->ReleaseStringUTFChars(env, uplo, nuplo);
+  if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, failed ? JNI_ABORT : 0);
+  if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, JNI_ABORT);
+  if (__ndiag) (*env)->ReleaseStringUTFChars(env, diag, __ndiag);
+  if (__ntrans) (*env)->ReleaseStringUTFChars(env, trans, __ntrans);
+  if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
   if (failed) throwOOM(env);
   return;
 fail:
@@ -1507,18 +1443,17 @@ fail:
 
 static int (*idamax_)(int *n, double *dx, int *incdx);
 
-jint Java_dev_ludovic_netlib_blas_JNIBLAS_idamaxK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jdoubleArray dx, jint offsetdx, jint incdx) {
-  jint ret;
+jint Java_dev_ludovic_netlib_blas_JNIBLAS_idamaxK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray dx, jint offsetdx, jint incdx) {
+  jint __ret;
   jboolean failed = FALSE;
-  double *ndx = NULL;
-  if (!(ndx = (*env)->GetPrimitiveArrayCritical(env, dx, NULL))) goto fail;
+  double *__ndx = NULL;
+  if (!(__ndx = (*env)->GetPrimitiveArrayCritical(env, dx, NULL))) goto fail;
   /* It returns 1-based index because that's how Fortran works */
-  ret = idamax_(&n, ndx + offsetdx, &incdx) - 1;
+  __ret = idamax_(&n, __ndx + offsetdx, &incdx) - 1;
 done:
-  if (ndx) (*env)->ReleasePrimitiveArrayCritical(env, dx, ndx, JNI_ABORT);
+  if (__ndx) (*env)->ReleasePrimitiveArrayCritical(env, dx, __ndx, JNI_ABORT);
   if (failed) throwOOM(env);
-  return ret;
+  return __ret;
 fail:
   failed = TRUE;
   goto done;
@@ -1526,18 +1461,17 @@ fail:
 
 static int (*isamax_)(int *n, float *sx, int *incsx);
 
-jint Java_dev_ludovic_netlib_blas_JNIBLAS_isamaxK(JNIEnv *env, UNUSED jobject obj,
-    jint n, jfloatArray sx, jint offsetsx, jint incsx) {
-  jint ret;
+jint Java_dev_ludovic_netlib_blas_JNIBLAS_isamaxK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray sx, jint offsetsx, jint incsx) {
+  jint __ret;
   jboolean failed = FALSE;
-  float *nsx = NULL;
-  if (!(nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) goto fail;
+  float *__nsx = NULL;
+  if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) goto fail;
   /* It returns 1-based index because that's how Fortran works */
-  ret = isamax_(&n, nsx + offsetsx, &incsx) - 1;
+  __ret = isamax_(&n, __nsx + offsetsx, &incsx) - 1;
 done:
-  if (nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, nsx, JNI_ABORT);
+  if (__nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, __nsx, JNI_ABORT);
   if (failed) throwOOM(env);
-  return ret;
+  return __ret;
 fail:
   failed = TRUE;
   goto done;
