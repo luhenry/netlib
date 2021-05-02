@@ -1082,7 +1082,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 1) {
       return 0;
     }
-    return idamaxK(n, x, offsetx, incx);
+    // Fortran arrays use 1-based index
+    return idamaxK(n, x, offsetx, incx) - 1;
   }
 
   protected abstract int idamaxK(int n, double[] x, int offsetx, int incx);
@@ -1101,7 +1102,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 1) {
       return 0;
     }
-    return isamaxK(n, x, offsetx, incx);
+    // Fortran arrays use 1-based index
+    return isamaxK(n, x, offsetx, incx) - 1;
   }
 
   protected abstract int isamaxK(int n, float[] x, int offsetx, int incx);

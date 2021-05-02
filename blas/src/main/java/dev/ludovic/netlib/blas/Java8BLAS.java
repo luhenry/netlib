@@ -5148,12 +5148,10 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
   }
 
   protected int idamaxK(int n, double[] x, int offsetx, int incx) {
-    //FIXME: figure out why f2j is faster than previous implementation
-    return org.netlib.blas.Idamax.idamax(n, x, offsetx, incx) - 1;
+    return org.netlib.blas.Idamax.idamax(n, x, offsetx, incx);
   }
 
   protected int isamaxK(int n, float[] x, int offsetx, int incx) {
-    //FIXME: figure out why f2j is faster than previous implementation
-    return org.netlib.blas.Isamax.isamax(n, x, offsetx, incx) - 1;
+    return org.netlib.blas.Isamax.isamax(n, x, offsetx, incx);
   }
 }

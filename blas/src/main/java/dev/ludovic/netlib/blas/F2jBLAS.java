@@ -233,11 +233,9 @@ public final class F2jBLAS extends AbstractBLAS implements dev.ludovic.netlib.Ja
     org.netlib.blas.Strsv.strsv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
   }
   protected int idamaxK(int n, double[] x, int offsetx, int incx) {
-    // F2j returns 1-based index because that's how Fortran works
-    return org.netlib.blas.Idamax.idamax(n, x, offsetx, incx) - 1;
+    return org.netlib.blas.Idamax.idamax(n, x, offsetx, incx);
   }
   protected int isamaxK(int n, float[] x, int offsetx, int incx) {
-    // F2j returns 1-based index because that's how Fortran works
-    return org.netlib.blas.Isamax.isamax(n, x, offsetx, incx) - 1;
+    return org.netlib.blas.Isamax.isamax(n, x, offsetx, incx);
   }
 }

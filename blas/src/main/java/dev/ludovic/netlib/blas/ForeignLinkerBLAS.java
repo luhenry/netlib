@@ -1051,7 +1051,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   protected int idamaxK(int n, double[] dx, int offsetdx, int incdx) {
     try (MemorySegment pdx = segment(dx, offsetdx); MemoryNativeCopy cpdx = copy(pdx)) {
-      return (int)idamaxHandle.invoke(n, cpdx.address(), incdx);
+      return (int)idamaxHandle.invoke(n, cpdx.address(), incdx) + 1;
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
@@ -1064,7 +1064,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   protected int isamaxK(int n, float[] sx, int offsetsx, int incx) {
     try (MemorySegment psx = segment(sx, offsetsx); MemoryNativeCopy cpsx = copy(psx)) {
-      return (int)isamaxHandle.invoke(n, cpsx.address(), incx);
+      return (int)isamaxHandle.invoke(n, cpsx.address(), incx) + 1;
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
