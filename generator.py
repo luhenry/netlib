@@ -23,17 +23,17 @@ class JBoolean:
     self.idx = 0
     self.name = name
     self.native_type_and_name = "int *{name}".format(name=name)
-    self.java_type_and_name = "jboolean {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jboolean {name}"]]
     self.native_argument = "&__n{name}".format(name=name)
-    self.native_local = "int __n{name}".format(name=name)
+    self.native_local = "int __n{name};".format(name=name)
     self.prolog = "__n{name} = {name};".format(name=name)
-    self.epilog = "if (!failed) {name} = __n{name};".format(name=name)
+    self.epilog = "if (!__failed) {name} = __n{name};".format(name=name)
 class JInt:
   def __init__(self, name):
     self.idx = 0
     self.name = name
     self.native_type_and_name = "int *{name}".format(name=name)
-    self.java_type_and_name = "jint {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jint {name}"]]
     self.native_argument = "&{name}".format(name=name)
     self.native_local = ""
     self.prolog = ""
@@ -43,7 +43,7 @@ class JFloat:
     self.idx = 0
     self.name = name
     self.native_type_and_name = "float *{name}".format(name=name)
-    self.java_type_and_name = "jfloat {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jfloat {name}"]]
     self.native_argument = "&{name}".format(name=name)
     self.native_local = ""
     self.prolog = ""
@@ -53,7 +53,7 @@ class JDouble:
     self.idx = 0
     self.name = name
     self.native_type_and_name = "double *{name}".format(name=name)
-    self.java_type_and_name = "jdouble {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jdouble {name}"]]
     self.native_argument = "&{name}".format(name=name)
     self.native_local = ""
     self.prolog = ""
@@ -63,20 +63,20 @@ class JString:
     self.idx = 0
     self.name = name
     self.native_type_and_name = "const char *{name}".format(name=name)
-    self.java_type_and_name = "jstring {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jstring {name}"]]
     self.native_argument = "__n{name}".format(name=name)
-    self.native_local = "const char *__n{name} = NULL".format(name=name)
-    self.prolog = "if (!(__n{name} = (*env)->GetStringUTFChars(env, {name}, NULL))) {{ failed = TRUE; goto done; }}".format(name=name)
+    self.native_local = "const char *__n{name} = NULL;".format(name=name)
+    self.prolog = "if (!(__n{name} = (*env)->GetStringUTFChars(env, {name}, NULL))) {{ __failed = TRUE; goto done; }}".format(name=name)
     self.epilog = "if (__n{name}) (*env)->ReleaseStringUTFChars(env, {name}, __n{name});".format(name=name)
 class JObject:
   def __init__(self, name):
     self.idx = 0
     self.name = name
     self.native_type_and_name = "const char *{name}".format(name=name)
-    self.java_type_and_name = "jstring {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jstring {name}"]]
     # self.native_argument = "__n{name}".format(name=name)
-    # self.native_local = "const char *__n{name} = NULL".format(name=name)
-    # self.prolog = "if (!(__n{name} = (*env)->GetStringUTFChars(env, {name}, NULL))) {{ failed = TRUE; goto done; }}".format(name=name)
+    # self.native_local = "const char *__n{name} = NULL;".format(name=name)
+    # self.prolog = "if (!(__n{name} = (*env)->GetStringUTFChars(env, {name}, NULL))) {{ __failed = TRUE; goto done; }}".format(name=name)
     # self.epilog = "if (__n{name}) (*env)->ReleaseStringUTFChars(env, {name}, __n{name});".format(name=name)
 
 class JBooleanW:
@@ -84,92 +84,92 @@ class JBooleanW:
     self.idx = 0
     self.name = name
     self.native_type_and_name = "int *{name}".format(name=name)
-    self.java_type_and_name = "jobject {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jobject {name}"]]
     self.native_argument = "&__n{name}".format(name=name)
-    self.native_local = "int __n{name} = 0".format(name=name)
+    self.native_local = "int __n{name} = 0;".format(name=name)
     self.prolog = "__n{name} = (*env)->GetBooleanField(env, {name}, booleanW_val_fieldID);".format(name=name)
-    self.epilog = "if (!failed) (*env)->SetBooleanField(env, {name}, booleanW_val_fieldID, __n{name});".format(name=name)
+    self.epilog = "if (!__failed) (*env)->SetBooleanField(env, {name}, booleanW_val_fieldID, __n{name});".format(name=name)
 class JIntW:
   def __init__(self, name):
     self.idx = 0
     self.name = name
     self.native_type_and_name = "int *{name}".format(name=name)
-    self.java_type_and_name = "jobject {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jobject {name}"]]
     self.native_argument = "&__n{name}".format(name=name)
-    self.native_local = "int __n{name} = 0".format(name=name)
+    self.native_local = "int __n{name} = 0;".format(name=name)
     self.prolog = "__n{name} = (*env)->GetIntField(env, {name}, intW_val_fieldID);".format(name=name)
-    self.epilog = "if (!failed) (*env)->SetIntField(env, {name}, intW_val_fieldID, __n{name});".format(name=name)
+    self.epilog = "if (!__failed) (*env)->SetIntField(env, {name}, intW_val_fieldID, __n{name});".format(name=name)
 class JFloatW:
   def __init__(self, name):
     self.idx = 0
     self.name = name
     self.native_type_and_name = "float *{name}".format(name=name)
-    self.java_type_and_name = "jobject {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jobject {name}"]]
     self.native_argument = "&__n{name}".format(name=name)
-    self.native_local = "float __n{name} = 0".format(name=name)
+    self.native_local = "float __n{name} = 0;".format(name=name)
     self.prolog = "__n{name} = (*env)->GetFloatField(env, {name}, floatW_val_fieldID);".format(name=name)
-    self.epilog = "if (!failed) (*env)->SetFloatField(env, {name}, floatW_val_fieldID, __n{name});".format(name=name)
+    self.epilog = "if (!__failed) (*env)->SetFloatField(env, {name}, floatW_val_fieldID, __n{name});".format(name=name)
 class JDoubleW:
   def __init__(self, name):
     self.idx = 0
     self.name = name
     self.native_type_and_name = "double *{name}".format(name=name)
-    self.java_type_and_name = "jobject {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jobject {name}"]]
     self.native_argument = "&__n{name}".format(name=name)
-    self.native_local = "double __n{name} = 0".format(name=name)
+    self.native_local = "double __n{name} = 0;".format(name=name)
     self.prolog = "__n{name} = (*env)->GetDoubleField(env, {name}, doubleW_val_fieldID);".format(name=name)
-    self.epilog = "if (!failed) (*env)->SetDoubleField(env, {name}, doubleW_val_fieldID, __n{name});".format(name=name)
+    self.epilog = "if (!__failed) (*env)->SetDoubleField(env, {name}, doubleW_val_fieldID, __n{name});".format(name=name)
 class JStringW:
   def __init__(self, name):
     self.idx = 0
     self.name = name
     self.native_type_and_name = "char *{name}".format(name=name)
-    self.java_type_and_name = "jobject {name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jobject {name}"]]
     self.native_argument = "__n{name}".format(name=name)
     self.native_local = "char *__n{name} = NULL; jstring __j{name} = NULL;".format(name=name)
-    self.prolog = "__j{name} = (jstring)(*env)->GetObjectField(env, {name}, StringW_val_fieldID); if (!(__n{name} = (char*)(*env)->GetStringUTFChars(env, {name}, NULL))) {{ failed = TRUE; goto done; }}".format(name=name)
-    self.epilog = "if (__n{name}) {{ (*env)->ReleaseStringUTFChars(env, __j{name}, (const char*)__n{name}); if (!failed) (*env)->SetObjectField(env, {name}, StringW_val_fieldID, __j{name}); }}".format(name=name)
+    self.prolog = "__j{name} = (jstring)(*env)->GetObjectField(env, {name}, StringW_val_fieldID); if (!(__n{name} = (char*)(*env)->GetStringUTFChars(env, {name}, NULL))) {{ __failed = TRUE; goto done; }}".format(name=name)
+    self.epilog = "if (__n{name}) {{ (*env)->ReleaseStringUTFChars(env, __j{name}, (const char*)__n{name}); if (!__failed) (*env)->SetObjectField(env, {name}, StringW_val_fieldID, __j{name}); }}".format(name=name)
 
 class JBooleanArray:
   def __init__(self, name):
     self.idx = 1
     self.name = name
     self.native_type_and_name = "int *{name}".format(name=name)
-    self.java_type_and_name = "jbooleanArray {name}, jint offset{name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jbooleanArray {name}", "jint offset{name}"]]
     self.native_argument = "__n{name} + offset{name}".format(name=name)
-    self.native_local = "jboolean *__j{name} = NULL; int *__n{name} = NULL".format(name=name)
-    self.prolog = "if (!(__j{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ failed = TRUE; goto done; }} do {{ int length = (*env)->GetArrayLength(env, {name}); if (length <= 0) {{ failed = TRUE; goto done; }} if (!(__n{name} = malloc(sizeof(jboolean) * length))) {{ failed = TRUE; goto done; }} for (int i = 0; i < length; i++) {{ __n{name}[i] = __j{name}[i]; }} }} while(0);".format(name=name)
+    self.native_local = "int *__n{name} = NULL; jboolean *__j{name} = NULL;".format(name=name)
+    self.prolog = "if (!(__j{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ __failed = TRUE; goto done; }} do {{ int length = (*env)->GetArrayLength(env, {name}); if (length <= 0) {{ __failed = TRUE; goto done; }} if (!(__n{name} = malloc(sizeof(jboolean) * length))) {{ __failed = TRUE; goto done; }} for (int i = 0; i < length; i++) {{ __n{name}[i] = __j{name}[i]; }} }} while(0);".format(name=name)
     self.epilog = "if (__n{name}) {{ free(__n{name}); }} if (__j{name}) (*env)->ReleasePrimitiveArrayCritical(env, {name}, __n{name}, JNI_ABORT);".format(name=name)
 class JIntArray:
   def __init__(self, name, mode = "0"):
     self.idx = 1
     self.name = name
     self.native_type_and_name = "int *{name}".format(name=name)
-    self.java_type_and_name = "jintArray {name}, jint offset{name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jintArray {name}", "jint offset{name}"]]
     self.native_argument = "__n{name} + offset{name}".format(name=name)
-    self.native_local = "int *__n{name} = NULL".format(name=name)
-    self.prolog = "if (!(__n{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ failed = TRUE; goto done; }}".format(name=name)
-    self.epilog = "if (__n{name}) (*env)->ReleasePrimitiveArrayCritical(env, {name}, __n{name}, {mode});".format(name=name, mode=("JNI_ABORT" if mode == "JNI_ABORT" else ("failed ? JNI_ABORT : %s" % mode)))
+    self.native_local = "int *__n{name} = NULL;".format(name=name)
+    self.prolog = "if (!(__n{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ __failed = TRUE; goto done; }}".format(name=name)
+    self.epilog = "if (__n{name}) (*env)->ReleasePrimitiveArrayCritical(env, {name}, __n{name}, {mode});".format(name=name, mode=("JNI_ABORT" if mode == "JNI_ABORT" else ("__failed ? JNI_ABORT : %s" % mode)))
 class JFloatArray:
   def __init__(self, name, mode = "0"):
     self.idx = 1
     self.name = name
     self.native_type_and_name = "float *{name}".format(name=name)
-    self.java_type_and_name = "jfloatArray {name}, jint offset{name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jfloatArray {name}", "jint offset{name}"]]
     self.native_argument = "__n{name} + offset{name}".format(name=name)
-    self.native_local = "float *__n{name} = NULL".format(name=name)
-    self.prolog = "if (!(__n{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ failed = TRUE; goto done; }}".format(name=name)
-    self.epilog = "if (__n{name}) (*env)->ReleasePrimitiveArrayCritical(env, {name}, __n{name}, {mode});".format(name=name, mode=("JNI_ABORT" if mode == "JNI_ABORT" else ("failed ? JNI_ABORT : %s" % mode)))
+    self.native_local = "float *__n{name} = NULL;".format(name=name)
+    self.prolog = "if (!(__n{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ __failed = TRUE; goto done; }}".format(name=name)
+    self.epilog = "if (__n{name}) (*env)->ReleasePrimitiveArrayCritical(env, {name}, __n{name}, {mode});".format(name=name, mode=("JNI_ABORT" if mode == "JNI_ABORT" else ("__failed ? JNI_ABORT : %s" % mode)))
 class JDoubleArray:
   def __init__(self, name, mode = "0"):
     self.idx = 1
     self.name = name
     self.native_type_and_name = "double *{name}".format(name=name)
-    self.java_type_and_name = "jdoubleArray {name}, jint offset{name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jdoubleArray {name}", "jint offset{name}"]]
     self.native_argument = "__n{name} + offset{name}".format(name=name)
-    self.native_local = "double *__n{name} = NULL".format(name=name)
-    self.prolog = "if (!(__n{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ failed = TRUE; goto done; }}".format(name=name)
-    self.epilog = "if (__n{name}) (*env)->ReleasePrimitiveArrayCritical(env, {name}, __n{name}, {mode});".format(name=name, mode=("JNI_ABORT" if mode == "JNI_ABORT" else ("failed ? JNI_ABORT : %s" % mode)))
+    self.native_local = "double *__n{name} = NULL;".format(name=name)
+    self.prolog = "if (!(__n{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ __failed = TRUE; goto done; }}".format(name=name)
+    self.epilog = "if (__n{name}) (*env)->ReleasePrimitiveArrayCritical(env, {name}, __n{name}, {mode});".format(name=name, mode=("JNI_ABORT" if mode == "JNI_ABORT" else ("__failed ? JNI_ABORT : %s" % mode)))
 
 class RoutineR:
   def __init__(self, pkg, ret, name, *args):
@@ -177,18 +177,18 @@ class RoutineR:
     print("static {ret} (*{name}_)({args});".format(ret=ret.native_type, name=name, args=", ".join([arg.native_type_and_name for arg in args])))
     print()
     # Print JNI function implementation
-    print("{ret} Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(ret=ret.java_type, pkg=pkg, pkgupper=pkg.upper(), name=name, args="".join([", " + arg.java_type_and_name for arg in args])))
-    print("  {rettype} __ret;".format(rettype=ret.java_type))
-    print("  jboolean failed = FALSE;")
+    print("{ret} Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(ret=ret.java_type, pkg=pkg, pkgupper=pkg.upper(), name=name, args="".join([", " + a for arg in args for a in arg.java_type_and_name]))) 
+    print("  {rettype} __ret = 0;".format(rettype=ret.java_type))
+    print("  jboolean __failed = FALSE;")
     if any(len(arg.native_local) > 0 for arg in sorted(args, key=lambda a: a.idx)):
-      print("  " + " ".join([a + ";" for a in [arg.native_local for arg in sorted(args, key=lambda a: a.idx)] if len(a) > 0]))
+      print("\n".join(["  " + a for a in [arg.native_local for arg in sorted(args, key=lambda a: a.idx)] if len(a) > 0]))
     if any(len(arg.prolog) > 0 for arg in sorted(args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.prolog for arg in sorted(args, key=lambda a: a.idx)] if len(a) > 0]))
     print("  __ret = {name}_({args});".format(name=name, args=", ".join([arg.native_argument for arg in args])))
     print("done:")
     if any(len(arg.epilog) > 0 for arg in sorted(args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.epilog for arg in sorted(args, key=lambda a: a.idx)] if len(a) > 0][::-1]))
-    print("  if (failed) throwOOM(env);")
+    print("  if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/OutOfMemoryError\"), \"Failed to copy from heap to native memory\");")
     print("  return __ret;")
     print("}")
     print()
@@ -211,17 +211,17 @@ class Routine:
     print("static void (*{name}_)({args});".format(name=name, args=", ".join([arg.native_type_and_name for arg in args])))
     print()
     # Print JNI function implementation
-    print("void Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=name, args="".join([", " + arg.java_type_and_name for arg in args])))
-    print("  jboolean failed = FALSE;")
+    print("void Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=name, args="".join([", " + a for arg in args for a in arg.java_type_and_name])))
+    print("  jboolean __failed = FALSE;")
     if any(len(arg.native_local) > 0 for arg in sorted(args, key=lambda a: a.idx)):
-      print("  " + " ".join([a + ";" for a in [arg.native_local for arg in sorted(args, key=lambda a: a.idx)] if len(a) > 0]))
+      print("\n".join(["  " + a for a in [arg.native_local for arg in sorted(args, key=lambda a: a.idx)] if len(a) > 0]))
     if any(len(arg.prolog) > 0 for arg in sorted(args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.prolog for arg in sorted(args, key=lambda a: a.idx)] if len(a) > 0]))
     print("  {name}_({args});".format(name=name, args=", ".join([arg.native_argument for arg in args])))
     print("done:")
     if any(len(arg.epilog) > 0 for arg in sorted(args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.epilog for arg in sorted(args, key=lambda a: a.idx)] if len(a) > 0][::-1]))
-    print("  if (failed) throwOOM(env);")
+    print("  if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/OutOfMemoryError\"), \"Failed to copy from heap to native memory\");")
     print("}")
     print()
 
@@ -231,7 +231,7 @@ class Routine_NI:
     print("// static void (*{name}_)({args});".format(name=name, args=", ".join([arg.native_type_and_name for arg in args])))
     print()
     # Print JNI function implementation
-    print("void Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=name, args="".join([", UNUSED " + arg.java_type_and_name for arg in args])))
+    print("void Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=name, args="".join([", UNUSED " + a for arg in args for a in arg.java_type_and_name])))
     print("  (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/UnsupportedOperationException\"), \"not implemented\");")
     print("}")
     print()
