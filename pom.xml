@@ -242,7 +242,7 @@ information or have any questions.
                     <arg line="OUTPUT='${project.build.directory}/native/Linux-amd64/libnetlib${project.artifactId}jni.so'"/>
                     <arg line="OBJDIR='${project.build.directory}/objs/Linux-amd64'"/>
                     <arg line="CC='x86_64-linux-gnu-gcc'"/>
-                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-unused-label -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
+                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-unused-label -Wno-maybe-uninitialized -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
                     <arg line="LD='x86_64-linux-gnu-gcc'"/>
                     <arg line="LDFLAGS='-shared'"/>
                     <arg line="all"/>
@@ -252,7 +252,7 @@ information or have any questions.
                     <arg line="OUTPUT='${project.build.directory}/native/Linux-aarch64/libnetlib${project.artifactId}jni.so'"/>
                     <arg line="OBJDIR='${project.build.directory}/objs/Linux-aarch64'"/>
                     <arg line="CC='aarch64-linux-gnu-gcc'"/>
-                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-unused-label -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
+                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-unused-label -Wno-maybe-uninitialized -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
                     <arg line="LD='aarch64-linux-gnu-gcc'"/>
                     <arg line="LDFLAGS='-shared'"/>
                     <arg line="all"/>
