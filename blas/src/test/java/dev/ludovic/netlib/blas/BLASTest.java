@@ -18,6 +18,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
+ * Please contact git@ludovic.dev or visit ludovic.dev if you need additional
+ * information or have any questions.
  */
 
 import java.io.BufferedReader;
@@ -37,35 +40,29 @@ public class BLASTest {
   final static double depsilon = 1e-11d;
   final static float sepsilon = 1e-3f;
 
-  final static BLAS f2j = dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance();
+  final static BLAS f2j = dev.ludovic.netlib.blas.F2jBLAS.getInstance();
 
   private static Stream<Arguments> BLASImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance())
+      Arguments.of(dev.ludovic.netlib.blas.F2jBLAS.getInstance()),
+      Arguments.of(dev.ludovic.netlib.blas.JNIBLAS.getInstance())
     );
-
-    try {
-      instances = Stream.concat(instances, Stream.of(
-        Arguments.of(dev.ludovic.netlib.blas.NetlibNativeBLAS.getInstance())
-      ));
-    } catch (ExceptionInInitializerError e) {
-    } catch (NoClassDefFoundError e) {
-    }
 
     String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 2);
     int major = Integer.parseInt(fullVersion[0]);
-    if (major >= 11) {
-      instances = Stream.concat(instances, Stream.of(
-        Arguments.of(dev.ludovic.netlib.blas.Java11BLAS.getInstance())
-      ));
-    } else {
+    if (major >= 8) {
       instances = Stream.concat(instances, Stream.of(
         Arguments.of(dev.ludovic.netlib.blas.Java8BLAS.getInstance())
       ));
     }
+    if (major >= 11) {
+      instances = Stream.concat(instances, Stream.of(
+        Arguments.of(dev.ludovic.netlib.blas.Java11BLAS.getInstance())
+      ));
+    }
     if (major >= 16) {
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of(dev.ludovic.netlib.blas.VectorizedBLAS.getInstance()),
+        Arguments.of(dev.ludovic.netlib.blas.VectorBLAS.getInstance()),
         Arguments.of(dev.ludovic.netlib.blas.ForeignLinkerBLAS.getInstance())
       ));
     }

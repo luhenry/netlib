@@ -35,9 +35,9 @@ public interface JavaBLAS extends BLAS {
     int major = Integer.parseInt(fullVersion[0]);
     if (major >= 16) {
       try {
-        return dev.ludovic.netlib.blas.VectorizedBLAS.getInstance();
+        return dev.ludovic.netlib.blas.VectorBLAS.getInstance();
       } catch (Throwable t) {
-        Logger.getLogger(JavaBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.VectorizedBLAS");
+        Logger.getLogger(JavaBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.VectorBLAS");
       }
     }
     if (major >= 11) {

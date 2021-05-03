@@ -43,7 +43,7 @@ public abstract class ARPACKBenchmark {
     public void setupImplementation() {
         switch (implementation) {
         case "f2j":
-            arpack = dev.ludovic.netlib.arpack.NetlibF2jARPACK.getInstance();
+            arpack = dev.ludovic.netlib.arpack.F2jARPACK.getInstance();
             break;
         case "java":
             arpack = dev.ludovic.netlib.JavaARPACK.getInstance();

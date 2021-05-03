@@ -43,7 +43,7 @@ public abstract class LAPACKBenchmark {
     public void setupImplementation() {
         switch (implementation) {
         case "f2j":
-            lapack = dev.ludovic.netlib.lapack.NetlibF2jLAPACK.getInstance();
+            lapack = dev.ludovic.netlib.lapack.F2jLAPACK.getInstance();
             break;
         case "java":
             lapack = dev.ludovic.netlib.JavaLAPACK.getInstance();

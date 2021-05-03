@@ -25,7 +25,19 @@
 
 package dev.ludovic.netlib;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public interface BLAS {
+
+  public static BLAS getInstance() {
+    try {
+      return dev.ludovic.netlib.NativeBLAS.getInstance();
+    } catch (Throwable t) {
+      Logger.getLogger(BLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.NativeBLAS");
+    }
+    return dev.ludovic.netlib.JavaBLAS.getInstance();
+  }
 
   public double dasum(int n, double[] x, int incx);
   public double dasum(int n, double[] x, int offsetx, int incx);
@@ -52,7 +64,7 @@ public interface BLAS {
   public float sdot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy);
 
   public float sdsdot(int n, float sb, float[] sx, int incx, float[] sy, int incy);
-  public float sdsdot(int n, float sb, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy);
+  public float sdsdot(int n, float sb, float[] sx, int offsetsx, int incx, float[] sy, int offsetsy, int incy);
 
   public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy);
   public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
@@ -88,23 +100,23 @@ public interface BLAS {
   public void drot(int n, double[] dx, int offsetdx, int incx, double[] dy, int offsetdy, int incy, double c, double s);
 
   public void srot(int n, float[] sx, int incx, float[] sy, int incy, float c, float s);
-  public void srot(int n, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy, float c, float s);
+  public void srot(int n, float[] sx, int offsetsx, int incx, float[] sy, int offsetsy, int incy, float c, float s);
 
   public void drotg(org.netlib.util.doubleW da, org.netlib.util.doubleW db, org.netlib.util.doubleW c, org.netlib.util.doubleW s);
 
   public void srotg(org.netlib.util.floatW sa, org.netlib.util.floatW sb, org.netlib.util.floatW c, org.netlib.util.floatW s);
 
   public void drotm(int n, double[] dx, int incx, double[] dy, int incy, double[] dparam);
-  public void drotm(int n, double[] dx, int offsetdx, int incx, double[] dy, int offsetdy, int incy, double[] dparam, int _dparam_offset);
+  public void drotm(int n, double[] dx, int offsetdx, int incx, double[] dy, int offsetdy, int incy, double[] dparam, int offsetdparam);
 
   public void srotm(int n, float[] sx, int incx, float[] sy, int incy, float[] sparam);
-  public void srotm(int n, float[] sx, int _sx_offset, int incx, float[] sy, int _sy_offset, int incy, float[] sparam, int _sparam_offset);
+  public void srotm(int n, float[] sx, int offsetsx, int incx, float[] sy, int offsetsy, int incy, float[] sparam, int offsetsparam);
 
   public void drotmg(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] dparam);
-  public void drotmg(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] dparam, int _dparam_offset);
+  public void drotmg(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] dparam, int offsetdparam);
 
   public void srotmg(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] sparam);
-  public void srotmg(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] sparam, int _sparam_offset);
+  public void srotmg(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] sparam, int offsetsparam);
 
   public void dsbmv(String uplo, int n, int k, double alpha, double[] a, int lda, double[] x, int incx, double beta, double[] y, int incy);
   public void dsbmv(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
@@ -230,7 +242,7 @@ public interface BLAS {
   public int idamax(int n, double[] x, int offsetx, int incx);
 
   public int isamax(int n, float[] sx, int incx);
-  public int isamax(int n, float[] sx, int _sx_offset, int incx);
+  public int isamax(int n, float[] sx, int offsetsx, int incx);
 
   public boolean lsame(String ca, String cb);
 }

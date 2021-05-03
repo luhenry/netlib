@@ -47,7 +47,7 @@ public abstract class BLASBenchmark {
     public void setupImplementation() {
         switch (implementation) {
         case "f2j":
-            blas = dev.ludovic.netlib.blas.NetlibF2jBLAS.getInstance();
+            blas = dev.ludovic.netlib.blas.F2jBLAS.getInstance();
             break;
         case "java":
             blas = dev.ludovic.netlib.JavaBLAS.getInstance();
@@ -57,6 +57,7 @@ public abstract class BLASBenchmark {
             break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }
+        System.out.println("implementation = " + blas.getClass().getName());
     }
 
     private final Random rand = new Random(0);

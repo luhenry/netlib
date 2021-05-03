@@ -52,6 +52,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     }
   }
 
+  private <T> void requireNonNull(T obj) {
+    Objects.requireNonNull(obj);
+  }
+
   public double dasum(int n, double[] x, int incx) {
     return dasum(n, x, 0, incx);
   }
@@ -60,7 +64,7 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return 0.0;
     }
-    Objects.requireNonNull(x);
+    requireNonNull(x);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     return dasumK(n, x, offsetx, incx);
   }
@@ -75,7 +79,7 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return 0.0f;
     }
-    Objects.requireNonNull(x);
+    requireNonNull(x);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     return sasumK(n, x, offsetx, incx);
   }
@@ -94,8 +98,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (alpha == 0.0) {
       return;
     }
-    Objects.requireNonNull(x);
-    Objects.requireNonNull(y);
+    requireNonNull(x);
+    requireNonNull(y);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     daxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
@@ -115,8 +119,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (alpha == 0.0f) {
       return;
     }
-    Objects.requireNonNull(x);
-    Objects.requireNonNull(y);
+    requireNonNull(x);
+    requireNonNull(y);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     saxpyK(n, alpha, x, offsetx, incx, y, offsety, incy);
@@ -132,8 +136,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return;
     }
-    Objects.requireNonNull(x);
-    Objects.requireNonNull(y);
+    requireNonNull(x);
+    requireNonNull(y);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     dcopyK(n, x, offsetx, incx, y, offsety, incy);
@@ -149,8 +153,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return;
     }
-    Objects.requireNonNull(x);
-    Objects.requireNonNull(y);
+    requireNonNull(x);
+    requireNonNull(y);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     scopyK(n, x, offsetx, incx, y, offsety, incy);
@@ -167,8 +171,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return 0.0;
     }
-    Objects.requireNonNull(x);
-    Objects.requireNonNull(y);
+    requireNonNull(x);
+    requireNonNull(y);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     return ddotK(n, x, offsetx, incx, y, offsety, incy);
@@ -185,8 +189,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return 0.0f;
     }
-    Objects.requireNonNull(x);
-    Objects.requireNonNull(y);
+    requireNonNull(x);
+    requireNonNull(y);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     return sdotK(n, x, offsetx, incx, y, offsety, incy);
@@ -202,6 +206,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return 0.0f;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     return sdsdotK(n, sb, x, offsetx, incx, y, offsety, incy);
   }
 
@@ -212,7 +220,12 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    //FIXME: add arguments checks
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     dgbmvK(trans, m, n, kl, ku, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -223,7 +236,12 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void sgbmv(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    //FIXME: add arguments checks
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     sgbmvK(trans, m, n, kl, ku, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -246,6 +264,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (m == 0 || n == 0 || ((alpha == 0.0 || k == 0) && beta == 1.0)) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(b);
+    requireNonNull(c);
+    checkIndex(offseta + (lsame("N", transa) ? k : m) * lda - 1, a.length);
+    checkIndex(offsetb + (lsame("N", transb) ? n : k) * ldb - 1, b.length);
+    checkIndex(offsetc + m * n - 1, c.length);
     dgemmK(transa, transb, m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
@@ -268,6 +292,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (m == 0 || n == 0 || ((alpha == 0.0f || k == 0) && beta == 1.0f)) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(b);
+    requireNonNull(c);
+    checkIndex(offseta + (lsame("N", transa) ? k : m) * lda - 1, a.length);
+    checkIndex(offsetb + (lsame("N", transb) ? n : k) * ldb - 1, b.length);
+    checkIndex(offsetc + m * n - 1, c.length);
     sgemmK(transa, transb, m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
@@ -288,6 +318,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (m == 0 || n == 0) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     dgemvK(trans, m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -308,6 +344,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (m == 0 || n == 0) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     sgemvK(trans, m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -327,6 +369,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (m == 0 || n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    requireNonNull(a);
+    checkIndex(offsetx + (m - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offseta + n * lda - 1, a.length);
     if (alpha != 0.0) {
       dgerK(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
     }
@@ -347,6 +395,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (m == 0 || n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    requireNonNull(a);
+    checkIndex(offsetx + (m - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offseta + n * lda - 1, a.length);
     if (alpha != 0.0f) {
       sgerK(m, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
     }
@@ -368,6 +422,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 1) {
       return Math.abs(x[offsetx + 0]);
     }
+    requireNonNull(x);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     return dnrm2K(n, x, offsetx, incx);
   }
 
@@ -387,6 +443,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 1) {
       return Math.abs(x[offsetx + 0]);
     }
+    requireNonNull(x);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     return snrm2K(n, x, offsetx, incx);
   }
 
@@ -400,6 +458,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     drotK(n, x, offsetx, incx, y, offsety, incy, c, s);
   }
 
@@ -413,6 +475,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     srotK(n, x, offsetx, incx, y, offsety, incy, c, s);
   }
 
@@ -469,7 +535,12 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void drotm(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] param, int offsetparam) {
-    //FIXME: add arguments checks
+    requireNonNull(x);
+    requireNonNull(y);
+    requireNonNull(param);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offsetparam + 4, param.length); /* param.length == 5 */
     drotmK(n, x, offsetx, incx, y, offsety, incy, param, offsetparam);
   }
 
@@ -480,7 +551,12 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void srotm(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] param, int offsetparam) {
-    //FIXME: add arguments checks
+    requireNonNull(x);
+    requireNonNull(y);
+    requireNonNull(param);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offsetparam + 4, param.length); /* param.length == 5 */
     srotmK(n, x, offsetx, incx, y, offsety, incy, param, offsetparam);
   }
 
@@ -491,7 +567,11 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void drotmg(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] param, int offsetparam) {
-    //FIXME: add arguments checks
+    requireNonNull(dd1);
+    requireNonNull(dd2);
+    requireNonNull(dx1);
+    requireNonNull(param);
+    checkIndex(offsetparam + 4, param.length);
     drotmgK(dd1, dd2, dx1, dy1, param, offsetparam);
   }
 
@@ -502,7 +582,11 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void srotmg(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] param, int offsetparam) {
-    //FIXME: add arguments checks
+    requireNonNull(sd1);
+    requireNonNull(sd2);
+    requireNonNull(sx1);
+    requireNonNull(param);
+    checkIndex(offsetparam + 4, param.length);
     srotmgK(sd1, sd2, sx1, sy1, param, offsetparam);
   }
 
@@ -513,7 +597,12 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dsbmv(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    //FIXME: add arguments checks
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     dsbmvK(uplo, n, k, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -524,7 +613,12 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void ssbmv(String uplo, int n, int k, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    //FIXME: add arguments checks
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     ssbmvK(uplo, n, k, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -545,6 +639,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (alpha == 1.0) {
       return;
     }
+    requireNonNull(x);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     dscalK(n, alpha, x, offsetx, incx);
   }
 
@@ -565,6 +661,8 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (alpha == 1.0f) {
       return;
     }
+    requireNonNull(x);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     sscalK(n, alpha, x, offsetx, incx);
   }
 
@@ -583,6 +681,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + (n * (n + 1) / 2) - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     dspmvK(uplo, n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -600,6 +704,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + (n * (n + 1) / 2) - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     sspmvK(uplo, n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -617,6 +727,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(a);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offseta + (n * (n + 1) / 2) - 1, a.length);
     dsprK(uplo, n, alpha, x, offsetx, incx, a, offseta);
   }
 
@@ -634,6 +748,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(a);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offseta + (n * (n + 1) / 2) - 1, a.length);
     ssprK(uplo, n, alpha, x, offsetx, incx, a, offseta);
   }
 
@@ -652,6 +770,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    requireNonNull(a);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offseta + (n * (n + 1) / 2) - 1, a.length);
     dspr2K(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta);
   }
   
@@ -670,6 +794,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    requireNonNull(a);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offseta + (n * (n + 1) / 2) - 1, a.length);
     sspr2K(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta);
   }
   
@@ -683,6 +813,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     dswapK(n, x, offsetx, incx, y, offsety, incy);
   }
 
@@ -696,6 +830,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n <= 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     sswapK(n, x, offsetx, incx, y, offsety, incy);
   }
 
@@ -716,6 +854,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (m == 0 || n == 0 || (alpha == 0.0 && beta == 1.0)) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(b);
+    requireNonNull(c);
+    checkIndex(offseta + (lsame("L", side) ? m : n) * lda - 1, a.length);
+    checkIndex(offsetb + n * ldb - 1, a.length);
+    checkIndex(offsetc + n * ldc - 1, b.length);
     dsymmK(side, uplo, m, n, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
@@ -736,6 +880,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (m == 0 || n == 0 || (alpha == 0.0f && beta == 1.0f)) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(b);
+    requireNonNull(c);
+    checkIndex(offseta + (lsame("L", side) ? m : n) * lda - 1, a.length);
+    checkIndex(offsetb + n * ldb - 1, a.length);
+    checkIndex(offsetc + n * ldc - 1, b.length);
     ssymmK(side, uplo, m, n, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
@@ -754,6 +904,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     dsymvK(uplo, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -772,6 +928,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(y);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     ssymvK(uplo, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
   }
 
@@ -790,6 +952,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(a);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offseta + n * lda - 1, a.length);
     dsyrK(uplo, n, alpha, x, offsetx, incx, a, offseta, lda);
   }
 
@@ -807,6 +973,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(a);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offseta + n * lda - 1, a.length);
     ssyrK(uplo, n, alpha, x, offsetx, incx, a, offseta, lda);
   }
 
@@ -825,6 +995,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    requireNonNull(a);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offseta + n * lda - 1, a.length);
     dsyr2K(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
   }
 
@@ -843,6 +1019,12 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 0) {
       return;
     }
+    requireNonNull(x);
+    requireNonNull(y);
+    requireNonNull(a);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
+    checkIndex(offseta + n * lda - 1, a.length);
     ssyr2K(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
   }
 
@@ -1082,7 +1264,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 1) {
       return 0;
     }
-    return idamaxK(n, x, offsetx, incx);
+    requireNonNull(x);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    // Fortran arrays use 1-based index
+    return idamaxK(n, x, offsetx, incx) - 1;
   }
 
   protected abstract int idamaxK(int n, double[] x, int offsetx, int incx);
@@ -1101,7 +1286,10 @@ abstract class AbstractBLAS<T> implements BLAS {
     if (n == 1) {
       return 0;
     }
-    return isamaxK(n, x, offsetx, incx);
+    requireNonNull(x);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
+    // Fortran arrays use 1-based index
+    return isamaxK(n, x, offsetx, incx) - 1;
   }
 
   protected abstract int isamaxK(int n, float[] x, int offsetx, int incx);

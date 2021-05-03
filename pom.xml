@@ -29,7 +29,7 @@ information or have any questions.
 
   <groupId>dev.ludovic.netlib</groupId>
   <artifactId>parent</artifactId>
-  <version>1.3.2</version>
+  <version>2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Netlib</name>
@@ -60,8 +60,8 @@ information or have any questions.
 
   <modules>
     <module>blas</module>
-    <module>arpack</module>
     <module>lapack</module>
+    <module>arpack</module>
     <module>benchmarks</module>
   </modules>
 
@@ -69,6 +69,7 @@ information or have any questions.
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javac.target>8</javac.target>
     <jvm.modules></jvm.modules>
+    <argLine></argLine><!-- used by jacoco -->
   </properties>
 
   <profiles>
@@ -76,6 +77,15 @@ information or have any questions.
       <id>jdk16</id>
       <activation>
         <jdk>16</jdk>
+      </activation>
+      <properties>
+        <jvm.modules>--add-modules=jdk.incubator.vector,jdk.incubator.foreign</jvm.modules>
+      </properties>
+    </profile>
+    <profile>
+      <id>jdk17</id>
+      <activation>
+        <jdk>17</jdk>
       </activation>
       <properties>
         <jvm.modules>--add-modules=jdk.incubator.vector,jdk.incubator.foreign</jvm.modules>
@@ -130,6 +140,26 @@ information or have any questions.
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.6</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -145,6 +175,9 @@ information or have any questions.
             <compilerVersion>${javac.target}</compilerVersion>
             <source>${javac.target}</source>
             <target>${javac.target}</target>
+            <compilerArgs>
+              <arg>-h</arg><arg>${project.build.directory}/include</arg>
+            </compilerArgs>
           </configuration>
         </plugin>
         <plugin>
@@ -169,10 +202,6 @@ information or have any questions.
           </configuration>
         </plugin>
         <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
-        </plugin>
-        <plugin>
           <artifactId>maven-site-plugin</artifactId>
           <version>3.3</version>
         </plugin>
@@ -189,13 +218,71 @@ information or have any questions.
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.0.0-M5</version>
           <configuration>
-            <argLine>${jvm.modules} -Dforeign.restricted=permit</argLine>
+            <argLine>${argLine} ${jvm.modules} -Dforeign.restricted=permit</argLine>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
           <version>1.5</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>3.0.0</version>
+          <executions>
+            <execution>
+              <phase>compile</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+                <target>
+                  <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                    <arg line="INPUTS='jni.c'"/>
+                    <arg line="OUTPUT='${project.build.directory}/native/Linux-amd64/libnetlib${project.artifactId}jni.so'"/>
+                    <arg line="OBJDIR='${project.build.directory}/objs/Linux-amd64'"/>
+                    <arg line="CC='x86_64-linux-gnu-gcc'"/>
+                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
+                    <arg line="LD='x86_64-linux-gnu-gcc'"/>
+                    <arg line="LDFLAGS='-shared'"/>
+                    <arg line="all"/>
+                  </exec>
+                  <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                    <arg line="INPUTS='jni.c'"/>
+                    <arg line="OUTPUT='${project.build.directory}/native/Linux-aarch64/libnetlib${project.artifactId}jni.so'"/>
+                    <arg line="OBJDIR='${project.build.directory}/objs/Linux-aarch64'"/>
+                    <arg line="CC='aarch64-linux-gnu-gcc'"/>
+                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
+                    <arg line="LD='aarch64-linux-gnu-gcc'"/>
+                    <arg line="LDFLAGS='-shared'"/>
+                    <arg line="all"/>
+                  </exec>
+                </target>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.2.0</version>
+          <executions>
+            <execution>
+              <id>copy-resources</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.outputDirectory}/resources/native</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>${project.build.directory}/native</directory>
+                    <filtering>false</filtering>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
