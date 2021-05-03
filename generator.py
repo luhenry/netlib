@@ -289,7 +289,7 @@ class Routine_NI:
     print("  // LOAD_SYMBOL({name}_);".format(name=self.name))
 
 class Library:
-  def __init__(self, pkg, *routines):
+  def __init__(self, pkg, libname, *routines):
     # Print copyright header
     print("/*")
     print(" * Copyright 2020, 2021, Ludovic Henry")
@@ -427,7 +427,7 @@ class Library:
     print("    return -1;")
     print("  }")
     print("  jstring property_nativeLib;")
-    print("  if (!get_system_property(env, (*env)->NewStringUTF(env, \"dev.ludovic.netlib.{pkg}.nativeLib\"), (*env)->NewStringUTF(env, \"{pkg}\"), &property_nativeLib)) {{".format(pkg=pkg))
+    print("  if (!get_system_property(env, (*env)->NewStringUTF(env, \"dev.ludovic.netlib.{pkg}.nativeLib\"), (*env)->NewStringUTF(env, \"{libname}\"), &property_nativeLib)) {{".format(pkg=pkg, libname=libname))
     print("    return -1;")
     print("  }")
     print("")
@@ -438,7 +438,7 @@ class Library:
     print("    (*env)->ReleaseStringUTFChars(env, property_nativeLibPath, utf);")
     print("  } else if (property_nativeLib) {")
     print("    const char *utf = (*env)->GetStringUTFChars(env, property_nativeLib, NULL);")
-    print("    snprintf(name, sizeof(name), \"lib%s.so\", utf);")
+    print("    snprintf(name, sizeof(name), \"%s\", utf);")
     print("    (*env)->ReleaseStringUTFChars(env, property_nativeLib, utf);")
     print("  } else {")
     print("    /* either property_nativeLibPath or property_nativeLib should always be non-NULL */")
@@ -474,7 +474,7 @@ class Library:
 # $< $1("$5")
 
 if sys.argv[1] == "blas":
-  Library("blas",
+  Library("blas", "libblas.so.3",
     RoutineR  (JDoubleR(), "dasum", JInt("n"), JDoubleArray("x", "JNI_ABORT"), JInt("incx")),
     RoutineR  (JFloatR(),  "sasum", JInt("n"), JFloatArray("x", "JNI_ABORT"), JInt("incx")),
     Routine   (            "daxpy", JInt("n"), JDouble("alpha"), JDoubleArray("x", "JNI_ABORT"), JInt("incx"), JDoubleArray("y"), JInt("incy")),
@@ -544,70 +544,8 @@ if sys.argv[1] == "blas":
     RoutineR  (JIntR(),    "isamax", JInt("n"), JFloatArray("sx", "JNI_ABORT"), JInt("incsx")),
   )
 
-if sys.argv[1] == "arpack":
-  Library("arpack",
-    Routine   (         "dmout",  JInt("lout"), JInt("m"), JInt("n"), JDoubleArray("a"), JInt("lda"), JInt("idigit"), JString("ifmt")),
-    Routine   (         "smout",  JInt("lout"), JInt("m"), JInt("n"), JFloatArray("a"), JInt("lda"), JInt("idigit"), JString("ifmt")),
-    Routine   (         "dvout",  JInt("lout"), JInt("n"), JDoubleArray("sx"), JInt("idigit"), JString("ifmt")),
-    Routine   (         "svout",  JInt("lout"), JInt("n"), JFloatArray("sx"), JInt("idigit"), JString("ifmt")),
-    Routine   (         "ivout",  JInt("lout"), JInt("n"), JIntArray("ix"), JInt("idigit"), JString("ifmt")),
-    Routine   (         "dgetv0", JIntW("ido"), JString("bmat"), JInt("itry"), JBoolean("initv"), JInt("n"), JInt("j"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("resid"), JDoubleW("rnorm"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("ierr")),
-    Routine   (         "sgetv0", JIntW("ido"), JString("bmat"), JInt("itry"), JBoolean("initv"), JInt("n"), JInt("j"), JFloatArray("v"), JInt("ldv"), JFloatArray("resid"), JFloatW("rnorm"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("ierr")),
-    Routine_NI(         "dlaqrb", JBoolean("wantt"), JInt("n"), JInt("ilo"), JInt("ihi"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("wr"), JDoubleArray("wi"), JDoubleArray("z"), JIntW("info")),
-    Routine_NI(         "slaqrb", JBoolean("wantt"), JInt("n"), JInt("ilo"), JInt("ihi"), JFloatArray("h"), JInt("ldh"), JFloatArray("wr"), JFloatArray("wi"), JFloatArray("z"), JIntW("info")),
-    Routine   (         "dnaitr", JIntW("ido"), JString("bmat"), JInt("n"), JInt("k"), JInt("np"), JInt("nb"), JDoubleArray("resid"), JDoubleW("rnorm"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("info")),
-    Routine   (         "snaitr", JIntW("ido"), JString("bmat"), JInt("n"), JInt("k"), JInt("np"), JInt("nb"), JFloatArray("resid"), JFloatW("rnorm"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("info")),
-    Routine   (         "dnapps", JInt("n"), JIntW("kev"), JInt("np"), JDoubleArray("shiftr"), JDoubleArray("shifti"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("resid"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workl"), JDoubleArray("workd")),
-    Routine   (         "snapps", JInt("n"), JIntW("kev"), JInt("np"), JFloatArray("shiftr"), JFloatArray("shifti"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JFloatArray("resid"), JFloatArray("q"), JInt("ldq"), JFloatArray("workl"), JFloatArray("workd")),
-    Routine   (         "dnaup2", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JIntW("np"), JDouble("tol"), JDoubleArray("resid"), JInt("mode"), JInt("iupd"), JInt("ishift"), JIntW("mxiter"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("ritzr"), JDoubleArray("ritzi"), JDoubleArray("bounds"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workl"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("info")),
-    Routine   (         "snaup2", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JIntW("np"), JFloat("tol"), JFloatArray("resid"), JInt("mode"), JInt("iupd"), JInt("ishift"), JIntW("mxiter"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JFloatArray("ritzr"), JFloatArray("ritzi"), JFloatArray("bounds"), JFloatArray("q"), JInt("ldq"), JFloatArray("workl"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("info")),
-    Routine   (         "dnaupd", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JInt("nev"), JDoubleW("tol"), JDoubleArray("resid"), JInt("ncv"), JDoubleArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JDoubleArray("workd"), JDoubleArray("workl"), JInt("lworkl"), JIntW("info")),
-    Routine   (         "snaupd", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JInt("nev"), JFloatW("tol"), JFloatArray("resid"), JInt("ncv"), JFloatArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JFloatArray("workd"), JFloatArray("workl"), JInt("lworkl"), JIntW("info")),
-    Routine   (         "dnconv", JInt("n"), JDoubleArray("ritzr"), JDoubleArray("ritzi"), JDoubleArray("bounds"), JDouble("tol"), JIntW("nconv")),
-    Routine   (         "snconv", JInt("n"), JFloatArray("ritzr"), JFloatArray("ritzi"), JFloatArray("bounds"), JFloat("tol"), JIntW("nconv")),
-    Routine   (         "dsconv", JInt("n"), JDoubleArray("ritz"), JDoubleArray("bounds"), JDouble("tol"), JIntW("nconv")),
-    Routine   (         "ssconv", JInt("n"), JFloatArray("ritz"), JFloatArray("bounds"), JFloat("tol"), JIntW("nconv")),
-    Routine   (         "dneigh", JDouble("rnorm"), JIntW("n"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("ritzr"), JDoubleArray("ritzi"), JDoubleArray("bounds"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workl"), JIntW("ierr")),
-    Routine   (         "sneigh", JFloat("rnorm"), JIntW("n"), JFloatArray("h"), JInt("ldh"), JFloatArray("ritzr"), JFloatArray("ritzi"), JFloatArray("bounds"), JFloatArray("q"), JInt("ldq"), JFloatArray("workl"), JIntW("ierr")),
-    Routine   (         "dneupd", JBoolean("rvec"), JString("howmny"), JBooleanArray("select"), JDoubleArray("dr"), JDoubleArray("di"), JDoubleArray("z"), JInt("ldz"), JDouble("sigmar"), JDouble("sigmai"), JDoubleArray("workev"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JDouble("tol"), JDoubleArray("resid"), JInt("ncv"), JDoubleArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JDoubleArray("workd"), JDoubleArray("workl"), JInt("lworkl"), JIntW("info")),
-    Routine   (         "sneupd", JBoolean("rvec"), JString("howmny"), JBooleanArray("select"), JFloatArray("dr"), JFloatArray("di"), JFloatArray("z"), JInt("ldz"), JFloat("sigmar"), JFloat("sigmai"), JFloatArray("workev"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JFloat("tol"), JFloatArray("resid"), JInt("ncv"), JFloatArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JFloatArray("workd"), JFloatArray("workl"), JInt("lworkl"), JIntW("info")),
-    Routine   (         "dngets", JInt("ishift"), JString("which"), JIntW("kev"), JIntW("np"), JDoubleArray("ritzr"), JDoubleArray("ritzi"), JDoubleArray("bounds"), JDoubleArray("shiftr"), JDoubleArray("shifti")),
-    Routine   (         "sngets", JInt("ishift"), JString("which"), JIntW("kev"), JIntW("np"), JFloatArray("ritzr"), JFloatArray("ritzi"), JFloatArray("bounds"), JFloatArray("shiftr"), JFloatArray("shifti")),
-    Routine   (         "dsaitr", JIntW("ido"), JString("bmat"), JInt("n"), JInt("k"), JInt("np"), JInt("mode"), JDoubleArray("resid"), JDoubleW("rnorm"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("info")),
-    Routine   (         "ssaitr", JIntW("ido"), JString("bmat"), JInt("n"), JInt("k"), JInt("np"), JInt("mode"), JFloatArray("resid"), JFloatW("rnorm"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("info")),
-    Routine   (         "dsapps", JInt("n"), JInt("kev"), JInt("np"), JDoubleArray("shift"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("resid"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workd")),
-    Routine   (         "ssapps", JInt("n"), JInt("kev"), JInt("np"), JFloatArray("shift"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JFloatArray("resid"), JFloatArray("q"), JInt("ldq"), JFloatArray("workd")),
-    Routine   (         "dsaup2", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JIntW("np"), JDouble("tol"), JDoubleArray("resid"), JInt("mode"), JInt("iupd"), JInt("ishift"), JIntW("mxiter"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("ritz"), JDoubleArray("bounds"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workl"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("info")),
-    Routine   (         "ssaup2", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JIntW("np"), JFloat("tol"), JFloatArray("resid"), JInt("mode"), JInt("iupd"), JInt("ishift"), JIntW("mxiter"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JFloatArray("ritz"), JFloatArray("bounds"), JFloatArray("q"), JInt("ldq"), JFloatArray("workl"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("info")),
-    Routine   (         "dseigt", JDouble("rnorm"), JInt("n"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("eig"), JDoubleArray("bounds"), JDoubleArray("workl"), JIntW("ierr")),
-    Routine   (         "sseigt", JFloat("rnorm"), JInt("n"), JFloatArray("h"), JInt("ldh"), JFloatArray("eig"), JFloatArray("bounds"), JFloatArray("workl"), JIntW("ierr")),
-    Routine   (         "dsesrt", JString("which"), JBoolean("apply"), JInt("n"), JDoubleArray("x"), JInt("na"), JDoubleArray("a"), JInt("lda")),
-    Routine   (         "ssesrt", JString("which"), JBoolean("apply"), JInt("n"), JFloatArray("x"), JInt("na"), JFloatArray("a"), JInt("lda")),
-    Routine   (         "dsaupd", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JInt("nev"), JDoubleW("tol"), JDoubleArray("resid"), JInt("ncv"), JDoubleArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JDoubleArray("workd"), JDoubleArray("workl"), JInt("lworkl"), JIntW("info")),
-    Routine   (         "ssaupd", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JInt("nev"), JFloatW("tol"), JFloatArray("resid"), JInt("ncv"), JFloatArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JFloatArray("workd"), JFloatArray("workl"), JInt("lworkl"), JIntW("info")),
-    Routine   (         "dseupd", JBoolean("rvec"), JString("howmny"), JBooleanArray("select"), JDoubleArray("d"), JDoubleArray("z"), JInt("ldz"), JDouble("sigma"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JDouble("tol"), JDoubleArray("resid"), JInt("ncv"), JDoubleArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JDoubleArray("workd"), JDoubleArray("workl"), JInt("lworkl"), JIntW("info")),
-    Routine   (         "sseupd", JBoolean("rvec"), JString("howmny"), JBooleanArray("select"), JFloatArray("d"), JFloatArray("z"), JInt("ldz"), JFloat("sigma"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JFloat("tol"), JFloatArray("resid"), JInt("ncv"), JFloatArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JFloatArray("workd"), JFloatArray("workl"), JInt("lworkl"), JIntW("info")),
-    Routine   (         "dsgets", JInt("ishift"), JString("which"), JIntW("kev"), JIntW("np"), JDoubleArray("ritz"), JDoubleArray("bounds"), JDoubleArray("shifts")),
-    Routine   (         "ssgets", JInt("ishift"), JString("which"), JIntW("kev"), JIntW("np"), JFloatArray("ritz"), JFloatArray("bounds"), JFloatArray("shifts")),
-    Routine   (         "dsortc", JString("which"), JBoolean("apply"), JInt("n"), JDoubleArray("xreal"), JDoubleArray("ximag"), JDoubleArray("y")),
-    Routine   (         "ssortc", JString("which"), JBoolean("apply"), JInt("n"), JFloatArray("xreal"), JFloatArray("ximag"), JFloatArray("y")),
-    Routine   (         "dsortr", JString("which"), JBoolean("apply"), JInt("n"), JDoubleArray("x1"), JDoubleArray("x2")),
-    Routine   (         "ssortr", JString("which"), JBoolean("apply"), JInt("n"), JFloatArray("x1"), JFloatArray("x2")),
-    Routine   (         "dstatn"),
-    Routine   (         "sstatn"),
-    Routine   (         "dstats"),
-    Routine   (         "sstats"),
-    Routine   (         "dstqrb", JInt("n"), JDoubleArray("d"), JDoubleArray("e"), JDoubleArray("z"), JDoubleArray("work"), JIntW("info")),
-    Routine   (         "sstqrb", JInt("n"), JFloatArray("d"), JFloatArray("e"), JFloatArray("z"), JFloatArray("work"), JIntW("info")),
-    RoutineR  (JIntR(), "icnteq", JInt("n"), JIntArray("array"), JInt("value")),
-    Routine   (         "icopy",  JInt("n"), JIntArray("lx"), JInt("incx"), JIntArray("ly"), JInt("incy")),
-    Routine   (         "iset",   JInt("n"), JInt("value"), JIntArray("array"), JInt("inc")),
-    Routine   (         "iswap",  JInt("n"), JIntArray("sx"), JInt("incx"), JIntArray("sy"), JInt("incy")),
-    Routine   (         "second", JFloatW("t")),
-  )
-
 if sys.argv[1] == "lapack":
-  Library("lapack",
+  Library("lapack", "liblapack.so.3",
     Routine   (             "dbdsdc",   JString("uplo"), JString("compq"), JInt("n"), JDoubleArray("d"), JDoubleArray("e"), JDoubleArray("u"), JInt("ldu"), JDoubleArray("vt"), JInt("ldvt"), JDoubleArray("q"), JIntArray("iq"), JDoubleArray("work"), JIntArray("iwork"), JIntW("info")),
     Routine   (             "dbdsqr",   JString("uplo"), JInt("n"), JInt("ncvt"), JInt("nru"), JInt("ncc"), JDoubleArray("d"), JDoubleArray("e"), JDoubleArray("vt"), JInt("ldvt"), JDoubleArray("u"), JInt("ldu"), JDoubleArray("c"), JInt("Ldc"), JDoubleArray("work"), JIntW("info")),
     Routine   (             "ddisna",   JString("job"), JInt("m"), JInt("n"), JDoubleArray("d"), JDoubleArray("sep"), JIntW("info")),
@@ -1331,4 +1269,66 @@ if sys.argv[1] == "lapack":
     RoutineR  (JFloatR(),   "slamc3",   JFloat("a"), JFloat("b")),
     Routine_NI(             "slamc4",   JIntW("emin"), JFloat("start"), JInt("base")),
     Routine_NI(             "slamc5",   JInt("beta"), JInt("p"), JInt("emin"), JBoolean("ieee"), JIntW("emax"), JFloatW("rmax")),
+  )
+
+if sys.argv[1] == "arpack":
+  Library("arpack", "libarpack.so.2",
+    Routine   (         "dmout",  JInt("lout"), JInt("m"), JInt("n"), JDoubleArray("a"), JInt("lda"), JInt("idigit"), JString("ifmt")),
+    Routine   (         "smout",  JInt("lout"), JInt("m"), JInt("n"), JFloatArray("a"), JInt("lda"), JInt("idigit"), JString("ifmt")),
+    Routine   (         "dvout",  JInt("lout"), JInt("n"), JDoubleArray("sx"), JInt("idigit"), JString("ifmt")),
+    Routine   (         "svout",  JInt("lout"), JInt("n"), JFloatArray("sx"), JInt("idigit"), JString("ifmt")),
+    Routine   (         "ivout",  JInt("lout"), JInt("n"), JIntArray("ix"), JInt("idigit"), JString("ifmt")),
+    Routine   (         "dgetv0", JIntW("ido"), JString("bmat"), JInt("itry"), JBoolean("initv"), JInt("n"), JInt("j"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("resid"), JDoubleW("rnorm"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("ierr")),
+    Routine   (         "sgetv0", JIntW("ido"), JString("bmat"), JInt("itry"), JBoolean("initv"), JInt("n"), JInt("j"), JFloatArray("v"), JInt("ldv"), JFloatArray("resid"), JFloatW("rnorm"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("ierr")),
+    Routine_NI(         "dlaqrb", JBoolean("wantt"), JInt("n"), JInt("ilo"), JInt("ihi"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("wr"), JDoubleArray("wi"), JDoubleArray("z"), JIntW("info")),
+    Routine_NI(         "slaqrb", JBoolean("wantt"), JInt("n"), JInt("ilo"), JInt("ihi"), JFloatArray("h"), JInt("ldh"), JFloatArray("wr"), JFloatArray("wi"), JFloatArray("z"), JIntW("info")),
+    Routine   (         "dnaitr", JIntW("ido"), JString("bmat"), JInt("n"), JInt("k"), JInt("np"), JInt("nb"), JDoubleArray("resid"), JDoubleW("rnorm"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("info")),
+    Routine   (         "snaitr", JIntW("ido"), JString("bmat"), JInt("n"), JInt("k"), JInt("np"), JInt("nb"), JFloatArray("resid"), JFloatW("rnorm"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("info")),
+    Routine   (         "dnapps", JInt("n"), JIntW("kev"), JInt("np"), JDoubleArray("shiftr"), JDoubleArray("shifti"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("resid"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workl"), JDoubleArray("workd")),
+    Routine   (         "snapps", JInt("n"), JIntW("kev"), JInt("np"), JFloatArray("shiftr"), JFloatArray("shifti"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JFloatArray("resid"), JFloatArray("q"), JInt("ldq"), JFloatArray("workl"), JFloatArray("workd")),
+    Routine   (         "dnaup2", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JIntW("np"), JDouble("tol"), JDoubleArray("resid"), JInt("mode"), JInt("iupd"), JInt("ishift"), JIntW("mxiter"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("ritzr"), JDoubleArray("ritzi"), JDoubleArray("bounds"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workl"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("info")),
+    Routine   (         "snaup2", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JIntW("np"), JFloat("tol"), JFloatArray("resid"), JInt("mode"), JInt("iupd"), JInt("ishift"), JIntW("mxiter"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JFloatArray("ritzr"), JFloatArray("ritzi"), JFloatArray("bounds"), JFloatArray("q"), JInt("ldq"), JFloatArray("workl"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("info")),
+    Routine   (         "dnaupd", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JInt("nev"), JDoubleW("tol"), JDoubleArray("resid"), JInt("ncv"), JDoubleArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JDoubleArray("workd"), JDoubleArray("workl"), JInt("lworkl"), JIntW("info")),
+    Routine   (         "snaupd", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JInt("nev"), JFloatW("tol"), JFloatArray("resid"), JInt("ncv"), JFloatArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JFloatArray("workd"), JFloatArray("workl"), JInt("lworkl"), JIntW("info")),
+    Routine   (         "dnconv", JInt("n"), JDoubleArray("ritzr"), JDoubleArray("ritzi"), JDoubleArray("bounds"), JDouble("tol"), JIntW("nconv")),
+    Routine   (         "snconv", JInt("n"), JFloatArray("ritzr"), JFloatArray("ritzi"), JFloatArray("bounds"), JFloat("tol"), JIntW("nconv")),
+    Routine   (         "dsconv", JInt("n"), JDoubleArray("ritz"), JDoubleArray("bounds"), JDouble("tol"), JIntW("nconv")),
+    Routine   (         "ssconv", JInt("n"), JFloatArray("ritz"), JFloatArray("bounds"), JFloat("tol"), JIntW("nconv")),
+    Routine   (         "dneigh", JDouble("rnorm"), JIntW("n"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("ritzr"), JDoubleArray("ritzi"), JDoubleArray("bounds"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workl"), JIntW("ierr")),
+    Routine   (         "sneigh", JFloat("rnorm"), JIntW("n"), JFloatArray("h"), JInt("ldh"), JFloatArray("ritzr"), JFloatArray("ritzi"), JFloatArray("bounds"), JFloatArray("q"), JInt("ldq"), JFloatArray("workl"), JIntW("ierr")),
+    Routine   (         "dneupd", JBoolean("rvec"), JString("howmny"), JBooleanArray("select"), JDoubleArray("dr"), JDoubleArray("di"), JDoubleArray("z"), JInt("ldz"), JDouble("sigmar"), JDouble("sigmai"), JDoubleArray("workev"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JDouble("tol"), JDoubleArray("resid"), JInt("ncv"), JDoubleArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JDoubleArray("workd"), JDoubleArray("workl"), JInt("lworkl"), JIntW("info")),
+    Routine   (         "sneupd", JBoolean("rvec"), JString("howmny"), JBooleanArray("select"), JFloatArray("dr"), JFloatArray("di"), JFloatArray("z"), JInt("ldz"), JFloat("sigmar"), JFloat("sigmai"), JFloatArray("workev"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JFloat("tol"), JFloatArray("resid"), JInt("ncv"), JFloatArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JFloatArray("workd"), JFloatArray("workl"), JInt("lworkl"), JIntW("info")),
+    Routine   (         "dngets", JInt("ishift"), JString("which"), JIntW("kev"), JIntW("np"), JDoubleArray("ritzr"), JDoubleArray("ritzi"), JDoubleArray("bounds"), JDoubleArray("shiftr"), JDoubleArray("shifti")),
+    Routine   (         "sngets", JInt("ishift"), JString("which"), JIntW("kev"), JIntW("np"), JFloatArray("ritzr"), JFloatArray("ritzi"), JFloatArray("bounds"), JFloatArray("shiftr"), JFloatArray("shifti")),
+    Routine   (         "dsaitr", JIntW("ido"), JString("bmat"), JInt("n"), JInt("k"), JInt("np"), JInt("mode"), JDoubleArray("resid"), JDoubleW("rnorm"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("info")),
+    Routine   (         "ssaitr", JIntW("ido"), JString("bmat"), JInt("n"), JInt("k"), JInt("np"), JInt("mode"), JFloatArray("resid"), JFloatW("rnorm"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("info")),
+    Routine   (         "dsapps", JInt("n"), JInt("kev"), JInt("np"), JDoubleArray("shift"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("resid"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workd")),
+    Routine   (         "ssapps", JInt("n"), JInt("kev"), JInt("np"), JFloatArray("shift"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JFloatArray("resid"), JFloatArray("q"), JInt("ldq"), JFloatArray("workd")),
+    Routine   (         "dsaup2", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JIntW("np"), JDouble("tol"), JDoubleArray("resid"), JInt("mode"), JInt("iupd"), JInt("ishift"), JIntW("mxiter"), JDoubleArray("v"), JInt("ldv"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("ritz"), JDoubleArray("bounds"), JDoubleArray("q"), JInt("ldq"), JDoubleArray("workl"), JIntArray("ipntr"), JDoubleArray("workd"), JIntW("info")),
+    Routine   (         "ssaup2", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JIntW("np"), JFloat("tol"), JFloatArray("resid"), JInt("mode"), JInt("iupd"), JInt("ishift"), JIntW("mxiter"), JFloatArray("v"), JInt("ldv"), JFloatArray("h"), JInt("ldh"), JFloatArray("ritz"), JFloatArray("bounds"), JFloatArray("q"), JInt("ldq"), JFloatArray("workl"), JIntArray("ipntr"), JFloatArray("workd"), JIntW("info")),
+    Routine   (         "dseigt", JDouble("rnorm"), JInt("n"), JDoubleArray("h"), JInt("ldh"), JDoubleArray("eig"), JDoubleArray("bounds"), JDoubleArray("workl"), JIntW("ierr")),
+    Routine   (         "sseigt", JFloat("rnorm"), JInt("n"), JFloatArray("h"), JInt("ldh"), JFloatArray("eig"), JFloatArray("bounds"), JFloatArray("workl"), JIntW("ierr")),
+    Routine   (         "dsesrt", JString("which"), JBoolean("apply"), JInt("n"), JDoubleArray("x"), JInt("na"), JDoubleArray("a"), JInt("lda")),
+    Routine   (         "ssesrt", JString("which"), JBoolean("apply"), JInt("n"), JFloatArray("x"), JInt("na"), JFloatArray("a"), JInt("lda")),
+    Routine   (         "dsaupd", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JInt("nev"), JDoubleW("tol"), JDoubleArray("resid"), JInt("ncv"), JDoubleArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JDoubleArray("workd"), JDoubleArray("workl"), JInt("lworkl"), JIntW("info")),
+    Routine   (         "ssaupd", JIntW("ido"), JString("bmat"), JInt("n"), JString("which"), JInt("nev"), JFloatW("tol"), JFloatArray("resid"), JInt("ncv"), JFloatArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JFloatArray("workd"), JFloatArray("workl"), JInt("lworkl"), JIntW("info")),
+    Routine   (         "dseupd", JBoolean("rvec"), JString("howmny"), JBooleanArray("select"), JDoubleArray("d"), JDoubleArray("z"), JInt("ldz"), JDouble("sigma"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JDouble("tol"), JDoubleArray("resid"), JInt("ncv"), JDoubleArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JDoubleArray("workd"), JDoubleArray("workl"), JInt("lworkl"), JIntW("info")),
+    Routine   (         "sseupd", JBoolean("rvec"), JString("howmny"), JBooleanArray("select"), JFloatArray("d"), JFloatArray("z"), JInt("ldz"), JFloat("sigma"), JString("bmat"), JInt("n"), JString("which"), JIntW("nev"), JFloat("tol"), JFloatArray("resid"), JInt("ncv"), JFloatArray("v"), JInt("ldv"), JIntArray("iparam"), JIntArray("ipntr"), JFloatArray("workd"), JFloatArray("workl"), JInt("lworkl"), JIntW("info")),
+    Routine   (         "dsgets", JInt("ishift"), JString("which"), JIntW("kev"), JIntW("np"), JDoubleArray("ritz"), JDoubleArray("bounds"), JDoubleArray("shifts")),
+    Routine   (         "ssgets", JInt("ishift"), JString("which"), JIntW("kev"), JIntW("np"), JFloatArray("ritz"), JFloatArray("bounds"), JFloatArray("shifts")),
+    Routine   (         "dsortc", JString("which"), JBoolean("apply"), JInt("n"), JDoubleArray("xreal"), JDoubleArray("ximag"), JDoubleArray("y")),
+    Routine   (         "ssortc", JString("which"), JBoolean("apply"), JInt("n"), JFloatArray("xreal"), JFloatArray("ximag"), JFloatArray("y")),
+    Routine   (         "dsortr", JString("which"), JBoolean("apply"), JInt("n"), JDoubleArray("x1"), JDoubleArray("x2")),
+    Routine   (         "ssortr", JString("which"), JBoolean("apply"), JInt("n"), JFloatArray("x1"), JFloatArray("x2")),
+    Routine   (         "dstatn"),
+    Routine   (         "sstatn"),
+    Routine   (         "dstats"),
+    Routine   (         "sstats"),
+    Routine   (         "dstqrb", JInt("n"), JDoubleArray("d"), JDoubleArray("e"), JDoubleArray("z"), JDoubleArray("work"), JIntW("info")),
+    Routine   (         "sstqrb", JInt("n"), JFloatArray("d"), JFloatArray("e"), JFloatArray("z"), JFloatArray("work"), JIntW("info")),
+    RoutineR  (JIntR(), "icnteq", JInt("n"), JIntArray("array"), JInt("value")),
+    Routine   (         "icopy",  JInt("n"), JIntArray("lx"), JInt("incx"), JIntArray("ly"), JInt("incy")),
+    Routine   (         "iset",   JInt("n"), JInt("value"), JIntArray("array"), JInt("inc")),
+    Routine   (         "iswap",  JInt("n"), JIntArray("sx"), JInt("incx"), JIntArray("sy"), JInt("incy")),
+    Routine   (         "second", JFloatW("t")),
   )

@@ -1836,7 +1836,7 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
     return -1;
   }
   jstring property_nativeLib;
-  if (!get_system_property(env, (*env)->NewStringUTF(env, "dev.ludovic.netlib.arpack.nativeLib"), (*env)->NewStringUTF(env, "arpack"), &property_nativeLib)) {
+  if (!get_system_property(env, (*env)->NewStringUTF(env, "dev.ludovic.netlib.arpack.nativeLib"), (*env)->NewStringUTF(env, "libarpack.so.2"), &property_nativeLib)) {
     return -1;
   }
 
@@ -1847,7 +1847,7 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
     (*env)->ReleaseStringUTFChars(env, property_nativeLibPath, utf);
   } else if (property_nativeLib) {
     const char *utf = (*env)->GetStringUTFChars(env, property_nativeLib, NULL);
-    snprintf(name, sizeof(name), "lib%s.so", utf);
+    snprintf(name, sizeof(name), "%s", utf);
     (*env)->ReleaseStringUTFChars(env, property_nativeLib, utf);
   } else {
     /* either property_nativeLibPath or property_nativeLib should always be non-NULL */
