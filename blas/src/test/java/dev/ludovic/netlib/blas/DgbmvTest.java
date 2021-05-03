@@ -35,5 +35,6 @@ public class DgbmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
+        org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }
