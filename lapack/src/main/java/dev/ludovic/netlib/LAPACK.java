@@ -25,7 +25,19 @@
 
 package dev.ludovic.netlib;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public interface LAPACK {
+
+  public static LAPACK getInstance() {
+    try {
+      return dev.ludovic.netlib.NativeLAPACK.getInstance();
+    } catch (Throwable t) {
+      Logger.getLogger(LAPACK.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.NativeLAPACK");
+    }
+    return dev.ludovic.netlib.JavaLAPACK.getInstance();
+  }
 
   public void dbdsdc(String uplo, String compq, int n, double[] d, double[] e, double[] u, int ldu, double[] vt, int ldvt, double[] q, int[] iq, double[] work, int[] iwork, org.netlib.util.intW info);
   public void dbdsdc(String uplo, String compq, int n, double[] d, int _d_offset, double[] e, int _e_offset, double[] u, int _u_offset, int ldu, double[] vt, int _vt_offset, int ldvt, double[] q, int _q_offset, int[] iq, int _iq_offset, double[] work, int _work_offset, int[] iwork, int _iwork_offset, org.netlib.util.intW info);
