@@ -24,9 +24,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.m2/repository
-        key: m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          m2-
+        key: m2
     - name: Install dependencies
       run: |
         sudo apt-get -y update
