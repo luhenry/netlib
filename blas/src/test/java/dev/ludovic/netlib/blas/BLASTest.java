@@ -48,8 +48,8 @@ public class BLASTest {
       Arguments.of(dev.ludovic.netlib.blas.JNIBLAS.getInstance())
     );
 
-    String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 2);
-    int major = Integer.parseInt(fullVersion[0]);
+    String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 3);
+    int major = Integer.parseInt(fullVersion[0]) > 1 ? Integer.parseInt(fullVersion[0]) : Integer.parseInt(fullVersion[1]);
     if (major >= 8) {
       instances = Stream.concat(instances, Stream.of(
         Arguments.of(dev.ludovic.netlib.blas.Java8BLAS.getInstance())
