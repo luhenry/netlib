@@ -1035,7 +1035,21 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dsyr2k(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    //FIXME: add arguments checks
+    checkArgument("DSYR2K", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSYR2K", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DSYR2K", 3, n >= 0);
+    checkArgument("DSYR2K", 4, k >= 0);
+    checkArgument("DSYR2K", 7, lda >= Math.max(1, lsame("N", trans) ? n : k));
+    checkArgument("DSYR2K", 9, ldb >= Math.max(1, lsame("N", trans) ? n : k));
+    checkArgument("DSYR2K", 12, ldc >= Math.max(1, n));
+    if (n == 0 || ((alpha == 0 || k == 0) && beta == 1.0))
+      return;
+    requireNonNull(a);
+    requireNonNull(b);
+    requireNonNull(c);
+    checkIndex(offseta + (lsame("N", trans) ? k : n) * lda - 1, a.length);
+    checkIndex(offsetb + (lsame("N", trans) ? k : n) * ldb - 1, b.length);
+    checkIndex(offsetc + n * ldc - 1, c.length);
     dsyr2kK(uplo, trans, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
@@ -1046,7 +1060,21 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void ssyr2k(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    //FIXME: add arguments checks
+    checkArgument("SSYR2K", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSYR2K", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("SSYR2K", 3, n >= 0);
+    checkArgument("SSYR2K", 4, k >= 0);
+    checkArgument("SSYR2K", 7, lda >= Math.max(1, lsame("N", trans) ? n : k));
+    checkArgument("SSYR2K", 9, ldb >= Math.max(1, lsame("N", trans) ? n : k));
+    checkArgument("SSYR2K", 12, ldc >= Math.max(1, n));
+    if (n == 0 || ((alpha == 0 || k == 0) && beta == 1.0f))
+      return;
+    requireNonNull(a);
+    requireNonNull(b);
+    requireNonNull(c);
+    checkIndex(offseta + (lsame("N", trans) ? k : n) * lda - 1, a.length);
+    checkIndex(offsetb + (lsame("N", trans) ? k : n) * ldb - 1, b.length);
+    checkIndex(offsetc + n * ldc - 1, c.length);
     ssyr2kK(uplo, trans, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
@@ -1057,7 +1085,18 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dsyrk(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double beta, double[] c, int offsetc, int ldc) {
-    //FIXME: add arguments checks
+    checkArgument("DSYRK", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSYRK", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DSYRK", 3, n >= 0);
+    checkArgument("DSYRK", 4, k >= 0);
+    checkArgument("DSYRK", 7, lda >= Math.max(1, lsame("N", trans) ? n : k));
+    checkArgument("DSYRK", 10, ldc >= Math.max(1, n));
+    if (n == 0 || ((alpha == 0 || k == 0) && beta == 1.0))
+      return;
+    requireNonNull(a);
+    requireNonNull(c);
+    checkIndex(offseta + (lsame("N", trans) ? k : n) * lda - 1, a.length);
+    checkIndex(offsetc + n * ldc - 1, c.length);
     dsyrkK(uplo, trans, n, k, alpha, a, offseta, lda, beta, c, offsetc, ldc);
   }
 
@@ -1068,7 +1107,18 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void ssyrk(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float beta, float[] c, int offsetc, int ldc) {
-    //FIXME: add arguments checks
+    checkArgument("SSYRK", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSYRK", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("SSYRK", 3, n >= 0);
+    checkArgument("SSYRK", 4, k >= 0);
+    checkArgument("SSYRK", 7, lda >= Math.max(1, lsame("N", trans) ? n : k));
+    checkArgument("SSYRK", 10, ldc >= Math.max(1, n));
+    if (n == 0 || ((alpha == 0 || k == 0) && beta == 1.0f))
+      return;
+    requireNonNull(a);
+    requireNonNull(c);
+    checkIndex(offseta + (lsame("N", trans) ? k : n) * lda - 1, a.length);
+    checkIndex(offsetc + n * ldc - 1, c.length);
     ssyrkK(uplo, trans, n, k, alpha, a, offseta, lda, beta, c, offsetc, ldc);
   }
 
@@ -1079,7 +1129,20 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dtbmv(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("DTBMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DTBMV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DTBMV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("DTBMV", 4, n >= 0);
+    checkArgument("DTBMV", 5, k >= 0);
+    checkArgument("DTBMV", 7, lda >= Math.max(1, k));
+    checkArgument("DTBMV", 9, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     dtbmvK(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
   }
 
@@ -1090,7 +1153,20 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void stbmv(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("STBMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("STBMV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("STBMV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("STBMV", 4, n >= 0);
+    checkArgument("STBMV", 5, k >= 0);
+    checkArgument("STBMV", 7, lda >= Math.max(1, k));
+    checkArgument("STBMV", 9, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     stbmvK(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
   }
 
@@ -1101,7 +1177,20 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dtbsv(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("DTBSV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DTBSV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DTBSV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("DTBSV", 4, n >= 0);
+    checkArgument("DTBSV", 5, k >= 0);
+    checkArgument("DTBSV", 7, lda >= Math.max(1, k));
+    checkArgument("DTBSV", 9, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     dtbsvK(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
   }
 
@@ -1112,7 +1201,20 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void stbsv(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("STBSV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("STBSV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("STBSV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("STBSV", 4, n >= 0);
+    checkArgument("STBSV", 5, k >= 0);
+    checkArgument("STBSV", 7, lda >= Math.max(1, k));
+    checkArgument("STBSV", 9, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     stbsvK(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
   }
 
@@ -1123,7 +1225,18 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dtpmv(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("DTPMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DTPMV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DTPMV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("DTPMV", 4, n >= 0);
+    checkArgument("DTPMV", 7, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * (n + 1) / 2 - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     dtpmvK(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
   }
 
@@ -1134,7 +1247,18 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void stpmv(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("STPMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("STPMV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("STPMV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("STPMV", 4, n >= 0);
+    checkArgument("STPMV", 7, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * (n + 1) / 2 - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     stpmvK(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
   }
 
@@ -1145,7 +1269,18 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dtpsv(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("DTPSV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DTPSV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DTPSV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("DTPSV", 4, n >= 0);
+    checkArgument("DTPSV", 7, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * (n + 1) / 2 - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     dtpsvK(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
   }
 
@@ -1156,7 +1291,18 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void stpsv(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("STPSV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("STPSV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("STPSV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("STPSV", 4, n >= 0);
+    checkArgument("STPSV", 7, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * (n + 1) / 2 - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     stpsvK(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
   }
 
@@ -1167,7 +1313,21 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dtrmm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
-    //FIXME: add arguments checks
+    checkArgument("DTRMM", 1, lsame("L", side) || lsame("R", side));
+    checkArgument("DTRMM", 2, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DTRMM", 3, lsame("N", transa) || lsame("T", transa) || lsame("C", transa));
+    checkArgument("DTRMM", 4, lsame("U", diag) || lsame("N", diag));
+    checkArgument("DTRMM", 5, m >= 0);
+    checkArgument("DTRMM", 6, n >= 0);
+    checkArgument("DTRMM", 9, lda >= Math.max(1, lsame("L", side) ? m : n));
+    checkArgument("DTRMM", 11, ldb >= Math.max(1, m));
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(b);
+    checkIndex(offseta + (lsame("L", side) ? m : n) * lda - 1, a.length);
+    checkIndex(offsetb + n * ldb - 1, a.length);
     dtrmmK(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
   }
 
@@ -1178,7 +1338,21 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void strmm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
-    //FIXME: add arguments checks
+    checkArgument("STRMM", 1, lsame("L", side) || lsame("R", side));
+    checkArgument("STRMM", 2, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("STRMM", 3, lsame("N", transa) || lsame("T", transa) || lsame("C", transa));
+    checkArgument("STRMM", 4, lsame("U", diag) || lsame("N", diag));
+    checkArgument("STRMM", 5, m >= 0);
+    checkArgument("STRMM", 6, n >= 0);
+    checkArgument("STRMM", 9, lda >= Math.max(1, lsame("L", side) ? m : n));
+    checkArgument("STRMM", 11, ldb >= Math.max(1, m));
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(b);
+    checkIndex(offseta + (lsame("L", side) ? m : n) * lda - 1, a.length);
+    checkIndex(offsetb + n * ldb - 1, a.length);
     strmmK(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
   }
 
@@ -1189,7 +1363,19 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dtrmv(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("DTRMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DTRMV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DTRMV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("DTRMV", 4, n >= 0);
+    checkArgument("DTRMV", 6, lda >= Math.max(1, n));
+    checkArgument("DTRMV", 8, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), a.length);
     dtrmvK(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
   }
 
@@ -1200,7 +1386,19 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void strmv(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("STRMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("STRMV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("STRMV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("STRMV", 4, n >= 0);
+    checkArgument("STRMV", 6, lda >= Math.max(1, n));
+    checkArgument("STRMV", 8, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), a.length);
     strmvK(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
   }
 
@@ -1211,7 +1409,21 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dtrsm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
-    //FIXME: add arguments checks
+    checkArgument("DTRSM", 1, lsame("L", side) || lsame("R", side));
+    checkArgument("DTRSM", 2, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DTRSM", 3, lsame("N", transa) || lsame("T", transa) || lsame("C", transa));
+    checkArgument("DTRSM", 4, lsame("U", diag) || lsame("N", diag));
+    checkArgument("DTRSM", 5, m >= 0);
+    checkArgument("DTRSM", 6, n >= 0);
+    checkArgument("DTRSM", 9, lda >= Math.max(1, lsame("L", side) ? m : n));
+    checkArgument("DTRSM", 11, ldb >= Math.max(1, m));
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(b);
+    checkIndex(offseta + (lsame("L", side) ? m : n) * lda - 1, a.length);
+    checkIndex(offsetb + n * ldb - 1, a.length);
     dtrsmK(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
   }
 
@@ -1222,7 +1434,21 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void strsm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
-    //FIXME: add arguments checks
+    checkArgument("STRSM", 1, lsame("L", side) || lsame("R", side));
+    checkArgument("STRSM", 2, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("STRSM", 3, lsame("N", transa) || lsame("T", transa) || lsame("C", transa));
+    checkArgument("STRSM", 4, lsame("U", diag) || lsame("N", diag));
+    checkArgument("STRSM", 5, m >= 0);
+    checkArgument("STRSM", 6, n >= 0);
+    checkArgument("STRSM", 9, lda >= Math.max(1, lsame("L", side) ? m : n));
+    checkArgument("STRSM", 11, ldb >= Math.max(1, m));
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(b);
+    checkIndex(offseta + (lsame("L", side) ? m : n) * lda - 1, a.length);
+    checkIndex(offsetb + n * ldb - 1, a.length);
     strsmK(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
   }
 
@@ -1233,7 +1459,19 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void dtrsv(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("DTRSV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DTRSV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DTRSV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("DTRSV", 4, n >= 0);
+    checkArgument("DTRSV", 6, lda >= Math.max(1, n));
+    checkArgument("DTRSV", 8, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), a.length);
     dtrsvK(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
   }
 
@@ -1244,7 +1482,19 @@ abstract class AbstractBLAS<T> implements BLAS {
   }
 
   public void strsv(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    //FIXME: add arguments checks
+    checkArgument("STRSV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("STRSV", 2, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("STRSV", 3, lsame("U", diag) || lsame("N", diag));
+    checkArgument("STRSV", 4, n >= 0);
+    checkArgument("STRSV", 6, lda >= Math.max(1, n));
+    checkArgument("STRSV", 8, incx != 0);
+    if (n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetx + (n - 1) * Math.abs(incx), a.length);
     strsvK(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
   }
 
