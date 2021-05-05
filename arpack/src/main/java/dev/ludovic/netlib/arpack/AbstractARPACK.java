@@ -25,9 +25,28 @@
 
 package dev.ludovic.netlib.arpack;
 
+import java.util.Objects;
+
 import dev.ludovic.netlib.ARPACK;
 
 abstract class AbstractARPACK implements ARPACK {
+
+  private void checkArgument(String method, int arg, boolean check) {
+    if (!check) {
+      throw new IllegalArgumentException(String.format("** On entry to '%s' parameter number %d had an illegal value", method, arg));
+    }
+  }
+
+  private void checkIndex(int index, int length) {
+    //FIXME: switch to Objects.checkIndex when the minimum version becomes JDK 11
+    if (index < 0 || index >= length) {
+      throw new IndexOutOfBoundsException(String.format("Index %s out of bounds for length %s", index, length));
+    }
+  }
+
+  private <T> void requireNonNull(T obj) {
+    Objects.requireNonNull(obj);
+  }
 
   public void dmout(int lout, int m, int n, double[] a, int lda, int idigit, String ifmt) {
     dmout(lout, m, n, a, 0, lda, idigit, ifmt);
@@ -441,7 +460,25 @@ abstract class AbstractARPACK implements ARPACK {
   }
 
   public void dsaupd(org.netlib.util.intW ido, String bmat, int n, String which, int nev, org.netlib.util.doubleW tol, double[] resid, int offsetresid, int ncv, double[] v, int offsetv, int ldv, int[] iparam, int offsetiparam, int[] ipntr, int offsetipntr, double[] workd, int offsetworkd, double[] workl, int offsetworkl, int lworkl, org.netlib.util.intW info) {
-    //FIXME add argument checks
+    checkArgument("DSAUPD", 2, lsame("I", bmat) || lsame("G", bmat));
+    checkArgument("DSAUPD", 3, n >= 0);
+    checkArgument("DSAUPD", 4, lsame("LA", which) || lsame("SA", which) || lsame("LM", which) || lsame("SM", which) || lsame("BE", which));
+    checkArgument("DSAUPD", 5, 0 < nev && nev < n);
+    checkArgument("DSAUPD", 15, lworkl >= Math.pow(ncv, 2)+ 8 * ncv);
+    requireNonNull(ido);
+    requireNonNull(tol);
+    requireNonNull(resid);
+    requireNonNull(v);
+    requireNonNull(iparam);
+    requireNonNull(ipntr);
+    requireNonNull(workd);
+    requireNonNull(info);
+    checkIndex(offsetresid + n - 1, resid.length);
+    checkIndex(offsetv + n * ncv - 1, v.length);
+    checkIndex(offsetiparam + 11 - 1, iparam.length);
+    checkIndex(offsetipntr + 11 - 1, ipntr.length);
+    checkIndex(offsetworkd + 3 * n - 1, workd.length);
+    checkIndex(offsetworkl + lworkl - 1, workl.length);
     dsaupdK(ido, bmat, n, which, nev, tol, resid, offsetresid, ncv, v, offsetv, ldv, iparam, offsetiparam, ipntr, offsetipntr, workd, offsetworkd, workl, offsetworkl, lworkl, info);
   }
 
@@ -452,7 +489,25 @@ abstract class AbstractARPACK implements ARPACK {
   }
 
   public void ssaupd(org.netlib.util.intW ido, String bmat, int n, String which, int nev, org.netlib.util.floatW tol, float[] resid, int offsetresid, int ncv, float[] v, int offsetv, int ldv, int[] iparam, int offsetiparam, int[] ipntr, int offsetipntr, float[] workd, int offsetworkd, float[] workl, int offsetworkl, int lworkl, org.netlib.util.intW info) {
-    //FIXME add argument checks
+    checkArgument("SSAUPD", 2, lsame("I", bmat) || lsame("G", bmat));
+    checkArgument("SSAUPD", 3, n >= 0);
+    checkArgument("SSAUPD", 4, lsame("LA", which) || lsame("SA", which) || lsame("LM", which) || lsame("SM", which) || lsame("BE", which));
+    checkArgument("SSAUPD", 5, 0 < nev && nev < n);
+    checkArgument("SSAUPD", 15, lworkl >= Math.pow(ncv, 2)+ 8 * ncv);
+    requireNonNull(ido);
+    requireNonNull(tol);
+    requireNonNull(resid);
+    requireNonNull(v);
+    requireNonNull(iparam);
+    requireNonNull(ipntr);
+    requireNonNull(workd);
+    requireNonNull(info);
+    checkIndex(offsetresid + n - 1, resid.length);
+    checkIndex(offsetv + n * ncv - 1, v.length);
+    checkIndex(offsetiparam + 11 - 1, iparam.length);
+    checkIndex(offsetipntr + 11 - 1, ipntr.length);
+    checkIndex(offsetworkd + 3 * n - 1, workd.length);
+    checkIndex(offsetworkl + lworkl - 1, workl.length);
     ssaupdK(ido, bmat, n, which, nev, tol, resid, offsetresid, ncv, v, offsetv, ldv, iparam, offsetiparam, ipntr, offsetipntr, workd, offsetworkd, workl, offsetworkl, lworkl, info);
   }
 
@@ -463,7 +518,33 @@ abstract class AbstractARPACK implements ARPACK {
   }
 
   public void dseupd(boolean rvec, String howmny, boolean[] select, int offsetselect, double[] d, int offsetd, double[] z, int offsetz, int ldz, double sigma, String bmat, int n, String which, org.netlib.util.intW nev, double tol, double[] resid, int offsetresid, int ncv, double[] v, int offsetv, int ldv, int[] iparam, int offsetiparam, int[] ipntr, int offsetipntr, double[] workd, int offsetworkd, double[] workl, int offsetworkl, int lworkl, org.netlib.util.intW info) {
-    //FIXME add argument checks
+    checkArgument("DSEUPD", 2, lsame("A", howmny) || lsame("S", howmny));
+    checkArgument("DSEUPD", 2, ldz >= Math.max(1, n));
+    checkArgument("DSEUPD", 8, lsame("I", bmat) || lsame("G", bmat));
+    checkArgument("DSEUPD", 9, n >= 0);
+    checkArgument("DSEUPD", 10, lsame("LA", which) || lsame("SA", which) || lsame("LM", which) || lsame("SM", which) || lsame("BE", which));
+    checkArgument("DSEUPD", 11, 0 < nev.val && nev.val < n);
+    checkArgument("DSEUPD", 21, lworkl >= Math.pow(ncv, 2)+ 8 * ncv);
+    requireNonNull(select);
+    requireNonNull(d);
+    if (rvec)
+      requireNonNull(z);
+    requireNonNull(resid);
+    requireNonNull(v);
+    requireNonNull(iparam);
+    requireNonNull(ipntr);
+    requireNonNull(workd);
+    requireNonNull(info);
+    checkIndex(offsetselect + nev.val - 1, select.length);
+    checkIndex(offsetd + nev.val - 1, d.length);
+    if (rvec)
+      checkIndex(offsetz + n * nev.val - 1, z.length);
+    checkIndex(offsetresid + n - 1, resid.length);
+    checkIndex(offsetv + n * ncv - 1, v.length);
+    checkIndex(offsetiparam + 11 - 1, iparam.length);
+    checkIndex(offsetipntr + 11 - 1, ipntr.length);
+    checkIndex(offsetworkd + 3 * n - 1, workd.length);
+    checkIndex(offsetworkl + lworkl - 1, workl.length);
     dseupdK(rvec, howmny, select, offsetselect, d, offsetd, z, offsetz, ldz, sigma, bmat, n, which, nev, tol, resid, offsetresid, ncv, v, offsetv, ldv, iparam, offsetiparam, ipntr, offsetipntr, workd, offsetworkd, workl, offsetworkl, lworkl, info);
   }
 
@@ -474,7 +555,33 @@ abstract class AbstractARPACK implements ARPACK {
   }
 
   public void sseupd(boolean rvec, String howmny, boolean[] select, int offsetselect, float[] d, int offsetd, float[] z, int offsetz, int ldz, float sigma, String bmat, int n, String which, org.netlib.util.intW nev, float tol, float[] resid, int offsetresid, int ncv, float[] v, int offsetv, int ldv, int[] iparam, int offsetiparam, int[] ipntr, int offsetipntr, float[] workd, int offsetworkd, float[] workl, int offsetworkl, int lworkl, org.netlib.util.intW info) {
-    //FIXME add argument checks
+    checkArgument("SSEUPD", 2, lsame("A", howmny) || lsame("S", howmny));
+    checkArgument("SSEUPD", 2, ldz >= Math.max(1, n));
+    checkArgument("SSEUPD", 8, lsame("I", bmat) || lsame("G", bmat));
+    checkArgument("SSEUPD", 9, n >= 0);
+    checkArgument("SSEUPD", 10, lsame("LA", which) || lsame("SA", which) || lsame("LM", which) || lsame("SM", which) || lsame("BE", which));
+    checkArgument("SSEUPD", 11, 0 < nev.val && nev.val < n);
+    checkArgument("SSEUPD", 21, lworkl >= Math.pow(ncv, 2)+ 8 * ncv);
+    requireNonNull(select);
+    requireNonNull(d);
+    if (rvec)
+      requireNonNull(z);
+    requireNonNull(resid);
+    requireNonNull(v);
+    requireNonNull(iparam);
+    requireNonNull(ipntr);
+    requireNonNull(workd);
+    requireNonNull(info);
+    checkIndex(offsetselect + nev.val - 1, select.length);
+    checkIndex(offsetd + nev.val - 1, d.length);
+    if (rvec)
+      checkIndex(offsetz + n * nev.val - 1, z.length);
+    checkIndex(offsetresid + n - 1, resid.length);
+    checkIndex(offsetv + n * ncv - 1, v.length);
+    checkIndex(offsetiparam + 11 - 1, iparam.length);
+    checkIndex(offsetipntr + 11 - 1, ipntr.length);
+    checkIndex(offsetworkd + 3 * n - 1, workd.length);
+    checkIndex(offsetworkl + lworkl - 1, workl.length);
     sseupdK(rvec, howmny, select, offsetselect, d, offsetd, z, offsetz, ldz, sigma, bmat, n, which, nev, tol, resid, offsetresid, ncv, v, offsetv, ldv, iparam, offsetiparam, ipntr, offsetipntr, workd, offsetworkd, workl, offsetworkl, lworkl, info);
   }
 
@@ -646,4 +753,8 @@ abstract class AbstractARPACK implements ARPACK {
   }
 
   protected abstract void secondK(org.netlib.util.floatW t);
+
+  public boolean lsame(String ca, String cb) {
+    return ca != null && ca.equalsIgnoreCase(cb);
+  }
 }

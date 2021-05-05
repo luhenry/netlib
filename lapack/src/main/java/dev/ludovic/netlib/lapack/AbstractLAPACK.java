@@ -25,9 +25,28 @@
 
 package dev.ludovic.netlib.lapack;
 
+import java.util.Objects;
+
 import dev.ludovic.netlib.LAPACK;
 
 abstract class AbstractLAPACK implements LAPACK {
+
+  private void checkArgument(String method, int arg, boolean check) {
+    if (!check) {
+      throw new IllegalArgumentException(String.format("** On entry to '%s' parameter number %d had an illegal value", method, arg));
+    }
+  }
+
+  private void checkIndex(int index, int length) {
+    //FIXME: switch to Objects.checkIndex when the minimum version becomes JDK 11
+    if (index < 0 || index >= length) {
+      throw new IndexOutOfBoundsException(String.format("Index %s out of bounds for length %s", index, length));
+    }
+  }
+
+  private <T> void requireNonNull(T obj) {
+    Objects.requireNonNull(obj);
+  }
 
   public void dbdsdc(String uplo, String compq, int n, double[] d, double[] e, double[] u, int ldu, double[] vt, int ldvt, double[] q, int[] iq, double[] work, int[] iwork, org.netlib.util.intW info) {
     dbdsdc(uplo, compq, n, d, 0, e, 0, u, 0, ldu, vt, 0, ldvt, q, 0, iq, 0, work, 0, iwork, 0, info);
@@ -254,7 +273,32 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void dgeev(String jobvl, String jobvr, int n, double[] a, int offseta, int lda, double[] wr, int offsetwr, double[] wi, int offsetwi, double[] vl, int offsetvl, int ldvl, double[] vr, int offsetvr, int ldvr, double[] work, int offsetwork, int lwork, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("DGEEV", 1, lsame("N", jobvl) || lsame("V", jobvl));
+    checkArgument("DGEEV", 2, lsame("N", jobvr) || lsame("V", jobvr));
+    checkArgument("DGEEV", 3, n >= 0);
+    checkArgument("DGEEV", 5, lda >= Math.max(1, n));
+    checkArgument("DGEEV", 9, ldvl >= Math.max(1, lsame("V", jobvl) ? n : 1));
+    checkArgument("DGEEV", 11, ldvr >= Math.max(1, lsame("V", jobvr) ? n : 1));
+    checkArgument("DGEEV", 11, lwork == -1 || lwork >= Math.max(1, (lsame("V", jobvl) || lsame("V", jobvr)) ? 4 * n : 3 * n));
+    requireNonNull(a);
+    requireNonNull(wr);
+    requireNonNull(wi);
+    if (lsame("N", jobvl))
+      requireNonNull(vl);
+    if (lsame("N", jobvr))
+      requireNonNull(vr);
+    requireNonNull(work);
+    requireNonNull(info);
+    if (lwork != -1) {
+      checkIndex(offseta + n * lda - 1, a.length);
+      checkIndex(offsetwr + n - 1, wr.length);
+      checkIndex(offsetwi + n - 1, wi.length);
+      if (lsame("N", jobvl))
+        checkIndex(offsetvl + n * ldvl - 1, vl.length);
+      if (lsame("N", jobvr))
+        checkIndex(offsetvr + n * ldvr - 1, vr.length);
+    }
+    checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
     dgeevK(jobvl, jobvr, n, a, offseta, lda, wr, offsetwr, wi, offsetwi, vl, offsetvl, ldvl, vr, offsetvr, ldvr, work, offsetwork, lwork, info);
   }
 
@@ -342,7 +386,20 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void dgels(String trans, int m, int n, int nrhs, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double[] work, int offsetwork, int lwork, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("DGELS", 1, lsame("N", trans) || lsame("T", trans));
+    checkArgument("DGELS", 2, m >= 0);
+    checkArgument("DGELS", 3, n >= 0);
+    checkArgument("DGELS", 4, nrhs >= 0);
+    checkArgument("DGELS", 6, lda >= Math.max(1, m));
+    checkArgument("DGELS", 8, ldb >= Math.max(1, Math.max(m, n)));
+    checkArgument("DGELS", 10, lwork == -1 || lwork >= Math.max(1, Math.min(m, n) + Math.max(Math.min(m, n), nrhs)));
+    requireNonNull(a);
+    requireNonNull(b);
+    requireNonNull(work);
+    requireNonNull(info);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetb + nrhs * (lsame("N", trans) ? m : n) - 1, b.length);
+    checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
     dgelsK(trans, m, n, nrhs, a, offseta, lda, b, offsetb, ldb, work, offsetwork, lwork, info);
   }
 
@@ -419,7 +476,19 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void dgeqp3(int m, int n, double[] a, int offseta, int lda, int[] jpvt, int offsetjpvt, double[] tau, int offsettau, double[] work, int offsetwork, int lwork, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("DGEQP3", 1, m >= 0);
+    checkArgument("DGEQP3", 2, n >= 0);
+    checkArgument("DGEQP3", 4, lda >= Math.max(1, m));
+    checkArgument("DGEQP3", 8, lwork == -1 || lwork >= Math.max(1, 3 * n + 1));
+    requireNonNull(a);
+    requireNonNull(jpvt);
+    requireNonNull(tau);
+    requireNonNull(work);
+    requireNonNull(info);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetjpvt + n - 1, jpvt.length);
+    checkIndex(offsettau + Math.min(m, n) - 1, tau.length);
+    checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
     dgeqp3K(m, n, a, offseta, lda, jpvt, offsetjpvt, tau, offsettau, work, offsetwork, lwork, info);
   }
 
@@ -452,7 +521,19 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void dgeqrf(int m, int n, double[] a, int offseta, int lda, double[] tau, int offsettau, double[] work, int offsetwork, int lwork, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("DGEQRF", 1, m >= 0);
+    checkArgument("DGEQRF", 2, n >= 0);
+    checkArgument("DGEQRF", 4, lda >= Math.max(1, m));
+    checkArgument("DGEQRF", 7, lwork == -1 || lwork >= Math.max(1, n));
+    requireNonNull(a);
+    requireNonNull(tau);
+    requireNonNull(work);
+    requireNonNull(info);
+    if (lwork != -1) {
+      checkIndex(offseta + n * lda - 1, a.length);
+      checkIndex(offsettau + Math.min(m, n) - 1, tau.length);
+    }
+    checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
     dgeqrfK(m, n, a, offseta, lda, tau, offsettau, work, offsetwork, lwork, info);
   }
 
@@ -573,7 +654,14 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void dgetrf(int m, int n, double[] a, int offseta, int lda, int[] ipiv, int offsetipiv, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("DGETRF", 1, m >= 0);
+    checkArgument("DGETRF", 2, n >= 0);
+    checkArgument("DGETRF", 4, lda >= Math.max(1, m));
+    requireNonNull(a);
+    requireNonNull(ipiv);
+    requireNonNull(info);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetipiv + Math.min(m, n) - 1, ipiv.length);
     dgetrfK(m, n, a, offseta, lda, ipiv, offsetipiv, info);
   }
 
@@ -4091,7 +4179,32 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void sgeev(String jobvl, String jobvr, int n, float[] a, int offseta, int lda, float[] wr, int offsetwr, float[] wi, int offsetwi, float[] vl, int offsetvl, int ldvl, float[] vr, int offsetvr, int ldvr, float[] work, int offsetwork, int lwork, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("SGEEV", 1, lsame("N", jobvl) || lsame("V", jobvl));
+    checkArgument("SGEEV", 2, lsame("N", jobvr) || lsame("V", jobvr));
+    checkArgument("SGEEV", 3, n >= 0);
+    checkArgument("SGEEV", 5, lda >= Math.max(1, n));
+    checkArgument("SGEEV", 9, ldvl >= Math.max(1, lsame("V", jobvl) ? n : 1));
+    checkArgument("SGEEV", 11, ldvr >= Math.max(1, lsame("V", jobvr) ? n : 1));
+    checkArgument("SGEEV", 11, lwork == -1 || lwork >= Math.max(1, (lsame("V", jobvl) || lsame("V", jobvr)) ? 4 * n : 3 * n));
+    requireNonNull(a);
+    requireNonNull(wr);
+    requireNonNull(wi);
+    if (lsame("N", jobvl))
+      requireNonNull(vl);
+    if (lsame("N", jobvr))
+      requireNonNull(vr);
+    requireNonNull(work);
+    requireNonNull(info);
+    if (lwork != -1) {
+      checkIndex(offseta + n * lda - 1, a.length);
+      checkIndex(offsetwr + n - 1, wr.length);
+      checkIndex(offsetwi + n - 1, wi.length);
+      if (lsame("N", jobvl))
+        checkIndex(offsetvl + n * ldvl - 1, vl.length);
+      if (lsame("N", jobvr))
+        checkIndex(offsetvr + n * ldvr - 1, vr.length);
+    }
+    checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
     sgeevK(jobvl, jobvr, n, a, offseta, lda, wr, offsetwr, wi, offsetwi, vl, offsetvl, ldvl, vr, offsetvr, ldvr, work, offsetwork, lwork, info);
   }
 
@@ -4179,7 +4292,20 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void sgels(String trans, int m, int n, int nrhs, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float[] work, int offsetwork, int lwork, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("SGELS", 1, lsame("N", trans) || lsame("T", trans));
+    checkArgument("SGELS", 2, m >= 0);
+    checkArgument("SGELS", 3, n >= 0);
+    checkArgument("SGELS", 4, nrhs >= 0);
+    checkArgument("SGELS", 6, lda >= Math.max(1, m));
+    checkArgument("SGELS", 8, ldb >= Math.max(1, Math.max(m, n)));
+    checkArgument("SGELS", 10, lwork == -1 || lwork >= Math.max(1, Math.min(m, n) + Math.max(Math.min(m, n), nrhs)));
+    requireNonNull(a);
+    requireNonNull(b);
+    requireNonNull(work);
+    requireNonNull(info);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetb + nrhs * (lsame("N", trans) ? m : n) - 1, b.length);
+    checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
     sgelsK(trans, m, n, nrhs, a, offseta, lda, b, offsetb, ldb, work, offsetwork, lwork, info);
   }
 
@@ -4256,7 +4382,19 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void sgeqp3(int m, int n, float[] a, int offseta, int lda, int[] jpvt, int offsetjpvt, float[] tau, int offsettau, float[] work, int offsetwork, int lwork, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("SGEQP3", 1, m >= 0);
+    checkArgument("SGEQP3", 2, n >= 0);
+    checkArgument("SGEQP3", 4, lda >= Math.max(1, m));
+    checkArgument("SGEQP3", 8, lwork == -1 || lwork >= Math.max(1, 3 * n + 1));
+    requireNonNull(a);
+    requireNonNull(jpvt);
+    requireNonNull(tau);
+    requireNonNull(work);
+    requireNonNull(info);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetjpvt + n - 1, jpvt.length);
+    checkIndex(offsettau + Math.min(m, n) - 1, tau.length);
+    checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
     sgeqp3K(m, n, a, offseta, lda, jpvt, offsetjpvt, tau, offsettau, work, offsetwork, lwork, info);
   }
 
@@ -4289,7 +4427,19 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void sgeqrf(int m, int n, float[] a, int offseta, int lda, float[] tau, int offsettau, float[] work, int offsetwork, int lwork, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("SGEQRF", 1, m >= 0);
+    checkArgument("SGEQRF", 2, n >= 0);
+    checkArgument("SGEQRF", 4, lda >= Math.max(1, m));
+    checkArgument("SGEQRF", 7, lwork == -1 || lwork >= Math.max(1, n));
+    requireNonNull(a);
+    requireNonNull(tau);
+    requireNonNull(work);
+    requireNonNull(info);
+    if (lwork != -1) {
+      checkIndex(offseta + n * lda - 1, a.length);
+      checkIndex(offsettau + Math.min(m, n) - 1, tau.length);
+    }
+    checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
     sgeqrfK(m, n, a, offseta, lda, tau, offsettau, work, offsetwork, lwork, info);
   }
 
@@ -4410,7 +4560,14 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   public void sgetrf(int m, int n, float[] a, int offseta, int lda, int[] ipiv, int offsetipiv, org.netlib.util.intW info) {
-    //FIXME Add arguments check
+    checkArgument("SGETRF", 1, m >= 0);
+    checkArgument("SGETRF", 2, n >= 0);
+    checkArgument("SGETRF", 4, lda >= Math.max(1, m));
+    requireNonNull(a);
+    requireNonNull(ipiv);
+    requireNonNull(info);
+    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offsetipiv + Math.min(m, n) - 1, ipiv.length);
     sgetrfK(m, n, a, offseta, lda, ipiv, offsetipiv, info);
   }
 
@@ -7704,12 +7861,6 @@ abstract class AbstractLAPACK implements LAPACK {
 
   protected abstract double dsecndK();
 
-  public boolean lsame(String ca, String cb) {
-    return lsameK(ca, cb);
-  }
-
-  protected abstract boolean lsameK(String ca, String cb);
-
   public float second() {
     return secondK();
   }
@@ -7751,4 +7902,8 @@ abstract class AbstractLAPACK implements LAPACK {
   }
 
   protected abstract void slamc5K(int beta, int p, int emin, boolean ieee, org.netlib.util.intW emax, org.netlib.util.floatW rmax);
+
+  public boolean lsame(String ca, String cb) {
+    return ca != null && ca.length() == 1 && ca.equalsIgnoreCase(cb);
+  }
 }
