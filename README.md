@@ -1,3 +1,7 @@
+# Thanks
+
+This project has been largely inspired by [`netlib-java`](https://github.com/fommil/netlib-java) and [@fommil](https://github.com/fommil)'s hard work.
+
 # Build
 
 ## Requirements
