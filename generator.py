@@ -47,18 +47,28 @@ class JBoolean:
     self.native_type_and_name = "int *{name}".format(name=name)
     self.java_type_and_name = [a.format(name=name) for a in ["jboolean {name}"]]
     self.native_argument = "&__n{name}".format(name=name)
-    self.native_local = "int __n{name};".format(name=name)
+    self.native_local = "int __n{name} __attribute__((aligned(8)));".format(name=name)
     self.prolog = "__n{name} = {name};".format(name=name)
-    self.epilog = "if (!__failed) {name} = __n{name};".format(name=name)
+    self.epilog = ""
 class JInt:
   def __init__(self, name):
     self.idx = 0
     self.name = name
     self.native_type_and_name = "int *{name}".format(name=name)
     self.java_type_and_name = [a.format(name=name) for a in ["jint {name}"]]
-    self.native_argument = "&{name}".format(name=name)
-    self.native_local = ""
-    self.prolog = ""
+    self.native_argument = "&__n{name}".format(name=name)
+    self.native_local = "int __n{name} __attribute__((aligned(8)));".format(name=name)
+    self.prolog = "__n{name} = {name};".format(name=name)
+    self.epilog = ""
+class JLong:
+  def __init__(self, name):
+    self.idx = 0
+    self.name = name
+    self.native_type_and_name = "long *{name}".format(name=name)
+    self.java_type_and_name = [a.format(name=name) for a in ["jlong {name}"]]
+    self.native_argument = "&__n{name}".format(name=name)
+    self.native_local = "long __n{name} __attribute__((aligned(8)));".format(name=name)
+    self.prolog = "__n{name} = {name};".format(name=name)
     self.epilog = ""
 class JFloat:
   def __init__(self, name):
@@ -66,9 +76,9 @@ class JFloat:
     self.name = name
     self.native_type_and_name = "float *{name}".format(name=name)
     self.java_type_and_name = [a.format(name=name) for a in ["jfloat {name}"]]
-    self.native_argument = "&{name}".format(name=name)
-    self.native_local = ""
-    self.prolog = ""
+    self.native_argument = "&__n{name}".format(name=name)
+    self.native_local = "float __n{name} __attribute__((aligned(8)));".format(name=name)
+    self.prolog = "__n{name} = {name};".format(name=name)
     self.epilog = ""
 class JDouble:
   def __init__(self, name):
@@ -76,9 +86,9 @@ class JDouble:
     self.name = name
     self.native_type_and_name = "double *{name}".format(name=name)
     self.java_type_and_name = [a.format(name=name) for a in ["jdouble {name}"]]
-    self.native_argument = "&{name}".format(name=name)
-    self.native_local = ""
-    self.prolog = ""
+    self.native_argument = "&__n{name}".format(name=name)
+    self.native_local = "double __n{name} __attribute__((aligned(8)));".format(name=name)
+    self.prolog = "__n{name} = {name};".format(name=name)
     self.epilog = ""
 class JString:
   def __init__(self, name):
