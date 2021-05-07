@@ -170,7 +170,13 @@ class JBooleanArray:
     self.java_type_and_name = [a.format(name=name) for a in ["jbooleanArray {name}", "jint offset{name}"]]
     self.native_argument = "__n{name} + offset{name}".format(name=name)
     self.native_local = "int *__n{name} = NULL; jboolean *__j{name} = NULL;".format(name=name)
-    self.prolog = "if (!(__j{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ __failed = TRUE; goto done; }} do {{ int length = (*env)->GetArrayLength(env, {name}); if (length <= 0) {{ __failed = TRUE; goto done; }} if (!(__n{name} = malloc(sizeof(jboolean) * length))) {{ __failed = TRUE; goto done; }} for (int i = 0; i < length; i++) {{ __n{name}[i] = __j{name}[i]; }} }} while(0);".format(name=name)
+    self.prolog = """if (!(__j{name} = (*env)->GetPrimitiveArrayCritical(env, {name}, NULL))) {{ __failed = TRUE; goto done; }}
+  do {{
+    int __length = (*env)->GetArrayLength(env, {name});
+    if (__length <= 0) {{ __failed = TRUE; goto done; }}
+    if (!(__n{name} = malloc(sizeof(int) * __length))) {{ __failed = TRUE; goto done; }}
+    for (int i = 0; i < __length; i++) {{ __n{name}[i] = __j{name}[i]; }}
+  }} while(0);""".format(name=name)
     self.epilog = "if (__n{name}) {{ free(__n{name}); }} if (__j{name}) (*env)->ReleasePrimitiveArrayCritical(env, {name}, __n{name}, JNI_ABORT);".format(name=name)
 class JIntArray:
   def __init__(self, name, mode = "0"):

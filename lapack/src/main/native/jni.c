@@ -2152,7 +2152,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggevxK(JNIEnv *env, UNUSED jobjec
   if (!(__nrcondv = (*env)->GetPrimitiveArrayCritical(env, rcondv, NULL))) { __failed = TRUE; goto done; }
   if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; }
   if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; }
-  if (!(__jbwork = (*env)->GetPrimitiveArrayCritical(env, bwork, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, bwork); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nbwork = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nbwork[i] = __jbwork[i]; } } while(0);
+  if (!(__jbwork = (*env)->GetPrimitiveArrayCritical(env, bwork, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, bwork);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nbwork = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nbwork[i] = __jbwork[i]; }
+  } while(0);
   dggevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na + offseta, &__nlda, __nb + offsetb, &__nldb, __nalphar + offsetalphar, __nalphai + offsetalphai, __nbeta + offsetbeta, __nvl + offsetvl, &__nldvl, __nvr + offsetvr, &__nldvr, &__nilo, &__nihi, __nlscale + offsetlscale, __nrscale + offsetrscale, &__nabnrm, &__nbbnrm, __nrconde + offsetrconde, __nrcondv + offsetrcondv, __nwork + offsetwork, &__nlwork, __niwork + offsetiwork, __nbwork + offsetbwork, &__ninfo);
 done:
   if (__nbwork) { free(__nbwork); } if (__jbwork) (*env)->ReleasePrimitiveArrayCritical(env, bwork, __nbwork, JNI_ABORT);
@@ -2934,7 +2940,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dhseinK(JNIEnv *env, UNUSED jobjec
   __nmm = mm;
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
   if (!(__nwr = (*env)->GetPrimitiveArrayCritical(env, wr, NULL))) { __failed = TRUE; goto done; }
   if (!(__nwi = (*env)->GetPrimitiveArrayCritical(env, wi, NULL))) { __failed = TRUE; goto done; }
@@ -12549,7 +12561,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgevcK(JNIEnv *env, UNUSED jobjec
   __nmm = mm;
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; }
   if (!(__np = (*env)->GetPrimitiveArrayCritical(env, p, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; }
@@ -12711,7 +12729,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsenK(JNIEnv *env, UNUSED jobjec
   __nlwork = lwork;
   __nliwork = liwork;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; }
   if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; }
   if (!(__nalphar = (*env)->GetPrimitiveArrayCritical(env, alphar, NULL))) { __failed = TRUE; goto done; }
@@ -12849,7 +12873,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsnaK(JNIEnv *env, UNUSED jobjec
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __nlwork = lwork;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; }
   if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; }
@@ -13212,7 +13242,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrevcK(JNIEnv *env, UNUSED jobjec
   __nmm = mm;
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; }
@@ -13352,7 +13388,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrsenK(JNIEnv *env, UNUSED jobjec
   __nlwork = lwork;
   __nliwork = liwork;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; }
   if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
   if (!(__nwr = (*env)->GetPrimitiveArrayCritical(env, wr, NULL))) { __failed = TRUE; goto done; }
@@ -13409,7 +13451,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrsnaK(JNIEnv *env, UNUSED jobjec
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __nldwork = ldwork;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; }
@@ -15834,7 +15882,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggevxK(JNIEnv *env, UNUSED jobjec
   if (!(__nrcondv = (*env)->GetPrimitiveArrayCritical(env, rcondv, NULL))) { __failed = TRUE; goto done; }
   if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; }
   if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; }
-  if (!(__jbwork = (*env)->GetPrimitiveArrayCritical(env, bwork, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, bwork); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nbwork = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nbwork[i] = __jbwork[i]; } } while(0);
+  if (!(__jbwork = (*env)->GetPrimitiveArrayCritical(env, bwork, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, bwork);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nbwork = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nbwork[i] = __jbwork[i]; }
+  } while(0);
   sggevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na + offseta, &__nlda, __nb + offsetb, &__nldb, __nalphar + offsetalphar, __nalphai + offsetalphai, __nbeta + offsetbeta, __nvl + offsetvl, &__nldvl, __nvr + offsetvr, &__nldvr, &__nilo, &__nihi, __nlscale + offsetlscale, __nrscale + offsetrscale, &__nabnrm, &__nbbnrm, __nrconde + offsetrconde, __nrcondv + offsetrcondv, __nwork + offsetwork, &__nlwork, __niwork + offsetiwork, __nbwork + offsetbwork, &__ninfo);
 done:
   if (__nbwork) { free(__nbwork); } if (__jbwork) (*env)->ReleasePrimitiveArrayCritical(env, bwork, __nbwork, JNI_ABORT);
@@ -16616,7 +16670,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_shseinK(JNIEnv *env, UNUSED jobjec
   __nmm = mm;
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
   if (!(__nwr = (*env)->GetPrimitiveArrayCritical(env, wr, NULL))) { __failed = TRUE; goto done; }
   if (!(__nwi = (*env)->GetPrimitiveArrayCritical(env, wi, NULL))) { __failed = TRUE; goto done; }
@@ -26188,7 +26248,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgevcK(JNIEnv *env, UNUSED jobjec
   __nmm = mm;
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; }
   if (!(__np = (*env)->GetPrimitiveArrayCritical(env, p, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; }
@@ -26350,7 +26416,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsenK(JNIEnv *env, UNUSED jobjec
   __nlwork = lwork;
   __nliwork = liwork;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; }
   if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; }
   if (!(__nalphar = (*env)->GetPrimitiveArrayCritical(env, alphar, NULL))) { __failed = TRUE; goto done; }
@@ -26488,7 +26560,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsnaK(JNIEnv *env, UNUSED jobjec
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __nlwork = lwork;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; }
   if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; }
@@ -26851,7 +26929,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strevcK(JNIEnv *env, UNUSED jobjec
   __nmm = mm;
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; }
@@ -26991,7 +27075,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strsenK(JNIEnv *env, UNUSED jobjec
   __nlwork = lwork;
   __nliwork = liwork;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; }
   if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
   if (!(__nwr = (*env)->GetPrimitiveArrayCritical(env, wr, NULL))) { __failed = TRUE; goto done; }
@@ -27048,7 +27138,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strsnaK(JNIEnv *env, UNUSED jobjec
   __nm = (*env)->GetIntField(env, m, intW_val_fieldID);
   __nldwork = ldwork;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; } do { int length = (*env)->GetArrayLength(env, select); if (length <= 0) { __failed = TRUE; goto done; } if (!(__nselect = malloc(sizeof(jboolean) * length))) { __failed = TRUE; goto done; } for (int i = 0; i < length; i++) { __nselect[i] = __jselect[i]; } } while(0);
+  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  do {
+    int __length = (*env)->GetArrayLength(env, select);
+    if (__length <= 0) { __failed = TRUE; goto done; }
+    if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
+    for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
+  } while(0);
   if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; }
   if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; }
