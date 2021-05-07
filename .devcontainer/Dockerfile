@@ -31,5 +31,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install \
         libopenblas-dev libarpack2-dev gdb vim build-essential gcc-x86-64-linux-gnu gcc-aarch64-linux-gnu
 
+RUN git config --global user.email "git@ludovic.dev" \
+ && git config --global user.name "Ludovic Henry" \
+ && git config --global core.editor "vim"
+
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
