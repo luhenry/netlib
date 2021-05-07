@@ -36,15 +36,12 @@ public abstract class LAPACKBenchmark {
 
     public LAPACK lapack;
 
-    @Param({"f2j", "java", "native"})
+    @Param({"java", "native"})
     public String implementation;
 
     @Setup
     public void setupImplementation() {
         switch (implementation) {
-        case "f2j":
-            lapack = dev.ludovic.netlib.lapack.F2jLAPACK.getInstance();
-            break;
         case "java":
             lapack = dev.ludovic.netlib.JavaLAPACK.getInstance();
             break;

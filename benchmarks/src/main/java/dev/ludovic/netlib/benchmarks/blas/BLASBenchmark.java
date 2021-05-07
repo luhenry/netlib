@@ -40,15 +40,12 @@ public abstract class BLASBenchmark {
 
     public BLAS blas;
 
-    @Param({"f2j", "java", "native"})
+    @Param({"java", "native"})
     public String implementation;
 
     @Setup
     public void setupImplementation() {
         switch (implementation) {
-        case "f2j":
-            blas = dev.ludovic.netlib.blas.F2jBLAS.getInstance();
-            break;
         case "java":
             blas = dev.ludovic.netlib.JavaBLAS.getInstance();
             break;

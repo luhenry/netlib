@@ -98,7 +98,7 @@ jobs:
     strategy:
       matrix:
         jdk: [8, 11, 16]
-        implementation: ["f2j", "java", "native"]
+        implementation: ["java", "native"]
         filter: ["dev.ludovic.netlib.benchmarks.blas.l1", "dev.ludovic.netlib.benchmarks.blas.l2", "dev.ludovic.netlib.benchmarks.blas.l3"]
         include:
         - jdk: 16

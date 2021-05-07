@@ -36,15 +36,12 @@ public abstract class ARPACKBenchmark {
 
     public ARPACK arpack;
 
-    @Param({"f2j", "java", "native"})
+    @Param({"java", "native"})
     public String implementation;
 
     @Setup
     public void setupImplementation() {
         switch (implementation) {
-        case "f2j":
-            arpack = dev.ludovic.netlib.arpack.F2jARPACK.getInstance();
-            break;
         case "java":
             arpack = dev.ludovic.netlib.JavaARPACK.getInstance();
             break;
