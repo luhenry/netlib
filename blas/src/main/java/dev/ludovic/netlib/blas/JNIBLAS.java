@@ -53,6 +53,7 @@ public final class JNIBLAS extends AbstractBLAS implements dev.ludovic.netlib.Na
       Files.copy(resource, temp = Files.createTempFile("libnetlibblasjni.so", "",
                                     PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-x---"))),
                   StandardCopyOption.REPLACE_EXISTING);
+      temp.toFile().deleteOnExit();
     } catch (IOException e) {
       throw new RuntimeException("Unable to load native implementation", e);
     }

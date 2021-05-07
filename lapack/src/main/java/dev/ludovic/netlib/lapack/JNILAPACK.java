@@ -53,6 +53,7 @@ public final class JNILAPACK extends AbstractLAPACK implements dev.ludovic.netli
       Files.copy(resource, temp = Files.createTempFile("libnetliblapackjni.so", "",
                                     PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-x---"))),
                   StandardCopyOption.REPLACE_EXISTING);
+      temp.toFile().deleteOnExit();
     } catch (IOException e) {
       throw new RuntimeException("Unable to load native implementation", e);
     }

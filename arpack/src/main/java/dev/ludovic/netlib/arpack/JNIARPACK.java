@@ -53,6 +53,7 @@ public final class JNIARPACK extends AbstractARPACK implements dev.ludovic.netli
       Files.copy(resource, temp = Files.createTempFile("libnetlibarpackjni.so", "",
                                     PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-x---"))),
                   StandardCopyOption.REPLACE_EXISTING);
+      temp.toFile().deleteOnExit();
     } catch (IOException e) {
       throw new RuntimeException("Unable to load native implementation", e);
     }
