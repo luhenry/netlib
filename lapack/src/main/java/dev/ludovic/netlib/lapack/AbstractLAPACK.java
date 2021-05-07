@@ -4065,7 +4065,39 @@ abstract class AbstractLAPACK implements LAPACK {
 
   public void dsyevr(String jobz, String range, String uplo, int n, double[] a, int offseta, int lda, double vl, double vu, int il, int iu, double abstol, org.netlib.util.intW m, double[] w, int offsetw, double[] z, int offsetz, int ldz, int[] isuppz, int offsetisuppz, double[] work, int offsetwork, int lwork, int[] iwork, int offsetiwork, int liwork, org.netlib.util.intW info) {
     if (debug) System.err.println("dsyevr");
-    //FIXME Add arguments check
+    checkArgument("DSYEVR", 1, lsame("N", jobz) || lsame("V", jobz));
+    checkArgument("DSYEVR", 2, lsame("A", range) || lsame("V", range) || lsame("I", range));
+    checkArgument("DSYEVR", 3, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSYEVR", 4, n >= 0);
+    checkArgument("DSYEVR", 6, lda >= Math.max(1, n));
+    if (lwork != -1 || liwork != -1) {
+      if (lsame("V", range)) {
+        checkArgument("DSYEVR", 6, vl < vu);
+        checkArgument("DSYEVR", 8, (n > 0 && 1 <= il && il <= iu) || (n == 0 && il == 0));
+        checkArgument("DSYEVR", 9, (n > 0 && 1 <= iu && iu <= n) || (n == 0 && iu == 0));
+      }
+    }
+    checkArgument("DSYEVR", 15, (lsame("V", jobz) && ldz >= Math.max(1, n)) || (lsame("N", jobz) && ldz >= 1));
+    checkArgument("DSYEVR", 18, lwork == -1 || lwork >= Math.max(1, 26 * n));
+    checkArgument("DSYEVR", 20, liwork == -1 || liwork >= Math.max(1, 10 * n));
+    requireNonNull(a);
+    requireNonNull(m);
+    requireNonNull(w);
+    if (lsame("N", jobz))
+      requireNonNull(z);
+    requireNonNull(isuppz);
+    requireNonNull(work);
+    requireNonNull(iwork);
+    requireNonNull(info);
+    if (lwork != -1 || liwork != -1) {
+      checkIndex(offseta + n * lda - 1, a.length);
+      checkIndex(offsetw + n - 1, w.length);
+      if (lsame("N", jobz))
+        checkIndex(offsetz + Math.max(1, n) * ldz - 1, z.length);
+      checkIndex(offsetisuppz + 2 * Math.max(1, n) - 1, isuppz.length);
+    }
+    checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
+    checkIndex(offsetiwork + Math.max(1, liwork) - 1, iwork.length);
     dsyevrK(jobz, range, uplo, n, a, offseta, lda, vl, vu, il, iu, abstol, m, w, offsetw, z, offsetz, ldz, isuppz, offsetisuppz, work, offsetwork, lwork, iwork, offsetiwork, liwork, info);
   }
 
