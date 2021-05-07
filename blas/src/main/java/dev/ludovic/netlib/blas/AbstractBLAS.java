@@ -29,7 +29,7 @@ import java.util.Objects;
 
 import dev.ludovic.netlib.BLAS;
 
-abstract class AbstractBLAS<T> implements BLAS {
+abstract class AbstractBLAS implements BLAS {
 
   private final static boolean debug = System.getProperty("dev.ludovic.netlib.blas.debug", "false").equals("true");
 
