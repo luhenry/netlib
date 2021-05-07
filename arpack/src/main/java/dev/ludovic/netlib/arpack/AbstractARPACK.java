@@ -869,6 +869,6 @@ abstract class AbstractARPACK implements ARPACK {
 
   public boolean lsame(String ca, String cb) {
     if (debug) System.err.println("lsame");
-    return ca != null && ca.equalsIgnoreCase(cb);
+    return ca != null && ca.regionMatches(true, 0, cb, 0, ca.length());
   }
 }

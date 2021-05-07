@@ -1684,6 +1684,6 @@ abstract class AbstractBLAS<T> implements BLAS {
 
   public boolean lsame(String ca, String cb) {
     if (debug) System.err.println("lsame");
-    return ca != null && ca.length() == 1 && ca.equalsIgnoreCase(cb);
+    return ca != null && ca.regionMatches(true, 0, cb, 0, ca.length());
   }
 }

@@ -9240,6 +9240,8 @@ abstract class AbstractLAPACK implements LAPACK {
 
   public double dlamch(String cmach) {
     if (debug) System.err.println("dlamch");
+    checkArgument("DLAMCH", 1, lsame("E", cmach) || lsame("S", cmach) || lsame("B", cmach) || lsame("P", cmach) || lsame("N", cmach) || lsame("R", cmach) || lsame("M", cmach) || lsame("U", cmach) || lsame("L", cmach) || lsame("O", cmach));
+    requireNonNull(cmach);
     return dlamchK(cmach);
   }
 
@@ -9296,6 +9298,8 @@ abstract class AbstractLAPACK implements LAPACK {
 
   public float slamch(String cmach) {
     if (debug) System.err.println("slamch");
+    requireNonNull(cmach);
+    checkArgument("DLAMCH", 1, lsame("E", cmach) || lsame("S", cmach) || lsame("B", cmach) || lsame("P", cmach) || lsame("N", cmach) || lsame("R", cmach) || lsame("M", cmach) || lsame("U", cmach) || lsame("L", cmach) || lsame("O", cmach));
     return slamchK(cmach);
   }
 
@@ -9338,6 +9342,6 @@ abstract class AbstractLAPACK implements LAPACK {
 
   public boolean lsame(String ca, String cb) {
     if (debug) System.err.println("lsame");
-    return ca != null && ca.length() == 1 && ca.equalsIgnoreCase(cb);
+    return ca != null && ca.regionMatches(true, 0, cb, 0, ca.length());
   }
 }
