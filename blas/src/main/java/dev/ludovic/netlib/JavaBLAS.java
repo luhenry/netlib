@@ -25,25 +25,9 @@
 
 package dev.ludovic.netlib;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public interface JavaBLAS extends BLAS {
 
   public static JavaBLAS getInstance() {
-    String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 2);
-    int major = Integer.parseInt(fullVersion[0]);
-    if (major >= 16) {
-      try {
-        return dev.ludovic.netlib.blas.VectorBLAS.getInstance();
-      } catch (Throwable t) {
-        Logger.getLogger(JavaBLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.blas.VectorBLAS");
-      }
-    }
-    if (major >= 11) {
-      return dev.ludovic.netlib.blas.Java11BLAS.getInstance();
-    } else {
-      return dev.ludovic.netlib.blas.Java8BLAS.getInstance();
-    }
+    return InstanceBuilder.JavaBLAS.getInstance();
   }
 }

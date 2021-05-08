@@ -25,17 +25,9 @@
 
 package dev.ludovic.netlib;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public interface NativeLAPACK extends LAPACK {
 
   public static NativeLAPACK getInstance() {
-    try {
-      return dev.ludovic.netlib.lapack.JNILAPACK.getInstance();
-    } catch (Throwable t) {
-      Logger.getLogger(NativeLAPACK.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.lapack.JNILAPACK");
-    }
-    throw new RuntimeException("Unable to load native implementation");
+    return InstanceBuilder.NativeLAPACK.getInstance();
   }
 }

@@ -25,18 +25,10 @@
 
 package dev.ludovic.netlib;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public interface BLAS {
 
   public static BLAS getInstance() {
-    try {
-      return dev.ludovic.netlib.NativeBLAS.getInstance();
-    } catch (Throwable t) {
-      Logger.getLogger(BLAS.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.NativeBLAS");
-    }
-    return dev.ludovic.netlib.JavaBLAS.getInstance();
+    return InstanceBuilder.BLAS.getInstance();
   }
 
   public double dasum(int n, double[] x, int incx);

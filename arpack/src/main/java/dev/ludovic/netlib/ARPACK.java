@@ -25,18 +25,10 @@
 
 package dev.ludovic.netlib;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public interface ARPACK {
 
   public static ARPACK getInstance() {
-    try {
-      return dev.ludovic.netlib.NativeARPACK.getInstance();
-    } catch (Throwable t) {
-      Logger.getLogger(ARPACK.class.getName()).warning("Failed to load implementation from:dev.ludovic.netlib.NativeARPACK");
-    }
-    return dev.ludovic.netlib.JavaARPACK.getInstance();
+    return InstanceBuilder.ARPACK.getInstance();
   }
 
   public void dmout(int lout, int m, int n, double[] a, int lda, int idigit, String ifmt);

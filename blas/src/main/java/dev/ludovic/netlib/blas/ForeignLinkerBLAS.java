@@ -31,7 +31,6 @@ import java.lang.invoke.MethodType;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.FunctionDescriptor;
@@ -44,8 +43,6 @@ import static jdk.incubator.foreign.CLinker.*;
 import dev.ludovic.netlib.BLAS;
 
 public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic.netlib.NativeBLAS {
-
-  private static final Logger LOGGER = Logger.getLogger(ForeignLinkerBLAS.class.getName());
 
   private static final ForeignLinkerBLAS instance = new ForeignLinkerBLAS();
 
