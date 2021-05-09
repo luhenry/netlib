@@ -2124,11 +2124,9 @@ jboolean get_system_property(JNIEnv *env, jstring key, jstring def, jstring *res
   return TRUE;
 }
 
-static void *libhandle;
-
 jboolean load_symbols(void) {
 #define LOAD_SYMBOL(name) \
-  name = dlsym(libhandle, #name); \
+  name = dlsym(NULL, #name); \
   if (!name) { \
     return FALSE; \
   }
@@ -2195,6 +2193,8 @@ jboolean load_symbols(void) {
 #undef LOAD_SYMBOL
  return TRUE;
 }
+
+static void *libhandle;
 
 jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
   JNIEnv *env;
@@ -2270,7 +2270,7 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
     return -1;
   }
 
-  libhandle = dlopen(name, RTLD_LAZY);
+  libhandle = dlopen(name, RTLD_LAZY | RTLD_GLOBAL);
   if (!libhandle) {
     return -1;
   }
