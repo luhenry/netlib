@@ -42,7 +42,7 @@ public class BLASTest {
 
   final static BLAS f2j = dev.ludovic.netlib.blas.F2jBLAS.getInstance();
 
-  private static Stream<Arguments> BLASImplementations() {
+  private static Stream<Arguments> BLASImplementations() throws Throwable {
     Stream instances = Stream.of(
       Arguments.of(dev.ludovic.netlib.blas.F2jBLAS.getInstance()),
       Arguments.of(dev.ludovic.netlib.blas.JNIBLAS.getInstance())
@@ -62,8 +62,12 @@ public class BLASTest {
     }
     if (major >= 16) {
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of(dev.ludovic.netlib.blas.VectorBLAS.getInstance()),
-        Arguments.of(dev.ludovic.netlib.blas.ForeignLinkerBLAS.getInstance())
+        Arguments.of(dev.ludovic.netlib.blas.VectorBLAS.getInstance())
+      ));
+    }
+    if (major >= 17) {
+      instances = Stream.concat(instances, Stream.of(
+        Arguments.of((dev.ludovic.netlib.NativeBLAS)Class.forName("dev.ludovic.netlib.blas.ForeignLinkerBLAS").getMethod("getInstance").invoke(null))
       ));
     }
 

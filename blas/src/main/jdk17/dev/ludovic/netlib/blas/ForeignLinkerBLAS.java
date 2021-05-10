@@ -46,12 +46,17 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private static final ForeignLinkerBLAS instance = new ForeignLinkerBLAS();
 
-  private final LibraryLookup blas =
-    System.getProperty("dev.ludovic.netlib.blas.nativeLibPath") != null ?
-      LibraryLookup.ofPath(Paths.get(System.getProperty("dev.ludovic.netlib.blas.nativeLibPath"))) :
-      LibraryLookup.ofLibrary(System.getProperty("dev.ludovic.netlib.blas.nativeLib", "blas"));
-
-  protected ForeignLinkerBLAS() {}
+  protected ForeignLinkerBLAS() {
+    String nativeLibPath = System.getProperty("dev.ludovic.netlib.blas.nativeLibPath");
+    String nativeLib = System.getProperty("dev.ludovic.netlib.blas.nativeLib", "blas");
+    if (nativeLibPath != null) {
+      System.load(nativeLibPath);
+    } else if (nativeLib != null) {
+      System.loadLibrary(nativeLib);
+    } else {
+      throw new RuntimeException("Unable to load native implementation");
+    }
+  }
 
   public static dev.ludovic.netlib.NativeBLAS getInstance() {
     return instance;
@@ -215,7 +220,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dasumHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dasum").get(), MethodType.methodType(double.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dasum").get(), MethodType.methodType(double.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.of(C_DOUBLE, C_INT, C_POINTER, C_INT));
 
   protected double dasumK(int n, double[] x, int offsetx, int incx) {
@@ -228,7 +233,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sasumHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sasum").get(), MethodType.methodType(float.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sasum").get(), MethodType.methodType(float.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.of(C_FLOAT, C_INT, C_POINTER, C_INT));
 
   protected float sasumK(int n, float[] x, int offsetx, int incx) {
@@ -241,7 +246,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle daxpyHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_daxpy").get(), MethodType.methodType(void.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_daxpy").get(), MethodType.methodType(void.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void daxpyK(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
@@ -255,7 +260,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle saxpyHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_saxpy").get(), MethodType.methodType(void.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_saxpy").get(), MethodType.methodType(void.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void saxpyK(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
@@ -269,7 +274,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dcopyHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dcopy").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dcopy").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dcopyK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
@@ -283,7 +288,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle scopyHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_scopy").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_scopy").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void scopyK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
@@ -297,7 +302,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle ddotHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_ddot").get(), MethodType.methodType(double.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_ddot").get(), MethodType.methodType(double.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.of(C_DOUBLE, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected double ddotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
@@ -311,7 +316,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sdotHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sdot").get(), MethodType.methodType(float.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sdot").get(), MethodType.methodType(float.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.of(C_FLOAT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected float sdotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
@@ -325,7 +330,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sdsdotHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sdsdot").get(), MethodType.methodType(float.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sdsdot").get(), MethodType.methodType(float.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.of(C_FLOAT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected float sdsdotK(int n, float sb, float[] sx, int offsetsx, int incsx, float[] sy, int offsetsy, int incsy) {
@@ -339,7 +344,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dgbmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dgbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dgbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dgbmvK(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
@@ -354,7 +359,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sgbmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sgbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sgbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void sgbmvK(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
@@ -369,7 +374,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dgemmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dgemm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dgemm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dgemmK(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
@@ -384,7 +389,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sgemmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sgemm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sgemm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void sgemmK(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
@@ -399,7 +404,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dgemvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dgemv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dgemv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dgemvK(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
@@ -414,7 +419,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sgemvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sgemv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sgemv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void sgemvK(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
@@ -429,7 +434,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dgerHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dger").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dger").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dgerK(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
@@ -444,7 +449,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sgerHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sger").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sger").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void sgerK(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
@@ -459,7 +464,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dnrm2Handle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dnrm2").get(), MethodType.methodType(double.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dnrm2").get(), MethodType.methodType(double.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.of(C_DOUBLE, C_INT, C_POINTER, C_INT));
 
   protected double dnrm2K(int n, double[] x, int offsetx, int incx) {
@@ -472,7 +477,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle snrm2Handle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_snrm2").get(), MethodType.methodType(float.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_snrm2").get(), MethodType.methodType(float.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.of(C_FLOAT, C_INT, C_POINTER, C_INT));
 
   protected float snrm2K(int n, float[] x, int offsetx, int incx) {
@@ -485,7 +490,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle drotHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_drot").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, double.class),
+        CLinker.findNative("cblas_drot").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, double.class),
           FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT, C_DOUBLE, C_DOUBLE));
 
   protected void drotK(int n, double[] dx, int offsetdx, int incx, double[] dy, int offsetdy, int incy, double c, double s) {
@@ -499,7 +504,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle srotHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_srot").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, float.class),
+        CLinker.findNative("cblas_srot").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, float.class),
           FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT, C_FLOAT, C_FLOAT));
 
   protected void srotK(int n, float[] sx, int offsetsx, int incx, float[] sy, int offsetsy, int incy, float c, float s) {
@@ -513,7 +518,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle drotmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_drotm").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class),
+        CLinker.findNative("cblas_drotm").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class),
           FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT, C_POINTER));
 
   protected void drotmK(int n, double[] dx, int offsetdx, int incx, double[] dy, int offsetdy, int incy, double[] dparam, int offsetdparam) {
@@ -528,7 +533,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle srotmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_srotm").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class),
+        CLinker.findNative("cblas_srotm").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class),
           FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT, C_POINTER));
 
   protected void srotmK(int n, float[] sx, int offsetsx, int incx, float[] sy, int offsetsy, int incy, float[] sparam, int offsetsparam) {
@@ -543,7 +548,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle drotmgHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_drotmg").get(), MethodType.methodType(void.class, MemoryAddress.class, MemoryAddress.class, MemoryAddress.class, double.class, MemoryAddress.class),
+        CLinker.findNative("cblas_drotmg").get(), MethodType.methodType(void.class, MemoryAddress.class, MemoryAddress.class, MemoryAddress.class, double.class, MemoryAddress.class),
           FunctionDescriptor.ofVoid(C_POINTER, C_POINTER, C_POINTER, C_DOUBLE, C_POINTER));
 
   protected void drotmgK(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] dparam, int offsetdparam) {
@@ -552,7 +557,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle srotmgHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_srotmg").get(), MethodType.methodType(void.class, MemoryAddress.class, MemoryAddress.class, MemoryAddress.class, float.class, MemoryAddress.class),
+        CLinker.findNative("cblas_srotmg").get(), MethodType.methodType(void.class, MemoryAddress.class, MemoryAddress.class, MemoryAddress.class, float.class, MemoryAddress.class),
           FunctionDescriptor.ofVoid(C_POINTER, C_POINTER, C_POINTER, C_FLOAT, C_POINTER));
 
   protected void srotmgK(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] sparam, int offsetsparam) {
@@ -561,7 +566,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dsbmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dsbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dsbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dsbmvK(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
@@ -576,7 +581,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle ssbmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_ssbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_ssbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void ssbmvK(String uplo, int n, int k, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
@@ -591,7 +596,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dscalHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dscal").get(), MethodType.methodType(void.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dscal").get(), MethodType.methodType(void.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dscalK(int n, double alpha, double[] x, int offsetx, int incx) {
@@ -604,7 +609,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sscalHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sscal").get(), MethodType.methodType(void.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sscal").get(), MethodType.methodType(void.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void sscalK(int n, float alpha, float[] x, int offsetx, int incx) {
@@ -617,7 +622,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dspmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dspmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dspmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dspmvK(String uplo, int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
@@ -632,7 +637,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sspmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sspmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sspmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void sspmvK(String uplo, int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
@@ -647,7 +652,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dsprHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dspr").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class),
+        CLinker.findNative("cblas_dspr").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER));
 
   protected void dsprK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
@@ -661,7 +666,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle ssprHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sspr").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class),
+        CLinker.findNative("cblas_sspr").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER));
 
   protected void ssprK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
@@ -675,7 +680,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dspr2Handle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dspr2").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class),
+        CLinker.findNative("cblas_dspr2").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_POINTER));
 
   protected void dspr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta) {
@@ -690,7 +695,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sspr2Handle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sspr2").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class),
+        CLinker.findNative("cblas_sspr2").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_POINTER));
 
   protected void sspr2K(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta) {
@@ -705,7 +710,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dswapHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dswap").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dswap").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
@@ -719,7 +724,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle sswapHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_sswap").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_sswap").get(), MethodType.methodType(void.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void sswapK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
@@ -733,7 +738,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dsymmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dsymm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dsymm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dsymmK(String side, String uplo, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
@@ -748,7 +753,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle ssymmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_ssymm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_ssymm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void ssymmK(String side, String uplo, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
@@ -763,7 +768,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dsymvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dsymv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dsymv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dsymvK(String uplo, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
@@ -778,7 +783,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle ssymvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_ssymv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_ssymv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void ssymvK(String uplo, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
@@ -793,7 +798,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dsyrHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dsyr").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dsyr").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dsyrK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
@@ -807,7 +812,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle ssyrHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_ssyr").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_ssyr").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void ssyrK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda) {
@@ -821,7 +826,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dsyr2Handle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dsyr2").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dsyr2").get(), MethodType.methodType(void.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dsyr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
@@ -836,7 +841,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle ssyr2Handle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_ssyr2").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_ssyr2").get(), MethodType.methodType(void.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void ssyr2K(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
@@ -851,7 +856,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dsyr2kHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dsyr2k").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dsyr2k").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dsyr2kK(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
@@ -866,7 +871,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle ssyr2kHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_ssyr2k").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_ssyr2k").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void ssyr2kK(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
@@ -881,7 +886,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dsyrkHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dsyrk").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dsyrk").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, double.class, MemoryAddress.class, int.class, double.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_DOUBLE, C_POINTER, C_INT));
 
   protected void dsyrkK(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double beta, double[] c, int offsetc, int ldc) {
@@ -890,7 +895,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle ssyrkHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_ssyrk").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_ssyrk").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, float.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_FLOAT, C_POINTER, C_INT));
 
   protected void ssyrkK(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float beta, float[] c, int offsetc, int ldc) {
@@ -899,7 +904,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dtbmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dtbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dtbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dtbmvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
@@ -908,7 +913,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle stbmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_stbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_stbmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void stbmvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
@@ -917,7 +922,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dtbsvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dtbsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dtbsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dtbsvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
@@ -926,7 +931,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle stbsvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_stbsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_stbsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void stbsvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
@@ -935,7 +940,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dtpmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dtpmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dtpmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_POINTER, C_INT));
 
   protected void dtpmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
@@ -944,7 +949,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle stpmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_stpmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_stpmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_POINTER, C_INT));
 
   protected void stpmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
@@ -953,7 +958,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dtpsvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dtpsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dtpsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_POINTER, C_INT));
 
   protected void dtpsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
@@ -962,7 +967,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle stpsvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_stpsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_stpsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_POINTER, C_INT));
 
   protected void stpsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
@@ -971,7 +976,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dtrmmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dtrmm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dtrmm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dtrmmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
@@ -980,7 +985,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle strmmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_strmm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_strmm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void strmmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
@@ -989,7 +994,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dtrmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dtrmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dtrmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dtrmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
@@ -998,7 +1003,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle strmvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_strmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_strmv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void strmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
@@ -1007,7 +1012,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dtrsmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dtrsm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dtrsm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, int.class, double.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_INT, C_DOUBLE, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dtrsmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
@@ -1016,7 +1021,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle strsmHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_strsm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_strsm").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, int.class, int.class, float.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_INT, C_FLOAT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void strsmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
@@ -1025,7 +1030,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle dtrsvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_dtrsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_dtrsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void dtrsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
@@ -1034,7 +1039,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle strsvHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_strsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_strsv").get(), MethodType.methodType(void.class, int.class, int.class, int.class, int.class, int.class, MemoryAddress.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.ofVoid(C_INT, C_INT, C_INT, C_INT, C_INT, C_POINTER, C_INT, C_POINTER, C_INT));
 
   protected void strsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
@@ -1043,7 +1048,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle idamaxHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_idamax").get(), MethodType.methodType(int.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_idamax").get(), MethodType.methodType(int.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.of(C_INT, C_INT, C_POINTER, C_INT));
 
   protected int idamaxK(int n, double[] dx, int offsetdx, int incdx) {
@@ -1056,7 +1061,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
 
   private final MethodHandle isamaxHandle =
       CLinker.getInstance().downcallHandle(
-        blas.lookup("cblas_isamax").get(), MethodType.methodType(int.class, int.class, MemoryAddress.class, int.class),
+        CLinker.findNative("cblas_isamax").get(), MethodType.methodType(int.class, int.class, MemoryAddress.class, int.class),
           FunctionDescriptor.of(C_INT, C_INT, C_POINTER, C_INT));
 
   protected int isamaxK(int n, float[] sx, int offsetsx, int incx) {

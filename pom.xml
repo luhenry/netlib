@@ -79,8 +79,8 @@ information or have any questions.
         <jdk>16</jdk>
       </activation>
       <properties>
-        <jvm.modules>--add-modules=jdk.incubator.vector,jdk.incubator.foreign</jvm.modules>
-        <argLine>${jvm.modules} -Dforeign.restricted=permit</argLine>
+        <jvm.modules>--add-modules=jdk.incubator.vector</jvm.modules>
+        <argLine>${jvm.modules}</argLine>
       </properties>
     </profile>
     <profile>
