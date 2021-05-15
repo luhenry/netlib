@@ -44,7 +44,7 @@ public class BLASTest {
 
   private static Stream<Arguments> BLASImplementations() throws Throwable {
     Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.blas.F2jBLAS.getInstance()),
+      Arguments.of(f2j),
       Arguments.of(dev.ludovic.netlib.blas.JNIBLAS.getInstance())
     );
 
