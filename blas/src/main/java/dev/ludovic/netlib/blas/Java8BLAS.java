@@ -5152,4 +5152,16 @@ public class Java8BLAS extends AbstractSparseBLAS implements dev.ludovic.netlib.
   protected int isamaxK(int n, float[] x, int offsetx, int incx) {
     return org.netlib.blas.Isamax.isamax(n, x, offsetx, incx);
   }
+
+  protected void daxpyiK(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    for (int i = 0; i < n; i += 1) {
+      y[offsety + indx[offsetindx + i + 0]] += alpha * x[offsetx + i + 0];
+    }
+  }
+
+  protected void saxpyiK(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    for (int i = 0; i < n; i += 1) {
+      y[offsety + indx[offsetindx + i + 0]] += alpha * x[offsetx + i + 0];
+    }
+  }
 }

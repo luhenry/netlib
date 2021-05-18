@@ -1879,4 +1879,32 @@ public class VectorBLAS extends Java11BLAS implements dev.ludovic.netlib.JavaBLA
       super.ssymvU(n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
     }
   }
+
+  protected void daxpyiK(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    int i = 0;
+    DoubleVector valpha = DoubleVector.broadcast(DMAX, alpha);
+    for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+      DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + (i + 0 * DMAX.length()));
+      DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety, indx, offsetindx + (i + 0 * DMAX.length()));
+      valpha.fma(vx0, vy0)
+        .intoArray(y, offsety, indx, offsetindx + (i + 0 * DMAX.length()));
+    }
+    for (; i < n; i += 1) {
+      y[offsety + indx[offsetindx + (i + 0)]] = Math.fma(alpha, x[offsetx + (i + 0)], y[offsety + indx[offsetindx + (i + 0)]]);
+    }
+  }
+
+  protected void saxpyiK(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    int i = 0;
+    FloatVector valpha = FloatVector.broadcast(FMAX, alpha);
+    for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+      FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + (i + 0 * FMAX.length()));
+      FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety, indx, offsetindx + (i + 0 * FMAX.length()));
+      valpha.fma(vx0, vy0)
+        .intoArray(y, offsety, indx, offsetindx + (i + 0 * FMAX.length()));
+    }
+    for (; i < n; i += 1) {
+      y[offsety + indx[offsetindx + (i + 0)]] = Math.fma(alpha, x[offsetx + (i + 0)], y[offsety + indx[offsetindx + (i + 0)]]);
+    }
+  }
 }

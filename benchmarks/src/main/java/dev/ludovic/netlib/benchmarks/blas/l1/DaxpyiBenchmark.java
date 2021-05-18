@@ -23,23 +23,33 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.benchmarks.blas.l1;
 
-public interface SparseBLAS {
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
-  public static SparseBLAS getInstance() {
-    return InstanceBuilder.SparseBLAS.getInstance();
-  }
+@State(Scope.Thread)
+public class DaxpyiBenchmark extends SparseL1Benchmark {
 
-  public default void daxpyi(int n, double alpha, double[] x, int[] indx, double[] y) {
-    daxpyi(n, alpha, x, 0, indx, 0, y, 0);
-  }
+    @Param({"10", "100000000"})
+    public int n;
 
-  public void daxpyi(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
+    public double alpha;
+    public double[] x;
+    public int[] indx;
+    public double[] y, yclone;
 
-  public default void saxpyi(int n, float alpha, float[] x, int[] indx, float[] y) {
-    saxpyi(n, alpha, x, 0, indx, 0, y, 0);
-  }
+    @Setup(Level.Trial)
+    public void setup() {
+        alpha = randomDouble();
+        x = randomDoubleArray(n);
+        indx = randomIndexArray(n, n * 3);
+        y = randomDoubleArray(n * 3);
+    }
 
-  public void saxpyi(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+    @Benchmark
+    public void run(Blackhole bh) {
+        blas.daxpyi(n, alpha, x, indx, yclone = y.clone());
+        bh.consume(yclone);
+    }
 }

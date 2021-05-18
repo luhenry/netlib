@@ -49,4 +49,42 @@ abstract class AbstractSparseBLAS extends AbstractBLAS implements SparseBLAS {
   private <T> void requireNonNull(T obj) {
     Objects.requireNonNull(obj);
   }
+
+  public void daxpyi(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    if (debug) System.err.println("daxpyi");
+    if (n <= 0) {
+      return;
+    }
+    if (alpha == 0.0) {
+      return;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    checkIndex(offsety + indx[offsetindx + n - 1], y.length);
+    daxpyiK(n, alpha, x, offsetx, indx, offsetindx, y, offsety);
+  }
+
+  protected abstract void daxpyiK(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
+
+  public void saxpyi(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    if (debug) System.err.println("saxpyi");
+    if (n <= 0) {
+      return;
+    }
+    if (alpha == 0.0f) {
+      return;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    checkIndex(offsety + indx[offsetindx + n - 1], y.length);
+    saxpyiK(n, alpha, x, offsetx, indx, offsetindx, y, offsety);
+  }
+
+  protected abstract void saxpyiK(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
 }

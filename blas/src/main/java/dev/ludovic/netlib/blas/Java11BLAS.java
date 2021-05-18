@@ -2452,4 +2452,18 @@ public class Java11BLAS extends Java8BLAS {
     }
     return (float)Math.sqrt(sum);
   }
+
+  protected void daxpyiK(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    for (int i = 0; i < n; i += 1) {
+      int indx0 = indx[offsetindx + (i + 0)];
+      y[offsety + indx0] = Math.fma(alpha, x[offsetx + (i + 0)], y[offsety + indx0]);
+    }
+  }
+
+  protected void saxpyiK(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    for (int i = 0; i < n; i += 1) {
+      int indx0 = indx[offsetindx + (i + 0)];
+      y[offsety + indx0] = Math.fma(alpha, x[offsetx + (i + 0)], y[offsety + indx0]);
+    }
+  }
 }
