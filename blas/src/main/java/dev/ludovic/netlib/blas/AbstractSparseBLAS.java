@@ -156,4 +156,35 @@ abstract class AbstractSparseBLAS extends AbstractBLAS implements SparseBLAS {
 
   protected abstract float sdotiiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy);
 
+  public void dcopyi(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    if (debug) System.err.println ("dcopyi");
+    if (n <= 0) {
+      return;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    checkIndex(offsety + indx[offsetindx + n - 1], y.length);
+    dcopyiK(n, x, offsetx, indx, offsetindx, y, offsety);
+  }
+
+  protected abstract void dcopyiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
+
+  public void scopyi(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    if (debug) System.err.println ("scopyi");
+    if (n <= 0) {
+      return;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    checkIndex(offsety + indx[offsetindx + n - 1], y.length);
+    scopyiK(n, x, offsetx, indx, offsetindx, y, offsety);
+  }
+
+  protected abstract void scopyiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
 }

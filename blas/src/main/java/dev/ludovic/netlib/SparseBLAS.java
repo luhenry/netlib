@@ -66,4 +66,16 @@ public interface SparseBLAS {
   }
 
   public float sdotii(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy);
+
+  public default void dcopyi(int n, double[] x, int[] indx, double[] y) {
+    dcopyi(n, x, 0, indx, 0, y, 0);
+  }
+
+  public void dcopyi(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
+
+  public default void scopyi(int n, float[] x, int[] indx, float[] y) {
+    scopyi(n, x, 0, indx, 0, y, 0);
+  }
+
+  public void scopyi(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
 }

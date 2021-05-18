@@ -5228,4 +5228,18 @@ public class Java8BLAS extends AbstractSparseBLAS implements dev.ludovic.netlib.
     }
     return sum;
   }
+
+  protected void dcopyiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    int i = 0;
+    for (; i < n; i++) {
+      y[offsety + indx[offsetindx + i + 0]] = x[offsetx + i + 0];
+    }
+  }
+
+  protected void scopyiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    int i = 0;
+    for (; i < n; i++) {
+      y[offsety + indx[offsetindx + i + 0]] = x[offsetx + i + 0];
+    }
+  }
 }

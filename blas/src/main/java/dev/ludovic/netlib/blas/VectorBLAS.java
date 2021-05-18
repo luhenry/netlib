@@ -1937,4 +1937,26 @@ public class VectorBLAS extends Java11BLAS implements dev.ludovic.netlib.JavaBLA
     }
     return sum;
   }
+
+  protected void dcopyiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    int i = 0;
+    for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+      DoubleVector.fromArray(DMAX, x, offsetx + (i + 0 * DMAX.length()))
+        .intoArray(y, offsety, indx, offsetindx + (i + 0 * DMAX.length()));
+    }
+    for (; i < n; i += 1) {
+      y[offsety + indx[offsetindx + i + 0]] = x[offsetx + i + 0];
+    }
+  }
+
+  protected void scopyiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    int i = 0;
+    for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+      FloatVector.fromArray(FMAX, x, offsetx + (i + 0 * FMAX.length()))
+        .intoArray(y, offsety, indx, offsetindx + (i + 0 * FMAX.length()));
+    }
+    for (; i < n; i += 1) {
+      y[offsety + indx[offsetindx + i + 0]] = x[offsetx + i + 0];
+    }
+  }
 }
