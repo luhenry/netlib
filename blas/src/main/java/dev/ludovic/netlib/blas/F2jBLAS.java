@@ -25,15 +25,13 @@
 
 package dev.ludovic.netlib.blas;
 
-import dev.ludovic.netlib.BLAS;
-
-public final class F2jBLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLAS {
+public final class F2jBLAS extends AbstractBLAS {
 
   private static final F2jBLAS instance = new F2jBLAS();
 
   protected F2jBLAS() {}
 
-  public static dev.ludovic.netlib.JavaBLAS getInstance() {
+  public static dev.ludovic.netlib.BLAS getInstance() {
     return instance;
   }
 
