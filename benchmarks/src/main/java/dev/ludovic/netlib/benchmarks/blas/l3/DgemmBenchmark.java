@@ -64,7 +64,7 @@ public class DgemmBenchmark extends L3Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.dgemm(transa, transb, m, n, k, alpha, a, transa.equals("N") ? m : k, b, transb.equals("N") ? k : n, beta, cclone = c.clone(), m);
         bh.consume(cclone);
     }

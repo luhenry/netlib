@@ -48,7 +48,7 @@ public class SdsdotBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         bh.consume(blas.sdsdot(n, sb, x, 1, y, 1));
     }
 }

@@ -53,7 +53,7 @@ public class Dsyr2Benchmark extends L2Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.dsyr2(uplo, n, alpha, x, 1, y, 1, aclone = a.clone(), n);
         bh.consume(aclone);
     }

@@ -50,7 +50,7 @@ public class DrotBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.drot(n, xclone = x.clone(), 1, yclone = y.clone(), 1, c, s);
         bh.consume(xclone);
         bh.consume(yclone);

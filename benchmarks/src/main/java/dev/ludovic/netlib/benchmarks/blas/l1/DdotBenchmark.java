@@ -46,7 +46,7 @@ public class DdotBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         bh.consume(blas.ddot(n, x, 1, y, 1));
     }
 }

@@ -51,7 +51,7 @@ public class SsprBenchmark extends L2Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.sspr(uplo, n, alpha, x, 1, aclone = a.clone());
         bh.consume(aclone);
     }

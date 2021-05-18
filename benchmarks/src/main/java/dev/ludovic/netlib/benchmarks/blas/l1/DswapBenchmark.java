@@ -46,7 +46,7 @@ public class DswapBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.dswap(n, xclone = x.clone(), 1, yclone = y.clone(), 1);
         bh.consume(xclone);
         bh.consume(yclone);

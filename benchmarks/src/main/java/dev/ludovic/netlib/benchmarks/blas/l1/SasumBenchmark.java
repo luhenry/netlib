@@ -44,7 +44,7 @@ public class SasumBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         bh.consume(blas.sasum(n, x, 1));
     }
 }

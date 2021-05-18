@@ -48,7 +48,7 @@ public class SaxpyBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.saxpy(n, alpha, x, 1, yclone = y.clone(), 1);
         bh.consume(yclone);
     }

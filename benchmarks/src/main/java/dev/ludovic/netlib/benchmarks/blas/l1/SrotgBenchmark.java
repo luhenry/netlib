@@ -51,7 +51,7 @@ public class SrotgBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.srotg(saclone = new floatW(sa.val), sbclone = new floatW(sb.val), cclone = new floatW(c.val), sclone = new floatW(s.val));
         bh.consume(saclone);
         bh.consume(sbclone);

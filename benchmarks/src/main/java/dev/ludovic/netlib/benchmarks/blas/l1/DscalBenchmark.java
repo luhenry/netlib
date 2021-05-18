@@ -46,7 +46,7 @@ public class DscalBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.dscal(n, alpha, xclone = x.clone(), 1);
         bh.consume(xclone);
     }

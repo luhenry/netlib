@@ -51,7 +51,7 @@ public class DrotgBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.drotg(saclone = new doubleW(sa.val), sbclone = new doubleW(sb.val), cclone = new doubleW(c.val), sclone = new doubleW(s.val));
         bh.consume(saclone);
         bh.consume(sbclone);

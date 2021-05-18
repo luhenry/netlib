@@ -44,7 +44,7 @@ public class IdamaxBenchmark extends L1Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         bh.consume(blas.idamax(n, x, 1));
     }
 }

@@ -58,7 +58,7 @@ public class SgemvBenchmark extends L2Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.sgemv(trans, m, n, alpha, a, m, x, 1, beta, yclone = y.clone(), 1);
         bh.consume(yclone);
     }

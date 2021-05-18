@@ -55,7 +55,7 @@ public class DspmvBenchmark extends L2Benchmark {
     }
 
     @Benchmark
-    public void blas(Blackhole bh) {
+    public void run(Blackhole bh) {
         blas.dspmv(uplo, n, alpha, a, x, 1, beta, yclone = y.clone(), 1);
         bh.consume(yclone);
     }
