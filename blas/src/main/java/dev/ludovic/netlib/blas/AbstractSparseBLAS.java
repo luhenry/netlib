@@ -119,4 +119,41 @@ abstract class AbstractSparseBLAS extends AbstractBLAS implements SparseBLAS {
   }
 
   protected abstract float sdotiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+
+  public double ddotii(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety, int[] indy, int offsetindy) {
+    if (debug) System.err.println("ddotii");
+    if (n <= 0) {
+      return 0.0;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    requireNonNull(indy);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    checkIndex(offsety + n - 1, y.length);
+    checkIndex(offsetindy + n - 1, indy.length);
+    return ddotiiK(n, x, offsetx, indx, offsetindx, y, offsety, indy, offsetindy);
+  }
+
+  protected abstract double ddotiiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety, int[] indy, int offsetindy);
+
+  public float sdotii(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy) {
+    if (debug) System.err.println("sdotii");
+    if (n <= 0) {
+      return 0.0f;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    requireNonNull(indy);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    checkIndex(offsety + n - 1, y.length);
+    checkIndex(offsetindy + n - 1, indy.length);
+    return sdotiiK(n, x, offsetx, indx, offsetindx, y, offsety, indy, offsetindy);
+  }
+
+  protected abstract float sdotiiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy);
+
 }

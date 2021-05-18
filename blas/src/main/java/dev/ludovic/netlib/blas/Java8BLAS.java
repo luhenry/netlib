@@ -5204,4 +5204,28 @@ public class Java8BLAS extends AbstractSparseBLAS implements dev.ludovic.netlib.
     }
     return sum;
   }
+
+  protected double ddotiiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety, int[] indy, int offsetindy) {
+    double sum = 0.0;
+    for (int ix = 0, iy = 0; ix < n && iy < n;) {
+      int indx0 = indx[offsetindx + (ix + 0)];
+      int indy0 = indy[offsetindy + (iy + 0)];
+      sum += x[offsetx + ix] * y[offsety + iy] * (indx0 == indy0 ? 1 : 0);
+      ix += indx0 <= indy0 ? 1 : 0;
+      iy += indx0 >= indy0 ? 1 : 0;
+    }
+    return sum;
+  }
+
+  protected float sdotiiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy) {
+    float sum = 0.0f;
+    for (int ix = 0, iy = 0; ix < n && iy < n;) {
+      int indx0 = indx[offsetindx + (ix + 0)];
+      int indy0 = indy[offsetindy + (iy + 0)];
+      sum += x[offsetx + ix] * y[offsety + iy] * (indx0 == indy0 ? 1 : 0);
+      ix += indx0 <= indy0 ? 1 : 0;
+      iy += indx0 >= indy0 ? 1 : 0;
+    }
+    return sum;
+  }
 }

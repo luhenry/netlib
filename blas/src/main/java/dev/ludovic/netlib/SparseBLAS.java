@@ -54,4 +54,16 @@ public interface SparseBLAS {
   }
 
   public float sdoti(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+
+  public default double ddotii(int n, double[] x, int[] indx, double[] y, int[] indy) {
+    return ddotii(n, x, 0, indx, 0, y, 0, indy, 0);
+  }
+
+  public double ddotii(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety, int[] indy, int offsetindy);
+
+  public default float sdotii(int n, float[] x, int[] indx, float[] y, int[] indy) {
+    return sdotii(n, x, 0, indx, 0, y, 0, indy, 0);
+  }
+
+  public float sdotii(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy);
 }
