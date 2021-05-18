@@ -23,35 +23,30 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.benchmarks.blas.l1;
 
-public interface SparseBLAS {
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
-  public static SparseBLAS getInstance() {
-    return InstanceBuilder.SparseBLAS.getInstance();
-  }
+@State(Scope.Thread)
+public class SdotiBenchmark extends SparseL1Benchmark {
 
-  public default void daxpyi(int n, double alpha, double[] x, int[] indx, double[] y) {
-    daxpyi(n, alpha, x, 0, indx, 0, y, 0);
-  }
+    @Param({"10", "100000000"})
+    public int n;
 
-  public void daxpyi(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
+    public float[] x;
+    public int[] indx;
+    public float[] y;
 
-  public default void saxpyi(int n, float alpha, float[] x, int[] indx, float[] y) {
-    saxpyi(n, alpha, x, 0, indx, 0, y, 0);
-  }
+    @Setup
+    public void setup() {
+        x = randomFloatArray(n);
+        indx = randomIndexArray(n, n * 3);
+        y = randomFloatArray(n * 3);
+    }
 
-  public void saxpyi(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
-
-  public default double ddoti(int n, double[] x, int[] indx, double[] y) {
-    return ddoti(n, x, 0, indx, 0, y, 0);
-  }
-
-  public double ddoti(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
-
-  public default float sdoti(int n, float[] x, int[] indx, float[] y) {
-    return sdoti(n, x, 0, indx, 0, y, 0);
-  }
-
-  public float sdoti(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+    @Benchmark
+    public void run(Blackhole bh) {
+        bh.consume(blas.sdoti(n, x, indx, y));
+    }
 }

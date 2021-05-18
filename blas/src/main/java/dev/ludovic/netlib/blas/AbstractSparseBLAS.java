@@ -87,4 +87,36 @@ abstract class AbstractSparseBLAS extends AbstractBLAS implements SparseBLAS {
   }
 
   protected abstract void saxpyiK(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+
+  public double ddoti(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    if (debug) System.err.println("ddoti");
+    if (n <= 0) {
+      return 0.0;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    checkIndex(offsety + indx[offsetindx + n - 1], y.length);
+    return ddotiK(n, x, offsetx, indx, offsetindx, y, offsety);
+  }
+
+  protected abstract double ddotiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
+
+  public float sdoti(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    if (debug) System.err.println("sdoti");
+    if (n <= 0) {
+      return 0.0f;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    checkIndex(offsety + indx[offsetindx + n - 1], y.length);
+    return sdotiK(n, x, offsetx, indx, offsetindx, y, offsety);
+  }
+
+  protected abstract float sdotiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
 }

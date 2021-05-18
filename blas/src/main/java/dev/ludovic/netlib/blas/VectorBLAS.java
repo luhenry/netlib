@@ -1907,4 +1907,34 @@ public class VectorBLAS extends Java11BLAS implements dev.ludovic.netlib.JavaBLA
       y[offsety + indx[offsetindx + (i + 0)]] = Math.fma(alpha, x[offsetx + (i + 0)], y[offsety + indx[offsetindx + (i + 0)]]);
     }
   }
+
+  protected double ddotiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    int i = 0;
+    DoubleVector vsum0 = DoubleVector.zero(DMAX);
+    for (; i < DMAX.loopBound(n); i += DMAX.length()) {
+      DoubleVector vx0 = DoubleVector.fromArray(DMAX, x, offsetx + (i + 0 * DMAX.length()));
+      DoubleVector vy0 = DoubleVector.fromArray(DMAX, y, offsety, indx, offsetindx + (i + 0 * DMAX.length()));
+      vsum0 = vx0.fma(vy0, vsum0);
+    }
+    double sum = vsum0.reduceLanes(VectorOperators.ADD);
+    for (; i < n; i += 1) {
+      sum = Math.fma(x[offsetx + (i + 0)], y[offsety + indx[offsetindx + (i + 0)]], sum);
+    }
+    return sum;
+  }
+
+  protected float sdotiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    int i = 0;
+    FloatVector vsum0 = FloatVector.zero(FMAX);
+    for (; i < FMAX.loopBound(n); i += FMAX.length()) {
+      FloatVector vx0 = FloatVector.fromArray(FMAX, x, offsetx + (i + 0 * FMAX.length()));
+      FloatVector vy0 = FloatVector.fromArray(FMAX, y, offsety, indx, offsetindx + (i + 0 * FMAX.length()));
+      vsum0 = vx0.fma(vy0, vsum0);
+    }
+    float sum = vsum0.reduceLanes(VectorOperators.ADD);
+    for (; i < n; i += 1) {
+      sum = Math.fma(x[offsetx + (i + 0)], y[offsety + indx[offsetindx + (i + 0)]], sum);
+    }
+    return sum;
+  }
 }

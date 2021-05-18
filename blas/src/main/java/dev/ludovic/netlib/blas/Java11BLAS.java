@@ -2466,4 +2466,44 @@ public class Java11BLAS extends Java8BLAS {
       y[offsety + indx0] = Math.fma(alpha, x[offsetx + (i + 0)], y[offsety + indx0]);
     }
   }
+
+  protected double ddotiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    double sum = 0.0;
+    int i = 0;
+    double sum0 = 0.0;
+    double sum1 = 0.0;
+    double sum2 = 0.0;
+    double sum3 = 0.0;
+    for (; i < loopBound(n, 4); i += 4) {
+      sum0 = Math.fma(x[offsetx + (i + 0)], y[offsety + indx[offsetindx + (i + 0)]], sum0);
+      sum1 = Math.fma(x[offsetx + (i + 1)], y[offsety + indx[offsetindx + (i + 1)]], sum1);
+      sum2 = Math.fma(x[offsetx + (i + 2)], y[offsety + indx[offsetindx + (i + 2)]], sum2);
+      sum3 = Math.fma(x[offsetx + (i + 3)], y[offsety + indx[offsetindx + (i + 3)]], sum3);
+    }
+    sum += sum0 + sum1 + sum2 + sum3;
+    for (; i < n; i += 1) {
+      sum = Math.fma(x[offsetx + (i + 0)], y[offsety + indx[offsetindx + (i + 0)]], sum);
+    }
+    return sum;
+  }
+
+  protected float sdotiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    float sum = 0.0f;
+    int i = 0;
+    float sum0 = 0.0f;
+    float sum1 = 0.0f;
+    float sum2 = 0.0f;
+    float sum3 = 0.0f;
+    for (; i < loopBound(n, 4); i += 4) {
+      sum0 = Math.fma(x[offsetx + (i + 0)], y[offsety + indx[offsetindx + (i + 0)]], sum0);
+      sum1 = Math.fma(x[offsetx + (i + 1)], y[offsety + indx[offsetindx + (i + 1)]], sum1);
+      sum2 = Math.fma(x[offsetx + (i + 2)], y[offsety + indx[offsetindx + (i + 2)]], sum2);
+      sum3 = Math.fma(x[offsetx + (i + 3)], y[offsety + indx[offsetindx + (i + 3)]], sum3);
+    }
+    sum += sum0 + sum1 + sum2 + sum3;
+    for (; i < n; i += 1) {
+      sum = Math.fma(x[offsetx + (i + 0)], y[offsety + indx[offsetindx + (i + 0)]], sum);
+    }
+    return sum;
+  }
 }
