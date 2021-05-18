@@ -23,11 +23,30 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.blas;
 
-public interface JavaBLAS extends SparseBLAS, BLAS {
+import java.util.Objects;
 
-  public static JavaBLAS getInstance() {
-    return InstanceBuilder.JavaBLAS.getInstance();
+import dev.ludovic.netlib.SparseBLAS;
+
+abstract class AbstractSparseBLAS extends AbstractBLAS implements SparseBLAS {
+
+  private final static boolean debug = System.getProperty("dev.ludovic.netlib.blas.debug", "false").equals("true");
+
+  private void checkArgument(String method, int arg, boolean check) {
+    if (!check) {
+      throw new IllegalArgumentException(String.format("** On entry to '%s' parameter number %d had an illegal value", method, arg));
+    }
+  }
+
+  private void checkIndex(int index, int length) {
+    //FIXME: switch to Objects.checkIndex when the minimum version becomes JDK 11
+    if (index < 0 || index >= length) {
+      throw new IndexOutOfBoundsException(String.format("Index %s out of bounds for length %s", index, length));
+    }
+  }
+
+  private <T> void requireNonNull(T obj) {
+    Objects.requireNonNull(obj);
   }
 }

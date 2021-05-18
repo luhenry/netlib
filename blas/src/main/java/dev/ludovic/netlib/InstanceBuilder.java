@@ -46,6 +46,18 @@ final class InstanceBuilder {
     }
   }
 
+  public static final class SparseBLAS {
+    private static final dev.ludovic.netlib.SparseBLAS instance = getInstanceImpl();
+
+    public static dev.ludovic.netlib.SparseBLAS getInstance() {
+      return instance;
+    }
+
+    private static dev.ludovic.netlib.SparseBLAS getInstanceImpl() {
+      return dev.ludovic.netlib.JavaBLAS.getInstance();
+    }
+  }
+
   public static final class NativeBLAS {
     private static final dev.ludovic.netlib.NativeBLAS instance = getInstanceImpl();
 

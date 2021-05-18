@@ -23,11 +23,13 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.benchmarks.blas.l1;
 
-public interface JavaBLAS extends SparseBLAS, BLAS {
+import dev.ludovic.netlib.benchmarks.blas.SparseBLASBenchmark;
 
-  public static JavaBLAS getInstance() {
-    return InstanceBuilder.JavaBLAS.getInstance();
-  }
+import org.openjdk.jmh.annotations.*;
+
+@Warmup(iterations = 3)
+@Measurement(iterations = 6)
+public class SparseL1Benchmark extends SparseBLASBenchmark {
 }
