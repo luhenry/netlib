@@ -187,4 +187,46 @@ abstract class AbstractSparseBLAS extends AbstractBLAS implements SparseBLAS {
   }
 
   protected abstract void scopyiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+
+  public void dspri(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    if (debug) System.err.println("dspri");
+    checkArgument("DSPRI", 1, lsame("U", uplo) || lsame("L", uplo));
+    if (n <= 0) {
+      return;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(a);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    //TODO checkIndex(offseta + ..., a.length);
+    if (lsame("U", uplo))
+      dspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    else
+      dspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+  }
+
+  protected abstract void dspriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta);
+  protected abstract void dspriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta);
+
+  public void sspri(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    if (debug) System.err.println("sspri");
+    checkArgument("SSPRI", 1, lsame("U", uplo) || lsame("L", uplo));
+    if (n <= 0) {
+      return;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(a);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    //TODO checkIndex(offseta + ..., a.length);
+    if (lsame("U", uplo))
+      sspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    else
+      sspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+  }
+
+  protected abstract void sspriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta);
+  protected abstract void sspriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta);
 }

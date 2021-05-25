@@ -5242,4 +5242,40 @@ public class Java8BLAS extends AbstractSparseBLAS implements dev.ludovic.netlib.
       y[offsety + indx[offsetindx + i + 0]] = x[offsetx + i + 0];
     }
   }
+
+  protected void dspriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    int col = 0, prevCol = 0, colStartIdx = 0;
+    for (int j = 0; j < n; j++) {
+      col = indx[offsetindx + j];
+      // Skip empty columns.
+      colStartIdx += (col - prevCol) * (col + prevCol + 1) / 2;
+      double alphax = alpha * x[offsetx + j];
+      for (int i = 0; i <= j; i++) {
+        a[offseta + colStartIdx + indx[offsetindx + i]] += alphax * x[offsetx + i];
+      }
+      prevCol = col;
+    }
+  }
+
+  protected void dspriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    throw new RuntimeException("not implemented");
+  }
+
+  protected void sspriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    int col = 0, prevCol = 0, colStartIdx = 0;
+    for (int j = 0; j < n; j++) {
+      col = indx[offsetindx + j];
+      // Skip empty columns.
+      colStartIdx += (col - prevCol) * (col + prevCol + 1) / 2;
+      float alphax = alpha * x[offsetx + j];
+      for (int i = 0; i <= j; i++) {
+        a[offseta + colStartIdx + indx[offsetindx + i]] += alphax * x[offsetx + i];
+      }
+      prevCol = col;
+    }
+  }
+
+  protected void sspriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    throw new RuntimeException("not implemented");
+  }
 }

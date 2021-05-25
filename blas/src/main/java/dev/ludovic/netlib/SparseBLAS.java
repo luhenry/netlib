@@ -78,4 +78,16 @@ public interface SparseBLAS {
   }
 
   public void scopyi(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+
+  public default void dspri(String uplo, int n, double alpha, double[] x, int[] indx, double[] a) {
+    dspri(uplo, n, alpha, x, 0, indx, 0, a, 0);
+  }
+
+  public void dspri(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta);
+
+  public default void sspri(String uplo, int n, float alpha, float[] x, int[] indx, float[] a) {
+    sspri(uplo, n, alpha, x, 0, indx, 0, a, 0);
+  }
+
+  public void sspri(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta);
 }
