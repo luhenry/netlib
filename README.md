@@ -42,7 +42,7 @@ For BLAS, LAPACK, and ARPACK, the system properties are the following:
 |   | `nativeLib` | `nativeLibPath` |
 | - | ----------- | --------------- |
 | BLAS | `-Ddev.ludovic.netlib.blas.nativeLib` set to `liblas.so.3` by default | `-Ddev.ludovic.netlib.blas.nativeLibPath` unset by default |
-| LAPACK | `-Ddev.ludovic.netlib.lapack.nativeLib` set to `lilapack.so.3` by default | `-Ddev.ludovic.netlib.lapack.nativeLibPath` unset by default |
+| LAPACK | `-Ddev.ludovic.netlib.lapack.nativeLib` set to `liblapack.so.3` by default | `-Ddev.ludovic.netlib.lapack.nativeLibPath` unset by default |
 | ARPACK | `-Ddev.ludovic.netlib.arpack.nativeLib` set to `libarpack.so.2` by default | `-Ddev.ludovic.netlib.arpack.nativeLibPath` unset by default |
 
 Here are some examples of overriding the loaded native library:
