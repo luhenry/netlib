@@ -5,7 +5,7 @@ This projects provides multiple Java implementations of BLAS, LAPACK, and ARPACK
 ## Run-time dependencies
 
 - JDK 8+
-- _[optional]_ A native library implementing BLAS, LAPACK, or ARPACK
+- _[optional]_ A native library implementing BLAS, LAPACK, or ARPACK installed on the machine
   - ex: [OpenBLAS](https://github.com/xianyi/OpenBLAS) and [Intel MKL](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html)
 
 ## Native implementations wrappers
@@ -15,6 +15,22 @@ This projects provides multiple Java implementations of BLAS, LAPACK, and ARPACK
 These [JNIBLAS](https://github.com/luhenry/netlib/blob/master/blas/src/main/java/dev/ludovic/netlib/blas/JNIBLAS.java), [JNILAPACK](https://github.com/luhenry/netlib/blob/master/lapack/src/main/java/dev/ludovic/netlib/lapack/JNILAPACK.java), and [JNIARPACK](https://github.com/luhenry/netlib/blob/master/arpack/src/main/java/dev/ludovic/netlib/arpack/JNIARPACK.java) classes distribute and automatically unpack the native JNI wrappers ([blas/jni.c](https://github.com/luhenry/netlib/blob/master/blas/src/main/native/jni.c), [lapack/jni.c](https://github.com/luhenry/netlib/blob/master/lapack/src/main/native/jni.c), and [arpack/jni.c](https://github.com/luhenry/netlib/blob/master/arpack/src/main/native/jni.c)) when needed.
 
 It supports all versions of Java 8+.
+
+### Native libraries installation
+
+The native libraries must be installed on the machine; `dev.ludovic.netlib` doesn't ship any native implementation.
+
+For BLAS and LAPACK, you can install OpenBLAS. For example on Ubuntu:
+```
+sudo apt-get install libopenblas-base
+```
+
+For ARPACK, you can install the Fortran77 reference implementation. For example on Ubuntu:
+```
+sudo apt-get install libarpack2
+```
+
+To install Intel MKL, follow the instructions at https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html
 
 ### Overriding the native implementations
 
@@ -35,7 +51,7 @@ Here are some examples of overriding the loaded native library:
 
 ### GPU acceleration
 
-As you can override the native library which is dynamically loaded, you can also load [NVBLAS](https://docs.nvidia.com/cuda/nvblas/index.html). This native library provides CUDA-based GPU acceleration for some subroutines and automatically fallbacks to a more generic, CPU-only implementation for other subroutines. You can find the full documentation on how to use it at [https://docs.nvidia.com/cuda/nvblas/index.html](https://docs.nvidia.com/cuda/nvblas/index.html).
+As you can override the native library which is dynamically loaded, you can also load [NVBLAS](https://docs.nvidia.com/cuda/nvblas/index.html). This native library provides CUDA-based GPU acceleration for some subroutines and automatically falls back to a more generic, CPU-only implementation for other subroutines. You can find the full documentation on how to use it at [https://docs.nvidia.com/cuda/nvblas/index.html](https://docs.nvidia.com/cuda/nvblas/index.html).
 
 To dynamically load it, you can set either of the above system properties:
 - `-Ddev.ludovic.netlib.blas.nativeLibPath=/path/to/libnvblas.so`
@@ -47,16 +63,18 @@ Java 16 introduced the [Vector API](https://openjdk.java.net/jeps/338), a Java-b
 
 The performance is on-par or above the native libraries on most [Level-1](http://www.netlib.org/blas/#_level_1) and [Level-2](http://www.netlib.org/blas/#_level_2) BLAS subroutines. For [Level-3](http://www.netlib.org/blas/#_level_3) BLAS subroutines, the performance still doesn't match native libraries ([some thought on why](https://mail.openjdk.java.net/pipermail/panama-dev/2021-January/011930.html)).
 
-# Thanks
+## Pure Java fallback for Java 8+
 
-This project has been largely inspired by [`netlib-java`](https://github.com/fommil/netlib-java) and [@fommil](https://github.com/fommil)'s hard work.
+If neither a native implementation nor the Vector API are available, it falls back to a pure Java implementation. For most subroutines, it uses [F2j](https://icl.utk.edu/f2j/overview/index.html), available in [`net.sourceforge.f2j:arpack_combined_all:0.1`](https://mvnrepository.com/artifact/net.sourceforge.f2j/arpack_combined_all/0.1).
+
+For some BLAS subroutines, [Java8BLAS](https://github.com/luhenry/netlib/blob/master/blas/src/main/java/dev/ludovic/netlib/blas/Java8BLAS.java) and [Java11BLAS](https://github.com/luhenry/netlib/blob/master/blas/src/main/java/dev/ludovic/netlib/blas/Java11BLAS.java) provide optimized implementations using primitives available in Java 8 and Java 11 respectively.
 
 # Build
 
 ## Dependencies
 
 - JDK 16+ for the Vector API and Foreign Linker API which have been integrated in JDK 16
-- `net.sourceforge.f2j:arpack_combined_all:0.1` for [F2j](https://icl.utk.edu/f2j/overview/index.html) fallbacks
+- [`net.sourceforge.f2j:arpack_combined_all:0.1`](https://mvnrepository.com/artifact/net.sourceforge.f2j/arpack_combined_all/0.1) for [F2j](https://icl.utk.edu/f2j/overview/index.html) fallback
 
 ## Commands
 
@@ -66,11 +84,15 @@ $> mvn clean package
 
 # Benchmarks
 
-You've a set of benchmarks in [benchmarks/src/main/java/dev/ludovic/netlib/benchmarks/](https://github.com/luhenry/netlib/tree/master/benchmarks/src/main/java/dev/ludovic/netlib/benchmarks/). You can run them with:
+A set of benchmarks is available in [benchmarks/src/main/java/dev/ludovic/netlib/benchmarks/](https://github.com/luhenry/netlib/tree/master/benchmarks/src/main/java/dev/ludovic/netlib/benchmarks/). Run them with:
 
 ```
 $> java -jar benchmarks/target/netlib-benchmarks.jar
 ```
+
+# Thanks
+
+This project has been largely inspired by [`netlib-java`](https://github.com/fommil/netlib-java) and [@fommil](https://github.com/fommil)'s hard work.
 
 # Contribution
 
