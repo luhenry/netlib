@@ -1,4 +1,4 @@
-This projects provides multiple Java implementations of BLAS, LAPACK, and ARPACK subroutines, supporting Java 8+. It provides hardware acceleration of BLAS, LAPACK, and ARPACK for all supported of versions of Java with native implementations like [OpenBLAS](https://github.com/xianyi/OpenBLAS) and [Intel MKL](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html), and of BLAS for Java 16+ based on the [Vector API](https://openjdk.java.net/jeps/338).
+This project provides multiple Java implementations of BLAS, LAPACK, and ARPACK subroutines, supporting Java 8+. It provides hardware acceleration of BLAS, LAPACK, and ARPACK with native implementations like [OpenBLAS](https://github.com/xianyi/OpenBLAS) and [Intel MKL](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html).
 
 # Usage
 
@@ -38,7 +38,7 @@ The native JNI wrappers dynamically load the native libraries ([OpenBLAS](https:
 1. `nativeLibPath`: the full path to the library
 2. `nativeLib`: the filename of the library; it should be found on the dynamic loader search path (see the search order in [`man 8 ld.so`](https://linux.die.net/man/8/ld.so))
 
-For BLAS, LAPACK, and ARPACK, the list of system properties is the following:
+For BLAS, LAPACK, and ARPACK, the system properties are the following:
 |   | `nativeLib` | `nativeLibPath` |
 | - | ----------- | --------------- |
 | BLAS | `-Ddev.ludovic.netlib.blas.nativeLib` set to `liblas.so.3` by default | `-Ddev.ludovic.netlib.blas.nativeLibPath` unset by default |
