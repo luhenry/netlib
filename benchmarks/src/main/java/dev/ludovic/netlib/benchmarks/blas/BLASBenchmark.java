@@ -82,4 +82,13 @@ public abstract class BLASBenchmark {
         }
         return res;
     }
+
+    protected int[] randomIndexArray(int nx, int ny) {
+        int[] res = new int[nx];
+        for (int i = 0; i < nx; i++) {
+            //FIXME: improve randomness
+            res[i] = i * (ny / nx) + rand.nextInt(ny / nx);
+        }
+        return res;
+    }
 }

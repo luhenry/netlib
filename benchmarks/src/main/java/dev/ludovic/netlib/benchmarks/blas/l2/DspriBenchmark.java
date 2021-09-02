@@ -29,7 +29,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
-public class DspriBenchmark extends SparseL2Benchmark {
+public class DspriBenchmark extends L2Benchmark {
 
     @Param({"U"})
     public String uplo;

@@ -198,4 +198,52 @@ public final class JNIBLAS extends AbstractBLAS implements dev.ludovic.netlib.Na
   protected native int idamaxK(int n, double[] dx, int offsetdx, int incdx);
 
   protected native int isamaxK(int n, float[] sx, int offsetsx, int incx);
+
+  protected void daxpyiK(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected void saxpyiK(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected void dcopyiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected void scopyiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected double ddotiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected float sdotiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected double ddotiiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety, int[] indy, int offsetindy) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected float sdotiiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected void dspriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected void dspriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected void sspriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected void sspriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
 }

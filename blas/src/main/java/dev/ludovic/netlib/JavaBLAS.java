@@ -25,7 +25,7 @@
 
 package dev.ludovic.netlib;
 
-public interface JavaBLAS extends SparseBLAS, BLAS {
+public interface JavaBLAS extends BLAS {
 
   public static JavaBLAS getInstance() {
     return InstanceBuilder.JavaBLAS.getInstance();

@@ -29,7 +29,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
-public class SdotiBenchmark extends SparseL1Benchmark {
+public class SdotiBenchmark extends L1Benchmark {
 
     @Param({"10", "100000000"})
     public int n;
