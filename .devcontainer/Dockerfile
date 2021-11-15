@@ -20,10 +20,9 @@ RUN if [ "${INSTALL_NODE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/l
 
 COPY --from=openjdk:8-jdk-buster /usr/local/openjdk-8 /usr/local/openjdk-8
 COPY --from=openjdk:11-jdk-buster /usr/local/openjdk-11 /usr/local/openjdk-11
-COPY --from=openjdk:16-jdk-buster /usr/local/openjdk-16 /usr/local/openjdk-16
 COPY --from=openjdk:17-jdk-buster /usr/local/openjdk-17 /usr/local/openjdk-17
 
-ENV JAVA_HOME="/usr/local/openjdk-16"
+ENV JAVA_HOME="/usr/local/openjdk-17"
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # [Optional] Uncomment this section to install additional OS packages.
