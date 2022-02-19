@@ -23,6 +23,8 @@
  * information or have any questions.
  */
 
+package dev.ludovic.netlib.blas;
+
 import dev.ludovic.netlib.BLAS;
 
 import org.junit.jupiter.api.Test;

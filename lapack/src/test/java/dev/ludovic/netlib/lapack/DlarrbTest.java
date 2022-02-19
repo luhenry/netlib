@@ -23,6 +23,8 @@
  * information or have any questions.
  */
 
+package dev.ludovic.netlib.lapack;
+
 import dev.ludovic.netlib.LAPACK;
 
 import org.junit.jupiter.api.Test;

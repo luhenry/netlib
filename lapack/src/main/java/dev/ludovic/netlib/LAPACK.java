@@ -28,7 +28,7 @@ package dev.ludovic.netlib;
 public interface LAPACK {
 
   public static LAPACK getInstance() {
-    return InstanceBuilder.LAPACK.getInstance();
+    return dev.ludovic.netlib.lapack.InstanceBuilder.LAPACK.getInstance();
   }
 
   public void dbdsdc(String uplo, String compq, int n, double[] d, double[] e, double[] u, int ldu, double[] vt, int ldvt, double[] q, int[] iq, double[] work, int[] iwork, org.netlib.util.intW info);

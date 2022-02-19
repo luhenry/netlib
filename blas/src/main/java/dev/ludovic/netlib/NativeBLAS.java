@@ -28,6 +28,6 @@ package dev.ludovic.netlib;
 public interface NativeBLAS extends BLAS {
 
   public static NativeBLAS getInstance() {
-    return InstanceBuilder.NativeBLAS.getInstance();
+    return dev.ludovic.netlib.blas.InstanceBuilder.NativeBLAS.getInstance();
   }
 }

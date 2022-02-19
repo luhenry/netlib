@@ -23,6 +23,8 @@
  * information or have any questions.
  */
 
+package dev.ludovic.netlib.arpack;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,12 +42,12 @@ public class ARPACKTest {
   final static double depsilon = 1e-15d;
   final static float sepsilon = 1e-6f;
 
-  final static ARPACK f2j = dev.ludovic.netlib.arpack.F2jARPACK.getInstance();
+  final static ARPACK f2j = F2jARPACK.getInstance();
 
   private static Stream<Arguments> ARPACKImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.arpack.F2jARPACK.getInstance()),
-      Arguments.of(dev.ludovic.netlib.arpack.JNIARPACK.getInstance())
+      Arguments.of(F2jARPACK.getInstance()),
+      Arguments.of(JNIARPACK.getInstance())
     );
 
     return instances;

@@ -28,7 +28,7 @@ package dev.ludovic.netlib;
 public interface ARPACK {
 
   public static ARPACK getInstance() {
-    return InstanceBuilder.ARPACK.getInstance();
+    return dev.ludovic.netlib.arpack.InstanceBuilder.ARPACK.getInstance();
   }
 
   public void dmout(int lout, int m, int n, double[] a, int lda, int idigit, String ifmt);

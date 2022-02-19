@@ -25,14 +25,12 @@
 
 package dev.ludovic.netlib.blas;
 
-import dev.ludovic.netlib.BLAS;
-
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.FloatVector;
 import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.VectorSpecies;
 
-public class VectorBLAS extends Java11BLAS implements dev.ludovic.netlib.JavaBLAS {
+class VectorBLAS extends Java11BLAS implements dev.ludovic.netlib.JavaBLAS {
 
   private static final VectorSpecies<Float>  FMAX = FloatVector.SPECIES_MAX;
   private static final VectorSpecies<Double> DMAX = DoubleVector.SPECIES_MAX;

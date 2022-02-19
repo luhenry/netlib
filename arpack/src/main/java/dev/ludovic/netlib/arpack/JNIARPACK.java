@@ -32,7 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermissions;
 
-public final class JNIARPACK extends AbstractARPACK implements dev.ludovic.netlib.NativeARPACK {
+final class JNIARPACK extends AbstractARPACK implements dev.ludovic.netlib.NativeARPACK {
 
   private static final JNIARPACK instance = new JNIARPACK();
 

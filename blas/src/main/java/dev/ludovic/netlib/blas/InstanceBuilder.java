@@ -23,11 +23,11 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.blas;
 
 import java.util.logging.Logger;
 
-final class InstanceBuilder {
+public final class InstanceBuilder {
 
   public static final class BLAS {
     private static final dev.ludovic.netlib.BLAS instance = getInstanceImpl();

@@ -28,6 +28,6 @@ package dev.ludovic.netlib;
 public interface JavaBLAS extends BLAS {
 
   public static JavaBLAS getInstance() {
-    return InstanceBuilder.JavaBLAS.getInstance();
+    return dev.ludovic.netlib.blas.InstanceBuilder.JavaBLAS.getInstance();
   }
 }

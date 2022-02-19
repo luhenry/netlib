@@ -23,6 +23,8 @@
  * information or have any questions.
  */
 
+package dev.ludovic.netlib.lapack;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,12 +42,12 @@ public class LAPACKTest {
   final static double depsilon = 1e-15d;
   final static float sepsilon = 1e-6f;
 
-  final static LAPACK f2j = dev.ludovic.netlib.lapack.F2jLAPACK.getInstance();
+  final static LAPACK f2j = F2jLAPACK.getInstance();
 
   private static Stream<Arguments> LAPACKImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(dev.ludovic.netlib.lapack.F2jLAPACK.getInstance()),
-      Arguments.of(dev.ludovic.netlib.lapack.JNILAPACK.getInstance())
+      Arguments.of(F2jLAPACK.getInstance()),
+      Arguments.of(JNILAPACK.getInstance())
     );
 
     return instances;

@@ -25,9 +25,7 @@
 
 package dev.ludovic.netlib.blas;
 
-import dev.ludovic.netlib.BLAS;
-
-public class Java11BLAS extends Java8BLAS {
+class Java11BLAS extends Java8BLAS {
 
   private static final Java11BLAS instance = new Java11BLAS();
 

@@ -28,6 +28,6 @@ package dev.ludovic.netlib;
 public interface NativeLAPACK extends LAPACK {
 
   public static NativeLAPACK getInstance() {
-    return InstanceBuilder.NativeLAPACK.getInstance();
+    return dev.ludovic.netlib.lapack.InstanceBuilder.NativeLAPACK.getInstance();
   }
 }

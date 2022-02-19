@@ -27,7 +27,7 @@ package dev.ludovic.netlib.lapack;
 
 import dev.ludovic.netlib.LAPACK;
 
-public final class F2jLAPACK extends AbstractLAPACK implements dev.ludovic.netlib.JavaLAPACK {
+final class F2jLAPACK extends AbstractLAPACK implements dev.ludovic.netlib.JavaLAPACK {
 
   private static final F2jLAPACK instance = new F2jLAPACK();
 

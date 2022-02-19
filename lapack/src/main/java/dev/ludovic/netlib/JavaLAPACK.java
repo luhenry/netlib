@@ -28,6 +28,6 @@ package dev.ludovic.netlib;
 public interface JavaLAPACK extends LAPACK {
 
   public static JavaLAPACK getInstance() {
-    return InstanceBuilder.JavaLAPACK.getInstance();
+    return dev.ludovic.netlib.lapack.InstanceBuilder.JavaLAPACK.getInstance();
   }
 }
