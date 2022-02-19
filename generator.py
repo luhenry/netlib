@@ -220,7 +220,12 @@ class RoutineR:
     print("static {ret} (*{name}_)({args});".format(ret=self.ret.native_type, name=self.name, args=", ".join([arg.native_type_and_name for arg in self.args])))
     print()
     # Print JNI function implementation
+    print("jboolean Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_has_{name}(UNUSED JNIEnv *env, UNUSED jobject obj) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=self.name))
+    print("  return {name}_ != NULL;".format(name=self.name))
+    print("}")
+    print()
     print("{ret} Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(ret=self.ret.java_type, pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", " + a for arg in self.args for a in arg.java_type_and_name]))) 
+    print("  if (!{name}_) (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/UnsupportedOperationException\"), \"symbol isn't available in native library\");".format(name=self.name))
     print("  {rettype} __ret = 0;".format(rettype=self.ret.java_type))
     print("  jboolean __failed = FALSE;")
     if any(len(arg.native_local) > 0 for arg in sorted(self.args, key=lambda a: a.idx)):
@@ -250,6 +255,10 @@ class RoutineR_NI:
     print("// static {ret} (*{name}_)({args});".format(ret=self.ret.native_type, name=self.name, args=", ".join([arg.native_type_and_name for arg in self.args])))
     print()
     # Print JNI function implementation
+    print("jboolean Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_has_{name}(UNUSED JNIEnv *env, UNUSED jobject obj) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=self.name))
+    print("  return FALSE;")
+    print("}")
+    print()
     print("{ret} Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(ret=self.ret.java_type, pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", UNUSED " + arg.java_type_and_name for arg in self.args])))
     print("  (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/UnsupportedOperationException\"), \"not implemented\");")
     print("  return 0;")
@@ -269,7 +278,12 @@ class Routine:
     print("static void (*{name}_)({args});".format(name=self.name, args=", ".join([arg.native_type_and_name for arg in self.args])))
     print()
     # Print JNI function implementation
+    print("jboolean Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_has_{name}(UNUSED JNIEnv *env, UNUSED jobject obj) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=self.name))
+    print("  return {name}_ != NULL;".format(name=self.name))
+    print("}")
+    print()
     print("void Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", " + a for arg in self.args for a in arg.java_type_and_name])))
+    print("  if (!{name}_) (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/UnsupportedOperationException\"), \"symbol isn't available in native library\");".format(name=self.name))
     print("  jboolean __failed = FALSE;")
     if any(len(arg.native_local) > 0 for arg in sorted(self.args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.native_local for arg in sorted(self.args, key=lambda a: a.idx)] if len(a) > 0]))
@@ -296,6 +310,10 @@ class Routine_NI:
     print("// static void (*{name}_)({args});".format(name=self.name, args=", ".join([arg.native_type_and_name for arg in self.args])))
     print()
     # Print JNI function implementation
+    print("jboolean Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_has_{name}(UNUSED JNIEnv *env, UNUSED jobject obj) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=self.name))
+    print("  return FALSE;")
+    print("}")
+    print()
     print("void Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", UNUSED " + a for arg in self.args for a in arg.java_type_and_name])))
     print("  (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/UnsupportedOperationException\"), \"not implemented\");")
     print("}")
@@ -372,10 +390,7 @@ class Library:
     # Print symbols loading
     print("jboolean load_symbols(void) {")
     print("#define LOAD_SYMBOL(name) \\")
-    print("  name = dlsym(NULL, #name); \\")
-    print("  if (!name) { \\")
-    print("    return FALSE; \\")
-    print("  }")
+    print("  name = dlsym(NULL, #name);")
     print("")
     for routine in routines:
       routine.render_load_symbol()
