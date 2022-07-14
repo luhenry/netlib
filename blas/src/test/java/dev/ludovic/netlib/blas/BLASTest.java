@@ -35,8 +35,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 
-import dev.ludovic.netlib.BLAS;
-
 public class BLASTest {
 
   final static double depsilon = 1e-11d;
@@ -69,7 +67,7 @@ public class BLASTest {
     }
     if (major >= 17) {
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of((dev.ludovic.netlib.NativeBLAS)Class.forName("ForeignLinkerBLAS").getMethod("getInstance").invoke(null))
+        Arguments.of((NativeBLAS)Class.forName("ForeignLinkerBLAS").getMethod("getInstance").invoke(null))
       ));
     }
 

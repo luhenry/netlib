@@ -32,7 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermissions;
 
-final class JNIBLAS extends AbstractBLAS implements dev.ludovic.netlib.NativeBLAS {
+final class JNIBLAS extends AbstractBLAS implements NativeBLAS {
 
   private static final JNIBLAS instance = new JNIBLAS();
 
@@ -61,7 +61,7 @@ final class JNIBLAS extends AbstractBLAS implements dev.ludovic.netlib.NativeBLA
     System.load(temp.toString());
   }
 
-  public static dev.ludovic.netlib.NativeBLAS getInstance() {
+  public static NativeBLAS getInstance() {
     return instance;
   }
 

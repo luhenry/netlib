@@ -2483,7 +2483,7 @@ static void *libhandle;
 
 jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
   JNIEnv *env;
-  if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_6) != JNI_OK) {
+  if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_8) != JNI_OK) {
     return -1;
   }
 
@@ -2564,7 +2564,7 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
     return -1;
   }
 
-  return JNI_VERSION_1_6;
+  return JNI_VERSION_1_8;
 }
 
 void JNI_OnUnload(UNUSED JavaVM *vm, UNUSED void *reserved) {

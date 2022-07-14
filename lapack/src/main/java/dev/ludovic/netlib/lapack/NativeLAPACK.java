@@ -23,12 +23,12 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.lapack;
 
 public interface NativeLAPACK extends LAPACK {
 
   public static NativeLAPACK getInstance() {
-    return dev.ludovic.netlib.lapack.InstanceBuilder.NativeLAPACK.getInstance();
+    return InstanceBuilder.getNativeInstance();
   }
 
   boolean has_dbdsdc();

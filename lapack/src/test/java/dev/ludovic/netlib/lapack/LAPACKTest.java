@@ -35,8 +35,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 
-import dev.ludovic.netlib.LAPACK;
-
 public class LAPACKTest {
 
   final static double depsilon = 1e-15d;

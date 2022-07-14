@@ -32,7 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermissions;
 
-final class JNILAPACK extends AbstractLAPACK implements dev.ludovic.netlib.NativeLAPACK {
+final class JNILAPACK extends AbstractLAPACK implements NativeLAPACK {
 
   private static final JNILAPACK instance = new JNILAPACK();
 
@@ -60,7 +60,7 @@ final class JNILAPACK extends AbstractLAPACK implements dev.ludovic.netlib.Nativ
 
     System.load(temp.toString());}
 
-  public static dev.ludovic.netlib.NativeLAPACK getInstance() {
+  public static NativeLAPACK getInstance() {
     return instance;
   }
 

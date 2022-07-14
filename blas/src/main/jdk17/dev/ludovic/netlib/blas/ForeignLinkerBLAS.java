@@ -40,9 +40,7 @@ import jdk.incubator.foreign.MemorySegment;
 
 import static jdk.incubator.foreign.CLinker.*;
 
-import dev.ludovic.netlib.BLAS;
-
-public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic.netlib.NativeBLAS {
+public final class ForeignLinkerBLAS extends AbstractBLAS implements NativeBLAS {
 
   private static final ForeignLinkerBLAS instance = new ForeignLinkerBLAS();
 
@@ -58,7 +56,7 @@ public final class ForeignLinkerBLAS extends AbstractBLAS implements dev.ludovic
     }
   }
 
-  public static dev.ludovic.netlib.NativeBLAS getInstance() {
+  public static NativeBLAS getInstance() {
     return instance;
   }
 

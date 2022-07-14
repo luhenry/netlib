@@ -31,7 +31,7 @@ class Java11BLAS extends Java8BLAS {
 
   protected Java11BLAS() {}
 
-  public static dev.ludovic.netlib.JavaBLAS getInstance() {
+  public static JavaBLAS getInstance() {
     return instance;
   }
 

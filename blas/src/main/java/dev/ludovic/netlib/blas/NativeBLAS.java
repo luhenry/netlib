@@ -23,12 +23,12 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.blas;
 
 public interface NativeBLAS extends BLAS {
 
   public static NativeBLAS getInstance() {
-    return dev.ludovic.netlib.blas.InstanceBuilder.NativeBLAS.getInstance();
+    return InstanceBuilder.getNativeInstance();
   }
 
   boolean has_dasum();

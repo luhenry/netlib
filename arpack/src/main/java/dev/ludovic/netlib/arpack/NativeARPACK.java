@@ -23,12 +23,12 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.arpack;
 
 public interface NativeARPACK extends ARPACK {
 
   public static NativeARPACK getInstance() {
-    return dev.ludovic.netlib.arpack.InstanceBuilder.NativeARPACK.getInstance();
+    return InstanceBuilder.getNativeInstance();
   }
 
   boolean has_dmout();

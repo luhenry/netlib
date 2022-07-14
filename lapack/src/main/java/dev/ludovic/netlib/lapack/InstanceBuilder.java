@@ -27,51 +27,47 @@ package dev.ludovic.netlib.lapack;
 
 import java.util.logging.Logger;
 
-public final class InstanceBuilder {
+final class InstanceBuilder {
 
-  public static final class LAPACK {
-    private static final dev.ludovic.netlib.LAPACK instance = getInstanceImpl();
+  private static final Logger log = Logger.getLogger(InstanceBuilder.class.getName());
 
-    public static dev.ludovic.netlib.LAPACK getInstance() {
-      return instance;
-    }
+  private static final LAPACK lapack = getInstanceImpl();
 
-    private static dev.ludovic.netlib.LAPACK getInstanceImpl() {
-      try {
-        return dev.ludovic.netlib.NativeLAPACK.getInstance();
-      } catch (Throwable t) {
-        Logger.getLogger(LAPACK.class.getName()).warning("Failed to load implementation from:" + dev.ludovic.netlib.NativeLAPACK.class.getName());
-      }
-      return dev.ludovic.netlib.JavaLAPACK.getInstance();
-    }
+  public static LAPACK getInstance() {
+    return lapack;
   }
 
-  public static final class NativeLAPACK {
-    private static final dev.ludovic.netlib.NativeLAPACK instance = getInstanceImpl();
-
-    public static dev.ludovic.netlib.NativeLAPACK getInstance() {
-      return instance;
+  private static LAPACK getInstanceImpl() {
+    try {
+      return NativeLAPACK.getInstance();
+    } catch (Throwable t) {
+      log.warning("Failed to load implementation from:" + NativeLAPACK.class.getName());
     }
-
-    private static dev.ludovic.netlib.NativeLAPACK getInstanceImpl() {
-      try {
-        return dev.ludovic.netlib.lapack.JNILAPACK.getInstance();
-      } catch (Throwable t) {
-        Logger.getLogger(NativeLAPACK.class.getName()).warning("Failed to load implementation from:" + dev.ludovic.netlib.lapack.JNILAPACK.class.getName());
-      }
-      throw new RuntimeException("Unable to load native implementation");
-    }
+    return JavaLAPACK.getInstance();
   }
 
-  public static final class JavaLAPACK {
-    private static final dev.ludovic.netlib.JavaLAPACK instance = getInstanceImpl();
+  private static final NativeLAPACK nativeLapack = getNativeInstanceImpl();
 
-    public static dev.ludovic.netlib.JavaLAPACK getInstance() {
-      return instance;
-    }
+  public static NativeLAPACK getNativeInstance() {
+    return nativeLapack;
+  }
 
-    private static dev.ludovic.netlib.JavaLAPACK getInstanceImpl() {
-      return dev.ludovic.netlib.lapack.F2jLAPACK.getInstance();
+  private static NativeLAPACK getNativeInstanceImpl() {
+    try {
+      return JNILAPACK.getInstance();
+    } catch (Throwable t) {
+      log.warning("Failed to load implementation from:" + JNILAPACK.class.getName());
     }
+    throw new RuntimeException("Unable to load native implementation");
+  }
+
+  private static final JavaLAPACK javaLapack = getJavaInstanceImpl();
+
+  public static JavaLAPACK getJavaInstance() {
+    return javaLapack;
+  }
+
+  private static JavaLAPACK getJavaInstanceImpl() {
+    return F2jLAPACK.getInstance();
   }
 }

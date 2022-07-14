@@ -25,8 +25,6 @@
 
 package dev.ludovic.netlib.arpack;
 
-import dev.ludovic.netlib.ARPACK;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

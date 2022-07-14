@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 
-import dev.ludovic.netlib.ARPACK;
+import dev.ludovic.netlib.arpack.ARPACK;
 
 public class ARPACKTest {
 

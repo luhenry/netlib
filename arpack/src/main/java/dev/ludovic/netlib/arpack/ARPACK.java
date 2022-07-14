@@ -23,12 +23,12 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.arpack;
 
 public interface ARPACK {
 
   public static ARPACK getInstance() {
-    return dev.ludovic.netlib.arpack.InstanceBuilder.ARPACK.getInstance();
+    return InstanceBuilder.getInstance();
   }
 
   public void dmout(int lout, int m, int n, double[] a, int lda, int idigit, String ifmt);

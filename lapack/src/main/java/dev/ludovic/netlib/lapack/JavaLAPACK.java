@@ -23,11 +23,11 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.lapack;
 
 public interface JavaLAPACK extends LAPACK {
 
   public static JavaLAPACK getInstance() {
-    return dev.ludovic.netlib.lapack.InstanceBuilder.JavaLAPACK.getInstance();
+    return InstanceBuilder.getJavaInstance();
   }
 }

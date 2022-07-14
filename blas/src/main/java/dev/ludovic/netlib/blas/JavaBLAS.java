@@ -23,11 +23,11 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.blas;
 
-public interface JavaARPACK extends ARPACK {
+public interface JavaBLAS extends BLAS {
 
-  public static JavaARPACK getInstance() {
-    return dev.ludovic.netlib.arpack.InstanceBuilder.JavaARPACK.getInstance();
+  public static JavaBLAS getInstance() {
+    return InstanceBuilder.getJavaInstance();
   }
 }

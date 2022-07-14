@@ -25,7 +25,7 @@
 
 package dev.ludovic.netlib.benchmarks.blas;
 
-import dev.ludovic.netlib.BLAS;
+import dev.ludovic.netlib.blas.*;
 
 import org.openjdk.jmh.annotations.*;
 
@@ -47,10 +47,10 @@ public abstract class BLASBenchmark {
     public void setupImplementation() {
         switch (implementation) {
         case "java":
-            blas = dev.ludovic.netlib.JavaBLAS.getInstance();
+            blas = JavaBLAS.getInstance();
             break;
         case "native":
-            blas = dev.ludovic.netlib.NativeBLAS.getInstance();
+            blas = NativeBLAS.getInstance();
             break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }

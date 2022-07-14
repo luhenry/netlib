@@ -27,8 +27,6 @@ package dev.ludovic.netlib.arpack;
 
 import java.util.Objects;
 
-import dev.ludovic.netlib.ARPACK;
-
 abstract class AbstractARPACK implements ARPACK {
 
   private final static boolean debug = System.getProperty("dev.ludovic.netlib.arpack.debug", "false").equals("true");
