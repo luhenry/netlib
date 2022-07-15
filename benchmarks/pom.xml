@@ -40,7 +40,7 @@ information or have any questions.
   <packaging>jar</packaging>
 
   <properties>
-    <jmh.version>1.27</jmh.version>
+    <jmh.version>1.35</jmh.version>
     <uberjar.name>netlib-benchmarks</uberjar.name>
   </properties>
 
