@@ -42,10 +42,6 @@ static jfieldID StringW_val_fieldID;
 
 static double (*dasum_)(int *n, double *x, int *incx);
 
-jboolean Java_dev_ludovic_netlib_blas_JNIBLAS_has_dasum(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return dasum_ != NULL;
-}
-
 jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_dasumK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx) {
   if (!dasum_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jdouble __ret = 0;
@@ -64,10 +60,6 @@ done:
 }
 
 static float (*sasum_)(int *n, float *x, int *incx);
-
-jboolean Java_dev_ludovic_netlib_blas_JNIBLAS_has_sasum(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return sasum_ != NULL;
-}
 
 jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sasumK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx) {
   if (!sasum_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -196,10 +188,6 @@ done:
 
 static double (*ddot_)(int *n, double *x, int *incx, double *y, int *incy);
 
-jboolean Java_dev_ludovic_netlib_blas_JNIBLAS_has_ddot(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return ddot_ != NULL;
-}
-
 jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_ddotK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
   if (!ddot_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jdouble __ret = 0;
@@ -224,10 +212,6 @@ done:
 
 static float (*sdot_)(int *n, float *x, int *incx, float *y, int *incy);
 
-jboolean Java_dev_ludovic_netlib_blas_JNIBLAS_has_sdot(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return sdot_ != NULL;
-}
-
 jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sdotK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
   if (!sdot_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jfloat __ret = 0;
@@ -251,10 +235,6 @@ done:
 }
 
 static float (*sdsdot_)(int *n, float *sb, float *sx, int *incsx, float *sy, int *incsy);
-
-jboolean Java_dev_ludovic_netlib_blas_JNIBLAS_has_sdsdot(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return sdsdot_ != NULL;
-}
 
 jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sdsdotK(JNIEnv *env, UNUSED jobject obj, jint n, jfloat sb, jfloatArray sx, jint offsetsx, jint incsx, jfloatArray sy, jint offsetsy, jint incsy) {
   if (!sdsdot_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -610,10 +590,6 @@ done:
 
 static double (*dnrm2_)(int *n, double *x, int *incx);
 
-jboolean Java_dev_ludovic_netlib_blas_JNIBLAS_has_dnrm2(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return dnrm2_ != NULL;
-}
-
 jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_dnrm2K(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx) {
   if (!dnrm2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jdouble __ret = 0;
@@ -632,10 +608,6 @@ done:
 }
 
 static float (*snrm2_)(int *n, float *x, int *incx);
-
-jboolean Java_dev_ludovic_netlib_blas_JNIBLAS_has_snrm2(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return snrm2_ != NULL;
-}
 
 jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_snrm2K(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx) {
   if (!snrm2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2252,10 +2224,6 @@ done:
 
 static int (*idamax_)(int *n, double *dx, int *incdx);
 
-jboolean Java_dev_ludovic_netlib_blas_JNIBLAS_has_idamax(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return idamax_ != NULL;
-}
-
 jint Java_dev_ludovic_netlib_blas_JNIBLAS_idamaxK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray dx, jint offsetdx, jint incdx) {
   if (!idamax_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jint __ret = 0;
@@ -2274,10 +2242,6 @@ done:
 }
 
 static int (*isamax_)(int *n, float *sx, int *incsx);
-
-jboolean Java_dev_ludovic_netlib_blas_JNIBLAS_has_isamax(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return isamax_ != NULL;
-}
 
 jint Java_dev_ludovic_netlib_blas_JNIBLAS_isamaxK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray sx, jint offsetsx, jint incsx) {
   if (!isamax_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");

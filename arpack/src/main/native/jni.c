@@ -2286,10 +2286,6 @@ done:
 
 static int (*icnteq_)(int *n, int *array, int *value);
 
-jboolean Java_dev_ludovic_netlib_arpack_JNIARPACK_has_icnteq(UNUSED JNIEnv *env, UNUSED jobject obj) {
-  return icnteq_ != NULL;
-}
-
 jint Java_dev_ludovic_netlib_arpack_JNIARPACK_icnteqK(JNIEnv *env, UNUSED jobject obj, jint n, jintArray array, jint offsetarray, jint value) {
   if (!icnteq_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jint __ret = 0;

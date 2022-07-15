@@ -220,10 +220,6 @@ class RoutineR:
     print("static {ret} (*{name}_)({args});".format(ret=self.ret.native_type, name=self.name, args=", ".join([arg.native_type_and_name for arg in self.args])))
     print()
     # Print JNI function implementation
-    print("jboolean Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_has_{name}(UNUSED JNIEnv *env, UNUSED jobject obj) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=self.name))
-    print("  return {name}_ != NULL;".format(name=self.name))
-    print("}")
-    print()
     print("{ret} Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(ret=self.ret.java_type, pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", " + a for arg in self.args for a in arg.java_type_and_name]))) 
     print("  if (!{name}_) (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/UnsupportedOperationException\"), \"symbol isn't available in native library\");".format(name=self.name))
     print("  {rettype} __ret = 0;".format(rettype=self.ret.java_type))
