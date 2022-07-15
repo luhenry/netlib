@@ -28,6 +28,6 @@ package dev.ludovic.netlib.arpack;
 public interface NativeARPACK extends ARPACK {
 
   public static NativeARPACK getInstance() {
-    return InstanceBuilder.getNativeInstance();
+    return InstanceBuilder.nativeArpack();
   }
 }

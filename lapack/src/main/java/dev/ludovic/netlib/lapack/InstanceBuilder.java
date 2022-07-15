@@ -31,43 +31,41 @@ final class InstanceBuilder {
 
   private static final Logger log = Logger.getLogger(InstanceBuilder.class.getName());
 
-  private static final LAPACK lapack = getInstanceImpl();
+  private static final LAPACK lapack;
+  private static final NativeLAPACK nativeLapack;
+  private static final JavaLAPACK javaLapack;
 
-  public static LAPACK getInstance() {
+  static {
+    nativeLapack = initializeNative();
+    javaLapack = initializeJava();
+    lapack = nativeLapack != null ? nativeLapack : javaLapack;
+  }
+
+  public static LAPACK lapack() {
     return lapack;
   }
 
-  private static LAPACK getInstanceImpl() {
-    try {
-      return NativeLAPACK.getInstance();
-    } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + NativeLAPACK.class.getName());
-    }
-    return JavaLAPACK.getInstance();
-  }
-
-  private static final NativeLAPACK nativeLapack = getNativeInstanceImpl();
-
-  public static NativeLAPACK getNativeInstance() {
-    return nativeLapack;
-  }
-
-  private static NativeLAPACK getNativeInstanceImpl() {
+  private static NativeLAPACK initializeNative() {
     try {
       return JNILAPACK.getInstance();
     } catch (Throwable t) {
       log.warning("Failed to load implementation from:" + JNILAPACK.class.getName());
+      return null;
     }
-    throw new RuntimeException("Unable to load native implementation");
   }
 
-  private static final JavaLAPACK javaLapack = getJavaInstanceImpl();
-
-  public static JavaLAPACK getJavaInstance() {
-    return javaLapack;
+  public static NativeLAPACK nativeLapack() {
+    if (nativeLapack == null) {
+      throw new RuntimeException("Unable to load native implementation");
+    }
+    return nativeLapack;
   }
 
-  private static JavaLAPACK getJavaInstanceImpl() {
+  private static JavaLAPACK initializeJava() {
     return F2jLAPACK.getInstance();
+  }
+
+  public static JavaLAPACK javaLapack() {
+    return javaLapack;
   }
 }

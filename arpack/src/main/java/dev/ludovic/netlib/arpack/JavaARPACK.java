@@ -28,6 +28,6 @@ package dev.ludovic.netlib.arpack;
 public interface JavaARPACK extends ARPACK {
 
   public static JavaARPACK getInstance() {
-    return InstanceBuilder.getJavaInstance();
+    return InstanceBuilder.javaArpack();
   }
 }

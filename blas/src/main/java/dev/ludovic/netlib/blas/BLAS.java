@@ -28,7 +28,7 @@ package dev.ludovic.netlib.blas;
 public interface BLAS {
 
   public static BLAS getInstance() {
-    return InstanceBuilder.getInstance();
+    return InstanceBuilder.blas();
   }
 
   public double dasum(int n, double[] x, int incx);
