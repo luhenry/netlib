@@ -31,56 +31,57 @@ final class InstanceBuilder {
 
   private static final Logger log = Logger.getLogger(InstanceBuilder.class.getName());
 
-  private static final BLAS blas = getInstanceImpl();
+  private static final BLAS blas;
+  private static final NativeBLAS nativeBlas;
+  private static final JavaBLAS javaBlas;
 
-  public static BLAS getInstance() {
+  static {
+    nativeBlas = initializeNative();
+    javaBlas = initializeJava();
+    blas = nativeBlas != null ? nativeBlas : javaBlas;
+  }
+
+  public static BLAS blas() {
     return blas;
   }
 
-  private static dev.ludovic.netlib.blas.BLAS getInstanceImpl() {
-    try {
-      return NativeBLAS.getInstance();
-    } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + dev.ludovic.netlib.blas.NativeBLAS.class.getName());
-    }
-    return JavaBLAS.getInstance();
-  }
-
-  private static final NativeBLAS nativeBlas = getNativeInstanceImpl();
-
-  public static NativeBLAS getNativeInstance() {
-    return nativeBlas;
-  }
-
-  private static NativeBLAS getNativeInstanceImpl() {
+  private static NativeBLAS initializeNative() {
     try {
       return JNIBLAS.getInstance();
     } catch (Throwable t) {
       log.warning("Failed to load implementation from:" + JNIBLAS.class.getName());
+      return null;
     }
-    throw new RuntimeException("Unable to load native implementation");
   }
 
-  private static final JavaBLAS javaBlas = getJavaInstanceImpl();
-
-  public static JavaBLAS getJavaInstance() {
-    return javaBlas;
+  public static NativeBLAS nativeBlas() {
+    if (nativeBlas == null) {
+      throw new RuntimeException("Unable to load native implementation");
+    }
+    return nativeBlas;
   }
 
-  private static JavaBLAS getJavaInstanceImpl() {
+  private static JavaBLAS initializeJava() {
     String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 2);
     int major = Integer.parseInt(fullVersion[0]);
     if (major >= 16) {
       try {
+        System.out.println("trying to return java 16 instance");
         return VectorBLAS.getInstance();
       } catch (Throwable t) {
         log.warning("Failed to load implementation from:" + VectorBLAS.class.getName());
       }
     }
     if (major >= 11) {
+      System.out.println("return java 11 instance");
       return Java11BLAS.getInstance();
     } else {
+      System.out.println("return java 8 instance");
       return Java8BLAS.getInstance();
     }
+  }
+
+  public static JavaBLAS javaBlas() {
+    return javaBlas;
   }
 }

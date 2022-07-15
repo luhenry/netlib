@@ -31,43 +31,41 @@ final class InstanceBuilder {
 
   private static final Logger log = Logger.getLogger(InstanceBuilder.class.getName());
 
-  private static final ARPACK arpack = getInstanceImpl();
+  private static final ARPACK arpack;
+  private static final NativeARPACK nativeArpack;
+  private static final JavaARPACK javaArpack;
 
-  public static ARPACK getInstance() {
+  static {
+    nativeArpack = initializeNative();
+    javaArpack = initializeJava();
+    arpack = nativeArpack != null ? nativeArpack : javaArpack;
+  }
+
+  public static ARPACK arpack() {
     return arpack;
   }
 
-  private static ARPACK getInstanceImpl() {
-    try {
-      return NativeARPACK.getInstance();
-    } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + NativeARPACK.class.getName());
-    }
-    return JavaARPACK.getInstance();
-  }
-
-  private static final NativeARPACK nativeArpack = getNativeInstanceImpl();
-
-  public static NativeARPACK getNativeInstance() {
-    return nativeArpack;
-  }
-
-  private static NativeARPACK getNativeInstanceImpl() {
+  private static NativeARPACK initializeNative() {
     try {
       return JNIARPACK.getInstance();
     } catch (Throwable t) {
       log.warning("Failed to load implementation from:" + JNIARPACK.class.getName());
+      return null;
     }
-    throw new RuntimeException("Unable to load native implementation");
   }
 
-  private static final JavaARPACK javaArpack = getJavaInstanceImpl();
-
-  public static JavaARPACK getJavaInstance() {
-    return javaArpack;
+  public static NativeARPACK nativeArpack() {
+    if (nativeArpack == null) {
+      throw new RuntimeException("Unable to load native implementation");
+    }
+    return nativeArpack;
   }
 
-  private static JavaARPACK getJavaInstanceImpl() {
+  private static JavaARPACK initializeJava() {
     return F2jARPACK.getInstance();
+  }
+
+  public static JavaARPACK javaArpack() {
+    return javaArpack;
   }
 }
