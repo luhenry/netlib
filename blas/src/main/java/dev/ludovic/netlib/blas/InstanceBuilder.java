@@ -58,11 +58,6 @@ final class InstanceBuilder {
     } catch (Throwable t) {
       log.warning("Failed to load implementation from:" + JNIBLAS.class.getName());
     }
-    try {
-      return (NativeBLAS)Class.forName("dev.ludovic.netlib.blas.ForeignLinkerBLAS").getMethod("getInstance").invoke(null);
-    } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + "dev.ludovic.netlib.blas.ForeignLinkerBLAS");
-    }
     throw new RuntimeException("Unable to load native implementation");
   }
 
