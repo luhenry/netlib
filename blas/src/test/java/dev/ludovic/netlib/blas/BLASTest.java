@@ -67,7 +67,7 @@ public class BLASTest {
     }
     if (major >= 17) {
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of((NativeBLAS)Class.forName("ForeignLinkerBLAS").getMethod("getInstance").invoke(null))
+        Arguments.of((NativeBLAS)Class.forName("dev.ludovic.netlib.blas.ForeignLinkerBLAS").getMethod("getInstance").invoke(null))
       ));
     }
 
