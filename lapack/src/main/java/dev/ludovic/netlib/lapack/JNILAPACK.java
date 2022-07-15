@@ -1492,11 +1492,11 @@ final class JNILAPACK extends AbstractLAPACK implements NativeLAPACK {
 
   protected native void dlamc5K(int beta, int p, int emin, boolean ieee, org.netlib.util.intW emax, org.netlib.util.doubleW rmax);
 
-  protected native double dsecndK();;
+  protected native double dsecndK();
 
   protected native boolean lsameK(String ca, String cb);
 
-  protected native float secondK(););
+  protected native float secondK();
 
   protected native float slamchK(String cmach);
 
