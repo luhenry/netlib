@@ -46,6 +46,9 @@ public class ARPACKTest {
 
   private static Stream<Arguments> ARPACKImplementations() {
     Stream instances = Stream.of(
+      Arguments.of(ARPACK.getInstance()),
+      Arguments.of(NativeARPACK.getInstance()),
+      Arguments.of(JavaARPACK.getInstance()),
       Arguments.of(F2jARPACK.getInstance()),
       Arguments.of(JNIARPACK.getInstance())
     );

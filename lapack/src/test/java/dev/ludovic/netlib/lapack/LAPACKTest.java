@@ -44,6 +44,9 @@ public class LAPACKTest {
 
   private static Stream<Arguments> LAPACKImplementations() {
     Stream instances = Stream.of(
+      Arguments.of(LAPACK.getInstance()),
+      Arguments.of(NativeLAPACK.getInstance()),
+      Arguments.of(JavaLAPACK.getInstance()),
       Arguments.of(F2jLAPACK.getInstance()),
       Arguments.of(JNILAPACK.getInstance())
     );
