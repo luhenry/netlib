@@ -25,11 +25,16 @@
 
 package dev.ludovic.netlib.benchmarks.blas.l1;
 
+import dev.ludovic.netlib.blas.JavaBLAS;
+
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
 public class SaxpyiBenchmark extends L1Benchmark {
+
+    @Param({"java"})
+    public String implementation;
 
     @Param({"10", "100000000"})
     public int n;
@@ -49,7 +54,7 @@ public class SaxpyiBenchmark extends L1Benchmark {
 
     @Benchmark
     public void run(Blackhole bh) {
-        blas.saxpyi(n, alpha, x, indx, yclone = y.clone());
+        ((JavaBLAS)blas).saxpyi(n, alpha, x, indx, yclone = y.clone());
         bh.consume(yclone);
     }
 }

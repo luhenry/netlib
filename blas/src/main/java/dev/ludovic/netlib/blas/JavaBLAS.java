@@ -30,4 +30,64 @@ public interface JavaBLAS extends BLAS {
   public static JavaBLAS getInstance() {
     return InstanceBuilder.javaBlas();
   }
+
+  public default void daxpyi(int n, double alpha, double[] x, int[] indx, double[] y) {
+    daxpyi(n, alpha, x, 0, indx, 0, y, 0);
+  }
+
+  public void daxpyi(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
+
+  public default void saxpyi(int n, float alpha, float[] x, int[] indx, float[] y) {
+    saxpyi(n, alpha, x, 0, indx, 0, y, 0);
+  }
+
+  public void saxpyi(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+
+  public default double ddoti(int n, double[] x, int[] indx, double[] y) {
+    return ddoti(n, x, 0, indx, 0, y, 0);
+  }
+
+  public double ddoti(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
+
+  public default float sdoti(int n, float[] x, int[] indx, float[] y) {
+    return sdoti(n, x, 0, indx, 0, y, 0);
+  }
+
+  public float sdoti(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+
+  public default double ddotii(int n, double[] x, int[] indx, double[] y, int[] indy) {
+    return ddotii(n, x, 0, indx, 0, y, 0, indy, 0);
+  }
+
+  public double ddotii(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety, int[] indy, int offsetindy);
+
+  public default float sdotii(int n, float[] x, int[] indx, float[] y, int[] indy) {
+    return sdotii(n, x, 0, indx, 0, y, 0, indy, 0);
+  }
+
+  public float sdotii(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy);
+
+  public default void dcopyi(int n, double[] x, int[] indx, double[] y) {
+    dcopyi(n, x, 0, indx, 0, y, 0);
+  }
+
+  public void dcopyi(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
+
+  public default void scopyi(int n, float[] x, int[] indx, float[] y) {
+    scopyi(n, x, 0, indx, 0, y, 0);
+  }
+
+  public void scopyi(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
+
+  public default void dspri(String uplo, int n, double alpha, double[] x, int[] indx, double[] a) {
+    dspri(uplo, n, alpha, x, 0, indx, 0, a, 0);
+  }
+
+  public void dspri(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta);
+
+  public default void sspri(String uplo, int n, float alpha, float[] x, int[] indx, float[] a) {
+    sspri(uplo, n, alpha, x, 0, indx, 0, a, 0);
+  }
+
+  public void sspri(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta);
 }

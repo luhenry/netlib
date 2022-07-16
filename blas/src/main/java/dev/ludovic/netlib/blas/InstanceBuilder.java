@@ -66,17 +66,14 @@ final class InstanceBuilder {
     int major = Integer.parseInt(fullVersion[0]);
     if (major >= 16) {
       try {
-        System.out.println("trying to return java 16 instance");
         return VectorBLAS.getInstance();
       } catch (Throwable t) {
         log.warning("Failed to load implementation from:" + VectorBLAS.class.getName());
       }
     }
     if (major >= 11) {
-      System.out.println("return java 11 instance");
       return Java11BLAS.getInstance();
     } else {
-      System.out.println("return java 8 instance");
       return Java8BLAS.getInstance();
     }
   }

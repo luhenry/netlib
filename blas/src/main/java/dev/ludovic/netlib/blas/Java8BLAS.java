@@ -24,7 +24,6 @@
  */
 
 package dev.ludovic.netlib.blas;
-
 class Java8BLAS extends AbstractBLAS implements JavaBLAS {
 
   private static final Java8BLAS instance = new Java8BLAS();

@@ -25,11 +25,16 @@
 
 package dev.ludovic.netlib.benchmarks.blas.l1;
 
+import dev.ludovic.netlib.blas.JavaBLAS;
+
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
 public class SdotiiBenchmark extends L1Benchmark {
+
+    @Param({"java"})
+    public String implementation;
 
     @Param({"10", "100000000"})
     public int n;
@@ -49,6 +54,6 @@ public class SdotiiBenchmark extends L1Benchmark {
 
     @Benchmark
     public void run(Blackhole bh) {
-        bh.consume(blas.sdotii(n, x, indx, y, indy));
+        bh.consume(((JavaBLAS)blas).sdotii(n, x, indx, y, indy));
     }
 }

@@ -25,11 +25,16 @@
 
 package dev.ludovic.netlib.benchmarks.blas.l2;
 
+import dev.ludovic.netlib.blas.JavaBLAS;
+
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
 public class SspriBenchmark extends L2Benchmark {
+
+    @Param({"java"})
+    public String implementation;
 
     @Param({"U"})
     public String uplo;
@@ -52,7 +57,7 @@ public class SspriBenchmark extends L2Benchmark {
 
     @Benchmark
     public void run(Blackhole bh) {
-        blas.sspri(uplo, n, alpha, x, indx, aclone = a.clone());
+        ((JavaBLAS)blas).sspri(uplo, n, alpha, x, indx, aclone = a.clone());
         bh.consume(aclone);
     }
 }

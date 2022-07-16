@@ -55,18 +55,6 @@ public interface BLAS {
 
   public void saxpy(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy);
 
-  public default void daxpyi(int n, double alpha, double[] x, int[] indx, double[] y) {
-    daxpyi(n, alpha, x, 0, indx, 0, y, 0);
-  }
-
-  public void daxpyi(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
-
-  public default void saxpyi(int n, float alpha, float[] x, int[] indx, float[] y) {
-    saxpyi(n, alpha, x, 0, indx, 0, y, 0);
-  }
-
-  public void saxpyi(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
-
   public default void dcopy(int n, double[] x, int incx, double[] y, int incy) {
     dcopy(n, x, 0, incx, y, 0, incy);
   }
@@ -79,18 +67,6 @@ public interface BLAS {
 
   public void scopy(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy);
 
-  public default void dcopyi(int n, double[] x, int[] indx, double[] y) {
-    dcopyi(n, x, 0, indx, 0, y, 0);
-  }
-
-  public void dcopyi(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
-
-  public default void scopyi(int n, float[] x, int[] indx, float[] y) {
-    scopyi(n, x, 0, indx, 0, y, 0);
-  }
-
-  public void scopyi(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
-
   public default double ddot(int n, double[] x, int incx, double[] y, int incy) {
     return ddot(n, x, 0, incx, y, 0, incy);
   }
@@ -102,30 +78,6 @@ public interface BLAS {
   }
 
   public float sdot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy);
-
-  public default double ddoti(int n, double[] x, int[] indx, double[] y) {
-    return ddoti(n, x, 0, indx, 0, y, 0);
-  }
-
-  public double ddoti(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety);
-
-  public default float sdoti(int n, float[] x, int[] indx, float[] y) {
-    return sdoti(n, x, 0, indx, 0, y, 0);
-  }
-
-  public float sdoti(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety);
-
-  public default double ddotii(int n, double[] x, int[] indx, double[] y, int[] indy) {
-    return ddotii(n, x, 0, indx, 0, y, 0, indy, 0);
-  }
-
-  public double ddotii(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety, int[] indy, int offsetindy);
-
-  public default float sdotii(int n, float[] x, int[] indx, float[] y, int[] indy) {
-    return sdotii(n, x, 0, indx, 0, y, 0, indy, 0);
-  }
-
-  public float sdotii(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy);
 
   public default float sdsdot(int n, float sb, float[] sx, int incx, float[] sy, int incy) {
     return sdsdot(n, sb, sx, 0, incx, sy, 0, incy);
@@ -280,18 +232,6 @@ public interface BLAS {
   }
 
   public void sspr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] ap, int offsetap);
-
-  public default void dspri(String uplo, int n, double alpha, double[] x, int[] indx, double[] a) {
-    dspri(uplo, n, alpha, x, 0, indx, 0, a, 0);
-  }
-
-  public void dspri(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta);
-
-  public default void sspri(String uplo, int n, float alpha, float[] x, int[] indx, float[] a) {
-    sspri(uplo, n, alpha, x, 0, indx, 0, a, 0);
-  }
-
-  public void sspri(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta);
 
   public default void dspr2(String uplo, int n, double alpha, double[] x, int incx, double[] y, int incy, double[] ap) {
     dspr2(uplo, n, alpha, x, 0, incx, y, 0, incy, ap, 0);
