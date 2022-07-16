@@ -23,12 +23,12 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.blas;
 
 public interface BLAS {
 
   public static BLAS getInstance() {
-    return InstanceBuilder.BLAS.getInstance();
+    return InstanceBuilder.blas();
   }
 
   public default double dasum(int n, double[] x, int incx) {

@@ -29,7 +29,7 @@ information or have any questions.
 
   <groupId>dev.ludovic.netlib</groupId>
   <artifactId>parent</artifactId>
-  <version>2-SNAPSHOT</version>
+  <version>3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Netlib</name>
@@ -89,8 +89,8 @@ information or have any questions.
         <jdk>17</jdk>
       </activation>
       <properties>
-        <jvm.modules>--add-modules=jdk.incubator.vector,jdk.incubator.foreign</jvm.modules>
-        <argLine>${jvm.modules} -Dforeign.restricted=permit</argLine>
+        <jvm.modules>--add-modules=jdk.incubator.vector</jvm.modules>
+        <argLine>${jvm.modules}</argLine>
       </properties>
     </profile>
   </profiles>

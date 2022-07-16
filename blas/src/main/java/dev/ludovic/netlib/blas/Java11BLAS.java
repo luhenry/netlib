@@ -25,15 +25,13 @@
 
 package dev.ludovic.netlib.blas;
 
-import dev.ludovic.netlib.BLAS;
-
-public class Java11BLAS extends Java8BLAS {
+class Java11BLAS extends Java8BLAS {
 
   private static final Java11BLAS instance = new Java11BLAS();
 
   protected Java11BLAS() {}
 
-  public static dev.ludovic.netlib.JavaBLAS getInstance() {
+  public static JavaBLAS getInstance() {
     return instance;
   }
 
@@ -1407,7 +1405,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a00, b02, sum02);
           sum10 = Math.fma(a10, b00, sum10);
           sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
+          sum12 = Math.fma(a10, b02, sum12);
           sum20 = Math.fma(a20, b00, sum20);
           sum21 = Math.fma(a20, b01, sum21);
           sum22 = Math.fma(a20, b02, sum22);
@@ -1422,7 +1420,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a01, b12, sum02);
           sum10 = Math.fma(a11, b10, sum10);
           sum11 = Math.fma(a11, b11, sum11);
-          sum11 = Math.fma(a11, b12, sum12);
+          sum12 = Math.fma(a11, b12, sum12);
           sum20 = Math.fma(a21, b10, sum20);
           sum21 = Math.fma(a21, b11, sum21);
           sum22 = Math.fma(a21, b12, sum22);
@@ -1439,7 +1437,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a00, b02, sum02);
           sum10 = Math.fma(a10, b00, sum10);
           sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
+          sum12 = Math.fma(a10, b02, sum12);
           sum20 = Math.fma(a20, b00, sum20);
           sum21 = Math.fma(a20, b01, sum21);
           sum22 = Math.fma(a20, b02, sum22);
@@ -1602,7 +1600,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a00, b02, sum02);
           sum10 = Math.fma(a10, b00, sum10);
           sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
+          sum12 = Math.fma(a10, b02, sum12);
           sum20 = Math.fma(a20, b00, sum20);
           sum21 = Math.fma(a20, b01, sum21);
           sum22 = Math.fma(a20, b02, sum22);
@@ -1617,7 +1615,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a01, b12, sum02);
           sum10 = Math.fma(a11, b10, sum10);
           sum11 = Math.fma(a11, b11, sum11);
-          sum11 = Math.fma(a11, b12, sum12);
+          sum12 = Math.fma(a11, b12, sum12);
           sum20 = Math.fma(a21, b10, sum20);
           sum21 = Math.fma(a21, b11, sum21);
           sum22 = Math.fma(a21, b12, sum22);
@@ -1634,7 +1632,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a00, b02, sum02);
           sum10 = Math.fma(a10, b00, sum10);
           sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
+          sum12 = Math.fma(a10, b02, sum12);
           sum20 = Math.fma(a20, b00, sum20);
           sum21 = Math.fma(a20, b01, sum21);
           sum22 = Math.fma(a20, b02, sum22);
@@ -1798,7 +1796,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a00, b02, sum02);
           sum10 = Math.fma(a10, b00, sum10);
           sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
+          sum12 = Math.fma(a10, b02, sum12);
           sum20 = Math.fma(a20, b00, sum20);
           sum21 = Math.fma(a20, b01, sum21);
           sum22 = Math.fma(a20, b02, sum22);
@@ -1813,7 +1811,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a01, b12, sum02);
           sum10 = Math.fma(a11, b10, sum10);
           sum11 = Math.fma(a11, b11, sum11);
-          sum11 = Math.fma(a11, b12, sum12);
+          sum12 = Math.fma(a11, b12, sum12);
           sum20 = Math.fma(a21, b10, sum20);
           sum21 = Math.fma(a21, b11, sum21);
           sum22 = Math.fma(a21, b12, sum22);
@@ -1830,7 +1828,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a00, b02, sum02);
           sum10 = Math.fma(a10, b00, sum10);
           sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
+          sum12 = Math.fma(a10, b02, sum12);
           sum20 = Math.fma(a20, b00, sum20);
           sum21 = Math.fma(a20, b01, sum21);
           sum22 = Math.fma(a20, b02, sum22);
@@ -1994,7 +1992,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a00, b02, sum02);
           sum10 = Math.fma(a10, b00, sum10);
           sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
+          sum12 = Math.fma(a10, b02, sum12);
           sum20 = Math.fma(a20, b00, sum20);
           sum21 = Math.fma(a20, b01, sum21);
           sum22 = Math.fma(a20, b02, sum22);
@@ -2009,7 +2007,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a01, b12, sum02);
           sum10 = Math.fma(a11, b10, sum10);
           sum11 = Math.fma(a11, b11, sum11);
-          sum11 = Math.fma(a11, b12, sum12);
+          sum12 = Math.fma(a11, b12, sum12);
           sum20 = Math.fma(a21, b10, sum20);
           sum21 = Math.fma(a21, b11, sum21);
           sum22 = Math.fma(a21, b12, sum22);
@@ -2026,7 +2024,7 @@ public class Java11BLAS extends Java8BLAS {
           sum02 = Math.fma(a00, b02, sum02);
           sum10 = Math.fma(a10, b00, sum10);
           sum11 = Math.fma(a10, b01, sum11);
-          sum11 = Math.fma(a10, b02, sum12);
+          sum12 = Math.fma(a10, b02, sum12);
           sum20 = Math.fma(a20, b00, sum20);
           sum21 = Math.fma(a20, b01, sum21);
           sum22 = Math.fma(a20, b02, sum22);

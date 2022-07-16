@@ -23,11 +23,49 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.lapack;
 
-public interface JavaLAPACK extends LAPACK {
+import java.util.logging.Logger;
 
-  public static JavaLAPACK getInstance() {
-    return InstanceBuilder.JavaLAPACK.getInstance();
+final class InstanceBuilder {
+
+  private static final Logger log = Logger.getLogger(InstanceBuilder.class.getName());
+
+  private static final LAPACK lapack;
+  private static final NativeLAPACK nativeLapack;
+  private static final JavaLAPACK javaLapack;
+
+  static {
+    nativeLapack = initializeNative();
+    javaLapack = initializeJava();
+    lapack = nativeLapack != null ? nativeLapack : javaLapack;
+  }
+
+  public static LAPACK lapack() {
+    return lapack;
+  }
+
+  private static NativeLAPACK initializeNative() {
+    try {
+      return JNILAPACK.getInstance();
+    } catch (Throwable t) {
+      log.warning("Failed to load implementation from:" + JNILAPACK.class.getName());
+      return null;
+    }
+  }
+
+  public static NativeLAPACK nativeLapack() {
+    if (nativeLapack == null) {
+      throw new RuntimeException("Unable to load native implementation");
+    }
+    return nativeLapack;
+  }
+
+  private static JavaLAPACK initializeJava() {
+    return F2jLAPACK.getInstance();
+  }
+
+  public static JavaLAPACK javaLapack() {
+    return javaLapack;
   }
 }

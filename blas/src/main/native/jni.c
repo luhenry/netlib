@@ -43,6 +43,7 @@ static jfieldID StringW_val_fieldID;
 static double (*dasum_)(int *n, double *x, int *incx);
 
 jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_dasumK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx) {
+  if (!dasum_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jdouble __ret = 0;
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
@@ -61,6 +62,7 @@ done:
 static float (*sasum_)(int *n, float *x, int *incx);
 
 jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sasumK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx) {
+  if (!sasum_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jfloat __ret = 0;
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
@@ -79,6 +81,7 @@ done:
 static void (*daxpy_)(int *n, double *alpha, double *x, int *incx, double *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_daxpyK(JNIEnv *env, UNUSED jobject obj, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
+  if (!daxpy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   double __nalpha __attribute__((aligned(8)));
@@ -102,6 +105,7 @@ done:
 static void (*saxpy_)(int *n, float *alpha, float *x, int *incx, float *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_saxpyK(JNIEnv *env, UNUSED jobject obj, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
+  if (!saxpy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   float __nalpha __attribute__((aligned(8)));
@@ -125,6 +129,7 @@ done:
 static void (*dcopy_)(int *n, double *x, int *incx, double *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dcopyK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
+  if (!dcopy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   int __nincx __attribute__((aligned(8)));
@@ -146,6 +151,7 @@ done:
 static void (*scopy_)(int *n, float *x, int *incx, float *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_scopyK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
+  if (!scopy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   int __nincx __attribute__((aligned(8)));
@@ -167,6 +173,7 @@ done:
 static double (*ddot_)(int *n, double *x, int *incx, double *y, int *incy);
 
 jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_ddotK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
+  if (!ddot_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jdouble __ret = 0;
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
@@ -190,6 +197,7 @@ done:
 static float (*sdot_)(int *n, float *x, int *incx, float *y, int *incy);
 
 jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sdotK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
+  if (!sdot_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jfloat __ret = 0;
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
@@ -213,6 +221,7 @@ done:
 static float (*sdsdot_)(int *n, float *sb, float *sx, int *incsx, float *sy, int *incsy);
 
 jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_sdsdotK(JNIEnv *env, UNUSED jobject obj, jint n, jfloat sb, jfloatArray sx, jint offsetsx, jint incsx, jfloatArray sy, jint offsetsy, jint incsy) {
+  if (!sdsdot_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jfloat __ret = 0;
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
@@ -238,6 +247,7 @@ done:
 static void (*dgbmv_)(const char *trans, int *m, int *n, int *kl, int *ku, double *alpha, double *a, int *lda, double *x, int *incx, double *beta, double *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dgbmvK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jint kl, jint ku, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+  if (!dgbmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__ntrans = NULL;
   int __nm __attribute__((aligned(8)));
@@ -277,6 +287,7 @@ done:
 static void (*sgbmv_)(const char *trans, int *m, int *n, int *kl, int *ku, float *alpha, float *a, int *lda, float *x, int *incx, float *beta, float *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_sgbmvK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jint kl, jint ku, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+  if (!sgbmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__ntrans = NULL;
   int __nm __attribute__((aligned(8)));
@@ -316,6 +327,7 @@ done:
 static void (*dgemm_)(const char *transa, const char *transb, int *m, int *n, int *k, double *alpha, double *a, int *lda, double *b, int *ldb, double *beta, double *c, int *ldc);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dgemmK(JNIEnv *env, UNUSED jobject obj, jstring transa, jstring transb, jint m, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
+  if (!dgemm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__ntransa = NULL;
   const char *__ntransb = NULL;
@@ -356,6 +368,7 @@ done:
 static void (*sgemm_)(const char *transa, const char *transb, int *m, int *n, int *k, float *alpha, float *a, int *lda, float *b, int *ldb, float *beta, float *c, int *ldc);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_sgemmK(JNIEnv *env, UNUSED jobject obj, jstring transa, jstring transb, jint m, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
+  if (!sgemm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__ntransa = NULL;
   const char *__ntransb = NULL;
@@ -396,6 +409,7 @@ done:
 static void (*dgemv_)(const char *trans, int *m, int *n, double *alpha, double *a, int *lda, double *x, int *incx, double *beta, double *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dgemvK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+  if (!dgemv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__ntrans = NULL;
   int __nm __attribute__((aligned(8)));
@@ -431,6 +445,7 @@ done:
 static void (*sgemv_)(const char *trans, int *m, int *n, float *alpha, float *a, int *lda, float *x, int *incx, float *beta, float *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_sgemvK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+  if (!sgemv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__ntrans = NULL;
   int __nm __attribute__((aligned(8)));
@@ -466,6 +481,7 @@ done:
 static void (*dger_)(int *m, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a, int *lda);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dgerK(JNIEnv *env, UNUSED jobject obj, jint m, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy, jdoubleArray a, jint offseta, jint lda) {
+  if (!dger_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nm __attribute__((aligned(8)));
   int __nn __attribute__((aligned(8)));
@@ -496,6 +512,7 @@ done:
 static void (*sger_)(int *m, int *n, float *alpha, float *x, int *incx, float *y, int *incy, float *a, int *lda);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_sgerK(JNIEnv *env, UNUSED jobject obj, jint m, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy, jfloatArray a, jint offseta, jint lda) {
+  if (!sger_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nm __attribute__((aligned(8)));
   int __nn __attribute__((aligned(8)));
@@ -526,6 +543,7 @@ done:
 static double (*dnrm2_)(int *n, double *x, int *incx);
 
 jdouble Java_dev_ludovic_netlib_blas_JNIBLAS_dnrm2K(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx) {
+  if (!dnrm2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jdouble __ret = 0;
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
@@ -544,6 +562,7 @@ done:
 static float (*snrm2_)(int *n, float *x, int *incx);
 
 jfloat Java_dev_ludovic_netlib_blas_JNIBLAS_snrm2K(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx) {
+  if (!snrm2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jfloat __ret = 0;
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
@@ -562,6 +581,7 @@ done:
 static void (*drot_)(int *n, double *dx, int *incx, double *dy, int *incy, double *c, double *s);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_drotK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray dx, jint offsetdx, jint incx, jdoubleArray dy, jint offsetdy, jint incy, jdouble c, jdouble s) {
+  if (!drot_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   int __nincx __attribute__((aligned(8)));
@@ -587,6 +607,7 @@ done:
 static void (*srot_)(int *n, float *sx, int *incx, float *sy, int *incy, float *c, float *s);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_srotK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray sx, jint offsetsx, jint incx, jfloatArray sy, jint offsetsy, jint incy, jfloat c, jfloat s) {
+  if (!srot_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   int __nincx __attribute__((aligned(8)));
@@ -612,6 +633,7 @@ done:
 static void (*drotm_)(int *n, double *dx, int *incx, double *dy, int *incy, double *dparam);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_drotmK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray dx, jint offsetdx, jint incx, jdoubleArray dy, jint offsetdy, jint incy, jdoubleArray dparam, jint offsetdparam) {
+  if (!drotm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   int __nincx __attribute__((aligned(8)));
@@ -636,6 +658,7 @@ done:
 static void (*srotm_)(int *n, float *sx, int *incx, float *sy, int *incy, float *sparam);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_srotmK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray sx, jint offsetsx, jint incx, jfloatArray sy, jint offsetsy, jint incy, jfloatArray sparam, jint offsetsparam) {
+  if (!srotm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   int __nincx __attribute__((aligned(8)));
@@ -660,6 +683,7 @@ done:
 static void (*drotmg_)(double *dd1, double *dd2, double *dx1, double *dy1, double *dparam);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_drotmgK(JNIEnv *env, UNUSED jobject obj, jobject dd1, jobject dd2, jobject dx1, jdouble dy1, jdoubleArray dparam, jint offsetdparam) {
+  if (!drotmg_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   double __ndd1 = 0;
   double __ndd2 = 0;
@@ -683,6 +707,7 @@ done:
 static void (*srotmg_)(float *sd1, float *sd2, float *sx1, float *sy1, float *sparam);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_srotmgK(JNIEnv *env, UNUSED jobject obj, jobject sd1, jobject sd2, jobject sx1, jfloat sy1, jfloatArray sparam, jint offsetsparam) {
+  if (!srotmg_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   float __nsd1 = 0;
   float __nsd2 = 0;
@@ -706,6 +731,7 @@ done:
 static void (*dsbmv_)(const char *uplo, int *n, int *k, double *alpha, double *a, int *lda, double *x, int *incx, double *beta, double *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dsbmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+  if (!dsbmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -741,6 +767,7 @@ done:
 static void (*ssbmv_)(const char *uplo, int *n, int *k, float *alpha, float *a, int *lda, float *x, int *incx, float *beta, float *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_ssbmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+  if (!ssbmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -776,6 +803,7 @@ done:
 static void (*dscal_)(int *n, double *alpha, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dscalK(JNIEnv *env, UNUSED jobject obj, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx) {
+  if (!dscal_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   double __nalpha __attribute__((aligned(8)));
@@ -794,6 +822,7 @@ done:
 static void (*sscal_)(int *n, float *alpha, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_sscalK(JNIEnv *env, UNUSED jobject obj, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx) {
+  if (!sscal_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   float __nalpha __attribute__((aligned(8)));
@@ -812,6 +841,7 @@ done:
 static void (*dspmv_)(const char *uplo, int *n, double *alpha, double *a, double *x, int *incx, double *beta, double *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dspmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray a, jint offseta, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+  if (!dspmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -843,6 +873,7 @@ done:
 static void (*sspmv_)(const char *uplo, int *n, float *alpha, float *a, float *x, int *incx, float *beta, float *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_sspmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray a, jint offseta, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+  if (!sspmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -874,6 +905,7 @@ done:
 static void (*dspr_)(const char *uplo, int *n, double *alpha, double *x, int *incx, double *a);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dsprK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray a, jint offseta) {
+  if (!dspr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -898,6 +930,7 @@ done:
 static void (*sspr_)(const char *uplo, int *n, float *alpha, float *x, int *incx, float *a);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_ssprK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray a, jint offseta) {
+  if (!sspr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -922,6 +955,7 @@ done:
 static void (*dspr2_)(const char *uplo, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dspr2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy, jdoubleArray a, jint offseta) {
+  if (!dspr2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -951,6 +985,7 @@ done:
 static void (*sspr2_)(const char *uplo, int *n, float *alpha, float *x, int *incx, float *y, int *incy, float *a);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_sspr2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy, jfloatArray a, jint offseta) {
+  if (!sspr2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -980,6 +1015,7 @@ done:
 static void (*dswap_)(int *n, double *x, int *incx, double *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dswapK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy) {
+  if (!dswap_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   int __nincx __attribute__((aligned(8)));
@@ -1001,6 +1037,7 @@ done:
 static void (*sswap_)(int *n, float *x, int *incx, float *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_sswapK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy) {
+  if (!sswap_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
   int __nincx __attribute__((aligned(8)));
@@ -1022,6 +1059,7 @@ done:
 static void (*dsymm_)(const char *side, const char *uplo, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb, double *beta, double *c, int *ldc);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dsymmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
+  if (!dsymm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nside = NULL;
   const char *__nuplo = NULL;
@@ -1060,6 +1098,7 @@ done:
 static void (*ssymm_)(const char *side, const char *uplo, int *m, int *n, float *alpha, float *a, int *lda, float *b, int *ldb, float *beta, float *c, int *ldc);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_ssymmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
+  if (!ssymm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nside = NULL;
   const char *__nuplo = NULL;
@@ -1098,6 +1137,7 @@ done:
 static void (*dsymv_)(const char *uplo, int *n, double *alpha, double *a, int *lda, double *x, int *incx, double *beta, double *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dsymvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx, jdouble beta, jdoubleArray y, jint offsety, jint incy) {
+  if (!dsymv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -1131,6 +1171,7 @@ done:
 static void (*ssymv_)(const char *uplo, int *n, float *alpha, float *a, int *lda, float *x, int *incx, float *beta, float *y, int *incy);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_ssymvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx, jfloat beta, jfloatArray y, jint offsety, jint incy) {
+  if (!ssymv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -1164,6 +1205,7 @@ done:
 static void (*dsyr_)(const char *uplo, int *n, double *alpha, double *x, int *incx, double *a, int *lda);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray a, jint offseta, jint lda) {
+  if (!dsyr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -1190,6 +1232,7 @@ done:
 static void (*ssyr_)(const char *uplo, int *n, float *alpha, float *x, int *incx, float *a, int *lda);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray a, jint offseta, jint lda) {
+  if (!ssyr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -1216,6 +1259,7 @@ done:
 static void (*dsyr2_)(const char *uplo, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a, int *lda);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyr2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdouble alpha, jdoubleArray x, jint offsetx, jint incx, jdoubleArray y, jint offsety, jint incy, jdoubleArray a, jint offseta, jint lda) {
+  if (!dsyr2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -1247,6 +1291,7 @@ done:
 static void (*ssyr2_)(const char *uplo, int *n, float *alpha, float *x, int *incx, float *y, int *incy, float *a, int *lda);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyr2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloat alpha, jfloatArray x, jint offsetx, jint incx, jfloatArray y, jint offsety, jint incy, jfloatArray a, jint offseta, jint lda) {
+  if (!ssyr2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   int __nn __attribute__((aligned(8)));
@@ -1278,6 +1323,7 @@ done:
 static void (*dsyr2k_)(const char *uplo, const char *trans, int *n, int *k, double *alpha, double *a, int *lda, double *b, int *ldb, double *beta, double *c, int *ldc);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyr2kK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
+  if (!dsyr2k_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1316,6 +1362,7 @@ done:
 static void (*ssyr2k_)(const char *uplo, const char *trans, int *n, int *k, float *alpha, float *a, int *lda, float *b, int *ldb, float *beta, float *c, int *ldc);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyr2kK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
+  if (!ssyr2k_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1354,6 +1401,7 @@ done:
 static void (*dsyrk_)(const char *uplo, const char *trans, int *n, int *k, double *alpha, double *a, int *lda, double *beta, double *c, int *ldc);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dsyrkK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jint n, jint k, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdouble beta, jdoubleArray c, jint offsetc, jint ldc) {
+  if (!dsyrk_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1387,6 +1435,7 @@ done:
 static void (*ssyrk_)(const char *uplo, const char *trans, int *n, int *k, float *alpha, float *a, int *lda, float *beta, float *c, int *ldc);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_ssyrkK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jint n, jint k, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloat beta, jfloatArray c, jint offsetc, jint ldc) {
+  if (!ssyrk_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1420,6 +1469,7 @@ done:
 static void (*dtbmv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, double *a, int *lda, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtbmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
+  if (!dtbmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1452,6 +1502,7 @@ done:
 static void (*stbmv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, float *a, int *lda, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_stbmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
+  if (!stbmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1484,6 +1535,7 @@ done:
 static void (*dtbsv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, double *a, int *lda, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtbsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
+  if (!dtbsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1516,6 +1568,7 @@ done:
 static void (*stbsv_)(const char *uplo, const char *trans, const char *diag, int *n, int *k, float *a, int *lda, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_stbsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
+  if (!stbsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1548,6 +1601,7 @@ done:
 static void (*dtpmv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtpmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jdoubleArray x, jint offsetx, jint incx) {
+  if (!dtpmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1576,6 +1630,7 @@ done:
 static void (*stpmv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_stpmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jfloatArray x, jint offsetx, jint incx) {
+  if (!stpmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1604,6 +1659,7 @@ done:
 static void (*dtpsv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtpsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jdoubleArray x, jint offsetx, jint incx) {
+  if (!dtpsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1632,6 +1688,7 @@ done:
 static void (*stpsv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_stpsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jfloatArray x, jint offsetx, jint incx) {
+  if (!stpsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1660,6 +1717,7 @@ done:
 static void (*dtrmm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrmmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring transa, jstring diag, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb) {
+  if (!dtrmm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nside = NULL;
   const char *__nuplo = NULL;
@@ -1697,6 +1755,7 @@ done:
 static void (*strmm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, float *alpha, float *a, int *lda, float *b, int *ldb);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_strmmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring transa, jstring diag, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb) {
+  if (!strmm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nside = NULL;
   const char *__nuplo = NULL;
@@ -1734,6 +1793,7 @@ done:
 static void (*dtrmv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, int *lda, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
+  if (!dtrmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1764,6 +1824,7 @@ done:
 static void (*strmv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, int *lda, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_strmvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
+  if (!strmv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1794,6 +1855,7 @@ done:
 static void (*dtrsm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrsmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring transa, jstring diag, jint m, jint n, jdouble alpha, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb) {
+  if (!dtrsm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nside = NULL;
   const char *__nuplo = NULL;
@@ -1831,6 +1893,7 @@ done:
 static void (*strsm_)(const char *side, const char *uplo, const char *transa, const char *diag, int *m, int *n, float *alpha, float *a, int *lda, float *b, int *ldb);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_strsmK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring transa, jstring diag, jint m, jint n, jfloat alpha, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb) {
+  if (!strsm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nside = NULL;
   const char *__nuplo = NULL;
@@ -1868,6 +1931,7 @@ done:
 static void (*dtrsv_)(const char *uplo, const char *trans, const char *diag, int *n, double *a, int *lda, double *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_dtrsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jint incx) {
+  if (!dtrsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1898,6 +1962,7 @@ done:
 static void (*strsv_)(const char *uplo, const char *trans, const char *diag, int *n, float *a, int *lda, float *x, int *incx);
 
 void Java_dev_ludovic_netlib_blas_JNIBLAS_strsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jint incx) {
+  if (!strsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   const char *__nuplo = NULL;
   const char *__ntrans = NULL;
@@ -1928,6 +1993,7 @@ done:
 static int (*idamax_)(int *n, double *dx, int *incdx);
 
 jint Java_dev_ludovic_netlib_blas_JNIBLAS_idamaxK(JNIEnv *env, UNUSED jobject obj, jint n, jdoubleArray dx, jint offsetdx, jint incdx) {
+  if (!idamax_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jint __ret = 0;
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
@@ -1946,6 +2012,7 @@ done:
 static int (*isamax_)(int *n, float *sx, int *incsx);
 
 jint Java_dev_ludovic_netlib_blas_JNIBLAS_isamaxK(JNIEnv *env, UNUSED jobject obj, jint n, jfloatArray sx, jint offsetsx, jint incsx) {
+  if (!isamax_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jint __ret = 0;
   jboolean __failed = FALSE;
   int __nn __attribute__((aligned(8)));
@@ -1976,10 +2043,7 @@ jboolean get_system_property(JNIEnv *env, jstring key, jstring def, jstring *res
 
 jboolean load_symbols(void) {
 #define LOAD_SYMBOL(name) \
-  name = dlsym(NULL, #name); \
-  if (!name) { \
-    return FALSE; \
-  }
+  name = dlsym(NULL, #name);
 
   LOAD_SYMBOL(dasum_);
   LOAD_SYMBOL(sasum_);
@@ -2057,7 +2121,7 @@ static void *libhandle;
 
 jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
   JNIEnv *env;
-  if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_6) != JNI_OK) {
+  if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_8) != JNI_OK) {
     return -1;
   }
 
@@ -2138,7 +2202,7 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
     return -1;
   }
 
-  return JNI_VERSION_1_6;
+  return JNI_VERSION_1_8;
 }
 
 void JNI_OnUnload(UNUSED JavaVM *vm, UNUSED void *reserved) {

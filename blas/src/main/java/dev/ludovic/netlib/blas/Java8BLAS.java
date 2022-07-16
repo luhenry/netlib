@@ -25,13 +25,13 @@
 
 package dev.ludovic.netlib.blas;
 
-public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBLAS {
+class Java8BLAS extends AbstractBLAS implements JavaBLAS {
 
   private static final Java8BLAS instance = new Java8BLAS();
 
   protected Java8BLAS() {}
 
-  public static dev.ludovic.netlib.JavaBLAS getInstance() {
+  public static JavaBLAS getInstance() {
     return instance;
   }
 
@@ -1888,7 +1888,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a00 * b02 + sum02;
           sum10 = a10 * b00 + sum10;
           sum11 = a10 * b01 + sum11;
-          sum11 = a10 * b02 + sum12;
+          sum12 = a10 * b02 + sum12;
           sum20 = a20 * b00 + sum20;
           sum21 = a20 * b01 + sum21;
           sum22 = a20 * b02 + sum22;
@@ -1903,7 +1903,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a01 * b12 + sum02;
           sum10 = a11 * b10 + sum10;
           sum11 = a11 * b11 + sum11;
-          sum11 = a11 * b12 + sum12;
+          sum12 = a11 * b12 + sum12;
           sum20 = a21 * b10 + sum20;
           sum21 = a21 * b11 + sum21;
           sum22 = a21 * b12 + sum22;
@@ -1920,7 +1920,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a00 * b02 + sum02;
           sum10 = a10 * b00 + sum10;
           sum11 = a10 * b01 + sum11;
-          sum11 = a10 * b02 + sum12;
+          sum12 = a10 * b02 + sum12;
           sum20 = a20 * b00 + sum20;
           sum21 = a20 * b01 + sum21;
           sum22 = a20 * b02 + sum22;
@@ -2083,7 +2083,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a00 * b02 + sum02;
           sum10 = a10 * b00 + sum10;
           sum11 = a10 * b01 + sum11;
-          sum11 = a10 * b02 + sum12;
+          sum12 = a10 * b02 + sum12;
           sum20 = a20 * b00 + sum20;
           sum21 = a20 * b01 + sum21;
           sum22 = a20 * b02 + sum22;
@@ -2098,7 +2098,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a01 * b12 + sum02;
           sum10 = a11 * b10 + sum10;
           sum11 = a11 * b11 + sum11;
-          sum11 = a11 * b12 + sum12;
+          sum12 = a11 * b12 + sum12;
           sum20 = a21 * b10 + sum20;
           sum21 = a21 * b11 + sum21;
           sum22 = a21 * b12 + sum22;
@@ -2115,7 +2115,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a00 * b02 + sum02;
           sum10 = a10 * b00 + sum10;
           sum11 = a10 * b01 + sum11;
-          sum11 = a10 * b02 + sum12;
+          sum12 = a10 * b02 + sum12;
           sum20 = a20 * b00 + sum20;
           sum21 = a20 * b01 + sum21;
           sum22 = a20 * b02 + sum22;
@@ -2279,7 +2279,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a00 * b02 + sum02;
           sum10 = a10 * b00 + sum10;
           sum11 = a10 * b01 + sum11;
-          sum11 = a10 * b02 + sum12;
+          sum12 = a10 * b02 + sum12;
           sum20 = a20 * b00 + sum20;
           sum21 = a20 * b01 + sum21;
           sum22 = a20 * b02 + sum22;
@@ -2294,7 +2294,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a01 * b12 + sum02;
           sum10 = a11 * b10 + sum10;
           sum11 = a11 * b11 + sum11;
-          sum11 = a11 * b12 + sum12;
+          sum12 = a11 * b12 + sum12;
           sum20 = a21 * b10 + sum20;
           sum21 = a21 * b11 + sum21;
           sum22 = a21 * b12 + sum22;
@@ -2311,7 +2311,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a00 * b02 + sum02;
           sum10 = a10 * b00 + sum10;
           sum11 = a10 * b01 + sum11;
-          sum11 = a10 * b02 + sum12;
+          sum12 = a10 * b02 + sum12;
           sum20 = a20 * b00 + sum20;
           sum21 = a20 * b01 + sum21;
           sum22 = a20 * b02 + sum22;
@@ -2475,7 +2475,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a00 * b02 + sum02;
           sum10 = a10 * b00 + sum10;
           sum11 = a10 * b01 + sum11;
-          sum11 = a10 * b02 + sum12;
+          sum12 = a10 * b02 + sum12;
           sum20 = a20 * b00 + sum20;
           sum21 = a20 * b01 + sum21;
           sum22 = a20 * b02 + sum22;
@@ -2490,7 +2490,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a01 * b12 + sum02;
           sum10 = a11 * b10 + sum10;
           sum11 = a11 * b11 + sum11;
-          sum11 = a11 * b12 + sum12;
+          sum12 = a11 * b12 + sum12;
           sum20 = a21 * b10 + sum20;
           sum21 = a21 * b11 + sum21;
           sum22 = a21 * b12 + sum22;
@@ -2507,7 +2507,7 @@ public class Java8BLAS extends AbstractBLAS implements dev.ludovic.netlib.JavaBL
           sum02 = a00 * b02 + sum02;
           sum10 = a10 * b00 + sum10;
           sum11 = a10 * b01 + sum11;
-          sum11 = a10 * b02 + sum12;
+          sum12 = a10 * b02 + sum12;
           sum20 = a20 * b00 + sum20;
           sum21 = a20 * b01 + sum21;
           sum22 = a20 * b02 + sum22;

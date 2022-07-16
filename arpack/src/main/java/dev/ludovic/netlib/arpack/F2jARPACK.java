@@ -25,15 +25,13 @@
 
 package dev.ludovic.netlib.arpack;
 
-import dev.ludovic.netlib.ARPACK;
-
-public final class F2jARPACK extends AbstractARPACK implements dev.ludovic.netlib.JavaARPACK {
+final class F2jARPACK extends AbstractARPACK implements JavaARPACK {
 
   private static final F2jARPACK instance = new F2jARPACK();
 
   protected F2jARPACK() {}
 
-  public static dev.ludovic.netlib.JavaARPACK getInstance() {
+  public static JavaARPACK getInstance() {
     return instance;
   }
 

@@ -23,12 +23,12 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.lapack;
 
 public interface LAPACK {
 
   public static LAPACK getInstance() {
-    return InstanceBuilder.LAPACK.getInstance();
+    return InstanceBuilder.lapack();
   }
 
   public void dbdsdc(String uplo, String compq, int n, double[] d, double[] e, double[] u, int ldu, double[] vt, int ldvt, double[] q, int[] iq, double[] work, int[] iwork, org.netlib.util.intW info);

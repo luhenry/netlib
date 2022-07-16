@@ -23,11 +23,11 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.blas;
 
-public interface NativeLAPACK extends LAPACK {
+public interface NativeBLAS extends BLAS {
 
-  public static NativeLAPACK getInstance() {
-    return InstanceBuilder.NativeLAPACK.getInstance();
+  public static NativeBLAS getInstance() {
+    return InstanceBuilder.nativeBlas();
   }
 }

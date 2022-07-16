@@ -25,7 +25,7 @@
 
 package dev.ludovic.netlib.benchmarks.arpack;
 
-import dev.ludovic.netlib.ARPACK;
+import dev.ludovic.netlib.arpack.*;
 
 import org.openjdk.jmh.annotations.*;
 
@@ -43,10 +43,10 @@ public abstract class ARPACKBenchmark {
     public void setupImplementation() {
         switch (implementation) {
         case "java":
-            arpack = dev.ludovic.netlib.JavaARPACK.getInstance();
+            arpack = JavaARPACK.getInstance();
             break;
         case "native":
-            arpack = dev.ludovic.netlib.NativeARPACK.getInstance();
+            arpack = NativeARPACK.getInstance();
             break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }

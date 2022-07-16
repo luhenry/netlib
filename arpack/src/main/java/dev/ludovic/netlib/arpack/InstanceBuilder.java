@@ -23,11 +23,49 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.arpack;
 
-public interface NativeARPACK extends ARPACK {
+import java.util.logging.Logger;
 
-  public static NativeARPACK getInstance() {
-    return InstanceBuilder.NativeARPACK.getInstance();
+final class InstanceBuilder {
+
+  private static final Logger log = Logger.getLogger(InstanceBuilder.class.getName());
+
+  private static final ARPACK arpack;
+  private static final NativeARPACK nativeArpack;
+  private static final JavaARPACK javaArpack;
+
+  static {
+    nativeArpack = initializeNative();
+    javaArpack = initializeJava();
+    arpack = nativeArpack != null ? nativeArpack : javaArpack;
+  }
+
+  public static ARPACK arpack() {
+    return arpack;
+  }
+
+  private static NativeARPACK initializeNative() {
+    try {
+      return JNIARPACK.getInstance();
+    } catch (Throwable t) {
+      log.warning("Failed to load implementation from:" + JNIARPACK.class.getName());
+      return null;
+    }
+  }
+
+  public static NativeARPACK nativeArpack() {
+    if (nativeArpack == null) {
+      throw new RuntimeException("Unable to load native implementation");
+    }
+    return nativeArpack;
+  }
+
+  private static JavaARPACK initializeJava() {
+    return F2jARPACK.getInstance();
+  }
+
+  public static JavaARPACK javaArpack() {
+    return javaArpack;
   }
 }

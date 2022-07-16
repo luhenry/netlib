@@ -25,7 +25,7 @@
 
 package dev.ludovic.netlib.benchmarks.lapack;
 
-import dev.ludovic.netlib.LAPACK;
+import dev.ludovic.netlib.lapack.*;
 
 import org.openjdk.jmh.annotations.*;
 
@@ -43,10 +43,10 @@ public abstract class LAPACKBenchmark {
     public void setupImplementation() {
         switch (implementation) {
         case "java":
-            lapack = dev.ludovic.netlib.JavaLAPACK.getInstance();
+            lapack = JavaLAPACK.getInstance();
             break;
         case "native":
-            lapack = dev.ludovic.netlib.NativeLAPACK.getInstance();
+            lapack = NativeLAPACK.getInstance();
             break;
         default: throw new IllegalArgumentException("Unknown implementation = " + implementation);
         }

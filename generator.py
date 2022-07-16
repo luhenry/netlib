@@ -221,6 +221,7 @@ class RoutineR:
     print()
     # Print JNI function implementation
     print("{ret} Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(ret=self.ret.java_type, pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", " + a for arg in self.args for a in arg.java_type_and_name]))) 
+    print("  if (!{name}_) (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/UnsupportedOperationException\"), \"symbol isn't available in native library\");".format(name=self.name))
     print("  {rettype} __ret = 0;".format(rettype=self.ret.java_type))
     print("  jboolean __failed = FALSE;")
     if any(len(arg.native_local) > 0 for arg in sorted(self.args, key=lambda a: a.idx)):
@@ -270,6 +271,7 @@ class Routine:
     print()
     # Print JNI function implementation
     print("void Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", " + a for arg in self.args for a in arg.java_type_and_name])))
+    print("  if (!{name}_) (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/UnsupportedOperationException\"), \"symbol isn't available in native library\");".format(name=self.name))
     print("  jboolean __failed = FALSE;")
     if any(len(arg.native_local) > 0 for arg in sorted(self.args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.native_local for arg in sorted(self.args, key=lambda a: a.idx)] if len(a) > 0]))
@@ -372,10 +374,7 @@ class Library:
     # Print symbols loading
     print("jboolean load_symbols(void) {")
     print("#define LOAD_SYMBOL(name) \\")
-    print("  name = dlsym(NULL, #name); \\")
-    print("  if (!name) { \\")
-    print("    return FALSE; \\")
-    print("  }")
+    print("  name = dlsym(NULL, #name);")
     print("")
     for routine in routines:
       routine.render_load_symbol()
@@ -389,7 +388,7 @@ class Library:
     print()
     print("jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {")
     print("  JNIEnv *env;")
-    print("  if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_6) != JNI_OK) {")
+    print("  if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_8) != JNI_OK) {")
     print("    return -1;")
     print("  }")
     print("")
@@ -470,7 +469,7 @@ class Library:
     print("    return -1;")
     print("  }")
     print("")
-    print("  return JNI_VERSION_1_6;")
+    print("  return JNI_VERSION_1_8;")
     print("}")
     print()
     print("void JNI_OnUnload(UNUSED JavaVM *vm, UNUSED void *reserved) {")

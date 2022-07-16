@@ -23,7 +23,7 @@
  * information or have any questions.
  */
 
-import dev.ludovic.netlib.ARPACK;
+package dev.ludovic.netlib.arpack;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

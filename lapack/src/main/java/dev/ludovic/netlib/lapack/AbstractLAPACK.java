@@ -27,8 +27,6 @@ package dev.ludovic.netlib.lapack;
 
 import java.util.Objects;
 
-import dev.ludovic.netlib.LAPACK;
-
 abstract class AbstractLAPACK implements LAPACK {
 
   private final static boolean debug = System.getProperty("dev.ludovic.netlib.lapack.debug", "false").equals("true");

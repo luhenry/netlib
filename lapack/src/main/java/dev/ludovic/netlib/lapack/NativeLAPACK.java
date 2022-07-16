@@ -23,11 +23,11 @@
  * information or have any questions.
  */
 
-package dev.ludovic.netlib;
+package dev.ludovic.netlib.lapack;
 
-public interface JavaARPACK extends ARPACK {
+public interface NativeLAPACK extends LAPACK {
 
-  public static JavaARPACK getInstance() {
-    return InstanceBuilder.JavaARPACK.getInstance();
+  public static NativeLAPACK getInstance() {
+    return InstanceBuilder.nativeLapack();
   }
 }

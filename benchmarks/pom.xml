@@ -30,17 +30,17 @@ information or have any questions.
   <parent>
     <groupId>dev.ludovic.netlib</groupId>
     <artifactId>parent</artifactId>
-    <version>2-SNAPSHOT</version>
+    <version>3-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>dev.ludovic.netlib</groupId>
   <artifactId>benchmarks</artifactId>
-  <version>2-SNAPSHOT</version>
+  <version>3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
-    <jmh.version>1.27</jmh.version>
+    <jmh.version>1.35</jmh.version>
     <uberjar.name>netlib-benchmarks</uberjar.name>
   </properties>
 
@@ -48,17 +48,17 @@ information or have any questions.
     <dependency>
       <groupId>dev.ludovic.netlib</groupId>
       <artifactId>blas</artifactId>
-      <version>2-SNAPSHOT</version>
+      <version>3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>dev.ludovic.netlib</groupId>
       <artifactId>arpack</artifactId>
-      <version>2-SNAPSHOT</version>
+      <version>3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>dev.ludovic.netlib</groupId>
       <artifactId>lapack</artifactId>
-      <version>2-SNAPSHOT</version>
+      <version>3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
