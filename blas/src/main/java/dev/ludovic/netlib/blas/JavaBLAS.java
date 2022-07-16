@@ -90,4 +90,16 @@ public interface JavaBLAS extends BLAS {
   }
 
   public void sspri(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta);
+
+  public default void dsyri(String uplo, int n, double alpha, double[] x, int[] indx, double[] a, int lda) {
+    dsyri(uplo, n, alpha, x, 0, indx, 0, a, 0, lda);
+  }
+
+  public void dsyri(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda);
+
+  public default void ssyri(String uplo, int n, float alpha, float[] x, int[] indx, float[] a, int lda) {
+    ssyri(uplo, n, alpha, x, 0, indx, 0, a, 0, lda);
+  }
+
+  public void ssyri(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda);
 }

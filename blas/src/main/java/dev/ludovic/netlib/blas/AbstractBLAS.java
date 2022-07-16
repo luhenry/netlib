@@ -1435,7 +1435,7 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected void daxpyiK(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public void saxpyi(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
@@ -1456,7 +1456,7 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected void saxpyiK(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public double ddoti(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
@@ -1474,7 +1474,7 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected double ddotiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public float sdoti(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
@@ -1492,7 +1492,7 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected float sdotiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public double ddotii(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety, int[] indy, int offsetindy) {
@@ -1512,7 +1512,7 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected double ddotiiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety, int[] indy, int offsetindy) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public float sdotii(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy) {
@@ -1532,7 +1532,7 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected float sdotiiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety, int[] indy, int offsetindy) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public void dcopyi(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
@@ -1550,7 +1550,7 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected void dcopyiK(int n, double[] x, int offsetx, int[] indx, int offsetindx, double[] y, int offsety) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public void scopyi(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
@@ -1568,7 +1568,7 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected void scopyiK(int n, float[] x, int offsetx, int[] indx, int offsetindx, float[] y, int offsety) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public void dspri(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
@@ -1583,17 +1583,11 @@ abstract class AbstractBLAS implements BLAS {
     checkIndex(offsetx + n - 1, x.length);
     checkIndex(offsetindx + n - 1, indx.length);
     //TODO checkIndex(offseta + ..., a.length);
-    if (lsame("U", uplo))
-      dspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
-    else
-      dspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    dspriK(uplo, n, alpha, x, offsetx, indx, offsetindx, a, offseta);
   }
 
-  protected void dspriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
-    throw new UnsupportedOperationException();
-  }
-  protected void dspriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
-    throw new UnsupportedOperationException();
+  protected void dspriK(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    throw new UnsupportedOperationException("not implemented");
   }
 
   public void sspri(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
@@ -1608,16 +1602,48 @@ abstract class AbstractBLAS implements BLAS {
     checkIndex(offsetx + n - 1, x.length);
     checkIndex(offsetindx + n - 1, indx.length);
     //TODO checkIndex(offseta + ..., a.length);
-    if (lsame("U", uplo))
-      sspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
-    else
-      sspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    sspriK(uplo, n, alpha, x, offsetx, indx, offsetindx, a, offseta);
   }
 
-  protected void sspriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
-    throw new UnsupportedOperationException();
+  protected void sspriK(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    throw new UnsupportedOperationException("not implemented");
   }
-  protected void sspriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
-    throw new UnsupportedOperationException();
+
+  public void dsyri(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
+    if (debug) System.err.println("dsyri");
+    checkArgument("DSYRI", 1, lsame("U", uplo) || lsame("L", uplo));
+    if (n <= 0) {
+      return;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(a);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    //TODO checkIndex(offseta  +..., a.length);
+    dsyriK(uplo, n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+  }
+
+  protected void dsyriK(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  public void ssyri(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
+    if (debug) System.err.println("ssyri");
+    checkArgument("SSYRI", 1, lsame("U", uplo) || lsame("L", uplo));
+    if (n <= 0) {
+      return;
+    }
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(a);
+    checkIndex(offsetx + n - 1, x.length);
+    checkIndex(offsetindx + n - 1, indx.length);
+    //TODO checkIndex(offseta  +..., a.length);
+    ssyriK(uplo, n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+  }
+
+  protected void ssyriK(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
   }
 }

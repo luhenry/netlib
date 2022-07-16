@@ -5242,6 +5242,14 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
     }
   }
 
+  protected void dspriK(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    if (lsame("U", uplo)) {
+      dspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    } else {
+      dspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    }
+  }
+
   protected void dspriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
     int col = 0, prevCol = 0, colStartIdx = 0;
     for (int j = 0; j < n; j++) {
@@ -5257,7 +5265,15 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dspriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
-    throw new RuntimeException("not implemented");
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected void sspriK(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    if (lsame("U", uplo)) {
+      sspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    } else {
+      sspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    }
   }
 
   protected void sspriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
@@ -5275,6 +5291,38 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void sspriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
-    throw new RuntimeException("not implemented");
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected void dsyriK(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
+    if (lsame("U", uplo)) {
+      dsyriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+    } else {
+      dsyriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+    }
+  }
+
+  protected void dsyriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected void dsyriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected void ssyriK(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
+    if (lsame("U", uplo)) {
+      ssyriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+    } else {
+      ssyriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+    }
+  }
+
+  protected void ssyriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+  
+  protected void ssyriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
   }
 }
