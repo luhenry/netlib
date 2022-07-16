@@ -25,7 +25,7 @@
 
 package dev.ludovic.netlib.blas;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 abstract class AbstractBLAS implements BLAS {
 
@@ -52,11 +52,6 @@ abstract class AbstractBLAS implements BLAS {
     }
   }
 
-  private <T> void requireNonNull(T obj) {
-    Objects.requireNonNull(obj);
-  }
-
-
   public double dasum(int n, double[] x, int offsetx, int incx) {
     if (debug) System.err.println("dasum");
     if (n <= 0) {
@@ -69,7 +64,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract double dasumK(int n, double[] x, int offsetx, int incx);
 
-
   public float sasum(int n, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("sasum");
     if (n <= 0) {
@@ -81,7 +75,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract float sasumK(int n, float[] x, int offsetx, int incx);
-
 
   // y += alpha * x
   public void daxpy(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
@@ -101,7 +94,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void daxpyK(int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy);
 
-
   // y += alpha * x
   public void saxpy(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (debug) System.err.println("saxpy");
@@ -120,7 +112,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void saxpyK(int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy);
 
-
   public void dcopy(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     if (debug) System.err.println("dcopy");
     if (n <= 0) {
@@ -135,7 +126,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dcopyK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy);
 
-
   public void scopy(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (debug) System.err.println("scopy");
     if (n <= 0) {
@@ -149,7 +139,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void scopyK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy);
-
 
   // sum(x * y)
   public double ddot(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
@@ -166,7 +155,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract double ddotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy);
 
-
   // sum(x * y)
   public float sdot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (debug) System.err.println("sdot");
@@ -182,7 +170,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract float sdotK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy);
 
-
   public float sdsdot(int n, float sb, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (debug) System.err.println("sdsdot");
     if (n <= 0) {
@@ -197,7 +184,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract float sdsdotK(int n, float sb, float[] x, int offsetx, int incx, float[] y, int offsety, int incy);
 
-
   public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (debug) System.err.println("dgbmv");
     requireNonNull(a);
@@ -211,7 +197,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dgbmvK(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
 
-
   public void sgbmv(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (debug) System.err.println("sgbmv");
     requireNonNull(a);
@@ -224,7 +209,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void sgbmvK(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
-
 
   // c = alpha * a * b + beta * c
   public void dgemm(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
@@ -250,7 +234,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void dgemmK(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc);
-
 
   // c = alpha * a * b + beta * c
   public void sgemm(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
@@ -457,7 +440,6 @@ abstract class AbstractBLAS implements BLAS {
     throw new UnsupportedOperationException("not implemented");
   }
 
-
   // A += alpha * x * y.t
 
   public void dger(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
@@ -483,7 +465,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dgerK(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda);
 
-
   public void sger(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
     if (debug) System.err.println("sger");
     checkArgument("SGER", 1, m >= 0);
@@ -507,7 +488,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void sgerK(int m, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda);
 
-
   public double dnrm2(int n, double[] x, int offsetx, int incx) {
     if (debug) System.err.println("dnrm2");
     if (n <= 0) {
@@ -525,7 +505,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract double dnrm2K(int n, double[] x, int offsetx, int incx);
-
 
   public float snrm2(int n, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("snrm2");
@@ -545,7 +524,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract float snrm2K(int n, float[] x, int offsetx, int incx);
 
-
   public void drot(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double c, double s) {
     if (debug) System.err.println("drot");
     if (n <= 0) {
@@ -559,7 +537,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void drotK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double c, double s);
-
 
   public void srot(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float c, float s) {
     if (debug) System.err.println("srot");
@@ -623,7 +600,6 @@ abstract class AbstractBLAS implements BLAS {
     }
   }
 
-
   public void drotm(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] param, int offsetparam) {
     if (debug) System.err.println("drotm");
     requireNonNull(x);
@@ -636,7 +612,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void drotmK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] param, int offsetparam);
-
 
   public void srotm(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] param, int offsetparam) {
     if (debug) System.err.println("srotm");
@@ -651,7 +626,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void srotmK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] param, int offsetparam);
 
-
   public void drotmg(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] param, int offsetparam) {
     if (debug) System.err.println("drotmg");
     requireNonNull(dd1);
@@ -664,7 +638,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void drotmgK(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] param, int offsetparam);
 
-
   public void srotmg(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] param, int offsetparam) {
     if (debug) System.err.println("srotmg");
     requireNonNull(sd1);
@@ -676,7 +649,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void srotmgK(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] param, int offsetparam);
-
 
   public void dsbmv(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (debug) System.err.println("dsbmv");
@@ -691,7 +663,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dsbmvK(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
 
-
   public void ssbmv(String uplo, int n, int k, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (debug) System.err.println("ssbmv");
     requireNonNull(a);
@@ -704,7 +675,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void ssbmvK(String uplo, int n, int k, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
-
 
   // x = alpha * x
   public void dscal(int n, double alpha, double[] x, int offsetx, int incx) {
@@ -725,7 +695,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dscalK(int n, double alpha, double[] x, int offsetx, int incx);
 
-
   // x = alpha * x
   public void sscal(int n, float alpha, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("sscal");
@@ -744,7 +713,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void sscalK(int n, float alpha, float[] x, int offsetx, int incx);
-
 
   // y = alpha * a * x + beta * y
   public void dspmv(String uplo, int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
@@ -767,7 +735,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dspmvK(String uplo, int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
 
-
   public void sspmv(String uplo, int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (debug) System.err.println("sspmv");
     checkArgument("SSPMV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -788,7 +755,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void sspmvK(String uplo, int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
 
-
   // a += alpha * x * x.t
   public void dspr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
     if (debug) System.err.println("dspr");
@@ -807,7 +773,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dsprK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta);
 
-
   // a += alpha * x * x.t
   public void sspr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
     if (debug) System.err.println("sspr");
@@ -825,7 +790,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void ssprK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta);
-
 
   // a += alpha * x * y.t + alpha * y * x.t
   public void dspr2(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta) {
@@ -848,7 +812,6 @@ abstract class AbstractBLAS implements BLAS {
   
   protected abstract void dspr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta);
 
-
   // a += alpha * x * y.t + alpha * y * x.t
   public void sspr2(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta) {
     if (debug) System.err.println("sspr2");
@@ -870,7 +833,6 @@ abstract class AbstractBLAS implements BLAS {
   
   protected abstract void sspr2K(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta);
 
-
   public void dswap(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
     if (debug) System.err.println("dswap");
     if (n <= 0) {
@@ -885,7 +847,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy);
 
-
   public void sswap(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy) {
     if (debug) System.err.println("sswap");
     if (n <= 0) {
@@ -899,7 +860,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void sswapK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy);
-
 
   public void dsymm(String side, String uplo, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
     if (debug) System.err.println("dsymm");
@@ -924,7 +884,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dsymmK(String side, String uplo, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc);
 
-
   public void ssymm(String side, String uplo, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
     if (debug) System.err.println("ssymm");
     checkArgument("SSYMM", 1, lsame("L", side) || lsame("R", side));
@@ -948,7 +907,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void ssymmK(String side, String uplo, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc);
 
-
   public void dsymv(String uplo, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (debug) System.err.println("dsymv");
     checkArgument("DSYMV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -969,7 +927,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void dsymvK(String uplo, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
-
 
   public void ssymv(String uplo, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (debug) System.err.println("ssymv");
@@ -992,7 +949,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void ssymvK(String uplo, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
 
-
   // a += alpha * x * x.t
   public void dsyr(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
     if (debug) System.err.println("dsyr");
@@ -1012,7 +968,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dsyrK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda);
 
-
   public void ssyr(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda) {
     if (debug) System.err.println("ssyr");
     checkArgument("SSYR", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1030,7 +985,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void ssyrK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda);
-
 
   public void dsyr2(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
     if (debug) System.err.println("dsyr2");
@@ -1053,7 +1007,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dsyr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda);
 
-
   public void ssyr2(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
     if (debug) System.err.println("ssyr2");
     checkArgument("SSYR2", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1074,7 +1027,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void ssyr2K(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda);
-
 
   public void dsyr2k(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
     if (debug) System.err.println("dsyr2k");
@@ -1098,7 +1050,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dsyr2kK(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc);
 
-
   public void ssyr2k(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
     if (debug) System.err.println("ssyr2k");
     checkArgument("SSYR2K", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1121,7 +1072,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void ssyr2kK(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc);
 
-
   public void dsyrk(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double beta, double[] c, int offsetc, int ldc) {
     if (debug) System.err.println("dsyrk");
     checkArgument("DSYRK", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1141,7 +1091,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dsyrkK(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double beta, double[] c, int offsetc, int ldc);
 
-
   public void ssyrk(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float beta, float[] c, int offsetc, int ldc) {
     if (debug) System.err.println("ssyrk");
     checkArgument("SSYRK", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1160,7 +1109,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void ssyrkK(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float beta, float[] c, int offsetc, int ldc);
-
 
   public void dtbmv(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
     if (debug) System.err.println("dtbmv");
@@ -1183,7 +1131,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dtbmvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx);
 
-
   public void stbmv(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("stbmv");
     checkArgument("STBMV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1204,7 +1151,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void stbmvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx);
-
 
   public void dtbsv(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
     if (debug) System.err.println("dtbsv");
@@ -1227,7 +1173,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dtbsvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx);
 
-
   public void stbsv(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("stbsv");
     checkArgument("STBSV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1249,7 +1194,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void stbsvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx);
 
-
   public void dtpmv(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
     if (debug) System.err.println("dtpmv");
     checkArgument("DTPMV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1268,7 +1212,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void dtpmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx);
-
 
   public void stpmv(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("stpmv");
@@ -1289,7 +1232,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void stpmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx);
 
-
   public void dtpsv(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
     if (debug) System.err.println("dtpsv");
     checkArgument("DTPSV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1309,7 +1251,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dtpsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx);
 
-
   public void stpsv(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("stpsv");
     checkArgument("STPSV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1328,7 +1269,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void stpsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx);
-
 
   public void dtrmm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
     if (debug) System.err.println("dtrmm");
@@ -1352,7 +1292,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dtrmmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb);
 
-
   public void strmm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
     if (debug) System.err.println("strmm");
     checkArgument("STRMM", 1, lsame("L", side) || lsame("R", side));
@@ -1375,7 +1314,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void strmmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb);
 
-
   public void dtrmv(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
     if (debug) System.err.println("dtrmv");
     checkArgument("DTRMV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1396,7 +1334,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dtrmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx);
 
-
   public void strmv(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("strmv");
     checkArgument("STRMV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1416,7 +1353,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void strmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx);
-
 
   public void dtrsm(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
     if (debug) System.err.println("dtrsm");
@@ -1440,7 +1376,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dtrsmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb);
 
-
   public void strsm(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
     if (debug) System.err.println("strsm");
     checkArgument("STRSM", 1, lsame("L", side) || lsame("R", side));
@@ -1463,7 +1398,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void strsmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb);
 
-
   public void dtrsv(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
     if (debug) System.err.println("dtrsv");
     checkArgument("DTRSV", 1, lsame("U", uplo) || lsame("L", uplo));
@@ -1483,7 +1417,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void dtrsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx);
-
 
   public void strsv(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("strsv");
@@ -1505,7 +1438,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void strsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx);
 
-
   public int idamax(int n, double[] x, int offsetx, int incx) {
     if (debug) System.err.println("idamax");
     if (n <= 0) {
@@ -1524,7 +1456,6 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract int idamaxK(int n, double[] x, int offsetx, int incx);
-
 
   public int isamax(int n, float[] x, int offsetx, int incx) {
     if (debug) System.err.println("isamax");
