@@ -2641,6 +2641,162 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
     }
   }
 
+  protected void dgemmiK(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    if (alpha == 0.0) {
+      dgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
+    } else {
+      if (lsame("N", transa) && lsame("N", transb)) {
+        dgemmiNN(m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+      } else if (lsame("N", transa)) {
+        dgemmiNT(m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+      } else if (lsame("N", transb)) {
+        dgemmiTN(m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+      } else {
+        dgemmiTT(m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+      }
+    }
+  }
+
+  protected void dgemmiNN(int m, int n, int k, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    for (int col = 0; col < n; col += 1) {
+      for (int i = 0; i < k; i += 1) {
+        double Bval = alpha * b[offsetb + i + col * ldb];
+        for (int row = ptra[offsetptra + i], rowEnd = ptra[offsetptra + i + 1]; row < rowEnd; row += 1) {
+          if (beta != 0.0) {
+            c[offsetc + inda[offsetinda + row] + col * ldc] = Bval * a[offseta + row] + beta * c[offsetc + inda[offsetinda + row] + col * ldc];
+          } else {
+            c[offsetc + inda[offsetinda + row] + col * ldc] = Bval * a[offseta + row];
+          }
+        }
+      }
+    }
+  }
+
+  protected void dgemmiNT(int m, int n, int k, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    for (int col = 0; col < n; col += 1) {
+      for (int i = 0; i < k; i += 1) {
+        double Bval = alpha * b[offsetb + col + i * ldb];
+        for (int row = ptra[offsetptra + i], rowEnd = ptra[offsetptra + i + 1]; row < rowEnd; row += 1) {
+          if (beta != 0.0) {
+            c[offsetc + inda[offsetinda + row] + col * ldc] = Bval * a[offseta + row] + beta * c[offsetc + inda[offsetinda + row] + col * ldc];
+          } else {
+            c[offsetc + inda[offsetinda + row] + col * ldc] = Bval * a[offseta + row];
+          }
+        }
+      }
+    }
+  }
+
+  protected void dgemmiTN(int m, int n, int k, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    for (int col = 0; col < n; col += 1) {
+      for (int row = 0; row < m; row += 1) {
+        double sum = 0.0;
+        for (int i = ptra[offsetptra + row], iEnd = ptra[offsetptra + row + 1]; i < iEnd; i += 1) {
+          sum += a[offseta + i] * b[offsetb + inda[offsetinda + i] + col * ldb];
+        }
+        if (beta != 0.0) {
+          c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
+        } else {
+          c[offsetc + row + col * ldc] = alpha * sum;
+        }
+      }
+    }
+  }
+
+  protected void dgemmiTT(int m, int n, int k, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    for (int col = 0; col < n; col += 1) {
+      for (int row = 0; row < m; row += 1) {
+        double sum = 0.0;
+        for (int i = ptra[offsetptra + row], iEnd = ptra[offsetptra + row + 1]; i < iEnd; i += 1) {
+          sum += a[offseta + i] * b[offsetb + col + inda[offsetinda + i] * ldb];
+        }
+        if (beta != 0.0) {
+          c[offsetc + row + col * ldc] = alpha * sum + beta * c[offsetc + row + col * ldc];
+        } else {
+          c[offsetc + row + col * ldc] = alpha * sum;
+        }
+      }
+    }
+  }
+
+  protected void sgemmiK(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+    if (alpha == 0.0f) {
+      sgemmBeta(0, m, 0, n, beta, c, offsetc, ldc);
+    } else {
+      if (lsame("N", transa) && lsame("N", transb)) {
+        sgemmiNN(m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+      } else if (lsame("N", transa)) {
+        sgemmiNT(m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+      } else if (lsame("N", transb)) {
+        sgemmiTN(m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+      } else {
+        sgemmiTT(m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+      }
+    }
+  }
+
+  protected void sgemmiNN(int m, int n, int k, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+    for (int col = 0; col < n; col += 1) {
+      for (int i = 0; i < k; i += 1) {
+        float Bval = alpha * b[offsetb + i + col * ldb];
+        for (int row = ptra[offsetptra + i], rowEnd = ptra[offsetptra + i + 1]; row < rowEnd; row += 1) {
+          if (beta != 0.0f) {
+            c[offsetc + inda[offsetinda + row] + col * ldc] = Bval * a[offseta + row] + beta * c[offsetc + inda[offsetinda + row] + col * ldc];
+          } else {
+            c[offsetc + inda[offsetinda + row] + col * ldc] = Bval * a[offseta + row];
+          }
+        }
+      }
+    }
+  }
+
+  protected void sgemmiNT(int m, int n, int k, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+    for (int col = 0; col < n; col += 1) {
+      for (int i = 0; i < k; i += 1) {
+        float Bval = alpha * b[offsetb + col + i * ldb];
+        for (int row = ptra[offsetptra + i], rowEnd = ptra[offsetptra + i + 1]; row < rowEnd; row += 1) {
+          if (beta != 0.0f) {
+            c[offsetc + inda[offsetinda + row] + col * ldc] = Bval * a[offseta + row] + beta * c[offsetc + inda[offsetinda + row] + col * ldc];
+          } else {
+            c[offsetc + inda[offsetinda + row] + col * ldc] = Bval * a[offseta + row];
+          }
+        }
+      }
+    }
+  }
+
+  protected void sgemmiTN(int m, int n, int k, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+    for (int col = 0; col < n; col += 1) {
+      for (int row = 0; row < m; row += 1) {
+        float sum = 0.0f;
+        for (int i = ptra[offsetptra + row], iEnd = ptra[offsetptra + row + 1]; i < iEnd; i += 1) {
+          sum += a[offseta + i] * b[offsetb + col * ldb + inda[offsetinda + i]];
+        }
+        if (beta != 0.0f) {
+          c[offsetc + col * ldc + row] = alpha * sum + beta * c[offsetc + col * ldc + row];
+        } else {
+          c[offsetc + col * ldc + row] = alpha * sum;
+        }
+      }
+    }
+  }
+
+  protected void sgemmiTT(int m, int n, int k, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+    for (int col = 0; col < n; col += 1) {
+      for (int row = 0; row < m; row += 1) {
+        float sum = 0.0f;
+        for (int i = ptra[offsetptra + row], iEnd = ptra[offsetptra + row + 1]; i < iEnd; i += 1) {
+          sum += a[offseta + i] * b[offsetb + col * ldc + inda[offsetinda + i]];
+        }
+        if (beta != 0.0f) {
+          c[offsetc + col * ldc + row] = alpha * sum + beta * c[offsetc + col * ldc + row];
+        } else {
+          c[offsetc + col * ldc + row] = alpha * sum;
+        }
+      }
+    }
+  }
+
   protected void dgemvK(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (alpha == 0.0) {
       int len = lsame("N", trans) ? m : n;
@@ -2659,6 +2815,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dgemvN(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    // y = beta * y
     if (beta != 1.0) {
       int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
       for (; row < m; row += 1, iy += incy) {
@@ -2669,6 +2826,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
         }
       }
     }
+    // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4) {
       int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
@@ -2752,11 +2910,13 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
 
   protected void sgemvN(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     // y = beta * y
-    for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
-      if (beta != 0.0f) {
-        y[offsety + iy] = beta * y[offsety + iy];
-      } else {
-        y[offsety + iy] = 0.0f;
+    if (beta != 1.0f) {
+      for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
       }
     }
     // y += alpha * A * x
@@ -2841,6 +3001,224 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
         y[offsety + iy] = alpha * sum;
       }
     }
+  }
+
+  protected void dgemviK(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    if (alpha == 0.0) {
+      int len = lsame("N", trans) ? m : n;
+      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
+      }
+    } else if (lsame("N", trans)) {
+      dgemviN(m, n, alpha, a, offseta, lda, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+    } else if (lsame("T", trans) || lsame("C", trans)) {
+      dgemviT(m, n, alpha, a, offseta, lda, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+    }
+  }
+
+  protected void dgemviN(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+      double sum = 0.0;
+      for (int col = 0; col < n; col += 1) {
+        sum += x[offsetx + col] * a[offseta + row + indx[offsetindx + col] * lda];
+      }
+      if (beta != 0.0) {
+        y[offsety + iy] = alpha * sum + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sum;
+      }
+    }
+  }
+
+  protected void dgemviT(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+      double sum = 0.0;
+      for (int col = 0; col < n; col += 1) {
+        sum += x[offsetx + col] * a[offseta + indx[offsetindx + col] + row * lda];
+      }
+      if (beta != 0.0) {
+        y[offsety + iy] = alpha * sum + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sum;
+      }
+    }
+  }
+
+  protected void sgemviK(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    if (alpha == 0.0) {
+      int len = lsame("N", trans) ? m : n;
+      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
+      }
+    } else if (lsame("N", trans)) {
+      sgemviN(m, n, alpha, a, offseta, lda, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+    } else if (lsame("T", trans) || lsame("C", trans)) {
+      sgemviT(m, n, alpha, a, offseta, lda, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+    }
+  }
+
+  protected void sgemviN(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+      float sum = 0.0f;
+      for (int col = 0; col < n; col += 1) {
+        sum += x[offsetx + col] * a[offseta + row + indx[offsetindx + col] * lda];
+      }
+      if (beta != 0.0f) {
+        y[offsety + iy] = alpha * sum + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sum;
+      }
+    }
+  }
+
+  protected void sgemviT(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
+      float sum = 0.0f;
+      for (int col = 0; col < n; col += 1) {
+        sum += x[offsetx + col] * a[offseta + indx[offsetindx + col] + row * lda];
+      }
+      if (beta != 0.0f) {
+        y[offsety + iy] = alpha * sum + beta * y[offsety + iy];
+      } else {
+        y[offsety + iy] = alpha * sum;
+      }
+    }
+  }
+
+  protected void dgemviK(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected void sgemviK(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented yet");
+  }
+
+  protected void dgemviiK(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    if (alpha == 0.0) {
+      int len = lsame("N", trans) ? m : n;
+      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
+      }
+    } else if (lsame("N", trans)) {
+      dgemviiN(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+    } else if (lsame("T", trans) || lsame("C", trans)) {
+      dgemviiT(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+    }
+  }
+
+  protected void dgemviiN(int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
+    // val xNnz = xIndices.length
+
+    // val yValues = y.values
+
+    // val mA: Int = A.numRows
+    // val nA: Int = A.numCols
+
+    // val Avals = A.values
+    // val Arows = A.rowIndices
+    // val Acols = A.colPtrs
+
+    // // y = beta * y
+    // if (beta != 1.0) {
+    //   int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
+    //   for (; row < m; row += 1, iy += incy) {
+    //     if (beta != 0.0) {
+    //       y[offsety + iy] = beta * y[offsety + iy];
+    //     } else {
+    //       y[offsety + iy] = 0.0;
+    //     }
+    //   }
+    // }
+    // // y += alpha * A * x
+    // var colCounterForA = 0
+    // var k = 0
+    // while (colCounterForA < nA && k < xNnz) {
+    //   if (indx[offsetindx + k] == colCounterForA) {
+    //     var i = ptra[offsetptra + colCounterForA];
+    //     val indEnd = ptra[offsetptra + colCounterForA + 1];
+
+    //     val xTemp = x[offsetx + k] * alpha
+    //     while (i < indEnd) {
+    //       y[offsety + Arows(i)] += a[offseta + i] * xTemp
+    //       i += 1
+    //     }
+    //     k += 1
+    //   }
+    //   colCounterForA += 1
+    // }
+  }
+
+  protected void dgemviiT(int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
+    // val xNnz = xIndices.length
+
+    // val yValues = y.values
+
+    // val mA: Int = A.numRows
+    // val nA: Int = A.numCols
+
+    // val Avals = A.values
+    // val Arows = A.colPtrs
+    // val Acols = A.rowIndices
+
+    // var rowCounter = 0
+    // while (rowCounter < mA) {
+    //   var i = Arows(rowCounter)
+    //   val indEnd = Arows(rowCounter + 1)
+    //   var sum = 0.0
+    //   var k = 0
+    //   while (i < indEnd && k < xNnz) {
+    //     if (indx[offsetindx + k] == ptra[offsetptra + i]) {
+    //       sum += a[offseta + i] * x[offsetx + k];
+    //       k += 1
+    //       i += 1
+    //     } else if (indx[offsetindx + k] < ptra[offsetptra + i]) {
+    //       k += 1
+    //     } else {
+    //       i += 1
+    //     }
+    //   }
+    //   y[offsety + rowCounter] = sum * alpha + beta * y[offsety + rowCounter]
+    //   rowCounter += 1
+    // }
+  }
+
+  protected void sgemviiK(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    if (alpha == 0.0) {
+      int len = lsame("N", trans) ? m : n;
+      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
+        if (beta != 0.0f) {
+          y[offsety + iy] = beta * y[offsety + iy];
+        } else {
+          y[offsety + iy] = 0.0f;
+        }
+      }
+    } else if (lsame("N", trans)) {
+      sgemviiN(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+    } else if (lsame("T", trans) || lsame("C", trans)) {
+      sgemviiT(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+    }
+  }
+
+  protected void sgemviiN(int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected void sgemviiT(int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
   }
 
   protected void dgerK(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
@@ -3441,6 +3819,58 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
 
   protected void ssprK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
     org.netlib.blas.Sspr.sspr(uplo, n, alpha, x, offsetx, incx, a, offseta);
+  }
+
+  protected void dspriK(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    if (lsame("U", uplo)) {
+      dspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    } else {
+      dspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    }
+  }
+
+  protected void dspriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    int col = 0, prevCol = 0, colStartIdx = 0;
+    for (int j = 0; j < n; j++) {
+      col = indx[offsetindx + j];
+      // Skip empty columns.
+      colStartIdx += (col - prevCol) * (col + prevCol + 1) / 2;
+      double alphax = alpha * x[offsetx + j];
+      for (int i = 0; i <= j; i++) {
+        a[offseta + colStartIdx + indx[offsetindx + i]] += alphax * x[offsetx + i];
+      }
+      prevCol = col;
+    }
+  }
+
+  protected void dspriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected void sspriK(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    if (lsame("U", uplo)) {
+      sspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    } else {
+      sspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
+    }
+  }
+
+  protected void sspriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    int col = 0, prevCol = 0, colStartIdx = 0;
+    for (int j = 0; j < n; j++) {
+      col = indx[offsetindx + j];
+      // Skip empty columns.
+      colStartIdx += (col - prevCol) * (col + prevCol + 1) / 2;
+      float alphax = alpha * x[offsetx + j];
+      for (int i = 0; i <= j; i++) {
+        a[offseta + colStartIdx + indx[offsetindx + i]] += alphax * x[offsetx + i];
+      }
+      prevCol = col;
+    }
+  }
+
+  protected void sspriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
+    throw new UnsupportedOperationException("not implemented");
   }
 
   protected void dspr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta) {
@@ -5056,6 +5486,38 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
     org.netlib.blas.Ssyr.ssyr(uplo, n, alpha, x, offsetx, incx, a, offseta, lda);
   }
 
+  protected void dsyriK(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
+    if (lsame("U", uplo)) {
+      dsyriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+    } else {
+      dsyriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+    }
+  }
+
+  protected void dsyriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected void dsyriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected void ssyriK(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
+    if (lsame("U", uplo)) {
+      ssyriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+    } else {
+      ssyriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
+    }
+  }
+
+  protected void ssyriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected void ssyriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
   protected void dsyr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
     org.netlib.blas.Dsyr2.dsyr2(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
   }
@@ -5240,89 +5702,5 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
     for (; i < n; i++) {
       y[offsety + indx[offsetindx + i + 0]] = x[offsetx + i + 0];
     }
-  }
-
-  protected void dspriK(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
-    if (lsame("U", uplo)) {
-      dspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
-    } else {
-      dspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
-    }
-  }
-
-  protected void dspriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
-    int col = 0, prevCol = 0, colStartIdx = 0;
-    for (int j = 0; j < n; j++) {
-      col = indx[offsetindx + j];
-      // Skip empty columns.
-      colStartIdx += (col - prevCol) * (col + prevCol + 1) / 2;
-      double alphax = alpha * x[offsetx + j];
-      for (int i = 0; i <= j; i++) {
-        a[offseta + colStartIdx + indx[offsetindx + i]] += alphax * x[offsetx + i];
-      }
-      prevCol = col;
-    }
-  }
-
-  protected void dspriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta) {
-    throw new UnsupportedOperationException("not implemented");
-  }
-
-  protected void sspriK(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
-    if (lsame("U", uplo)) {
-      sspriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
-    } else {
-      sspriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta);
-    }
-  }
-
-  protected void sspriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
-    int col = 0, prevCol = 0, colStartIdx = 0;
-    for (int j = 0; j < n; j++) {
-      col = indx[offsetindx + j];
-      // Skip empty columns.
-      colStartIdx += (col - prevCol) * (col + prevCol + 1) / 2;
-      float alphax = alpha * x[offsetx + j];
-      for (int i = 0; i <= j; i++) {
-        a[offseta + colStartIdx + indx[offsetindx + i]] += alphax * x[offsetx + i];
-      }
-      prevCol = col;
-    }
-  }
-
-  protected void sspriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta) {
-    throw new UnsupportedOperationException("not implemented");
-  }
-
-  protected void dsyriK(String uplo, int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
-    if (lsame("U", uplo)) {
-      dsyriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
-    } else {
-      dsyriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
-    }
-  }
-
-  protected void dsyriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
-    throw new UnsupportedOperationException("not implemented");
-  }
-
-  protected void dsyriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
-    throw new UnsupportedOperationException("not implemented");
-  }
-
-  protected void ssyriK(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
-    if (lsame("U", uplo)) {
-      ssyriU(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
-    } else {
-      ssyriL(n, alpha, x, offsetx, indx, offsetindx, a, offseta, lda);
-    }
-  }
-
-  protected void ssyriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
-    throw new UnsupportedOperationException("not implemented");
-  }
-  
-  protected void ssyriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
-    throw new UnsupportedOperationException("not implemented");
   }
 }

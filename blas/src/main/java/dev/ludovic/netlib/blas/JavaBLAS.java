@@ -102,4 +102,52 @@ public interface JavaBLAS extends BLAS {
   }
 
   public void ssyri(String uplo, int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda);
+
+  public default void dgemvi(String trans, int m, int n, double alpha, double[] a, int lda, double[] x, int[] indx, int offsetindx, double beta, double[] y, int incy) {
+    dgemvi(trans, m, n, alpha, a, 0, lda, x, 0, indx, offsetindx, beta, y, 0, incy);
+  }
+
+  public void dgemvi(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy);
+
+  public default void sgemvi(String trans, int m, int n, float alpha, float[] a, int lda, float[] x, int[] indx, int offsetindx, float beta, float[] y, int incy) {
+    sgemvi(trans, m, n, alpha, a, 0, lda, x, 0, indx, offsetindx, beta, y, 0, incy);
+  }
+
+  public void sgemvi(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy);
+
+  public default void dgemvi(String trans, int m, int n, double alpha, double[] a, int[] inda, int[] ptra, double[] x, int incx, double beta, double[] y, int incy) {
+    dgemvi(trans, m, n, alpha, a, 0, inda, 0, ptra, 0, x, 0, incx, beta, y, 0, incy);
+  }
+
+  public void dgemvi(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
+
+  public default void sgemvi(String trans, int m, int n, float alpha, float[] a, int[] inda, int[] ptra, float[] x, int incx, float beta, float[] y, int incy) {
+    sgemvi(trans, m, n, alpha, a, 0, inda, 0, ptra, 0, x, 0, incx, beta, y, 0, incy);
+  }
+
+  public void sgemvi(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
+
+  public default void dgemvii(String trans, int m, int n, double alpha, double[] a, int[] inda, int[] ptra, double[] x, int[] indx, double beta, double[] y, int incy) {
+    dgemvii(trans, m, n, alpha, a, 0, inda, 0, ptra, 0, x, 0, indx, 0, beta, y, 0, incy);
+  }
+
+  public void dgemvii(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy);
+
+  public default void sgemvii(String trans, int m, int n, float alpha, float[] a, int[] inda, int[] ptra, float[] x, int[] indx, float beta, float[] y, int incy) {
+    sgemvii(trans, m, n, alpha, a, 0, inda, 0, ptra, 0, x, 0, indx, 0, beta, y, 0, incy);
+  }
+
+  public void sgemvii(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy);
+
+  public default void dgemmi(String transa, String transb, int m, int n, int k, double alpha, double[] a, int[] inda, int[] ptra, double[] b, int ldb, double beta, double[] c, int ldc) {
+    dgemmi(transa, transb, m, n, k, alpha, a, 0, inda, 0, ptra, 0, b, 0, ldb, beta, c, 0, ldc);
+  }
+
+  public void dgemmi(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc);
+
+  public default void sgemmi(String transa, String transb, int m, int n, int k, float alpha, float[] a, int[] inda, int[] ptra, float[] b, int ldb, float beta, float[] c, int Ldc) {
+    sgemmi(transa, transb, m, n, k, alpha, a, 0, inda, 0, ptra, 0, b, 0, ldb, beta, c, 0, Ldc);
+  }
+
+  public void sgemmi(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int Ldc);
 }

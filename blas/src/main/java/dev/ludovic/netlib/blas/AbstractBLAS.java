@@ -277,6 +277,23 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void sgemmK(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc);
 
+  public void dgemmi(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    if (debug) System.err.println("dgemmi");
+    dgemmiK(transa, transb, m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+  }
+
+  protected void dgemmiK(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  public void sgemmi(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+    if (debug) System.err.println("sgemmi");
+    sgemmiK(transa, transb, m, n, k, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, b, offsetb, ldb, beta, c, offsetc, ldc);
+  }
+
+  protected void sgemmiK(String transa, String transb, int m, int n, int k, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
+    throw new UnsupportedOperationException("not implemented");
+  }
 
   // y = alpha * A * x + beta * y
   public void dgemv(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
@@ -301,7 +318,6 @@ abstract class AbstractBLAS implements BLAS {
 
   protected abstract void dgemvK(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy);
 
-
   // y = alpha * A * x + beta * y
   public void sgemv(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (debug) System.err.println("sgemv");
@@ -324,6 +340,123 @@ abstract class AbstractBLAS implements BLAS {
   }
 
   protected abstract void sgemvK(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy);
+
+  public void dgemvi(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    if (debug) System.err.println("dgemvi");
+    checkArgument("DGEMVI", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DGEMVI", 2, m >= 0);
+    checkArgument("DGEMVI", 2, n >= 0);
+    if (m == 0 || n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    dgemviK(trans, m, n, alpha, a, offseta, lda, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+  }
+
+  protected void dgemviK(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  public void sgemvi(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    if (debug) System.err.println("sgemvi");
+    checkArgument("SGEMVI", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("SGEMVI", 2, m >= 0);
+    checkArgument("SGEMVI", 2, n >= 0);
+    if (m == 0 || n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    sgemviK(trans, m, n, alpha, a, offseta, lda, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+  }
+
+  protected void sgemviK(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  public void dgemvi(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    if (debug) System.err.println("dgemvi");
+    checkArgument("DGEMVI", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DGEMVI", 2, m >= 0);
+    checkArgument("DGEMVI", 2, n >= 0);
+    if (m == 0 || n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(inda);
+    requireNonNull(x);
+    requireNonNull(y);
+    dgemviK(trans, m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, incx, beta, y, offsety, incy);
+  }
+
+  protected void dgemviK(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  public void sgemvi(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+    if (debug) System.err.println("sgemvi");
+    checkArgument("SGEMVI", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("SGEMVI", 2, m >= 0);
+    checkArgument("SGEMVI", 2, n >= 0);
+    if (m == 0 || n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(inda);
+    requireNonNull(x);
+    requireNonNull(y);
+    sgemviK(trans, m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, incx, beta, y, offsety, incy);
+  }
+
+  protected void sgemviK(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  public void dgemvii(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    if (debug) System.err.println("dgemvii");
+    checkArgument("DGEMVII", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DGEMVII", 2, m >= 0);
+    checkArgument("DGEMVII", 2, n >= 0);
+    if (m == 0 || n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(inda);
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    dgemviiK(trans, m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+  }
+
+  protected void dgemviiK(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  public void sgemvii(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    if (debug) System.err.println("sgemvii");
+    checkArgument("SGEMVII", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("SGEMVII", 2, m >= 0);
+    checkArgument("SGEMVII", 2, n >= 0);
+    if (m == 0 || n == 0) {
+      return;
+    }
+    requireNonNull(a);
+    requireNonNull(inda);
+    requireNonNull(x);
+    requireNonNull(indx);
+    requireNonNull(y);
+    sgemviiK(trans, m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
+  }
+
+  protected void sgemviiK(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
 
   // A += alpha * x * y.t
 
