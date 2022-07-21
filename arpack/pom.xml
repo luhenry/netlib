@@ -41,6 +41,7 @@ information or have any questions.
 
   <properties>
     <junit.version>5.8.2</junit.version>
+    <automatic.module.name>dev.ludovic.netlib.arpack</automatic.module.name>
   </properties>
 
   <dependencies>
