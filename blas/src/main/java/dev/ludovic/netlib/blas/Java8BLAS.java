@@ -24,6 +24,7 @@
  */
 
 package dev.ludovic.netlib.blas;
+
 class Java8BLAS extends AbstractBLAS implements JavaBLAS {
 
   private static final Java8BLAS instance = new Java8BLAS();
@@ -2817,14 +2818,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   protected void dgemvN(int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     // y = beta * y
     if (beta != 1.0) {
-      int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
-      for (; row < m; row += 1, iy += incy) {
-        if (beta != 0.0) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0;
-        }
-      }
+      dscal(m, beta, y, incy);
     }
     // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
@@ -2911,13 +2905,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   protected void sgemvN(int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     // y = beta * y
     if (beta != 1.0f) {
-      for (int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0; row < m; row += 1, iy += incy) {
-        if (beta != 0.0f) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0f;
-        }
-      }
+      sscal(m, beta, y, incy);
     }
     // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0;
@@ -3005,14 +2993,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
 
   protected void dgemviK(String trans, int m, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
     if (alpha == 0.0) {
-      int len = lsame("N", trans) ? m : n;
-      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
-        if (beta != 0.0f) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0f;
-        }
-      }
+      dscal(lsame("N", trans) ? m : n, beta, y, incy);
     } else if (lsame("N", trans)) {
       dgemviN(m, n, alpha, a, offseta, lda, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
     } else if (lsame("T", trans) || lsame("C", trans)) {
@@ -3050,14 +3031,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
 
   protected void sgemviK(String trans, int m, int n, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
     if (alpha == 0.0) {
-      int len = lsame("N", trans) ? m : n;
-      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
-        if (beta != 0.0f) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0f;
-        }
-      }
+      sscal(lsame("N", trans) ? m : n, beta, y, offsety, incy);
     } else if (lsame("N", trans)) {
       sgemviN(m, n, alpha, a, offseta, lda, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
     } else if (lsame("T", trans) || lsame("C", trans)) {
@@ -3094,23 +3068,78 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dgemviK(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    throw new UnsupportedOperationException("not implemented yet");
+    if (alpha == 0.0) {
+      dscal(lsame("N", trans) ? m : n, beta, y, offsety, incy);
+    } else if (lsame("N", trans)) {
+      dgemviN(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, incx, beta, y, offsety, incy);
+    } else if (lsame("T", trans) || lsame("C", trans)) {
+      dgemviT(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, incx, beta, y, offsety, incy);
+    }
+  }
+
+  protected void dgemviN(int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    // y = beta * y
+    if (beta != 1.0) {
+      dscal(m, beta, y, incy);
+    }
+    // y += alpha * A * x
+    for (int col = 0; col < n; col += 1) {
+      double alphax = alpha * x[offsetx + col];
+      for (int i = ptra[offsetptra + col], iEnd = ptra[offsetptra + col + 1]; i < iEnd; i += 1) {
+        y[offsety + inda[offsetinda + i]] += alphax * a[offseta + i];
+      }
+    }
+  }
+
+  protected void dgemviT(int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
+    // y = alpha * A * x + beta * y
+    for (int row = 0; row < m; row += 1) {
+      double sum = 0.0;
+      for (int i = ptra[offsetptra + row], iEnd = ptra[offsetptra + row + 1]; i < iEnd; i += 1) {
+        sum += a[offseta + i] * x[offsetx + inda[offsetinda + i]];
+      }
+      y[offsety + row] += alpha * sum + beta * y[offsety + row];
+    }
   }
 
   protected void sgemviK(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    throw new UnsupportedOperationException("not implemented yet");
+    if (alpha == 0.0) {
+      sscal(lsame("N", trans) ? m : n, beta, y, incy);
+    } else if (lsame("N", trans)) {
+      sgemviN(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, incx, beta, y, offsety, incy);
+    } else if (lsame("T", trans) || lsame("C", trans)) {
+      sgemviT(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, incx, beta, y, offsety, incy);
+    }
+  }
+
+  protected void sgemviN(int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+    // y = beta * y
+    if (beta != 1.0) {
+      sscal(m, beta, y, incy);
+    }
+    // y += alpha * A * x
+    for (int col = 0; col < n; col += 1) {
+      float alphax = alpha * x[offsetx + col];
+      for (int i = ptra[offsetptra + col], iEnd = ptra[offsetptra + col + 1]; i < iEnd; i += 1) {
+        y[offsety + inda[offsetinda + i]] += alphax * a[offseta + i];
+      }
+    }
+  }
+
+  protected void sgemviT(int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
+    // y = alpha * A * x + beta * y
+    for (int row = 0; row < m; row += 1) {
+      float sum = 0.0f;
+      for (int i = ptra[offsetptra + row], iEnd = ptra[offsetptra + row + 1]; i < iEnd; i += 1) {
+        sum += a[offseta + i] * x[offsetx + inda[offsetinda + i]];
+      }
+      y[offsety + row] += alpha * sum + beta * y[offsety + row];
+    }
   }
 
   protected void dgemviiK(String trans, int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
     if (alpha == 0.0) {
-      int len = lsame("N", trans) ? m : n;
-      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
-        if (beta != 0.0f) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0f;
-        }
-      }
+      dscal(lsame("N", trans) ? m : n, beta, y, offsety, incy);
     } else if (lsame("N", trans)) {
       dgemviiN(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
     } else if (lsame("T", trans) || lsame("C", trans)) {
@@ -3119,93 +3148,44 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dgemviiN(int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
-    throw new UnsupportedOperationException("not implemented");
-    // val xNnz = xIndices.length
-
-    // val yValues = y.values
-
-    // val mA: Int = A.numRows
-    // val nA: Int = A.numCols
-
-    // val Avals = A.values
-    // val Arows = A.rowIndices
-    // val Acols = A.colPtrs
-
-    // // y = beta * y
-    // if (beta != 1.0) {
-    //   int row = 0, iy = incy < 0 ? (m - 1) * -incy : 0;
-    //   for (; row < m; row += 1, iy += incy) {
-    //     if (beta != 0.0) {
-    //       y[offsety + iy] = beta * y[offsety + iy];
-    //     } else {
-    //       y[offsety + iy] = 0.0;
-    //     }
-    //   }
-    // }
-    // // y += alpha * A * x
-    // var colCounterForA = 0
-    // var k = 0
-    // while (colCounterForA < nA && k < xNnz) {
-    //   if (indx[offsetindx + k] == colCounterForA) {
-    //     var i = ptra[offsetptra + colCounterForA];
-    //     val indEnd = ptra[offsetptra + colCounterForA + 1];
-
-    //     val xTemp = x[offsetx + k] * alpha
-    //     while (i < indEnd) {
-    //       y[offsety + Arows(i)] += a[offseta + i] * xTemp
-    //       i += 1
-    //     }
-    //     k += 1
-    //   }
-    //   colCounterForA += 1
-    // }
+    // y = beta * y
+    if (beta != 1.0) {
+      dscal(m, beta, y, incy);
+    }
+    // y += alpha * A * x
+    for (int col = 0, k = 0; col < n && k < indx.length; col += 1) {
+      if (indx[offsetindx + k] == col) {
+        double alphax = alpha * x[offsetx + k];
+        for (int i = ptra[offsetptra + col], iEnd = ptra[offsetptra + col + 1]; i < iEnd; i += 1) {
+          y[offsety + inda[offsetinda + i]] += alphax * a[offseta + i];
+        }
+        k += 1;
+      }
+    }
   }
 
   protected void dgemviiT(int m, int n, double alpha, double[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, double[] x, int offsetx, int[] indx, int offsetindx, double beta, double[] y, int offsety, int incy) {
-    throw new UnsupportedOperationException("not implemented");
-    // val xNnz = xIndices.length
-
-    // val yValues = y.values
-
-    // val mA: Int = A.numRows
-    // val nA: Int = A.numCols
-
-    // val Avals = A.values
-    // val Arows = A.colPtrs
-    // val Acols = A.rowIndices
-
-    // var rowCounter = 0
-    // while (rowCounter < mA) {
-    //   var i = Arows(rowCounter)
-    //   val indEnd = Arows(rowCounter + 1)
-    //   var sum = 0.0
-    //   var k = 0
-    //   while (i < indEnd && k < xNnz) {
-    //     if (indx[offsetindx + k] == ptra[offsetptra + i]) {
-    //       sum += a[offseta + i] * x[offsetx + k];
-    //       k += 1
-    //       i += 1
-    //     } else if (indx[offsetindx + k] < ptra[offsetptra + i]) {
-    //       k += 1
-    //     } else {
-    //       i += 1
-    //     }
-    //   }
-    //   y[offsety + rowCounter] = sum * alpha + beta * y[offsety + rowCounter]
-    //   rowCounter += 1
-    // }
+    // y = alpha * A * x + beta * y
+    for (int row = 0; row < m; row += 1) {
+      double sum = 0.0;
+      for (int i = ptra[offsetptra + row], iEnd = ptra[offsetptra + row + 1], k = 0; i < iEnd && k < indx.length;) {
+        if (indx[offsetindx + k] == ptra[offsetptra + i]) {
+          sum += a[offseta + i] * x[offsetx + k];
+          k += 1;
+          i += 1;
+        } else if (indx[offsetindx + k] < ptra[offsetptra + i]) {
+          k += 1;
+        } else {
+          i += 1;
+        }
+      }
+      y[offsety + row] = alpha * sum + beta * y[offsety + row];
+    }
   }
 
   protected void sgemviiK(String trans, int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
     if (alpha == 0.0) {
-      int len = lsame("N", trans) ? m : n;
-      for (int i = 0, iy = incy < 0 ? (len - 1) * -incy : 0; i < len; i += 1, iy += incy) {
-        if (beta != 0.0f) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0f;
-        }
-      }
+      sscal(lsame("N", trans) ? m : n, beta, y, offsety, incy);
     } else if (lsame("N", trans)) {
       sgemviiN(m, n, alpha, a, offseta, inda, offsetinda, ptra, offsetptra, x, offsetx, indx, offsetindx, beta, y, offsety, incy);
     } else if (lsame("T", trans) || lsame("C", trans)) {
@@ -3214,11 +3194,39 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void sgemviiN(int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
-    throw new UnsupportedOperationException("not implemented");
+    // y = beta * y
+    if (beta != 1.0) {
+      sscal(m, beta, y, incy);
+    }
+    // y += alpha * A * x
+    for (int col = 0, k = 0; col < n && k < indx.length; col += 1) {
+      if (indx[offsetindx + k] == col) {
+        float alphax = alpha * x[offsetx + k];
+        for (int i = ptra[offsetptra + col], iEnd = ptra[offsetptra + col + 1]; i < iEnd; i += 1) {
+          y[offsety + inda[offsetinda + i]] += alphax * a[offseta + i];
+        }
+        k += 1;
+      }
+    }
   }
 
   protected void sgemviiT(int m, int n, float alpha, float[] a, int offseta, int[] inda, int offsetinda, int[] ptra, int offsetptra, float[] x, int offsetx, int[] indx, int offsetindx, float beta, float[] y, int offsety, int incy) {
-    throw new UnsupportedOperationException("not implemented");
+    // y = alpha * A * x + beta * y
+    for (int row = 0; row < m; row += 1) {
+      float sum = 0.0f;
+      for (int i = ptra[offsetptra + row], iEnd = ptra[offsetptra + row + 1], k = 0; i < iEnd && k < indx.length;) {
+        if (indx[offsetindx + k] == ptra[offsetptra + i]) {
+          sum += a[offseta + i] * x[offsetx + k];
+          k += 1;
+          i += 1;
+        } else if (indx[offsetindx + k] < ptra[offsetptra + i]) {
+          k += 1;
+        } else {
+          i += 1;
+        }
+      }
+      y[offsety + row] = alpha * sum + beta * y[offsety + row];
+    }
   }
 
   protected void dgerK(int m, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
@@ -3414,38 +3422,52 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dscalK(int n, double alpha, double[] x, int offsetx, int incx) {
-    if (incx == 1) {
-      for (int ix = 0; ix < n; ix += 1) {
-        x[offsetx + ix] *= alpha;
+    if (alpha != 0.0) {
+      if (incx == 1) {
+        for (int ix = 0; ix < n; ix += 1) {
+          x[offsetx + ix] *= alpha;
+        }
+      } else {
+        for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
+          x[offsetx + ix] *= alpha;
+        }
       }
     } else {
-      for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
-        x[offsetx + ix] *= alpha;
+      if (incx == 1) {
+        java.util.Arrays.fill(x, offsetx, offsetx + n, 0.0);
+      } else {
+        for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
+          x[offsetx + ix] = 0.0;
+        }
       }
     }
   }
 
   protected void sscalK(int n, float alpha, float[] x, int offsetx, int incx) {
-    if (incx == 1) {
-      for (int ix = 0; ix < n; ix += 1) {
-        x[offsetx + ix] *= alpha;
+    if (alpha != 0.0f) {
+      if (incx == 1) {
+        for (int ix = 0; ix < n; ix += 1) {
+          x[offsetx + ix] *= alpha;
+        }
+      } else {
+        for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
+          x[offsetx + ix] *= alpha;
+        }
       }
     } else {
-      for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
-        x[offsetx + ix] *= alpha;
+      if (incx == 1) {
+        java.util.Arrays.fill(x, offsetx, offsetx + n, 0.0f);
+      } else {
+        for (int ix = incx < 0 ? (n - 1) * -incx : 0; incx < 0 ? ix >= 0 : ix < n * incx; ix += incx) {
+          x[offsetx + ix] = 0.0f;
+        }
       }
     }
   }
 
   protected void dspmvK(String uplo, int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (alpha == 0.0) {
-      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
-        if (beta != 0.0) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0;
-        }
-      }
+      dscal(n, beta, y, incy);
     } else if (lsame("U", uplo)) {
       dspmvU(n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
     } else if (lsame("L", uplo)) {
@@ -3542,13 +3564,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   protected void dspmvL(int n, double alpha, double[] a, int offseta, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     // y = beta * y
     if (beta != 1.0) {
-      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
-        if (beta != 0.0) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0;
-        }
-      }
+      dscal(n, beta, y, incy);
     }
     // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
@@ -3627,13 +3643,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
 
   protected void sspmvK(String uplo, int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (alpha == 0.0f) {
-      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
-        if (beta != 0.0f) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0f;
-        }
-      }
+      sscal(n, beta, y, incy);
     } else if (lsame("U", uplo)) {
       sspmvU(n, alpha, a, offseta, x, offsetx, incx, beta, y, offsety, incy);
     } else if (lsame("L", uplo)) {
@@ -3730,13 +3740,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   protected void sspmvL(int n, float alpha, float[] a, int offseta, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     // y = beta * y
     if (beta != 1.0f) {
-      for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
-        if (beta != 0.0f) {
-          y[offsety + iy] = beta * y[offsety + iy];
-        } else {
-          y[offsety + iy] = 0.0f;
-        }
-      }
+      sscal(n, beta, y, incy);
     }
     // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
@@ -5219,7 +5223,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
         }
       }
     }
-    // y += alpha * A * x 
+    // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
       double alphaxix0 = alpha * x[offsetx + ix + incx * 0];
@@ -5403,7 +5407,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
         }
       }
     }
-    // y += alpha * A * x 
+    // y += alpha * A * x
     int col = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
     for (; col < loopBound(n, 4); col += 4, ix += incx * 4, iy += incy * 4) {
       float alphaxix0 = alpha * x[offsetx + ix + incx * 0];
@@ -5495,7 +5499,13 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dsyriU(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
-    throw new UnsupportedOperationException("not implemented");
+    for (int i = 0; i < n; i += 1) {
+      double alphax = alpha * x[offsetx + i];
+      int offset = indx[offsetindx + i] * lda;
+      for (int j = 0; j < n; j += 1) {
+        a[offseta + indx[offsetindx + j] + offset] += alphax * x[offsetx + j];
+      }
+    }
   }
 
   protected void dsyriL(int n, double alpha, double[] x, int offsetx, int[] indx, int offsetindx, double[] a, int offseta, int lda) {
@@ -5511,7 +5521,13 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void ssyriU(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
-    throw new UnsupportedOperationException("not implemented");
+    for (int i = 0; i < n; i += 1) {
+      float alphax = alpha * x[offsetx + i];
+      int offset = indx[offsetindx + i] * lda;
+      for (int j = 0; j < n; j += 1) {
+        a[offseta + indx[offsetindx + j] + offset] += alphax * x[offsetx + j];
+      }
+    }
   }
 
   protected void ssyriL(int n, float alpha, float[] x, int offsetx, int[] indx, int offsetindx, float[] a, int offseta, int lda) {
