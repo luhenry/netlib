@@ -325,9 +325,9 @@ abstract class AbstractLAPACK implements LAPACK {
     requireNonNull(a);
     requireNonNull(wr);
     requireNonNull(wi);
-    if (lsame("N", jobvl))
+    if (lsame("V", jobvl))
       requireNonNull(vl);
-    if (lsame("N", jobvr))
+    if (lsame("V", jobvr))
       requireNonNull(vr);
     requireNonNull(work);
     requireNonNull(info);
@@ -4959,9 +4959,9 @@ abstract class AbstractLAPACK implements LAPACK {
     requireNonNull(a);
     requireNonNull(wr);
     requireNonNull(wi);
-    if (lsame("N", jobvl))
+    if (lsame("V", jobvl))
       requireNonNull(vl);
-    if (lsame("N", jobvr))
+    if (lsame("V", jobvr))
       requireNonNull(vr);
     requireNonNull(work);
     requireNonNull(info);
