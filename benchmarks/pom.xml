@@ -30,13 +30,13 @@ information or have any questions.
   <parent>
     <groupId>dev.ludovic.netlib</groupId>
     <artifactId>parent</artifactId>
-    <version>3-SNAPSHOT</version>
+    <version>3.0.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>dev.ludovic.netlib</groupId>
   <artifactId>benchmarks</artifactId>
-  <version>3-SNAPSHOT</version>
+  <version>3.0.2</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -49,17 +49,17 @@ information or have any questions.
     <dependency>
       <groupId>dev.ludovic.netlib</groupId>
       <artifactId>blas</artifactId>
-      <version>3-SNAPSHOT</version>
+      <version>3.0.2</version>
     </dependency>
     <dependency>
       <groupId>dev.ludovic.netlib</groupId>
       <artifactId>arpack</artifactId>
-      <version>3-SNAPSHOT</version>
+      <version>3.0.2</version>
     </dependency>
     <dependency>
       <groupId>dev.ludovic.netlib</groupId>
       <artifactId>lapack</artifactId>
-      <version>3-SNAPSHOT</version>
+      <version>3.0.2</version>
     </dependency>
 
     <dependency>
