@@ -30,11 +30,21 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.netlib.util.intW;
+
 public class SgeevTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 2;
+        float[] a = {1.0f, 0.75f, 0.5f, 1.0f};
+        float[] wr = new float[2];
+        float[] wi = new float[2];
+        int lwork = 68; // optimal size from previous query
+        float[] work = new float[lwork];
+        intW info = new intW(2);
+
+        lapack.sgeev("N", "N", n, a, n, wr, wi, new float[1], 1, new float[1], 1, work, lwork, info);
     }
 }
