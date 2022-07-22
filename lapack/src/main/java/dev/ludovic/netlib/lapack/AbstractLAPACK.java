@@ -325,9 +325,9 @@ abstract class AbstractLAPACK implements LAPACK {
     requireNonNull(a);
     requireNonNull(wr);
     requireNonNull(wi);
-    if (lsame("N", jobvl))
+    if (lsame("V", jobvl))
       requireNonNull(vl);
-    if (lsame("N", jobvr))
+    if (lsame("V", jobvr))
       requireNonNull(vr);
     requireNonNull(work);
     requireNonNull(info);
@@ -335,9 +335,9 @@ abstract class AbstractLAPACK implements LAPACK {
       checkIndex(offseta + n * lda - 1, a.length);
       checkIndex(offsetwr + n - 1, wr.length);
       checkIndex(offsetwi + n - 1, wi.length);
-      if (lsame("N", jobvl))
+      if (lsame("V", jobvl))
         checkIndex(offsetvl + n * ldvl - 1, vl.length);
-      if (lsame("N", jobvr))
+      if (lsame("V", jobvr))
         checkIndex(offsetvr + n * ldvr - 1, vr.length);
     }
     checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
@@ -4959,9 +4959,9 @@ abstract class AbstractLAPACK implements LAPACK {
     requireNonNull(a);
     requireNonNull(wr);
     requireNonNull(wi);
-    if (lsame("N", jobvl))
+    if (lsame("V", jobvl))
       requireNonNull(vl);
-    if (lsame("N", jobvr))
+    if (lsame("V", jobvr))
       requireNonNull(vr);
     requireNonNull(work);
     requireNonNull(info);
@@ -4969,9 +4969,9 @@ abstract class AbstractLAPACK implements LAPACK {
       checkIndex(offseta + n * lda - 1, a.length);
       checkIndex(offsetwr + n - 1, wr.length);
       checkIndex(offsetwi + n - 1, wi.length);
-      if (lsame("N", jobvl))
+      if (lsame("V", jobvl))
         checkIndex(offsetvl + n * ldvl - 1, vl.length);
-      if (lsame("N", jobvr))
+      if (lsame("V", jobvr))
         checkIndex(offsetvr + n * ldvr - 1, vr.length);
     }
     checkIndex(offsetwork + Math.max(1, lwork) - 1, work.length);
