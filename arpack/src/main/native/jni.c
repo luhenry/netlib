@@ -58,8 +58,8 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dmoutK(JNIEnv *env, UNUSED jobject
   __nlda = lda;
   __nidigit = idigit;
   if (!(__nifmt = (*env)->GetStringUTFChars(env, ifmt, NULL))) { __failed = TRUE; goto done; }
-  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; }
-  dmout_(&__nlout, &__nm, &__nn, __na + offseta, &__nlda, &__nidigit, __nifmt);
+  if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
+  dmout_(&__nlout, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nidigit, __nifmt);
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (__nifmt) (*env)->ReleaseStringUTFChars(env, ifmt, __nifmt);
@@ -84,8 +84,8 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_smoutK(JNIEnv *env, UNUSED jobject
   __nlda = lda;
   __nidigit = idigit;
   if (!(__nifmt = (*env)->GetStringUTFChars(env, ifmt, NULL))) { __failed = TRUE; goto done; }
-  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; }
-  smout_(&__nlout, &__nm, &__nn, __na + offseta, &__nlda, &__nidigit, __nifmt);
+  if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
+  smout_(&__nlout, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nidigit, __nifmt);
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (__nifmt) (*env)->ReleaseStringUTFChars(env, ifmt, __nifmt);
@@ -106,8 +106,8 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dvoutK(JNIEnv *env, UNUSED jobject
   __nn = n;
   __nidigit = idigit;
   if (!(__nifmt = (*env)->GetStringUTFChars(env, ifmt, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) { __failed = TRUE; goto done; }
-  dvout_(&__nlout, &__nn, __nsx + offsetsx, &__nidigit, __nifmt);
+  if (sx) { if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) { __failed = TRUE; goto done; } }
+  dvout_(&__nlout, &__nn, __nsx ? __nsx + offsetsx : NULL, &__nidigit, __nifmt);
 done:
   if (__nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, __nsx, __failed ? JNI_ABORT : 0);
   if (__nifmt) (*env)->ReleaseStringUTFChars(env, ifmt, __nifmt);
@@ -128,8 +128,8 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_svoutK(JNIEnv *env, UNUSED jobject
   __nn = n;
   __nidigit = idigit;
   if (!(__nifmt = (*env)->GetStringUTFChars(env, ifmt, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) { __failed = TRUE; goto done; }
-  svout_(&__nlout, &__nn, __nsx + offsetsx, &__nidigit, __nifmt);
+  if (sx) { if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) { __failed = TRUE; goto done; } }
+  svout_(&__nlout, &__nn, __nsx ? __nsx + offsetsx : NULL, &__nidigit, __nifmt);
 done:
   if (__nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, __nsx, __failed ? JNI_ABORT : 0);
   if (__nifmt) (*env)->ReleaseStringUTFChars(env, ifmt, __nifmt);
@@ -150,8 +150,8 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ivoutK(JNIEnv *env, UNUSED jobject
   __nn = n;
   __nidigit = idigit;
   if (!(__nifmt = (*env)->GetStringUTFChars(env, ifmt, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nix = (*env)->GetPrimitiveArrayCritical(env, ix, NULL))) { __failed = TRUE; goto done; }
-  ivout_(&__nlout, &__nn, __nix + offsetix, &__nidigit, __nifmt);
+  if (ix) { if (!(__nix = (*env)->GetPrimitiveArrayCritical(env, ix, NULL))) { __failed = TRUE; goto done; } }
+  ivout_(&__nlout, &__nn, __nix ? __nix + offsetix : NULL, &__nidigit, __nifmt);
 done:
   if (__nix) (*env)->ReleasePrimitiveArrayCritical(env, ix, __nix, __failed ? JNI_ABORT : 0);
   if (__nifmt) (*env)->ReleaseStringUTFChars(env, ifmt, __nifmt);
@@ -185,11 +185,11 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dgetv0K(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nrnorm = (*env)->GetDoubleField(env, rnorm, doubleW_val_fieldID);
   __nierr = (*env)->GetIntField(env, ierr, intW_val_fieldID);
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  dgetv0_(&__nido, __nbmat, &__nitry, &__ninitv, &__nn, &__nj, __nv + offsetv, &__nldv, __nresid + offsetresid, &__nrnorm, __nipntr + offsetipntr, __nworkd + offsetworkd, &__nierr);
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  dgetv0_(&__nido, __nbmat, &__nitry, &__ninitv, &__nn, &__nj, __nv ? __nv + offsetv : NULL, &__nldv, __nresid ? __nresid + offsetresid : NULL, &__nrnorm, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__nierr);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -229,11 +229,11 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_sgetv0K(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nrnorm = (*env)->GetFloatField(env, rnorm, floatW_val_fieldID);
   __nierr = (*env)->GetIntField(env, ierr, intW_val_fieldID);
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  sgetv0_(&__nido, __nbmat, &__nitry, &__ninitv, &__nn, &__nj, __nv + offsetv, &__nldv, __nresid + offsetresid, &__nrnorm, __nipntr + offsetipntr, __nworkd + offsetworkd, &__nierr);
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  sgetv0_(&__nido, __nbmat, &__nitry, &__ninitv, &__nn, &__nj, __nv ? __nv + offsetv : NULL, &__nldv, __nresid ? __nresid + offsetresid : NULL, &__nrnorm, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__nierr);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -288,12 +288,12 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dnaitrK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nldh = ldh;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  dnaitr_(&__nido, __nbmat, &__nn, &__nk, &__nnp, &__nnb, __nresid + offsetresid, &__nrnorm, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nipntr + offsetipntr, __nworkd + offsetworkd, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  dnaitr_(&__nido, __nbmat, &__nn, &__nk, &__nnp, &__nnb, __nresid ? __nresid + offsetresid : NULL, &__nrnorm, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__ninfo);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -337,12 +337,12 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_snaitrK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nldh = ldh;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  snaitr_(&__nido, __nbmat, &__nn, &__nk, &__nnp, &__nnb, __nresid + offsetresid, &__nrnorm, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nipntr + offsetipntr, __nworkd + offsetworkd, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  snaitr_(&__nido, __nbmat, &__nn, &__nk, &__nnp, &__nnb, __nresid ? __nresid + offsetresid : NULL, &__nrnorm, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__ninfo);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -381,15 +381,15 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dnappsK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nldh = ldh;
   __nldq = ldq;
-  if (!(__nshiftr = (*env)->GetPrimitiveArrayCritical(env, shiftr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nshifti = (*env)->GetPrimitiveArrayCritical(env, shifti, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  dnapps_(&__nn, &__nkev, &__nnp, __nshiftr + offsetshiftr, __nshifti + offsetshifti, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nresid + offsetresid, __nq + offsetq, &__nldq, __nworkl + offsetworkl, __nworkd + offsetworkd);
+  if (shiftr) { if (!(__nshiftr = (*env)->GetPrimitiveArrayCritical(env, shiftr, NULL))) { __failed = TRUE; goto done; } }
+  if (shifti) { if (!(__nshifti = (*env)->GetPrimitiveArrayCritical(env, shifti, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  dnapps_(&__nn, &__nkev, &__nnp, __nshiftr ? __nshiftr + offsetshiftr : NULL, __nshifti ? __nshifti + offsetshifti : NULL, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nresid ? __nresid + offsetresid : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkl ? __nworkl + offsetworkl : NULL, __nworkd ? __nworkd + offsetworkd : NULL);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
@@ -428,15 +428,15 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_snappsK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nldh = ldh;
   __nldq = ldq;
-  if (!(__nshiftr = (*env)->GetPrimitiveArrayCritical(env, shiftr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nshifti = (*env)->GetPrimitiveArrayCritical(env, shifti, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  snapps_(&__nn, &__nkev, &__nnp, __nshiftr + offsetshiftr, __nshifti + offsetshifti, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nresid + offsetresid, __nq + offsetq, &__nldq, __nworkl + offsetworkl, __nworkd + offsetworkd);
+  if (shiftr) { if (!(__nshiftr = (*env)->GetPrimitiveArrayCritical(env, shiftr, NULL))) { __failed = TRUE; goto done; } }
+  if (shifti) { if (!(__nshifti = (*env)->GetPrimitiveArrayCritical(env, shifti, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  snapps_(&__nn, &__nkev, &__nnp, __nshiftr ? __nshiftr + offsetshiftr : NULL, __nshifti ? __nshifti + offsetshifti : NULL, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nresid ? __nresid + offsetresid : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkl ? __nworkl + offsetworkl : NULL, __nworkd ? __nworkd + offsetworkd : NULL);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
@@ -495,17 +495,17 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dnaup2K(JNIEnv *env, UNUSED jobjec
   __nldh = ldh;
   __nldq = ldq;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  dnaup2_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__nnp, &__ntol, __nresid + offsetresid, &__nmode, &__niupd, &__nishift, &__nmxiter, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nritzr + offsetritzr, __nritzi + offsetritzi, __nbounds + offsetbounds, __nq + offsetq, &__nldq, __nworkl + offsetworkl, __nipntr + offsetipntr, __nworkd + offsetworkd, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzr) { if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzi) { if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  dnaup2_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__nnp, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nmode, &__niupd, &__nishift, &__nmxiter, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nritzr ? __nritzr + offsetritzr : NULL, __nritzi ? __nritzi + offsetritzi : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkl ? __nworkl + offsetworkl : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__ninfo);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -572,17 +572,17 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_snaup2K(JNIEnv *env, UNUSED jobjec
   __nldh = ldh;
   __nldq = ldq;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  snaup2_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__nnp, &__ntol, __nresid + offsetresid, &__nmode, &__niupd, &__nishift, &__nmxiter, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nritzr + offsetritzr, __nritzi + offsetritzi, __nbounds + offsetbounds, __nq + offsetq, &__nldq, __nworkl + offsetworkl, __nipntr + offsetipntr, __nworkd + offsetworkd, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzr) { if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzi) { if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  snaup2_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__nnp, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nmode, &__niupd, &__nishift, &__nmxiter, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nritzr ? __nritzr + offsetritzr : NULL, __nritzi ? __nritzi + offsetritzi : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkl ? __nworkl + offsetworkl : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__ninfo);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -635,13 +635,13 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dnaupdK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nlworkl = lworkl;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  dnaupd_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid + offsetresid, &__nncv, __nv + offsetv, &__nldv, __niparam + offsetiparam, __nipntr + offsetipntr, __nworkd + offsetworkd, __nworkl + offsetworkl, &__nlworkl, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (iparam) { if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  dnaupd_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nncv, __nv ? __nv + offsetv : NULL, &__nldv, __niparam ? __niparam + offsetiparam : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nlworkl, &__ninfo);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
@@ -688,13 +688,13 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_snaupdK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nlworkl = lworkl;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  snaupd_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid + offsetresid, &__nncv, __nv + offsetv, &__nldv, __niparam + offsetiparam, __nipntr + offsetipntr, __nworkd + offsetworkd, __nworkl + offsetworkl, &__nlworkl, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (iparam) { if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  snaupd_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nncv, __nv ? __nv + offsetv : NULL, &__nldv, __niparam ? __niparam + offsetiparam : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nlworkl, &__ninfo);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
@@ -724,10 +724,10 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dnconvK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ntol = tol;
   __nnconv = (*env)->GetIntField(env, nconv, intW_val_fieldID);
-  if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  dnconv_(&__nn, __nritzr + offsetritzr, __nritzi + offsetritzi, __nbounds + offsetbounds, &__ntol, &__nnconv);
+  if (ritzr) { if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzi) { if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  dnconv_(&__nn, __nritzr ? __nritzr + offsetritzr : NULL, __nritzi ? __nritzi + offsetritzi : NULL, __nbounds ? __nbounds + offsetbounds : NULL, &__ntol, &__nnconv);
 done:
   if (__nbounds) (*env)->ReleasePrimitiveArrayCritical(env, bounds, __nbounds, __failed ? JNI_ABORT : 0);
   if (__nritzi) (*env)->ReleasePrimitiveArrayCritical(env, ritzi, __nritzi, __failed ? JNI_ABORT : 0);
@@ -750,10 +750,10 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_snconvK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ntol = tol;
   __nnconv = (*env)->GetIntField(env, nconv, intW_val_fieldID);
-  if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  snconv_(&__nn, __nritzr + offsetritzr, __nritzi + offsetritzi, __nbounds + offsetbounds, &__ntol, &__nnconv);
+  if (ritzr) { if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzi) { if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  snconv_(&__nn, __nritzr ? __nritzr + offsetritzr : NULL, __nritzi ? __nritzi + offsetritzi : NULL, __nbounds ? __nbounds + offsetbounds : NULL, &__ntol, &__nnconv);
 done:
   if (__nbounds) (*env)->ReleasePrimitiveArrayCritical(env, bounds, __nbounds, __failed ? JNI_ABORT : 0);
   if (__nritzi) (*env)->ReleasePrimitiveArrayCritical(env, ritzi, __nritzi, __failed ? JNI_ABORT : 0);
@@ -775,9 +775,9 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dsconvK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ntol = tol;
   __nnconv = (*env)->GetIntField(env, nconv, intW_val_fieldID);
-  if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  dsconv_(&__nn, __nritz + offsetritz, __nbounds + offsetbounds, &__ntol, &__nnconv);
+  if (ritz) { if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  dsconv_(&__nn, __nritz ? __nritz + offsetritz : NULL, __nbounds ? __nbounds + offsetbounds : NULL, &__ntol, &__nnconv);
 done:
   if (__nbounds) (*env)->ReleasePrimitiveArrayCritical(env, bounds, __nbounds, __failed ? JNI_ABORT : 0);
   if (__nritz) (*env)->ReleasePrimitiveArrayCritical(env, ritz, __nritz, __failed ? JNI_ABORT : 0);
@@ -798,9 +798,9 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ssconvK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ntol = tol;
   __nnconv = (*env)->GetIntField(env, nconv, intW_val_fieldID);
-  if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  ssconv_(&__nn, __nritz + offsetritz, __nbounds + offsetbounds, &__ntol, &__nnconv);
+  if (ritz) { if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  ssconv_(&__nn, __nritz ? __nritz + offsetritz : NULL, __nbounds ? __nbounds + offsetbounds : NULL, &__ntol, &__nnconv);
 done:
   if (__nbounds) (*env)->ReleasePrimitiveArrayCritical(env, bounds, __nbounds, __failed ? JNI_ABORT : 0);
   if (__nritz) (*env)->ReleasePrimitiveArrayCritical(env, ritz, __nritz, __failed ? JNI_ABORT : 0);
@@ -829,13 +829,13 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dneighK(JNIEnv *env, UNUSED jobjec
   __nldh = ldh;
   __nldq = ldq;
   __nierr = (*env)->GetIntField(env, ierr, intW_val_fieldID);
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  dneigh_(&__nrnorm, &__nn, __nh + offseth, &__nldh, __nritzr + offsetritzr, __nritzi + offsetritzi, __nbounds + offsetbounds, __nq + offsetq, &__nldq, __nworkl + offsetworkl, &__nierr);
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzr) { if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzi) { if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  dneigh_(&__nrnorm, &__nn, __nh ? __nh + offseth : NULL, &__nldh, __nritzr ? __nritzr + offsetritzr : NULL, __nritzi ? __nritzi + offsetritzi : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkl ? __nworkl + offsetworkl : NULL, &__nierr);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -869,13 +869,13 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_sneighK(JNIEnv *env, UNUSED jobjec
   __nldh = ldh;
   __nldq = ldq;
   __nierr = (*env)->GetIntField(env, ierr, intW_val_fieldID);
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  sneigh_(&__nrnorm, &__nn, __nh + offseth, &__nldh, __nritzr + offsetritzr, __nritzi + offsetritzi, __nbounds + offsetbounds, __nq + offsetq, &__nldq, __nworkl + offsetworkl, &__nierr);
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzr) { if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzi) { if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  sneigh_(&__nrnorm, &__nn, __nh ? __nh + offseth : NULL, &__nldh, __nritzr ? __nritzr + offsetritzr : NULL, __nritzi ? __nritzi + offsetritzi : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkl ? __nworkl + offsetworkl : NULL, &__nierr);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -932,24 +932,24 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dneupdK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nlworkl = lworkl;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  if (select) { if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
   do {
     int __length = (*env)->GetArrayLength(env, select);
     if (__length <= 0) { __failed = TRUE; goto done; }
     if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
     for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
-  } while(0);
-  if (!(__ndr = (*env)->GetPrimitiveArrayCritical(env, dr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__ndi = (*env)->GetPrimitiveArrayCritical(env, di, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkev = (*env)->GetPrimitiveArrayCritical(env, workev, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  dneupd_(&__nrvec, __nhowmny, __nselect + offsetselect, __ndr + offsetdr, __ndi + offsetdi, __nz + offsetz, &__nldz, &__nsigmar, &__nsigmai, __nworkev + offsetworkev, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid + offsetresid, &__nncv, __nv + offsetv, &__nldv, __niparam + offsetiparam, __nipntr + offsetipntr, __nworkd + offsetworkd, __nworkl + offsetworkl, &__nlworkl, &__ninfo);
+  } while(0); }
+  if (dr) { if (!(__ndr = (*env)->GetPrimitiveArrayCritical(env, dr, NULL))) { __failed = TRUE; goto done; } }
+  if (di) { if (!(__ndi = (*env)->GetPrimitiveArrayCritical(env, di, NULL))) { __failed = TRUE; goto done; } }
+  if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
+  if (workev) { if (!(__nworkev = (*env)->GetPrimitiveArrayCritical(env, workev, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (iparam) { if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  dneupd_(&__nrvec, __nhowmny, __nselect ? __nselect + offsetselect : NULL, __ndr ? __ndr + offsetdr : NULL, __ndi ? __ndi + offsetdi : NULL, __nz ? __nz + offsetz : NULL, &__nldz, &__nsigmar, &__nsigmai, __nworkev ? __nworkev + offsetworkev : NULL, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nncv, __nv ? __nv + offsetv : NULL, &__nldv, __niparam ? __niparam + offsetiparam : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nlworkl, &__ninfo);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
@@ -1014,24 +1014,24 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_sneupdK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nlworkl = lworkl;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  if (select) { if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
   do {
     int __length = (*env)->GetArrayLength(env, select);
     if (__length <= 0) { __failed = TRUE; goto done; }
     if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
     for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
-  } while(0);
-  if (!(__ndr = (*env)->GetPrimitiveArrayCritical(env, dr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__ndi = (*env)->GetPrimitiveArrayCritical(env, di, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkev = (*env)->GetPrimitiveArrayCritical(env, workev, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  sneupd_(&__nrvec, __nhowmny, __nselect + offsetselect, __ndr + offsetdr, __ndi + offsetdi, __nz + offsetz, &__nldz, &__nsigmar, &__nsigmai, __nworkev + offsetworkev, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid + offsetresid, &__nncv, __nv + offsetv, &__nldv, __niparam + offsetiparam, __nipntr + offsetipntr, __nworkd + offsetworkd, __nworkl + offsetworkl, &__nlworkl, &__ninfo);
+  } while(0); }
+  if (dr) { if (!(__ndr = (*env)->GetPrimitiveArrayCritical(env, dr, NULL))) { __failed = TRUE; goto done; } }
+  if (di) { if (!(__ndi = (*env)->GetPrimitiveArrayCritical(env, di, NULL))) { __failed = TRUE; goto done; } }
+  if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
+  if (workev) { if (!(__nworkev = (*env)->GetPrimitiveArrayCritical(env, workev, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (iparam) { if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  sneupd_(&__nrvec, __nhowmny, __nselect ? __nselect + offsetselect : NULL, __ndr ? __ndr + offsetdr : NULL, __ndi ? __ndi + offsetdi : NULL, __nz ? __nz + offsetz : NULL, &__nldz, &__nsigmar, &__nsigmai, __nworkev ? __nworkev + offsetworkev : NULL, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nncv, __nv ? __nv + offsetv : NULL, &__nldv, __niparam ? __niparam + offsetiparam : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nlworkl, &__ninfo);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
@@ -1070,12 +1070,12 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dngetsK(JNIEnv *env, UNUSED jobjec
   if (!(__nwhich = (*env)->GetStringUTFChars(env, which, NULL))) { __failed = TRUE; goto done; }
   __nkev = (*env)->GetIntField(env, kev, intW_val_fieldID);
   __nnp = (*env)->GetIntField(env, np, intW_val_fieldID);
-  if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nshiftr = (*env)->GetPrimitiveArrayCritical(env, shiftr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nshifti = (*env)->GetPrimitiveArrayCritical(env, shifti, NULL))) { __failed = TRUE; goto done; }
-  dngets_(&__nishift, __nwhich, &__nkev, &__nnp, __nritzr + offsetritzr, __nritzi + offsetritzi, __nbounds + offsetbounds, __nshiftr + offsetshiftr, __nshifti + offsetshifti);
+  if (ritzr) { if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzi) { if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (shiftr) { if (!(__nshiftr = (*env)->GetPrimitiveArrayCritical(env, shiftr, NULL))) { __failed = TRUE; goto done; } }
+  if (shifti) { if (!(__nshifti = (*env)->GetPrimitiveArrayCritical(env, shifti, NULL))) { __failed = TRUE; goto done; } }
+  dngets_(&__nishift, __nwhich, &__nkev, &__nnp, __nritzr ? __nritzr + offsetritzr : NULL, __nritzi ? __nritzi + offsetritzi : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nshiftr ? __nshiftr + offsetshiftr : NULL, __nshifti ? __nshifti + offsetshifti : NULL);
 done:
   if (__nshifti) (*env)->ReleasePrimitiveArrayCritical(env, shifti, __nshifti, __failed ? JNI_ABORT : 0);
   if (__nshiftr) (*env)->ReleasePrimitiveArrayCritical(env, shiftr, __nshiftr, __failed ? JNI_ABORT : 0);
@@ -1106,12 +1106,12 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_sngetsK(JNIEnv *env, UNUSED jobjec
   if (!(__nwhich = (*env)->GetStringUTFChars(env, which, NULL))) { __failed = TRUE; goto done; }
   __nkev = (*env)->GetIntField(env, kev, intW_val_fieldID);
   __nnp = (*env)->GetIntField(env, np, intW_val_fieldID);
-  if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nshiftr = (*env)->GetPrimitiveArrayCritical(env, shiftr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nshifti = (*env)->GetPrimitiveArrayCritical(env, shifti, NULL))) { __failed = TRUE; goto done; }
-  sngets_(&__nishift, __nwhich, &__nkev, &__nnp, __nritzr + offsetritzr, __nritzi + offsetritzi, __nbounds + offsetbounds, __nshiftr + offsetshiftr, __nshifti + offsetshifti);
+  if (ritzr) { if (!(__nritzr = (*env)->GetPrimitiveArrayCritical(env, ritzr, NULL))) { __failed = TRUE; goto done; } }
+  if (ritzi) { if (!(__nritzi = (*env)->GetPrimitiveArrayCritical(env, ritzi, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (shiftr) { if (!(__nshiftr = (*env)->GetPrimitiveArrayCritical(env, shiftr, NULL))) { __failed = TRUE; goto done; } }
+  if (shifti) { if (!(__nshifti = (*env)->GetPrimitiveArrayCritical(env, shifti, NULL))) { __failed = TRUE; goto done; } }
+  sngets_(&__nishift, __nwhich, &__nkev, &__nnp, __nritzr ? __nritzr + offsetritzr : NULL, __nritzi ? __nritzi + offsetritzi : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nshiftr ? __nshiftr + offsetshiftr : NULL, __nshifti ? __nshifti + offsetshifti : NULL);
 done:
   if (__nshifti) (*env)->ReleasePrimitiveArrayCritical(env, shifti, __nshifti, __failed ? JNI_ABORT : 0);
   if (__nshiftr) (*env)->ReleasePrimitiveArrayCritical(env, shiftr, __nshiftr, __failed ? JNI_ABORT : 0);
@@ -1154,12 +1154,12 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dsaitrK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nldh = ldh;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  dsaitr_(&__nido, __nbmat, &__nn, &__nk, &__nnp, &__nmode, __nresid + offsetresid, &__nrnorm, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nipntr + offsetipntr, __nworkd + offsetworkd, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  dsaitr_(&__nido, __nbmat, &__nn, &__nk, &__nnp, &__nmode, __nresid ? __nresid + offsetresid : NULL, &__nrnorm, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__ninfo);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -1203,12 +1203,12 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ssaitrK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nldh = ldh;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  ssaitr_(&__nido, __nbmat, &__nn, &__nk, &__nnp, &__nmode, __nresid + offsetresid, &__nrnorm, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nipntr + offsetipntr, __nworkd + offsetworkd, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  ssaitr_(&__nido, __nbmat, &__nn, &__nk, &__nnp, &__nmode, __nresid ? __nresid + offsetresid : NULL, &__nrnorm, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__ninfo);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -1245,13 +1245,13 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dsappsK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nldh = ldh;
   __nldq = ldq;
-  if (!(__nshift = (*env)->GetPrimitiveArrayCritical(env, shift, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  dsapps_(&__nn, &__nkev, &__nnp, __nshift + offsetshift, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nresid + offsetresid, __nq + offsetq, &__nldq, __nworkd + offsetworkd);
+  if (shift) { if (!(__nshift = (*env)->GetPrimitiveArrayCritical(env, shift, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  dsapps_(&__nn, &__nkev, &__nnp, __nshift ? __nshift + offsetshift : NULL, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nresid ? __nresid + offsetresid : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkd ? __nworkd + offsetworkd : NULL);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -1285,13 +1285,13 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ssappsK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nldh = ldh;
   __nldq = ldq;
-  if (!(__nshift = (*env)->GetPrimitiveArrayCritical(env, shift, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  ssapps_(&__nn, &__nkev, &__nnp, __nshift + offsetshift, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nresid + offsetresid, __nq + offsetq, &__nldq, __nworkd + offsetworkd);
+  if (shift) { if (!(__nshift = (*env)->GetPrimitiveArrayCritical(env, shift, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  ssapps_(&__nn, &__nkev, &__nnp, __nshift ? __nshift + offsetshift : NULL, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nresid ? __nresid + offsetresid : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkd ? __nworkd + offsetworkd : NULL);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -1346,16 +1346,16 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dsaup2K(JNIEnv *env, UNUSED jobjec
   __nldh = ldh;
   __nldq = ldq;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  dsaup2_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__nnp, &__ntol, __nresid + offsetresid, &__nmode, &__niupd, &__nishift, &__nmxiter, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nritz + offsetritz, __nbounds + offsetbounds, __nq + offsetq, &__nldq, __nworkl + offsetworkl, __nipntr + offsetipntr, __nworkd + offsetworkd, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ritz) { if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  dsaup2_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__nnp, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nmode, &__niupd, &__nishift, &__nmxiter, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nritz ? __nritz + offsetritz : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkl ? __nworkl + offsetworkl : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__ninfo);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -1420,16 +1420,16 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ssaup2K(JNIEnv *env, UNUSED jobjec
   __nldh = ldh;
   __nldq = ldq;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  ssaup2_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__nnp, &__ntol, __nresid + offsetresid, &__nmode, &__niupd, &__nishift, &__nmxiter, __nv + offsetv, &__nldv, __nh + offseth, &__nldh, __nritz + offsetritz, __nbounds + offsetbounds, __nq + offsetq, &__nldq, __nworkl + offsetworkl, __nipntr + offsetipntr, __nworkd + offsetworkd, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (ritz) { if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  ssaup2_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__nnp, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nmode, &__niupd, &__nishift, &__nmxiter, __nv ? __nv + offsetv : NULL, &__nldv, __nh ? __nh + offseth : NULL, &__nldh, __nritz ? __nritz + offsetritz : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nworkl ? __nworkl + offsetworkl : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, &__ninfo);
 done:
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
   if (__nipntr) (*env)->ReleasePrimitiveArrayCritical(env, ipntr, __nipntr, __failed ? JNI_ABORT : 0);
@@ -1467,11 +1467,11 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dseigtK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __nldh = ldh;
   __nierr = (*env)->GetIntField(env, ierr, intW_val_fieldID);
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__neig = (*env)->GetPrimitiveArrayCritical(env, eig, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  dseigt_(&__nrnorm, &__nn, __nh + offseth, &__nldh, __neig + offseteig, __nbounds + offsetbounds, __nworkl + offsetworkl, &__nierr);
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (eig) { if (!(__neig = (*env)->GetPrimitiveArrayCritical(env, eig, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  dseigt_(&__nrnorm, &__nn, __nh ? __nh + offseth : NULL, &__nldh, __neig ? __neig + offseteig : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nierr);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nbounds) (*env)->ReleasePrimitiveArrayCritical(env, bounds, __nbounds, __failed ? JNI_ABORT : 0);
@@ -1498,11 +1498,11 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_sseigtK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __nldh = ldh;
   __nierr = (*env)->GetIntField(env, ierr, intW_val_fieldID);
-  if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; }
-  if (!(__neig = (*env)->GetPrimitiveArrayCritical(env, eig, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  sseigt_(&__nrnorm, &__nn, __nh + offseth, &__nldh, __neig + offseteig, __nbounds + offsetbounds, __nworkl + offsetworkl, &__nierr);
+  if (h) { if (!(__nh = (*env)->GetPrimitiveArrayCritical(env, h, NULL))) { __failed = TRUE; goto done; } }
+  if (eig) { if (!(__neig = (*env)->GetPrimitiveArrayCritical(env, eig, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  sseigt_(&__nrnorm, &__nn, __nh ? __nh + offseth : NULL, &__nldh, __neig ? __neig + offseteig : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nierr);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nbounds) (*env)->ReleasePrimitiveArrayCritical(env, bounds, __nbounds, __failed ? JNI_ABORT : 0);
@@ -1529,9 +1529,9 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dsesrtK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __nna = na;
   __nlda = lda;
-  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; }
-  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; }
-  dsesrt_(__nwhich, &__napply, &__nn, __nx + offsetx, &__nna, __na + offseta, &__nlda);
+  if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
+  if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
+  dsesrt_(__nwhich, &__napply, &__nn, __nx ? __nx + offsetx : NULL, &__nna, __na ? __na + offseta : NULL, &__nlda);
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -1556,9 +1556,9 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ssesrtK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __nna = na;
   __nlda = lda;
-  if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; }
-  if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; }
-  ssesrt_(__nwhich, &__napply, &__nn, __nx + offsetx, &__nna, __na + offseta, &__nlda);
+  if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
+  if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
+  ssesrt_(__nwhich, &__napply, &__nn, __nx ? __nx + offsetx : NULL, &__nna, __na ? __na + offseta : NULL, &__nlda);
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -1597,13 +1597,13 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dsaupdK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nlworkl = lworkl;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  dsaupd_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid + offsetresid, &__nncv, __nv + offsetv, &__nldv, __niparam + offsetiparam, __nipntr + offsetipntr, __nworkd + offsetworkd, __nworkl + offsetworkl, &__nlworkl, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (iparam) { if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  dsaupd_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nncv, __nv ? __nv + offsetv : NULL, &__nldv, __niparam ? __niparam + offsetiparam : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nlworkl, &__ninfo);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
@@ -1650,13 +1650,13 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ssaupdK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nlworkl = lworkl;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  ssaupd_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid + offsetresid, &__nncv, __nv + offsetv, &__nldv, __niparam + offsetiparam, __nipntr + offsetipntr, __nworkd + offsetworkd, __nworkl + offsetworkl, &__nlworkl, &__ninfo);
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (iparam) { if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  ssaupd_(&__nido, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nncv, __nv ? __nv + offsetv : NULL, &__nldv, __niparam ? __niparam + offsetiparam : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nlworkl, &__ninfo);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
@@ -1712,22 +1712,22 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dseupdK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nlworkl = lworkl;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  if (select) { if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
   do {
     int __length = (*env)->GetArrayLength(env, select);
     if (__length <= 0) { __failed = TRUE; goto done; }
     if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
     for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
-  } while(0);
-  if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  dseupd_(&__nrvec, __nhowmny, __nselect + offsetselect, __nd + offsetd, __nz + offsetz, &__nldz, &__nsigma, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid + offsetresid, &__nncv, __nv + offsetv, &__nldv, __niparam + offsetiparam, __nipntr + offsetipntr, __nworkd + offsetworkd, __nworkl + offsetworkl, &__nlworkl, &__ninfo);
+  } while(0); }
+  if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
+  if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (iparam) { if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  dseupd_(&__nrvec, __nhowmny, __nselect ? __nselect + offsetselect : NULL, __nd ? __nd + offsetd : NULL, __nz ? __nz + offsetz : NULL, &__nldz, &__nsigma, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nncv, __nv ? __nv + offsetv : NULL, &__nldv, __niparam ? __niparam + offsetiparam : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nlworkl, &__ninfo);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
@@ -1786,22 +1786,22 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_sseupdK(JNIEnv *env, UNUSED jobjec
   __nldv = ldv;
   __nlworkl = lworkl;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
+  if (select) { if (!(__jselect = (*env)->GetPrimitiveArrayCritical(env, select, NULL))) { __failed = TRUE; goto done; }
   do {
     int __length = (*env)->GetArrayLength(env, select);
     if (__length <= 0) { __failed = TRUE; goto done; }
     if (!(__nselect = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
     for (int i = 0; i < __length; i++) { __nselect[i] = __jselect[i]; }
-  } while(0);
-  if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; }
-  if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; }
-  sseupd_(&__nrvec, __nhowmny, __nselect + offsetselect, __nd + offsetd, __nz + offsetz, &__nldz, &__nsigma, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid + offsetresid, &__nncv, __nv + offsetv, &__nldv, __niparam + offsetiparam, __nipntr + offsetipntr, __nworkd + offsetworkd, __nworkl + offsetworkl, &__nlworkl, &__ninfo);
+  } while(0); }
+  if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
+  if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
+  if (resid) { if (!(__nresid = (*env)->GetPrimitiveArrayCritical(env, resid, NULL))) { __failed = TRUE; goto done; } }
+  if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
+  if (iparam) { if (!(__niparam = (*env)->GetPrimitiveArrayCritical(env, iparam, NULL))) { __failed = TRUE; goto done; } }
+  if (ipntr) { if (!(__nipntr = (*env)->GetPrimitiveArrayCritical(env, ipntr, NULL))) { __failed = TRUE; goto done; } }
+  if (workd) { if (!(__nworkd = (*env)->GetPrimitiveArrayCritical(env, workd, NULL))) { __failed = TRUE; goto done; } }
+  if (workl) { if (!(__nworkl = (*env)->GetPrimitiveArrayCritical(env, workl, NULL))) { __failed = TRUE; goto done; } }
+  sseupd_(&__nrvec, __nhowmny, __nselect ? __nselect + offsetselect : NULL, __nd ? __nd + offsetd : NULL, __nz ? __nz + offsetz : NULL, &__nldz, &__nsigma, __nbmat, &__nn, __nwhich, &__nnev, &__ntol, __nresid ? __nresid + offsetresid : NULL, &__nncv, __nv ? __nv + offsetv : NULL, &__nldv, __niparam ? __niparam + offsetiparam : NULL, __nipntr ? __nipntr + offsetipntr : NULL, __nworkd ? __nworkd + offsetworkd : NULL, __nworkl ? __nworkl + offsetworkl : NULL, &__nlworkl, &__ninfo);
 done:
   if (__nworkl) (*env)->ReleasePrimitiveArrayCritical(env, workl, __nworkl, __failed ? JNI_ABORT : 0);
   if (__nworkd) (*env)->ReleasePrimitiveArrayCritical(env, workd, __nworkd, __failed ? JNI_ABORT : 0);
@@ -1836,10 +1836,10 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dsgetsK(JNIEnv *env, UNUSED jobjec
   if (!(__nwhich = (*env)->GetStringUTFChars(env, which, NULL))) { __failed = TRUE; goto done; }
   __nkev = (*env)->GetIntField(env, kev, intW_val_fieldID);
   __nnp = (*env)->GetIntField(env, np, intW_val_fieldID);
-  if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nshifts = (*env)->GetPrimitiveArrayCritical(env, shifts, NULL))) { __failed = TRUE; goto done; }
-  dsgets_(&__nishift, __nwhich, &__nkev, &__nnp, __nritz + offsetritz, __nbounds + offsetbounds, __nshifts + offsetshifts);
+  if (ritz) { if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (shifts) { if (!(__nshifts = (*env)->GetPrimitiveArrayCritical(env, shifts, NULL))) { __failed = TRUE; goto done; } }
+  dsgets_(&__nishift, __nwhich, &__nkev, &__nnp, __nritz ? __nritz + offsetritz : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nshifts ? __nshifts + offsetshifts : NULL);
 done:
   if (__nshifts) (*env)->ReleasePrimitiveArrayCritical(env, shifts, __nshifts, __failed ? JNI_ABORT : 0);
   if (__nbounds) (*env)->ReleasePrimitiveArrayCritical(env, bounds, __nbounds, __failed ? JNI_ABORT : 0);
@@ -1866,10 +1866,10 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ssgetsK(JNIEnv *env, UNUSED jobjec
   if (!(__nwhich = (*env)->GetStringUTFChars(env, which, NULL))) { __failed = TRUE; goto done; }
   __nkev = (*env)->GetIntField(env, kev, intW_val_fieldID);
   __nnp = (*env)->GetIntField(env, np, intW_val_fieldID);
-  if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nshifts = (*env)->GetPrimitiveArrayCritical(env, shifts, NULL))) { __failed = TRUE; goto done; }
-  ssgets_(&__nishift, __nwhich, &__nkev, &__nnp, __nritz + offsetritz, __nbounds + offsetbounds, __nshifts + offsetshifts);
+  if (ritz) { if (!(__nritz = (*env)->GetPrimitiveArrayCritical(env, ritz, NULL))) { __failed = TRUE; goto done; } }
+  if (bounds) { if (!(__nbounds = (*env)->GetPrimitiveArrayCritical(env, bounds, NULL))) { __failed = TRUE; goto done; } }
+  if (shifts) { if (!(__nshifts = (*env)->GetPrimitiveArrayCritical(env, shifts, NULL))) { __failed = TRUE; goto done; } }
+  ssgets_(&__nishift, __nwhich, &__nkev, &__nnp, __nritz ? __nritz + offsetritz : NULL, __nbounds ? __nbounds + offsetbounds : NULL, __nshifts ? __nshifts + offsetshifts : NULL);
 done:
   if (__nshifts) (*env)->ReleasePrimitiveArrayCritical(env, shifts, __nshifts, __failed ? JNI_ABORT : 0);
   if (__nbounds) (*env)->ReleasePrimitiveArrayCritical(env, bounds, __nbounds, __failed ? JNI_ABORT : 0);
@@ -1894,10 +1894,10 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dsortcK(JNIEnv *env, UNUSED jobjec
   if (!(__nwhich = (*env)->GetStringUTFChars(env, which, NULL))) { __failed = TRUE; goto done; }
   __napply = apply;
   __nn = n;
-  if (!(__nxreal = (*env)->GetPrimitiveArrayCritical(env, xreal, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nximag = (*env)->GetPrimitiveArrayCritical(env, ximag, NULL))) { __failed = TRUE; goto done; }
-  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) { __failed = TRUE; goto done; }
-  dsortc_(__nwhich, &__napply, &__nn, __nxreal + offsetxreal, __nximag + offsetximag, __ny + offsety);
+  if (xreal) { if (!(__nxreal = (*env)->GetPrimitiveArrayCritical(env, xreal, NULL))) { __failed = TRUE; goto done; } }
+  if (ximag) { if (!(__nximag = (*env)->GetPrimitiveArrayCritical(env, ximag, NULL))) { __failed = TRUE; goto done; } }
+  if (y) { if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) { __failed = TRUE; goto done; } }
+  dsortc_(__nwhich, &__napply, &__nn, __nxreal ? __nxreal + offsetxreal : NULL, __nximag ? __nximag + offsetximag : NULL, __ny ? __ny + offsety : NULL);
 done:
   if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, __failed ? JNI_ABORT : 0);
   if (__nximag) (*env)->ReleasePrimitiveArrayCritical(env, ximag, __nximag, __failed ? JNI_ABORT : 0);
@@ -1920,10 +1920,10 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ssortcK(JNIEnv *env, UNUSED jobjec
   if (!(__nwhich = (*env)->GetStringUTFChars(env, which, NULL))) { __failed = TRUE; goto done; }
   __napply = apply;
   __nn = n;
-  if (!(__nxreal = (*env)->GetPrimitiveArrayCritical(env, xreal, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nximag = (*env)->GetPrimitiveArrayCritical(env, ximag, NULL))) { __failed = TRUE; goto done; }
-  if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) { __failed = TRUE; goto done; }
-  ssortc_(__nwhich, &__napply, &__nn, __nxreal + offsetxreal, __nximag + offsetximag, __ny + offsety);
+  if (xreal) { if (!(__nxreal = (*env)->GetPrimitiveArrayCritical(env, xreal, NULL))) { __failed = TRUE; goto done; } }
+  if (ximag) { if (!(__nximag = (*env)->GetPrimitiveArrayCritical(env, ximag, NULL))) { __failed = TRUE; goto done; } }
+  if (y) { if (!(__ny = (*env)->GetPrimitiveArrayCritical(env, y, NULL))) { __failed = TRUE; goto done; } }
+  ssortc_(__nwhich, &__napply, &__nn, __nxreal ? __nxreal + offsetxreal : NULL, __nximag ? __nximag + offsetximag : NULL, __ny ? __ny + offsety : NULL);
 done:
   if (__ny) (*env)->ReleasePrimitiveArrayCritical(env, y, __ny, __failed ? JNI_ABORT : 0);
   if (__nximag) (*env)->ReleasePrimitiveArrayCritical(env, ximag, __nximag, __failed ? JNI_ABORT : 0);
@@ -1945,9 +1945,9 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dsortrK(JNIEnv *env, UNUSED jobjec
   if (!(__nwhich = (*env)->GetStringUTFChars(env, which, NULL))) { __failed = TRUE; goto done; }
   __napply = apply;
   __nn = n;
-  if (!(__nx1 = (*env)->GetPrimitiveArrayCritical(env, x1, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nx2 = (*env)->GetPrimitiveArrayCritical(env, x2, NULL))) { __failed = TRUE; goto done; }
-  dsortr_(__nwhich, &__napply, &__nn, __nx1 + offsetx1, __nx2 + offsetx2);
+  if (x1) { if (!(__nx1 = (*env)->GetPrimitiveArrayCritical(env, x1, NULL))) { __failed = TRUE; goto done; } }
+  if (x2) { if (!(__nx2 = (*env)->GetPrimitiveArrayCritical(env, x2, NULL))) { __failed = TRUE; goto done; } }
+  dsortr_(__nwhich, &__napply, &__nn, __nx1 ? __nx1 + offsetx1 : NULL, __nx2 ? __nx2 + offsetx2 : NULL);
 done:
   if (__nx2) (*env)->ReleasePrimitiveArrayCritical(env, x2, __nx2, __failed ? JNI_ABORT : 0);
   if (__nx1) (*env)->ReleasePrimitiveArrayCritical(env, x1, __nx1, __failed ? JNI_ABORT : 0);
@@ -1968,9 +1968,9 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_ssortrK(JNIEnv *env, UNUSED jobjec
   if (!(__nwhich = (*env)->GetStringUTFChars(env, which, NULL))) { __failed = TRUE; goto done; }
   __napply = apply;
   __nn = n;
-  if (!(__nx1 = (*env)->GetPrimitiveArrayCritical(env, x1, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nx2 = (*env)->GetPrimitiveArrayCritical(env, x2, NULL))) { __failed = TRUE; goto done; }
-  ssortr_(__nwhich, &__napply, &__nn, __nx1 + offsetx1, __nx2 + offsetx2);
+  if (x1) { if (!(__nx1 = (*env)->GetPrimitiveArrayCritical(env, x1, NULL))) { __failed = TRUE; goto done; } }
+  if (x2) { if (!(__nx2 = (*env)->GetPrimitiveArrayCritical(env, x2, NULL))) { __failed = TRUE; goto done; } }
+  ssortr_(__nwhich, &__napply, &__nn, __nx1 ? __nx1 + offsetx1 : NULL, __nx2 ? __nx2 + offsetx2 : NULL);
 done:
   if (__nx2) (*env)->ReleasePrimitiveArrayCritical(env, x2, __nx2, __failed ? JNI_ABORT : 0);
   if (__nx1) (*env)->ReleasePrimitiveArrayCritical(env, x1, __nx1, __failed ? JNI_ABORT : 0);
@@ -2031,11 +2031,11 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_dstqrbK(JNIEnv *env, UNUSED jobjec
   double *__nwork = NULL;
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; }
-  if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; }
-  dstqrb_(&__nn, __nd + offsetd, __ne + offsete, __nz + offsetz, __nwork + offsetwork, &__ninfo);
+  if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
+  if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
+  if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
+  if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
+  dstqrb_(&__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -2058,11 +2058,11 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_sstqrbK(JNIEnv *env, UNUSED jobjec
   float *__nwork = NULL;
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
-  if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; }
-  if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; }
-  sstqrb_(&__nn, __nd + offsetd, __ne + offsete, __nz + offsetz, __nwork + offsetwork, &__ninfo);
+  if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
+  if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
+  if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
+  if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
+  sstqrb_(&__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -2083,8 +2083,8 @@ jint Java_dev_ludovic_netlib_arpack_JNIARPACK_icnteqK(JNIEnv *env, UNUSED jobjec
   int *__narray = NULL;
   __nn = n;
   __nvalue = value;
-  if (!(__narray = (*env)->GetPrimitiveArrayCritical(env, array, NULL))) { __failed = TRUE; goto done; }
-  __ret = icnteq_(&__nn, __narray + offsetarray, &__nvalue);
+  if (array) { if (!(__narray = (*env)->GetPrimitiveArrayCritical(env, array, NULL))) { __failed = TRUE; goto done; } }
+  __ret = icnteq_(&__nn, __narray ? __narray + offsetarray : NULL, &__nvalue);
 done:
   if (__narray) (*env)->ReleasePrimitiveArrayCritical(env, array, __narray, __failed ? JNI_ABORT : 0);
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
@@ -2104,9 +2104,9 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_icopyK(JNIEnv *env, UNUSED jobject
   __nn = n;
   __nincx = incx;
   __nincy = incy;
-  if (!(__nlx = (*env)->GetPrimitiveArrayCritical(env, lx, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nly = (*env)->GetPrimitiveArrayCritical(env, ly, NULL))) { __failed = TRUE; goto done; }
-  icopy_(&__nn, __nlx + offsetlx, &__nincx, __nly + offsetly, &__nincy);
+  if (lx) { if (!(__nlx = (*env)->GetPrimitiveArrayCritical(env, lx, NULL))) { __failed = TRUE; goto done; } }
+  if (ly) { if (!(__nly = (*env)->GetPrimitiveArrayCritical(env, ly, NULL))) { __failed = TRUE; goto done; } }
+  icopy_(&__nn, __nlx ? __nlx + offsetlx : NULL, &__nincx, __nly ? __nly + offsetly : NULL, &__nincy);
 done:
   if (__nly) (*env)->ReleasePrimitiveArrayCritical(env, ly, __nly, __failed ? JNI_ABORT : 0);
   if (__nlx) (*env)->ReleasePrimitiveArrayCritical(env, lx, __nlx, __failed ? JNI_ABORT : 0);
@@ -2125,8 +2125,8 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_isetK(JNIEnv *env, UNUSED jobject 
   __nn = n;
   __nvalue = value;
   __ninc = inc;
-  if (!(__narray = (*env)->GetPrimitiveArrayCritical(env, array, NULL))) { __failed = TRUE; goto done; }
-  iset_(&__nn, &__nvalue, __narray + offsetarray, &__ninc);
+  if (array) { if (!(__narray = (*env)->GetPrimitiveArrayCritical(env, array, NULL))) { __failed = TRUE; goto done; } }
+  iset_(&__nn, &__nvalue, __narray ? __narray + offsetarray : NULL, &__ninc);
 done:
   if (__narray) (*env)->ReleasePrimitiveArrayCritical(env, array, __narray, __failed ? JNI_ABORT : 0);
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
@@ -2145,9 +2145,9 @@ void Java_dev_ludovic_netlib_arpack_JNIARPACK_iswapK(JNIEnv *env, UNUSED jobject
   __nn = n;
   __nincx = incx;
   __nincy = incy;
-  if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) { __failed = TRUE; goto done; }
-  if (!(__nsy = (*env)->GetPrimitiveArrayCritical(env, sy, NULL))) { __failed = TRUE; goto done; }
-  iswap_(&__nn, __nsx + offsetsx, &__nincx, __nsy + offsetsy, &__nincy);
+  if (sx) { if (!(__nsx = (*env)->GetPrimitiveArrayCritical(env, sx, NULL))) { __failed = TRUE; goto done; } }
+  if (sy) { if (!(__nsy = (*env)->GetPrimitiveArrayCritical(env, sy, NULL))) { __failed = TRUE; goto done; } }
+  iswap_(&__nn, __nsx ? __nsx + offsetsx : NULL, &__nincx, __nsy ? __nsy + offsetsy : NULL, &__nincy);
 done:
   if (__nsy) (*env)->ReleasePrimitiveArrayCritical(env, sy, __nsy, __failed ? JNI_ABORT : 0);
   if (__nsx) (*env)->ReleasePrimitiveArrayCritical(env, sx, __nsx, __failed ? JNI_ABORT : 0);
