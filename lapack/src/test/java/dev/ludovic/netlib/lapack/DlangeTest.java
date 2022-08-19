@@ -30,11 +30,30 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Random;
+
 public class DlangeTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testNullWorkspace(LAPACK lapack) {
+        int n = 13;
+        double[] greensFunction = new double[n * n];
+
+        // some predictable test data
+        Random rnd = new Random(42);
+        for (int i = 0; i < n * n; ++i) {
+            greensFunction[i] = rnd.nextDouble();
+        }
+
+        double[] w = null;
+
+        assertEquals(8.347588916043293, lapack.dlange("1", n, n, greensFunction, n, w), depsilon);
     }
 }
