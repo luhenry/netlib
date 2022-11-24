@@ -90,6 +90,25 @@ A set of benchmarks is available in [benchmarks/src/main/java/dev/ludovic/netlib
 $> java -jar benchmarks/target/netlib-benchmarks.jar
 ```
 
+# Release
+
+Update the version in the `**/pom.xml`, create a tag, and push it:
+
+```
+$> export VERSION=3.0.3
+$> git checkout --detach HEAD
+$> sed -i -E "s/<version>[0-9]+\-SNAPSHOT<\/version>/<version>$VERSION<\/version>/g" **/pom.xml
+$> git commit -p -m "v$VERSION" **/pom.xml
+$> git tag v$VERSION
+$> git push origin v$VERSION
+```
+
+That will trigger the upload of the package to Sonatype via Github Actions.
+
+Then, go to https://oss.sonatype.org/, go to "Staging Repositories", verify the content of the package, "Close" the package, and finally click "Release" to deploy it to Maven Central.
+
+Finally, go to https://github.com/luhenry/netlib/releases to update and publish the release on the Github repository.
+
 # Thanks
 
 This project has been largely inspired by [`netlib-java`](https://github.com/fommil/netlib-java) and [@fommil](https://github.com/fommil)'s hard work.
