@@ -181,4 +181,25 @@ public class SgemmTest extends BLASTest {
         blas.sgemm("T", "T", M, N/2, K, 0.0f, sgeAT, K, sgeBT, N/2, 1.0f, sgeCcopy = sgeC.clone(), M);
         assertArrayEquals(expected, sgeCcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffsetBoundsChecking(BLAS blas) {
+        // Test case that reproduces the original bounds checking issue for sgemm
+        // Matrix A (2x3) with offset=1, stored in array of length 9
+        float[] a = {1.0f, 4.0f, 7.0f, 2.0f, 5.0f, 8.0f, 3.0f, 6.0f, 9.0f};
+        float[] b = {1.0f, 2.0f, 3.0f};
+        float[] c = new float[2];
+        float[] cExpected = new float[2];
+
+        // This should not throw IndexOutOfBoundsException
+        assertDoesNotThrow(() -> {
+            blas.sgemm("N", "N", 2, 1, 3, 1.0f, a, 1, 3, b, 0, 3, 0.0f, c, 0, 2);
+        });
+
+        // Compare with F2J result
+        f2j.sgemm("N", "N", 2, 1, 3, 1.0f, a, 1, 3, b, 0, 3, 0.0f, cExpected, 0, 2);
+        blas.sgemm("N", "N", 2, 1, 3, 1.0f, a, 1, 3, b, 0, 3, 0.0f, c, 0, 2);
+        assertArrayEquals(cExpected, c, sepsilon);
+    }
 }
