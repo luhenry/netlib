@@ -349,7 +349,7 @@ abstract class AbstractBLAS implements BLAS {
     requireNonNull(a);
     requireNonNull(x);
     requireNonNull(y);
-    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offseta + (n - 1) * lda + (m - 1), a.length);
     checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     dgemvK(trans, m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
@@ -377,7 +377,7 @@ abstract class AbstractBLAS implements BLAS {
     requireNonNull(a);
     requireNonNull(x);
     requireNonNull(y);
-    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offseta + (n - 1) * lda + (m - 1), a.length);
     checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     sgemvK(trans, m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);

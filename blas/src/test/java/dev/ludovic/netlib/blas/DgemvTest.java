@@ -128,4 +128,25 @@ public class DgemvTest extends BLASTest {
         // }
         assertArrayEquals(expected, dYcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffsetBoundsChecking(BLAS blas) {
+        // Test case that reproduces the original bounds checking issue for dgemv
+        // Matrix A (2x3) with offset=1, stored in array of length 9
+        double[] a = {1.0, 4.0, 7.0, 2.0, 5.0, 8.0, 3.0, 6.0, 9.0};
+        double[] x = {1.0, 2.0, 3.0};
+        double[] y = new double[2];
+        double[] yExpected = new double[2];
+
+        // This should not throw IndexOutOfBoundsException
+        assertDoesNotThrow(() -> {
+            blas.dgemv("N", 2, 3, 1.0, a, 1, 3, x, 0, 1, 0.0, y, 0, 1);
+        });
+
+        // Compare with F2J result
+        f2j.dgemv("N", 2, 3, 1.0, a, 1, 3, x, 0, 1, 0.0, yExpected, 0, 1);
+        blas.dgemv("N", 2, 3, 1.0, a, 1, 3, x, 0, 1, 0.0, y, 0, 1);
+        assertArrayEquals(yExpected, y, depsilon);
+    }
 }
