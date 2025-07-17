@@ -93,4 +93,46 @@ public class SgemvTest extends BLASTest {
         blas.sgemv("T", M, N,  1.0f, sgeA, M, sX, 1,  0.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset1BoundsChecking(BLAS blas) {
+        // Test case that reproduces the original bounds checking issue for sgemv
+        // Matrix A (2x3) with offset=1, stored in array of length 9
+        float[] a = {1.0f, 4.0f, 7.0f, 2.0f, 5.0f, 8.0f, 3.0f, 6.0f, 9.0f};
+        float[] x = {1.0f, 2.0f, 3.0f};
+        float[] y = new float[2];
+        float[] yExpected = new float[2];
+
+        // This should not throw IndexOutOfBoundsException
+        assertDoesNotThrow(() -> {
+            blas.sgemv("N", 2, 3, 1.0f, a, 1, 3, x, 0, 1, 0.0f, y, 0, 1);
+        });
+
+        // Compare with F2J result
+        f2j.sgemv("N", 2, 3, 1.0f, a, 1, 3, x, 0, 1, 0.0f, yExpected, 0, 1);
+        blas.sgemv("N", 2, 3, 1.0f, a, 1, 3, x, 0, 1, 0.0f, y, 0, 1);
+        assertArrayEquals(yExpected, y, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset2BoundsChecking(BLAS blas) {
+        // Test case that reproduces the original bounds checking issue for sgemv
+        // Matrix A (2x3) with offset=1, stored in array of length 9
+        float[] a = {1.0f, 4.0f, 7.0f, 2.0f, 5.0f, 8.0f, 3.0f, 6.0f, 9.0f, 10.0f};
+        float[] x = {1.0f, 2.0f, 3.0f};
+        float[] y = new float[2];
+        float[] yExpected = new float[2];
+
+        // This should not throw IndexOutOfBoundsException
+        assertDoesNotThrow(() -> {
+            blas.sgemv("N", 2, 3, 1.0f, a, 2, 3, x, 0, 1, 0.0f, y, 0, 1);
+        });
+
+        // Compare with F2J result
+        f2j.sgemv("N", 2, 3, 1.0f, a, 2, 3, x, 0, 1, 0.0f, yExpected, 0, 1);
+        blas.sgemv("N", 2, 3, 1.0f, a, 2, 3, x, 0, 1, 0.0f, y, 0, 1);
+        assertArrayEquals(yExpected, y, sepsilon);
+    }
 }

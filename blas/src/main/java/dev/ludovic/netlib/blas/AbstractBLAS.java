@@ -291,9 +291,9 @@ abstract class AbstractBLAS implements BLAS {
     requireNonNull(a);
     requireNonNull(b);
     requireNonNull(c);
-    checkIndex(offseta + (lsame("N", transa) ? k : m) * lda - 1, a.length);
-    checkIndex(offsetb + (lsame("N", transb) ? n : k) * ldb - 1, b.length);
-    checkIndex(offsetc + m * n - 1, c.length);
+    checkIndex(offseta + (lsame("N", transa) ? (k - 1) * lda + (m - 1) : (m - 1) * lda + (k - 1)), a.length);
+    checkIndex(offsetb + (lsame("N", transb) ? (n - 1) * ldb + (k - 1) : (k - 1) * ldb + (n - 1)), b.length);
+    checkIndex(offsetc + (n - 1) * ldc + (m - 1), c.length);
     dgemmK(transa, transb, m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
@@ -321,9 +321,9 @@ abstract class AbstractBLAS implements BLAS {
     requireNonNull(a);
     requireNonNull(b);
     requireNonNull(c);
-    checkIndex(offseta + (lsame("N", transa) ? k : m) * lda - 1, a.length);
-    checkIndex(offsetb + (lsame("N", transb) ? n : k) * ldb - 1, b.length);
-    checkIndex(offsetc + m * n - 1, c.length);
+    checkIndex(offseta + (lsame("N", transa) ? (k - 1) * lda + (m - 1) : (m - 1) * lda + (k - 1)), a.length);
+    checkIndex(offsetb + (lsame("N", transb) ? (n - 1) * ldb + (k - 1) : (k - 1) * ldb + (n - 1)), b.length);
+    checkIndex(offsetc + (n - 1) * ldc + (m - 1), c.length);
     sgemmK(transa, transb, m, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
   }
 
@@ -349,7 +349,7 @@ abstract class AbstractBLAS implements BLAS {
     requireNonNull(a);
     requireNonNull(x);
     requireNonNull(y);
-    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offseta + (n - 1) * lda + (m - 1), a.length);
     checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     dgemvK(trans, m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
@@ -377,7 +377,7 @@ abstract class AbstractBLAS implements BLAS {
     requireNonNull(a);
     requireNonNull(x);
     requireNonNull(y);
-    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offseta + (n - 1) * lda + (m - 1), a.length);
     checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     sgemvK(trans, m, n, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
