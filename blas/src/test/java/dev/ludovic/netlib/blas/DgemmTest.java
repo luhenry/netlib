@@ -188,7 +188,7 @@ public class DgemmTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
-    void testOffsetBoundsChecking(BLAS blas) {
+    void testOffset1BoundsChecking(BLAS blas) {
         // Test case that reproduces the original bounds checking issue
         // Matrix A (2x3) with offset=1, stored in array of length 9
         double[] a = {1.0, 4.0, 7.0, 2.0, 5.0, 8.0, 3.0, 6.0, 9.0};
@@ -204,6 +204,27 @@ public class DgemmTest extends BLASTest {
         // Compare with F2J result
         f2j.dgemm("N", "N", 2, 1, 3, 1.0, a, 1, 3, b, 0, 3, 0.0, cExpected, 0, 2);
         blas.dgemm("N", "N", 2, 1, 3, 1.0, a, 1, 3, b, 0, 3, 0.0, c, 0, 2);
+        assertArrayEquals(cExpected, c, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset2BoundsChecking(BLAS blas) {
+        // Test case that reproduces the original bounds checking issue
+        // Matrix A (2x3) with offset=1, stored in array of length 10
+        double[] a = {1.0, 4.0, 7.0, 2.0, 5.0, 8.0, 3.0, 6.0, 9.0, 10.0};
+        double[] b = {1.0, 2.0, 3.0};
+        double[] c = new double[2];
+        double[] cExpected = new double[2];
+
+        // This should not throw IndexOutOfBoundsException
+        assertDoesNotThrow(() -> {
+            blas.dgemm("N", "N", 2, 1, 3, 1.0, a, 2, 3, b, 0, 3, 0.0, c, 0, 2);
+        });
+
+        // Compare with F2J result
+        f2j.dgemm("N", "N", 2, 1, 3, 1.0, a, 2, 3, b, 0, 3, 0.0, cExpected, 0, 2);
+        blas.dgemm("N", "N", 2, 1, 3, 1.0, a, 2, 3, b, 0, 3, 0.0, c, 0, 2);
         assertArrayEquals(cExpected, c, depsilon);
     }
 }
