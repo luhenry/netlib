@@ -75,19 +75,9 @@ information or have any questions.
 
   <profiles>
     <profile>
-      <id>jdk16</id>
+      <id>vector</id>
       <activation>
-        <jdk>16</jdk>
-      </activation>
-      <properties>
-        <jvm.modules>--add-modules=jdk.incubator.vector</jvm.modules>
-        <argLine>${jvm.modules}</argLine>
-      </properties>
-    </profile>
-    <profile>
-      <id>jdk17</id>
-      <activation>
-        <jdk>17</jdk>
+        <jdk>[16,</jdk>
       </activation>
       <properties>
         <jvm.modules>--add-modules=jdk.incubator.vector</jvm.modules>
