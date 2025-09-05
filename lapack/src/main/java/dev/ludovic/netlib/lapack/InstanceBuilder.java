@@ -56,7 +56,7 @@ final class InstanceBuilder {
     try {
       return JNILAPACK.getInstance();
     } catch (Throwable t) {
-      log.fine("Failed to load implementation from:" + JNILAPACK.class.getName());
+      log.fine("Failed to load implementation from:" + JNILAPACK.class.getName(), t);
       return null;
     }
   }

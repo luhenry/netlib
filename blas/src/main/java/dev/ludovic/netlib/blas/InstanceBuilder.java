@@ -64,7 +64,7 @@ final class InstanceBuilder {
     try {
       return JNIBLAS.getInstance();
     } catch (Throwable t) {
-      log.fine("Failed to load implementation from:" + JNIBLAS.class.getName());
+      log.fine("Failed to load implementation from:" + JNIBLAS.class.getName(), t);
       return null;
     }
   }
@@ -84,7 +84,7 @@ final class InstanceBuilder {
         log.finest("trying to return java 16 instance");
         return VectorBLAS.getInstance();
       } catch (Throwable t) {
-        log.fine("Failed to load implementation from:" + VectorBLAS.class.getName());
+        log.fine("Failed to load implementation from:" + VectorBLAS.class.getName(), t);
       }
     }
     if (major >= 11) {
