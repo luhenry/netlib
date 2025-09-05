@@ -38,7 +38,22 @@ final class InstanceBuilder {
   static {
     nativeBlas = initializeNative();
     javaBlas = initializeJava();
-    blas = nativeBlas != null ? nativeBlas : javaBlas;
+
+    if (nativeBlas == null) {
+      if (javaBlas instanceof VectorBLAS) {
+        log.info("Using JavaBLAS, with features requiring at least Java 16 and the incubating Vector API");
+      } else if (javaBlas instanceof Java11BLAS) {
+        log.info("Using JavaBLAS, with features requiring at least Java 11");
+      } else if (javaBlas instanceof Java8BLAS) {
+        log.info("Using JavaBLAS, with features requiring at least Java 8");
+      } else {
+        log.info("Using JavaBLAS");
+      }
+      blas = javaBlas;
+    } else {
+      log.info("Using native BLAS");
+      blas = nativeBlas;
+    }
   }
 
   public static BLAS blas() {
@@ -49,7 +64,7 @@ final class InstanceBuilder {
     try {
       return JNIBLAS.getInstance();
     } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + JNIBLAS.class.getName());
+      log.fine("Failed to load implementation from:" + JNIBLAS.class.getName());
       return null;
     }
   }
@@ -69,16 +84,15 @@ final class InstanceBuilder {
         log.finest("trying to return java 16 instance");
         return VectorBLAS.getInstance();
       } catch (Throwable t) {
-        log.warning("Failed to load implementation from:" + VectorBLAS.class.getName());
+        log.fine("Failed to load implementation from:" + VectorBLAS.class.getName());
       }
     }
     if (major >= 11) {
       log.finest("return java 11 instance");
       return Java11BLAS.getInstance();
-    } else {
-      log.finest("return java 8 instance");
-      return Java8BLAS.getInstance();
     }
+    log.finest("return java 8 instance");
+    return Java8BLAS.getInstance();
   }
 
   public static JavaBLAS javaBlas() {

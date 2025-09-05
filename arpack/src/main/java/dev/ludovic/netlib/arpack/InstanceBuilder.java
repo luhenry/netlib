@@ -38,7 +38,14 @@ final class InstanceBuilder {
   static {
     nativeArpack = initializeNative();
     javaArpack = initializeJava();
-    arpack = nativeArpack != null ? nativeArpack : javaArpack;
+
+    if (nativeArpack == null) {
+      log.info("Using JavaARPACK");
+      arpack = javaArpack;
+    } else {
+      log.info("Using native ARPACK");
+      arpack = nativeArpack;
+    }
   }
 
   public static ARPACK arpack() {
@@ -49,7 +56,7 @@ final class InstanceBuilder {
     try {
       return JNIARPACK.getInstance();
     } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + JNIARPACK.class.getName());
+      log.fine("Failed to load implementation from:" + JNIARPACK.class.getName());
       return null;
     }
   }

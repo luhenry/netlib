@@ -38,7 +38,14 @@ final class InstanceBuilder {
   static {
     nativeLapack = initializeNative();
     javaLapack = initializeJava();
-    lapack = nativeLapack != null ? nativeLapack : javaLapack;
+
+    if (nativeLapack == null) {
+      log.info("Using JavaLAPACK");
+      lapack = javaLapack;
+    } else {
+      log.info("Using native LAPACK");
+      lapack = nativeLapack;
+    }
   }
 
   public static LAPACK lapack() {
@@ -49,14 +56,14 @@ final class InstanceBuilder {
     try {
       return JNILAPACK.getInstance();
     } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + JNILAPACK.class.getName());
+      log.fine("Failed to load implementation from:" + JNILAPACK.class.getName());
       return null;
     }
   }
 
   public static NativeLAPACK nativeLapack() {
     if (nativeLapack == null) {
-      throw new RuntimeException("Unable to load native implementation");
+      throw new RuntimeException("Unable to load native LAPACK implementation");
     }
     return nativeLapack;
   }
