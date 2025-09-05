@@ -57,7 +57,7 @@ final class InstanceBuilder {
     try {
       return JNIARPACK.getInstance();
     } catch (Throwable t) {
-        log.log(Level.FINE, "Failed to load implementation from:" + JNIARPACK.class.getName(), t);
+      log.log(Level.FINE, "Failed to load implementation from:" + JNIARPACK.class.getName(), t);
       return null;
     }
   }
