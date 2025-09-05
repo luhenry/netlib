@@ -26,6 +26,7 @@
 package dev.ludovic.netlib.lapack;
 
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,10 +56,11 @@ final class JNILAPACK extends AbstractLAPACK implements NativeLAPACK {
                   StandardCopyOption.REPLACE_EXISTING);
       temp.toFile().deleteOnExit();
     } catch (IOException e) {
-      throw new RuntimeException("Unable to load native implementation", e);
+      throw new UncheckedIOException("Unable to load native implementation", e);
     }
 
-    System.load(temp.toString());}
+    System.load(temp.toString());
+  }
 
   public static NativeLAPACK getInstance() {
     return instance;
