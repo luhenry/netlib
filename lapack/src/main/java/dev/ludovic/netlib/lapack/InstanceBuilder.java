@@ -25,6 +25,7 @@
 
 package dev.ludovic.netlib.lapack;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 final class InstanceBuilder {
@@ -56,7 +57,7 @@ final class InstanceBuilder {
     try {
       return JNILAPACK.getInstance();
     } catch (Throwable t) {
-      log.fine("Failed to load implementation from:" + JNILAPACK.class.getName(), t);
+      log.log(Level.FINE, "Failed to load implementation from:" + JNILAPACK.class.getName(), t);
       return null;
     }
   }
