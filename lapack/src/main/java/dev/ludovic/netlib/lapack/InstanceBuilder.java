@@ -25,6 +25,7 @@
 
 package dev.ludovic.netlib.lapack;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 final class InstanceBuilder {
@@ -39,6 +40,8 @@ final class InstanceBuilder {
     nativeLapack = initializeNative();
     javaLapack = initializeJava();
     lapack = nativeLapack != null ? nativeLapack : javaLapack;
+
+    log.info("Using " + lapack.getClass().getName());
   }
 
   public static LAPACK lapack() {
@@ -49,14 +52,14 @@ final class InstanceBuilder {
     try {
       return JNILAPACK.getInstance();
     } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + JNILAPACK.class.getName());
+      log.log(Level.FINE, "Failed to load implementation from:" + JNILAPACK.class.getName(), t);
       return null;
     }
   }
 
   public static NativeLAPACK nativeLapack() {
     if (nativeLapack == null) {
-      throw new RuntimeException("Unable to load native implementation");
+      throw new RuntimeException("Unable to load native LAPACK implementation");
     }
     return nativeLapack;
   }

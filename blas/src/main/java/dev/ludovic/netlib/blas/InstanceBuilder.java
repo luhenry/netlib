@@ -25,6 +25,7 @@
 
 package dev.ludovic.netlib.blas;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 final class InstanceBuilder {
@@ -39,6 +40,8 @@ final class InstanceBuilder {
     nativeBlas = initializeNative();
     javaBlas = initializeJava();
     blas = nativeBlas != null ? nativeBlas : javaBlas;
+
+    log.info("Using " + blas.getClass().getName());
   }
 
   public static BLAS blas() {
@@ -49,7 +52,7 @@ final class InstanceBuilder {
     try {
       return JNIBLAS.getInstance();
     } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + JNIBLAS.class.getName());
+      log.log(Level.FINE, "Failed to load implementation from:" + JNIBLAS.class.getName(), t);
       return null;
     }
   }
@@ -69,16 +72,15 @@ final class InstanceBuilder {
         log.finest("trying to return java 16 instance");
         return VectorBLAS.getInstance();
       } catch (Throwable t) {
-        log.warning("Failed to load implementation from:" + VectorBLAS.class.getName());
+        log.log(Level.FINE, "Failed to load implementation from:" + VectorBLAS.class.getName(), t);
       }
     }
     if (major >= 11) {
       log.finest("return java 11 instance");
       return Java11BLAS.getInstance();
-    } else {
-      log.finest("return java 8 instance");
-      return Java8BLAS.getInstance();
     }
+    log.finest("return java 8 instance");
+    return Java8BLAS.getInstance();
   }
 
   public static JavaBLAS javaBlas() {

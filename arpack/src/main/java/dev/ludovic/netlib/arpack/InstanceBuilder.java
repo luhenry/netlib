@@ -25,6 +25,7 @@
 
 package dev.ludovic.netlib.arpack;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 final class InstanceBuilder {
@@ -39,6 +40,8 @@ final class InstanceBuilder {
     nativeArpack = initializeNative();
     javaArpack = initializeJava();
     arpack = nativeArpack != null ? nativeArpack : javaArpack;
+
+    log.info("Using " + arpack.getClass().getName());
   }
 
   public static ARPACK arpack() {
@@ -49,7 +52,7 @@ final class InstanceBuilder {
     try {
       return JNIARPACK.getInstance();
     } catch (Throwable t) {
-      log.warning("Failed to load implementation from:" + JNIARPACK.class.getName());
+      log.log(Level.FINE, "Failed to load implementation from:" + JNIARPACK.class.getName(), t);
       return null;
     }
   }
