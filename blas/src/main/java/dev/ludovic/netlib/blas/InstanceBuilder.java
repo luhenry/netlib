@@ -39,22 +39,9 @@ final class InstanceBuilder {
   static {
     nativeBlas = initializeNative();
     javaBlas = initializeJava();
+    blas = nativeBlas != null ? nativeBlas : javaBlas;
 
-    if (nativeBlas == null) {
-      if (javaBlas instanceof VectorBLAS) {
-        log.info("Using JavaBLAS, with features requiring at least Java 16 and the incubating Vector API");
-      } else if (javaBlas instanceof Java11BLAS) {
-        log.info("Using JavaBLAS, with features requiring at least Java 11");
-      } else if (javaBlas instanceof Java8BLAS) {
-        log.info("Using JavaBLAS, with features requiring at least Java 8");
-      } else {
-        log.info("Using JavaBLAS");
-      }
-      blas = javaBlas;
-    } else {
-      log.info("Using native BLAS");
-      blas = nativeBlas;
-    }
+    log.info("Using " + blas.getClass().getName());
   }
 
   public static BLAS blas() {

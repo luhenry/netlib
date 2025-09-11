@@ -39,14 +39,9 @@ final class InstanceBuilder {
   static {
     nativeArpack = initializeNative();
     javaArpack = initializeJava();
+    arpack = nativeArpack != null ? nativeArpack : javaArpack;
 
-    if (nativeArpack == null) {
-      log.info("Using JavaARPACK");
-      arpack = javaArpack;
-    } else {
-      log.info("Using native ARPACK");
-      arpack = nativeArpack;
-    }
+    log.info("Using " + arpack.getClass().getName());
   }
 
   public static ARPACK arpack() {

@@ -39,14 +39,9 @@ final class InstanceBuilder {
   static {
     nativeLapack = initializeNative();
     javaLapack = initializeJava();
+    lapack = nativeLapack != null ? nativeLapack : javaLapack;
 
-    if (nativeLapack == null) {
-      log.info("Using JavaLAPACK");
-      lapack = javaLapack;
-    } else {
-      log.info("Using native LAPACK");
-      lapack = nativeLapack;
-    }
+    log.info("Using " + lapack.getClass().getName());
   }
 
   public static LAPACK lapack() {
