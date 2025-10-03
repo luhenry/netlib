@@ -32,13 +32,13 @@ information or have any questions.
   <parent>
     <groupId>dev.ludovic.netlib</groupId>
     <artifactId>parent</artifactId>
-    <version>3-SNAPSHOT</version>
+    <version>3.0.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>dev.ludovic.netlib</groupId>
   <artifactId>lapack</artifactId>
-  <version>3-SNAPSHOT</version>
+  <version>3.0.5</version>
   <packaging>jar</packaging>
 
   <properties>
