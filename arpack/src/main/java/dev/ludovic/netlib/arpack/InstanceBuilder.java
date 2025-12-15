@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 
 final class InstanceBuilder {
 
+  public static final String ALLOW_NATIVE_ARPACK = "dev.ludovic.netlib.arpack.allowNative";
+
   private static final Logger log = Logger.getLogger(InstanceBuilder.class.getName());
 
   private static final ARPACK arpack;
@@ -37,7 +39,14 @@ final class InstanceBuilder {
   private static final JavaARPACK javaArpack;
 
   static {
-    nativeArpack = initializeNative();
+    String allowNativeArpack = System.getProperty(ALLOW_NATIVE_ARPACK, "true");
+    if (Boolean.parseBoolean(allowNativeArpack)) {
+      nativeArpack = initializeNative();
+    } else {
+      log.info("Skip trying to load native BLAS implementation because system property " +
+              ALLOW_NATIVE_ARPACK + " is " + allowNativeArpack);
+      nativeArpack = null;
+    }
     javaArpack = initializeJava();
     arpack = nativeArpack != null ? nativeArpack : javaArpack;
 

@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 
 final class InstanceBuilder {
 
+  public static final String ALLOW_NATIVE_LAPACK = "dev.ludovic.netlib.lapack.allowNative";
+
   private static final Logger log = Logger.getLogger(InstanceBuilder.class.getName());
 
   private static final LAPACK lapack;
@@ -37,7 +39,14 @@ final class InstanceBuilder {
   private static final JavaLAPACK javaLapack;
 
   static {
-    nativeLapack = initializeNative();
+    String allowNativeLapack = System.getProperty(ALLOW_NATIVE_LAPACK, "true");
+    if (Boolean.parseBoolean(allowNativeLapack)) {
+      nativeLapack = initializeNative();
+    } else {
+      log.info("Skip trying to load native LAPACK implementation because system property " +
+              ALLOW_NATIVE_LAPACK + " is " + allowNativeLapack);
+      nativeLapack = null;
+    }
     javaLapack = initializeJava();
     lapack = nativeLapack != null ? nativeLapack : javaLapack;
 
@@ -52,7 +61,7 @@ final class InstanceBuilder {
     try {
       return JNILAPACK.getInstance();
     } catch (Throwable t) {
-      log.log(Level.FINE, "Failed to load implementation from:" + JNILAPACK.class.getName(), t);
+      log.log(Level.FINE, "Failed to load implementation from: " + JNILAPACK.class.getName(), t);
       return null;
     }
   }
