@@ -27,6 +27,8 @@ package dev.ludovic.netlib.lapack;
 
 public interface LAPACK {
 
+  public static final String ALLOW_NATIVE_LAPACK = "dev.ludovic.netlib.lapack.allowNative";
+
   public static LAPACK getInstance() {
     return InstanceBuilder.lapack();
   }

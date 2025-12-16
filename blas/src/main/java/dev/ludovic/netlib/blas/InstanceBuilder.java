@@ -30,8 +30,6 @@ import java.util.logging.Logger;
 
 final class InstanceBuilder {
 
-  public static final String ALLOW_NATIVE_BLAS = "dev.ludovic.netlib.blas.allowNative";
-
   private static final Logger log = Logger.getLogger(InstanceBuilder.class.getName());
 
   private static final BLAS blas;
@@ -39,12 +37,12 @@ final class InstanceBuilder {
   private static final JavaBLAS javaBlas;
 
   static {
-    String allowNativeBlas = System.getProperty(ALLOW_NATIVE_BLAS, "true");
+    String allowNativeBlas = System.getProperty(BLAS.ALLOW_NATIVE_BLAS, "true");
     if (Boolean.parseBoolean(allowNativeBlas)) {
       nativeBlas = initializeNative();
     } else {
       log.info("Skip trying to load native BLAS implementation because system property " +
-              ALLOW_NATIVE_BLAS + " is " + allowNativeBlas);
+              BLAS.ALLOW_NATIVE_BLAS + " is " + allowNativeBlas);
       nativeBlas = null;
     }
     javaBlas = initializeJava();
