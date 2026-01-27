@@ -27,6 +27,8 @@ package dev.ludovic.netlib.arpack;
 
 public interface ARPACK {
 
+  public static final String ALLOW_NATIVE_ARPACK = "dev.ludovic.netlib.arpack.allowNative";
+
   public static ARPACK getInstance() {
     return InstanceBuilder.arpack();
   }

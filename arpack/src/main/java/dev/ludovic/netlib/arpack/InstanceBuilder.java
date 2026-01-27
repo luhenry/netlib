@@ -37,7 +37,14 @@ final class InstanceBuilder {
   private static final JavaARPACK javaArpack;
 
   static {
-    nativeArpack = initializeNative();
+    String allowNativeArpack = System.getProperty(ARPACK.ALLOW_NATIVE_ARPACK, "true");
+    if (Boolean.parseBoolean(allowNativeArpack)) {
+      nativeArpack = initializeNative();
+    } else {
+      log.info("Skip trying to load native BLAS implementation because system property " +
+              ARPACK.ALLOW_NATIVE_ARPACK + " is " + allowNativeArpack);
+      nativeArpack = null;
+    }
     javaArpack = initializeJava();
     arpack = nativeArpack != null ? nativeArpack : javaArpack;
 
@@ -52,7 +59,7 @@ final class InstanceBuilder {
     try {
       return JNIARPACK.getInstance();
     } catch (Throwable t) {
-      log.log(Level.FINE, "Failed to load implementation from:" + JNIARPACK.class.getName(), t);
+      log.log(Level.FINE, "Failed to load implementation from: " + JNIARPACK.class.getName(), t);
       return null;
     }
   }

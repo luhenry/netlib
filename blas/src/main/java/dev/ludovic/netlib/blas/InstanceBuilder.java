@@ -37,7 +37,14 @@ final class InstanceBuilder {
   private static final JavaBLAS javaBlas;
 
   static {
-    nativeBlas = initializeNative();
+    String allowNativeBlas = System.getProperty(BLAS.ALLOW_NATIVE_BLAS, "true");
+    if (Boolean.parseBoolean(allowNativeBlas)) {
+      nativeBlas = initializeNative();
+    } else {
+      log.info("Skip trying to load native BLAS implementation because system property " +
+              BLAS.ALLOW_NATIVE_BLAS + " is " + allowNativeBlas);
+      nativeBlas = null;
+    }
     javaBlas = initializeJava();
     blas = nativeBlas != null ? nativeBlas : javaBlas;
 
@@ -52,7 +59,7 @@ final class InstanceBuilder {
     try {
       return JNIBLAS.getInstance();
     } catch (Throwable t) {
-      log.log(Level.FINE, "Failed to load implementation from:" + JNIBLAS.class.getName(), t);
+      log.log(Level.FINE, "Failed to load implementation from: " + JNIBLAS.class.getName(), t);
       return null;
     }
   }

@@ -27,6 +27,8 @@ package dev.ludovic.netlib.blas;
 
 public interface BLAS {
 
+  public static final String ALLOW_NATIVE_BLAS = "dev.ludovic.netlib.blas.allowNative";
+
   public static BLAS getInstance() {
     return InstanceBuilder.blas();
   }
