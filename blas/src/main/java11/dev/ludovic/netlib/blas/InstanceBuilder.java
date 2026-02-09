@@ -72,8 +72,8 @@ final class InstanceBuilder {
   }
 
   private static JavaBLAS initializeJava() {
-    log.finest("return java 8 instance");
-    return Java8BLAS.getInstance();
+    log.finest("return java 11 instance");
+    return Java11BLAS.getInstance();
   }
 
   public static JavaBLAS javaBlas() {

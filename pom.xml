@@ -150,6 +150,11 @@ information or have any questions.
             <goals>
               <goal>report</goal>
             </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/META-INF/versions/**</exclude>
+              </excludes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -183,6 +188,41 @@ information or have any questions.
               <arg>-h</arg><arg>${project.build.directory}/include</arg>
             </compilerArgs>
           </configuration>
+          <executions>
+            <!-- Compile Java 11 specific sources -->
+            <execution>
+              <id>compile-java11</id>
+              <phase>compile</phase>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+              <configuration>
+                <release>11</release>
+                <compileSourceRoots>
+                  <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+                </compileSourceRoots>
+                <outputDirectory>${project.build.outputDirectory}/META-INF/versions/11</outputDirectory>
+              </configuration>
+            </execution>
+            <!-- Compile Java 16 specific sources -->
+            <execution>
+              <id>compile-java16</id>
+              <phase>compile</phase>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+              <configuration>
+                <release>16</release>
+                <compileSourceRoots>
+                  <compileSourceRoot>${project.basedir}/src/main/java16</compileSourceRoot>
+                </compileSourceRoots>
+                <compilerArgs>
+                  <arg>--add-modules=jdk.incubator.vector</arg>
+                </compilerArgs>
+                <outputDirectory>${project.build.outputDirectory}/META-INF/versions/16</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
@@ -199,6 +239,7 @@ information or have any questions.
             <archive>
               <manifestEntries>
                 <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+                <Multi-Release>true</Multi-Release>
               </manifestEntries>
             </archive>
           </configuration>

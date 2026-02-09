@@ -36,7 +36,7 @@ jobs:
         java-version: 17
         distribution: temurin
     - name: Build
-      run: mvn --batch-mode compile test-compile
+      run: mvn --batch-mode compile test-compile jar:jar
     # Test with JDK ${{ matrix.jdk }}
     - name: Set up JDK ${{ matrix.jdk }}
       uses: actions/setup-java@v4
@@ -44,7 +44,7 @@ jobs:
         java-version: ${{ matrix.jdk }}
         distribution: temurin
     - name: Test
-      run: mvn --batch-mode --projects blas,lapack,arpack surefire:test
+      run: mvn --batch-mode --projects blas,lapack,arpack surefire:test failsafe:integration-test failsafe:verify
 
   release:
     name: Release

@@ -72,8 +72,14 @@ final class InstanceBuilder {
   }
 
   private static JavaBLAS initializeJava() {
-    log.finest("return java 8 instance");
-    return Java8BLAS.getInstance();
+    try {
+      log.finest("trying to return java 16 instance");
+      return VectorBLAS.getInstance();
+    } catch (Throwable t) {
+      log.log(Level.FINE, "Failed to load implementation from:" + VectorBLAS.class.getName(), t);
+      log.finest("fallback to java 11 instance");
+      return Java11BLAS.getInstance();
+    }
   }
 
   public static JavaBLAS javaBlas() {
