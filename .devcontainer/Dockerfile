@@ -1,38 +1,48 @@
-# See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.177.0/containers/java/.devcontainer/base.Dockerfile
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
-# [Choice] Java version: 11, 15
-ARG VARIANT="15"
-FROM mcr.microsoft.com/vscode/devcontainers/java:0-${VARIANT}
+# Avoid prompts from apt
+ENV DEBIAN_FRONTEND=noninteractive
 
-# [Option] Install Maven
-ARG INSTALL_MAVEN="false"
-ARG MAVEN_VERSION=""
-# [Option] Install Gradle
-ARG INSTALL_GRADLE="false"
-ARG GRADLE_VERSION=""
-RUN if [ "${INSTALL_MAVEN}" = "true" ]; then su vscode -c "umask 0002 && . /usr/local/sdkman/bin/sdkman-init.sh && sdk install maven \"${MAVEN_VERSION}\""; fi \
-    && if [ "${INSTALL_GRADLE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/local/sdkman/bin/sdkman-init.sh && sdk install gradle \"${GRADLE_VERSION}\""; fi
+# Install cross-compilers and scientific libraries
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc-aarch64-linux-gnu libc6-dev-arm64-cross \
+    gcc-riscv64-linux-gnu libc6-dev-riscv64-cross \
+    gcc-x86-64-linux-gnu libc6-dev-amd64-cross \
+    libopenblas-dev \
+    liblapack-dev \
+    libarpack2-dev \
+ && rm -rf /var/lib/apt/lists/*
 
-# [Option] Install Node.js
-ARG INSTALL_NODE="true"
-ARG NODE_VERSION="lts/*"
-RUN if [ "${INSTALL_NODE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
+# Install multiple Java versions from Adoptium (Eclipse Temurin)
+RUN bash -eux -o pipefail <<EOF
+    ARCH=\$(dpkg --print-architecture)
+    if [ "\$ARCH" = "amd64" ]; then
+        ADOPTIUM_ARCH=x64;
+    elif [ "\$ARCH" = "arm64" ]; then
+        ADOPTIUM_ARCH=aarch64;
+    else
+        echo "Unsupported architecture: \$ARCH" && exit 1;
+    fi
+    for VERSION in 8 11 17 21 25; do
+        mkdir -p /usr/lib/jvm/temurin-\${VERSION}-jdk-\${ARCH};
+        wget -O - "https://api.adoptium.net/v3/binary/latest/\${VERSION}/ga/linux/\${ADOPTIUM_ARCH}/jdk/hotspot/normal/eclipse?project=jdk" --progress=dot:giga \
+            | tar -xzf - --strip-components=1 -C /usr/lib/jvm/temurin-\${VERSION}-jdk-\${ARCH};
+    done
+EOF
 
-COPY --from=openjdk:8-jdk-buster /usr/local/openjdk-8 /usr/local/openjdk-8
-COPY --from=openjdk:11-jdk-buster /usr/local/openjdk-11 /usr/local/openjdk-11
-COPY --from=openjdk:17-jdk-buster /usr/local/openjdk-17 /usr/local/openjdk-17
-
-ENV JAVA_HOME="/usr/local/openjdk-17"
+# Set Java 25 as default
+RUN ARCH=$(dpkg --print-architecture) \
+ && ln -sf /usr/lib/jvm/temurin-25-jdk-${ARCH} /usr/lib/jvm/default-java
+ENV JAVA_HOME=/usr/lib/jvm/default-java
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-# [Optional] Uncomment this section to install additional OS packages.
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install \
-        libopenblas-dev libarpack2-dev gdb vim build-essential gcc-x86-64-linux-gnu gcc-aarch64-linux-gnu
+# Install Maven
+ARG MAVEN_VERSION=3.9.6
+RUN mkdir -p /opt/apache-maven-${MAVEN_VERSION} \
+ && wget -O - https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz --progress=dot:giga \
+        | tar -xzf - --strip-components=1 -C /opt/apache-maven-${MAVEN_VERSION}
 
-RUN git config --global user.email "git@ludovic.dev" \
- && git config --global user.name "Ludovic Henry" \
- && git config --global core.editor "vim"
-
-# [Optional] Uncomment this line to install global node packages.
-# RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
+ENV MAVEN_HOME=/opt/apache-maven-${MAVEN_VERSION}
+ENV PATH="${MAVEN_HOME}/bin:${PATH}"
