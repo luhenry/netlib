@@ -84,6 +84,114 @@ information or have any questions.
         <argLine>${jvm.modules}</argLine>
       </properties>
     </profile>
+    <profile>
+      <id>linux-native</id>
+      <activation>
+        <os>
+          <name>Linux</name>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>compile</phase>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                  <configuration>
+                    <target>
+                      <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                        <arg line="INPUTS='jni.c'"/>
+                        <arg line="OUTPUT='${project.build.directory}/native/Linux-amd64/libnetlib${project.artifactId}jni.so'"/>
+                        <arg line="OBJDIR='${project.build.directory}/objs/Linux-amd64'"/>
+                        <arg line="CC='x86_64-linux-gnu-gcc'"/>
+                        <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
+                        <arg line="LD='x86_64-linux-gnu-gcc'"/>
+                        <arg line="LDFLAGS='-shared'"/>
+                        <arg line="all"/>
+                      </exec>
+                      <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                        <arg line="INPUTS='jni.c'"/>
+                        <arg line="OUTPUT='${project.build.directory}/native/Linux-aarch64/libnetlib${project.artifactId}jni.so'"/>
+                        <arg line="OBJDIR='${project.build.directory}/objs/Linux-aarch64'"/>
+                        <arg line="CC='aarch64-linux-gnu-gcc'"/>
+                        <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
+                        <arg line="LD='aarch64-linux-gnu-gcc'"/>
+                        <arg line="LDFLAGS='-shared'"/>
+                        <arg line="all"/>
+                      </exec>
+                      <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                        <arg line="INPUTS='jni.c'"/>
+                        <arg line="OUTPUT='${project.build.directory}/native/Linux-riscv64/libnetlib${project.artifactId}jni.so'"/>
+                        <arg line="OBJDIR='${project.build.directory}/objs/Linux-riscv64'"/>
+                        <arg line="CC='riscv64-linux-gnu-gcc'"/>
+                        <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
+                        <arg line="LD='riscv64-linux-gnu-gcc'"/>
+                        <arg line="LDFLAGS='-shared'"/>
+                        <arg line="all"/>
+                      </exec>
+                    </target>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>macos-native</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>compile</phase>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                  <configuration>
+                    <target>
+                      <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                        <arg line="INPUTS='jni.c'"/>
+                        <arg line="OUTPUT='${project.build.directory}/native/macos-aarch64/libnetlib${project.artifactId}jni.dylib'"/>
+                        <arg line="OBJDIR='${project.build.directory}/objs/macos-aarch64'"/>
+                        <arg line="CC='clang'"/>
+                        <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -arch arm64 -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin'"/>
+                        <arg line="LD='clang'"/>
+                        <arg line="LDFLAGS='-dynamiclib -arch arm64'"/>
+                        <arg line="all"/>
+                      </exec>
+                      <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                        <arg line="INPUTS='jni.c'"/>
+                        <arg line="OUTPUT='${project.build.directory}/native/macos-x86_64/libnetlib${project.artifactId}jni.dylib'"/>
+                        <arg line="OBJDIR='${project.build.directory}/objs/macos-x86_64'"/>
+                        <arg line="CC='clang'"/>
+                        <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -arch x86_64 -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin'"/>
+                        <arg line="LD='clang'"/>
+                        <arg line="LDFLAGS='-dynamiclib -arch x86_64'"/>
+                        <arg line="all"/>
+                      </exec>
+                    </target>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
   </profiles>
 
   <build>
@@ -137,7 +245,7 @@ information or have any questions.
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.6</version>
+        <version>0.8.14</version>
         <executions>
           <execution>
             <goals>
@@ -228,8 +336,21 @@ information or have any questions.
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.5.3</version>
+          <dependencies>
+            <dependency>
+              <groupId>me.fabriciorby</groupId>
+              <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
+              <version>1.5.1</version>
+            </dependency>
+          </dependencies>
           <configuration>
-              <reportFormat>plain</reportFormat>
+            <reportFormat>plain</reportFormat>
+            <systemPropertyVariables>
+              <java.util.logging.config.file>${project.build.testOutputDirectory}/logging.properties</java.util.logging.config.file>
+            </systemPropertyVariables>
+            <statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter">
+              <usePhrasedClassNameInTestCaseSummary>true</usePhrasedClassNameInTestCaseSummary>
+            </statelessTestsetInfoReporter>
           </configuration>
         </plugin>
         <plugin>
@@ -240,48 +361,6 @@ information or have any questions.
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
           <version>3.0.0</version>
-          <executions>
-            <execution>
-              <phase>compile</phase>
-              <goals>
-                <goal>run</goal>
-              </goals>
-              <configuration>
-                <target>
-                  <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
-                    <arg line="INPUTS='jni.c'"/>
-                    <arg line="OUTPUT='${project.build.directory}/native/Linux-amd64/libnetlib${project.artifactId}jni.so'"/>
-                    <arg line="OBJDIR='${project.build.directory}/objs/Linux-amd64'"/>
-                    <arg line="CC='x86_64-linux-gnu-gcc'"/>
-                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
-                    <arg line="LD='x86_64-linux-gnu-gcc'"/>
-                    <arg line="LDFLAGS='-shared'"/>
-                    <arg line="all"/>
-                  </exec>
-                  <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
-                    <arg line="INPUTS='jni.c'"/>
-                    <arg line="OUTPUT='${project.build.directory}/native/Linux-aarch64/libnetlib${project.artifactId}jni.so'"/>
-                    <arg line="OBJDIR='${project.build.directory}/objs/Linux-aarch64'"/>
-                    <arg line="CC='aarch64-linux-gnu-gcc'"/>
-                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
-                    <arg line="LD='aarch64-linux-gnu-gcc'"/>
-                    <arg line="LDFLAGS='-shared'"/>
-                    <arg line="all"/>
-                  </exec>
-                  <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
-                    <arg line="INPUTS='jni.c'"/>
-                    <arg line="OUTPUT='${project.build.directory}/native/Linux-riscv64/libnetlib${project.artifactId}jni.so'"/>
-                    <arg line="OBJDIR='${project.build.directory}/objs/Linux-riscv64'"/>
-                    <arg line="CC='riscv64-linux-gnu-gcc'"/>
-                    <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -fPIC -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux'"/>
-                    <arg line="LD='riscv64-linux-gnu-gcc'"/>
-                    <arg line="LDFLAGS='-shared'"/>
-                    <arg line="all"/>
-                  </exec>
-                </target>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>

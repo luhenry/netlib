@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
 
 public class LAPACKTest {
@@ -44,11 +45,11 @@ public class LAPACKTest {
 
   private static Stream<Arguments> LAPACKImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(LAPACK.getInstance()),
-      Arguments.of(NativeLAPACK.getInstance()),
-      Arguments.of(JavaLAPACK.getInstance()),
-      Arguments.of(F2jLAPACK.getInstance()),
-      Arguments.of(JNILAPACK.getInstance())
+      Arguments.of(Named.of("LAPACK", LAPACK.getInstance())),
+      Arguments.of(Named.of("NativeLAPACK", NativeLAPACK.getInstance())),
+      Arguments.of(Named.of("JavaLAPACK", JavaLAPACK.getInstance())),
+      Arguments.of(Named.of("F2jLAPACK", F2jLAPACK.getInstance())),
+      Arguments.of(Named.of("JNILAPACK", JNILAPACK.getInstance()))
     );
 
     return instances;

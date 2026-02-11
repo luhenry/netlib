@@ -32,8 +32,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.logging.Logger;
 
 final class JNIBLAS extends AbstractBLAS implements NativeBLAS {
+
+  private static final Logger log = Logger.getLogger(JNIBLAS.class.getName());
 
   private static final JNIBLAS instance = new JNIBLAS();
 
@@ -42,16 +45,25 @@ final class JNIBLAS extends AbstractBLAS implements NativeBLAS {
     if (osName == null || osName.isEmpty()) {
         throw new RuntimeException("Unable to load native implementation");
     }
+    if (osName.equals("Mac OS X")) {
+        osName = "macos";
+    }
     String osArch = System.getProperty("os.arch");
     if (osArch == null || osArch.isEmpty()) {
         throw new RuntimeException("Unable to load native implementation");
     }
 
+    String libPrefix = "libnetlibblasjni";
+    String libExtension = osName.equals("macos") ? ".dylib" : ".so";
+    String libName = libPrefix + libExtension;
+
+    log.fine(String.format("Trying to load native implementation from resource: resources/native/%s-%s/%s", osName, osArch, libName));
+
     Path temp;
     try (InputStream resource = this.getClass().getClassLoader().getResourceAsStream(
-            String.format("resources/native/%s-%s/libnetlibblasjni.so", osName, osArch))) {
+            String.format("resources/native/%s-%s/%s", osName, osArch, libName))) {
       assert resource != null;
-      Files.copy(resource, temp = Files.createTempFile("libnetlibblasjni.so", "",
+      Files.copy(resource, temp = Files.createTempFile(libPrefix, libExtension,
                                     PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-x---"))),
                   StandardCopyOption.REPLACE_EXISTING);
       temp.toFile().deleteOnExit();
