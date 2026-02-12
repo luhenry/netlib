@@ -42,16 +42,23 @@ final class JNIARPACK extends AbstractARPACK implements NativeARPACK {
     if (osName == null || osName.isEmpty()) {
         throw new RuntimeException("Unable to load native implementation");
     }
+    if (osName.equals("Mac OS X")) {
+        osName = "macos";
+    }
     String osArch = System.getProperty("os.arch");
     if (osArch == null || osArch.isEmpty()) {
         throw new RuntimeException("Unable to load native implementation");
     }
 
+    String libPrefix = "libnetlibarpackjni";
+    String libExtension = osName.equals("macos") ? ".dylib" : ".so";
+    String libName = libPrefix + libExtension;
+
     Path temp;
     try (InputStream resource = this.getClass().getClassLoader().getResourceAsStream(
-            String.format("resources/native/%s-%s/libnetlibarpackjni.so", osName, osArch))) {
+            String.format("resources/native/%s-%s/%s", osName, osArch, libName))) {
       assert resource != null;
-      Files.copy(resource, temp = Files.createTempFile("libnetlibarpackjni.so", "",
+      Files.copy(resource, temp = Files.createTempFile(libPrefix, libExtension,
                                     PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-x---"))),
                   StandardCopyOption.REPLACE_EXISTING);
       temp.toFile().deleteOnExit();

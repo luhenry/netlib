@@ -20,6 +20,8 @@ It supports all versions of Java 8+.
 
 The native libraries must be installed on the machine; `dev.ludovic.netlib` doesn't ship any native implementation.
 
+#### Linux
+
 For BLAS and LAPACK, you can install OpenBLAS. For example on Ubuntu:
 ```
 sudo apt-get install libopenblas-base
@@ -32,6 +34,17 @@ sudo apt-get install libarpack2
 
 To install Intel MKL, follow the instructions at https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html
 
+#### macOS
+
+For BLAS and LAPACK, macOS includes Apple's [Accelerate framework](https://developer.apple.com/documentation/accelerate) by default, which provides highly optimized implementations. No installation is required — `dev.ludovic.netlib` will automatically use Accelerate on macOS.
+
+For ARPACK, you can install it via Homebrew:
+```
+brew install arpack
+```
+
+**Note:** Accelerate is not available for ARPACK, so the Homebrew installation is required if you need native ARPACK support on macOS.
+
 ### Overriding the native implementations
 
 The native JNI wrappers dynamically load the native libraries ([OpenBLAS](https://github.com/xianyi/OpenBLAS) or [Intel MKL](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) for example). You can override which library is dynamically loaded through two system properties, checked in order:
@@ -39,11 +52,20 @@ The native JNI wrappers dynamically load the native libraries ([OpenBLAS](https:
 2. `nativeLib`: the filename of the library; it should be found on the dynamic loader search path (see the search order in [`man 8 ld.so`](https://linux.die.net/man/8/ld.so))
 
 For BLAS, LAPACK, and ARPACK, the system properties are the following:
+
+**Linux:**
 |   | `nativeLib` | `nativeLibPath` |
 | - | ----------- | --------------- |
-| BLAS | `-Ddev.ludovic.netlib.blas.nativeLib` set to `liblas.so.3` by default | `-Ddev.ludovic.netlib.blas.nativeLibPath` unset by default |
+| BLAS | `-Ddev.ludovic.netlib.blas.nativeLib` set to `libblas.so.3` by default | `-Ddev.ludovic.netlib.blas.nativeLibPath` unset by default |
 | LAPACK | `-Ddev.ludovic.netlib.lapack.nativeLib` set to `liblapack.so.3` by default | `-Ddev.ludovic.netlib.lapack.nativeLibPath` unset by default |
 | ARPACK | `-Ddev.ludovic.netlib.arpack.nativeLib` set to `libarpack.so.2` by default | `-Ddev.ludovic.netlib.arpack.nativeLibPath` unset by default |
+
+**macOS:**
+|   | `nativeLib` | `nativeLibPath` |
+| - | ----------- | --------------- |
+| BLAS | `-Ddev.ludovic.netlib.blas.nativeLib` set to `/System/Library/Frameworks/Accelerate.framework/Accelerate` by default | `-Ddev.ludovic.netlib.blas.nativeLibPath` unset by default |
+| LAPACK | `-Ddev.ludovic.netlib.lapack.nativeLib` set to `/System/Library/Frameworks/Accelerate.framework/Accelerate` by default | `-Ddev.ludovic.netlib.lapack.nativeLibPath` unset by default |
+| ARPACK | `-Ddev.ludovic.netlib.arpack.nativeLib` set to `/usr/local/lib/libarpack.dylib` on x86_64 and `/opt/homebrew/lib/libarpack.dylib` on aarch64 by default | `-Ddev.ludovic.netlib.arpack.nativeLibPath` unset by default |
 
 Here are some examples of overriding the loaded native library:
 - `-Ddev.ludovic.netlib.blas.nativeLibPath=/usr/lib/x86_64-linux-gnu/libopenblas.so` for [OpenBLAS](https://github.com/xianyi/OpenBLAS)

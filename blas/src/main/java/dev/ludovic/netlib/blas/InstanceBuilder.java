@@ -79,7 +79,7 @@ final class InstanceBuilder {
         log.finest("trying to return java 16 instance");
         return VectorBLAS.getInstance();
       } catch (Throwable t) {
-        log.log(Level.FINE, "Failed to load implementation from:" + VectorBLAS.class.getName(), t);
+        log.log(Level.FINE, "Failed to load implementation from: " + VectorBLAS.class.getName(), t);
       }
     }
     if (major >= 11) {

@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
 
 import dev.ludovic.netlib.arpack.ARPACK;
@@ -46,11 +47,11 @@ public class ARPACKTest {
 
   private static Stream<Arguments> ARPACKImplementations() {
     Stream instances = Stream.of(
-      Arguments.of(ARPACK.getInstance()),
-      Arguments.of(NativeARPACK.getInstance()),
-      Arguments.of(JavaARPACK.getInstance()),
-      Arguments.of(F2jARPACK.getInstance()),
-      Arguments.of(JNIARPACK.getInstance())
+      Arguments.of(Named.of("ARPACK", ARPACK.getInstance())),
+      Arguments.of(Named.of("NativeARPACK", NativeARPACK.getInstance())),
+      Arguments.of(Named.of("JavaARPACK", JavaARPACK.getInstance())),
+      Arguments.of(Named.of("F2jARPACK", F2jARPACK.getInstance())),
+      Arguments.of(Named.of("JNIARPACK", JNIARPACK.getInstance()))
     );
 
     return instances;

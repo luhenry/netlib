@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
 
 public class BLASTest {
@@ -44,28 +45,28 @@ public class BLASTest {
 
   private static Stream<Arguments> BLASImplementations() throws Throwable {
     Stream instances = Stream.of(
-      Arguments.of(BLAS.getInstance()),
-      Arguments.of(NativeBLAS.getInstance()),
-      Arguments.of(JavaBLAS.getInstance()),
-      Arguments.of(F2jBLAS.getInstance()),
-      Arguments.of(JNIBLAS.getInstance())
+      Arguments.of(Named.of("BLAS", BLAS.getInstance())),
+      Arguments.of(Named.of("NativeBLAS", NativeBLAS.getInstance())),
+      Arguments.of(Named.of("JavaBLAS", JavaBLAS.getInstance())),
+      Arguments.of(Named.of("F2jBLAS", F2jBLAS.getInstance())),
+      Arguments.of(Named.of("JNIBLAS", JNIBLAS.getInstance()))
     );
 
     String[] fullVersion = System.getProperty("java.version").split("[+.\\-]+", 3);
     int major = Integer.parseInt(fullVersion[0]) > 1 ? Integer.parseInt(fullVersion[0]) : Integer.parseInt(fullVersion[1]);
     if (major >= 8) {
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of(Java8BLAS.getInstance())
+        Arguments.of(Named.of("Java8BLAS", Java8BLAS.getInstance()))
       ));
     }
     if (major >= 11) {
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of(Java11BLAS.getInstance())
+        Arguments.of(Named.of("Java11BLAS", Java11BLAS.getInstance()))
       ));
     }
     if (major >= 16) {
       instances = Stream.concat(instances, Stream.of(
-        Arguments.of(VectorBLAS.getInstance())
+        Arguments.of(Named.of("VectorBLAS", VectorBLAS.getInstance()))
       ));
     }
 

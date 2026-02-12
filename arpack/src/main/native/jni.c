@@ -23,6 +23,7 @@
  * information or have any questions.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <dlfcn.h>
@@ -2182,7 +2183,7 @@ jboolean get_system_property(JNIEnv *env, jstring key, jstring def, jstring *res
 
 jboolean load_symbols(void) {
 #define LOAD_SYMBOL(name) \
-  name = dlsym(NULL, #name);
+  name = dlsym(RTLD_DEFAULT, #name);
 
   LOAD_SYMBOL(dmout_);
   LOAD_SYMBOL(smout_);
@@ -2252,60 +2253,84 @@ static void *libhandle;
 jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
   JNIEnv *env;
   if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_8) != JNI_OK) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: GetEnv failed\n");
     return -1;
   }
 
   jclass booleanW_class = (*env)->FindClass(env, "org/netlib/util/booleanW");
   if (!booleanW_class) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: FindClass org/netlib/util/booleanW failed\n");
     return -1;
   }
   booleanW_val_fieldID = (*env)->GetFieldID(env, booleanW_class, "val", "Z");
   if (!booleanW_val_fieldID) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: GetFieldID booleanW.val failed\n");
     return -1;
   }
 
   jclass intW_class = (*env)->FindClass(env, "org/netlib/util/intW");
   if (!intW_class) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: FindClass org/netlib/util/intW failed\n");
     return -1;
   }
   intW_val_fieldID = (*env)->GetFieldID(env, intW_class, "val", "I");
   if (!intW_val_fieldID) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: GetFieldID intW.val failed\n");
     return -1;
   }
 
   jclass floatW_class = (*env)->FindClass(env, "org/netlib/util/floatW");
   if (!floatW_class) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: FindClass org/netlib/util/floatW failed\n");
     return -1;
   }
   floatW_val_fieldID = (*env)->GetFieldID(env, floatW_class, "val", "F");
   if (!floatW_val_fieldID) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: GetFieldID floatW.val failed\n");
     return -1;
   }
 
   jclass doubleW_class = (*env)->FindClass(env, "org/netlib/util/doubleW");
   if (!doubleW_class) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: FindClass org/netlib/util/doubleW failed\n");
     return -1;
   }
   doubleW_val_fieldID = (*env)->GetFieldID(env, doubleW_class, "val", "D");
   if (!doubleW_val_fieldID) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: GetFieldID doubleW.val failed\n");
     return -1;
   }
 
   jclass StringW_class = (*env)->FindClass(env, "org/netlib/util/StringW");
   if (!StringW_class) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: FindClass org/netlib/util/StringW failed\n");
     return -1;
   }
   StringW_val_fieldID = (*env)->GetFieldID(env, StringW_class, "val", "Ljava/lang/String;");
   if (!StringW_val_fieldID) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: GetFieldID StringW.val failed\n");
     return -1;
   }
 
   jstring property_nativeLibPath;
   if (!get_system_property(env, (*env)->NewStringUTF(env, "dev.ludovic.netlib.arpack.nativeLibPath"), NULL, &property_nativeLibPath)) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: get_system_property nativeLibPath failed\n");
     return -1;
   }
   jstring property_nativeLib;
-  if (!get_system_property(env, (*env)->NewStringUTF(env, "dev.ludovic.netlib.arpack.nativeLib"), (*env)->NewStringUTF(env, "libarpack.so.2"), &property_nativeLib)) {
+#ifdef __APPLE__
+#if defined(__x86_64__)
+ static const char *default_native_lib = "/usr/local/lib/libarpack.dylib";
+#elif defined(__aarch64__)
+ static const char *default_native_lib = "/opt/homebrew/lib/libarpack.dylib";
+#else
+#error Unsupported darwin architecture
+#endif
+#else
+  static const char *default_native_lib = "libarpack.so.2";
+#endif
+  if (!get_system_property(env, (*env)->NewStringUTF(env, "dev.ludovic.netlib.arpack.nativeLib"), (*env)->NewStringUTF(env, default_native_lib), &property_nativeLib)) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: get_system_property nativeLib failed\n");
     return -1;
   }
 
@@ -2320,15 +2345,18 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
     (*env)->ReleaseStringUTFChars(env, property_nativeLib, utf);
   } else {
     /* either property_nativeLibPath or property_nativeLib should always be non-NULL */
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: no native library name resolved\n");
     return -1;
   }
 
   libhandle = dlopen(name, RTLD_LAZY | RTLD_GLOBAL);
   if (!libhandle) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: dlopen(%s) failed: %s\n", name, dlerror());
     return -1;
   }
 
   if (!load_symbols()) {
+    fprintf(stderr, "netlib-arpack: JNI_OnLoad: load_symbols failed\n");
     return -1;
   }
 
