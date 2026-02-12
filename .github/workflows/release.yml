@@ -32,9 +32,7 @@ jobs:
       with:
         name: macos-natives
         path: |
-          blas/target/native/macos-*/
-          lapack/target/native/macos-*/
-          arpack/target/native/macos-*/
+          */target/native/macos-*/
         if-no-files-found: error
 
   build-jar:
@@ -63,7 +61,7 @@ jobs:
         name: macos-natives
         path: .
     - name: Build
-      run: mvn --batch-mode compile test-compile process-classes jar:jar
+      run: mvn --batch-mode package -DskipTests
     - name: Log content of jar files
       run: |
         for module in blas lapack arpack; do
@@ -75,9 +73,7 @@ jobs:
       with:
         name: target-dir
         path: |
-          blas/target/
-          lapack/target/
-          arpack/target/
+          */target/
         if-no-files-found: error
 
   test-linux:
@@ -156,17 +152,11 @@ jobs:
       with:
         path: ~/.m2/repository
         key: m2
-    - name: Download JARs
+    - name: Download target folder
       uses: actions/download-artifact@v4
       with:
-        name: jars
+        name: target-dir
         path: .
-    - name: Log content of jar files
-      run: |
-        for module in blas lapack arpack; do
-          echo "=== Contents of ${module}/target/${module}-*.jar:"
-          jar tf ${module}/target/${module}-*.jar
-        done
     - name: Set up JDK 25
       uses: actions/setup-java@v4
       with: # running setup-java again overwrites the settings.xml
@@ -177,7 +167,7 @@ jobs:
         server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
     - name: Publish to Sonatype OSSRH
-      run: mvn --batch-mode -DskipTests deploy
+      run: mvn --batch-mode -DskipTests -Dmaven.main.skip -Dmaven.install.skip -Dmaven.antrun.skip=true deploy
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
