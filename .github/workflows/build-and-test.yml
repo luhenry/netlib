@@ -32,9 +32,7 @@ jobs:
       with:
         name: macos-natives
         path: |
-          blas/target/native/macos-*/
-          lapack/target/native/macos-*/
-          arpack/target/native/macos-*/
+          */target/native/macos-*/
         if-no-files-found: error
 
   build-jar:
@@ -63,7 +61,7 @@ jobs:
         name: macos-natives
         path: .
     - name: Build
-      run: mvn --batch-mode compile test-compile process-classes jar:jar
+      run: mvn --batch-mode package -DskipTests
     - name: Log content of jar files
       run: |
         for module in blas lapack arpack; do
@@ -75,9 +73,7 @@ jobs:
       with:
         name: target-dir
         path: |
-          blas/target/
-          lapack/target/
-          arpack/target/
+          */target/
         if-no-files-found: error
 
   test-linux:
