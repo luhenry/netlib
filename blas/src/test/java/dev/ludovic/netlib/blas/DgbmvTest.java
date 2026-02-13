@@ -35,6 +35,37 @@ public class DgbmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dYcopy;
+        int lda = KL + KU + 1;
+
+        // trans=N, alpha=1.0, beta=2.0
+        f2j.dgbmv("N", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dgbmv("N", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T, alpha=1.0, beta=2.0
+        f2j.dgbmv("T", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dgbmv("T", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=N, alpha=1.0, beta=0.0
+        f2j.dgbmv("N", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dgbmv("N", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T, alpha=1.0, beta=0.0
+        f2j.dgbmv("T", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dgbmv("T", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=N, alpha=0.0, beta=1.0
+        f2j.dgbmv("N", M, N, KL, KU, 0.0, dgbA, lda, dX, 1, 1.0, expected = dY.clone(), 1);
+        blas.dgbmv("N", M, N, KL, KU, 0.0, dgbA, lda, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T, alpha=0.0, beta=1.0
+        f2j.dgbmv("T", M, N, KL, KU, 0.0, dgbA, lda, dX, 1, 1.0, expected = dY.clone(), 1);
+        blas.dgbmv("T", M, N, KL, KU, 0.0, dgbA, lda, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
     }
 }

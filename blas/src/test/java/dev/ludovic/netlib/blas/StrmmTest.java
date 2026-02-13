@@ -35,6 +35,26 @@ public class StrmmTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, sgeBcopy;
+
+        // side=L, uplo=U, transa=N, diag=N
+        f2j.strmm("L", "U", "N", "N", M, N, 1.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strmm("L", "U", "N", "N", M, N, 1.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertArrayEquals(expected, sgeBcopy, sepsilon);
+
+        // side=L, uplo=L, transa=N, diag=N
+        f2j.strmm("L", "L", "N", "N", M, N, 1.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strmm("L", "L", "N", "N", M, N, 1.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertArrayEquals(expected, sgeBcopy, sepsilon);
+
+        // side=R, uplo=U, transa=N, diag=N
+        f2j.strmm("R", "U", "N", "N", M, N, 1.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strmm("R", "U", "N", "N", M, N, 1.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertArrayEquals(expected, sgeBcopy, sepsilon);
+
+        // side=L, uplo=U, transa=T, diag=N
+        f2j.strmm("L", "U", "T", "N", M, N, 1.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strmm("L", "U", "T", "N", M, N, 1.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertArrayEquals(expected, sgeBcopy, sepsilon);
     }
 }

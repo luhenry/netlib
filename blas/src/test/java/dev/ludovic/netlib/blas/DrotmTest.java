@@ -35,6 +35,34 @@ public class DrotmTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expectedX, expectedY, dXcopy, dYcopy;
+
+        // flag=-1.0: use full H matrix [[h11,h12],[h21,h22]]
+        double[] dparam1 = {-1.0, 1.0, 0.0, 0.0, 1.0};
+        f2j.drotm(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, dparam1);
+        blas.drotm(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, dparam1);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+
+        // flag=0.0: use H matrix [[1,h12],[h21,1]]
+        double[] dparam2 = {0.0, 0.0, -0.5, 0.5, 0.0};
+        f2j.drotm(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, dparam2);
+        blas.drotm(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, dparam2);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+
+        // flag=1.0: use H matrix [[h11,1],[-1,h22]]
+        double[] dparam3 = {1.0, 0.5, 0.0, 0.0, 0.5};
+        f2j.drotm(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, dparam3);
+        blas.drotm(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, dparam3);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+
+        // flag=-2.0: identity (no-op)
+        double[] dparam4 = {-2.0, 0.0, 0.0, 0.0, 0.0};
+        f2j.drotm(M, expectedX = dX.clone(), 1, expectedY = dY.clone(), 1, dparam4);
+        blas.drotm(M, dXcopy = dX.clone(), 1, dYcopy = dY.clone(), 1, dparam4);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
     }
 }

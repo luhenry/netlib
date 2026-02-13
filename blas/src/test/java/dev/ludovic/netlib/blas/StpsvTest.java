@@ -35,6 +35,26 @@ public class StpsvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, sXcopy;
+
+        // uplo=U, trans=N, diag=N
+        f2j.stpsv("U", "N", "N", M, sgeAU, expected = sX.clone(), 1);
+        blas.stpsv("U", "N", "N", M, sgeAU, sXcopy = sX.clone(), 1);
+        assertRelArrayEquals(expected, sXcopy, ssolveEpsilon);
+
+        // uplo=L, trans=N, diag=N
+        f2j.stpsv("L", "N", "N", M, sgeAL, expected = sX.clone(), 1);
+        blas.stpsv("L", "N", "N", M, sgeAL, sXcopy = sX.clone(), 1);
+        assertRelArrayEquals(expected, sXcopy, ssolveEpsilon);
+
+        // uplo=U, trans=T, diag=N
+        f2j.stpsv("U", "T", "N", M, sgeAU, expected = sX.clone(), 1);
+        blas.stpsv("U", "T", "N", M, sgeAU, sXcopy = sX.clone(), 1);
+        assertRelArrayEquals(expected, sXcopy, ssolveEpsilon);
+
+        // uplo=L, trans=T, diag=U
+        f2j.stpsv("L", "T", "U", M, sgeAL, expected = sX.clone(), 1);
+        blas.stpsv("L", "T", "U", M, sgeAL, sXcopy = sX.clone(), 1);
+        assertRelArrayEquals(expected, sXcopy, ssolveEpsilon);
     }
 }

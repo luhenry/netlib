@@ -35,6 +35,26 @@ public class DtrmmTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dgeBcopy;
+
+        // side=L, uplo=U, transa=N, diag=N
+        f2j.dtrmm("L", "U", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrmm("L", "U", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertArrayEquals(expected, dgeBcopy, depsilon);
+
+        // side=L, uplo=L, transa=N, diag=N
+        f2j.dtrmm("L", "L", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrmm("L", "L", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertArrayEquals(expected, dgeBcopy, depsilon);
+
+        // side=R, uplo=U, transa=N, diag=N
+        f2j.dtrmm("R", "U", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrmm("R", "U", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertArrayEquals(expected, dgeBcopy, depsilon);
+
+        // side=L, uplo=U, transa=T, diag=N
+        f2j.dtrmm("L", "U", "T", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrmm("L", "U", "T", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertArrayEquals(expected, dgeBcopy, depsilon);
     }
 }

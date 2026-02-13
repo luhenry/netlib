@@ -35,6 +35,26 @@ public class StrmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, sXcopy;
+
+        // uplo=U, trans=N, diag=N
+        f2j.strmv("U", "N", "N", M, ssyA, M, expected = sX.clone(), 1);
+        blas.strmv("U", "N", "N", M, ssyA, M, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=L, trans=N, diag=N
+        f2j.strmv("L", "N", "N", M, ssyA, M, expected = sX.clone(), 1);
+        blas.strmv("L", "N", "N", M, ssyA, M, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=U, trans=T, diag=N
+        f2j.strmv("U", "T", "N", M, ssyA, M, expected = sX.clone(), 1);
+        blas.strmv("U", "T", "N", M, ssyA, M, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=L, trans=T, diag=U
+        f2j.strmv("L", "T", "U", M, ssyA, M, expected = sX.clone(), 1);
+        blas.strmv("L", "T", "U", M, ssyA, M, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
     }
 }
