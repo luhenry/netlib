@@ -35,6 +35,21 @@ public class SpoequTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] s_expected = new float[N];
+        org.netlib.util.floatW scond_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW amax_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.spoequ(N, sPositiveDefiniteMatrix, 0, N, s_expected, 0, scond_expected, amax_expected, info_expected);
+
+        float[] s_actual = new float[N];
+        org.netlib.util.floatW scond_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW amax_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.spoequ(N, sPositiveDefiniteMatrix, 0, N, s_actual, 0, scond_actual, amax_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(s_expected, s_actual, sepsilon);
+        assertEquals(scond_expected.val, scond_actual.val, sepsilon);
+        assertEquals(amax_expected.val, amax_actual.val, sepsilon);
     }
 }

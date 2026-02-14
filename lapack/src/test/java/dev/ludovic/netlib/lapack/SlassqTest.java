@@ -35,6 +35,30 @@ public class SlassqTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "slassq not correctly implemented in " + lapack.getClass().getSimpleName());
+
+        org.netlib.util.floatW scale_expected = new org.netlib.util.floatW(1.0f);
+        org.netlib.util.floatW sumsq_expected = new org.netlib.util.floatW(0.0f);
+        f2j.slassq(N, sArray1, 0, 1, scale_expected, sumsq_expected);
+
+        org.netlib.util.floatW scale_actual = new org.netlib.util.floatW(1.0f);
+        org.netlib.util.floatW sumsq_actual = new org.netlib.util.floatW(0.0f);
+        lapack.slassq(N, sArray1, 0, 1, scale_actual, sumsq_actual);
+
+        assertEquals(scale_expected.val, scale_actual.val, sepsilon);
+        assertEquals(sumsq_expected.val, sumsq_actual.val, sepsilon);
+
+        // Test with non-unit increment
+        scale_expected.val = 1.0f;
+        sumsq_expected.val = 0.0f;
+        f2j.slassq(N / 2, sArray1, 0, 2, scale_expected, sumsq_expected);
+
+        scale_actual.val = 1.0f;
+        sumsq_actual.val = 0.0f;
+        lapack.slassq(N / 2, sArray1, 0, 2, scale_actual, sumsq_actual);
+
+        assertEquals(scale_expected.val, scale_actual.val, sepsilon);
+        assertEquals(sumsq_expected.val, sumsq_actual.val, sepsilon);
     }
 }

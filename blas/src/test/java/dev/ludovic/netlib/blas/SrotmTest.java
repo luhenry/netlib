@@ -35,6 +35,34 @@ public class SrotmTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expectedX, expectedY, sXcopy, sYcopy;
+
+        // flag=-1.0f: use full H matrix [[h11,h12],[h21,h22]]
+        float[] sparam1 = {-1.0f, 1.0f, 0.0f, 0.0f, 1.0f};
+        f2j.srotm(M, expectedX = sX.clone(), 1, expectedY = sY.clone(), 1, sparam1);
+        blas.srotm(M, sXcopy = sX.clone(), 1, sYcopy = sY.clone(), 1, sparam1);
+        assertArrayEquals(expectedX, sXcopy, sepsilon);
+        assertArrayEquals(expectedY, sYcopy, sepsilon);
+
+        // flag=0.0f: use H matrix [[1,h12],[h21,1]]
+        float[] sparam2 = {0.0f, 0.0f, -0.5f, 0.5f, 0.0f};
+        f2j.srotm(M, expectedX = sX.clone(), 1, expectedY = sY.clone(), 1, sparam2);
+        blas.srotm(M, sXcopy = sX.clone(), 1, sYcopy = sY.clone(), 1, sparam2);
+        assertArrayEquals(expectedX, sXcopy, sepsilon);
+        assertArrayEquals(expectedY, sYcopy, sepsilon);
+
+        // flag=1.0f: use H matrix [[h11,1],[-1,h22]]
+        float[] sparam3 = {1.0f, 0.5f, 0.0f, 0.0f, 0.5f};
+        f2j.srotm(M, expectedX = sX.clone(), 1, expectedY = sY.clone(), 1, sparam3);
+        blas.srotm(M, sXcopy = sX.clone(), 1, sYcopy = sY.clone(), 1, sparam3);
+        assertArrayEquals(expectedX, sXcopy, sepsilon);
+        assertArrayEquals(expectedY, sYcopy, sepsilon);
+
+        // flag=-2.0f: identity (no-op)
+        float[] sparam4 = {-2.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+        f2j.srotm(M, expectedX = sX.clone(), 1, expectedY = sY.clone(), 1, sparam4);
+        blas.srotm(M, sXcopy = sX.clone(), 1, sYcopy = sY.clone(), 1, sparam4);
+        assertArrayEquals(expectedX, sXcopy, sepsilon);
+        assertArrayEquals(expectedY, sYcopy, sepsilon);
     }
 }

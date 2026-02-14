@@ -35,6 +35,45 @@ public class SgtconTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create tridiagonal matrix
+        float[] dl = new float[N - 1];
+        float[] d = new float[N];
+        float[] du = new float[N - 1];
+
+        for (int i = 0; i < N; i++) {
+            d[i] = (i + 1) * 2.0f;
+        }
+        for (int i = 0; i < N - 1; i++) {
+            dl[i] = -(i + 1);
+            du[i] = (i + 1);
+        }
+
+        // Compute norm before factorization
+        float anorm = f2j.slangt("1", N, dl, 0, d, 0, du, 0);
+
+        // First factor the tridiagonal matrix using sgttrf
+        float[] dl_copy = dl.clone();
+        float[] d_copy = d.clone();
+        float[] du_copy = du.clone();
+        float[] du2 = new float[N - 2];
+        int[] ipiv = new int[N];
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        f2j.sgttrf(N, dl_copy, 0, d_copy, 0, du_copy, 0, du2, 0, ipiv, 0, info);
+
+        // Test condition number estimation
+        org.netlib.util.floatW rcond_expected = new org.netlib.util.floatW(0.0f);
+        float[] work_expected = new float[2 * N];
+        int[] iwork_expected = new int[N];
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.sgtcon("1", N, dl_copy, 0, d_copy, 0, du_copy, 0, du2, 0, ipiv, 0, anorm, rcond_expected, work_expected, 0, iwork_expected, 0, info_expected);
+
+        org.netlib.util.floatW rcond_actual = new org.netlib.util.floatW(0.0f);
+        float[] work_actual = new float[2 * N];
+        int[] iwork_actual = new int[N];
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.sgtcon("1", N, dl_copy, 0, d_copy, 0, du_copy, 0, du2, 0, ipiv, 0, anorm, rcond_actual, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(rcond_expected.val, rcond_actual.val, sepsilon);
     }
 }

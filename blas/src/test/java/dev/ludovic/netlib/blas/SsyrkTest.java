@@ -35,6 +35,43 @@ public class SsyrkTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, ssyAcopy;
+
+        // uplo=U, trans=N: C := alpha*A*A^T + beta*C, A is n x k (M x K), lda=M
+        f2j.ssyrk("U", "N", M, K, 1.0f, sgeA, M, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyrk("U", "N", M, K, 1.0f, sgeA, M, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        // uplo=L, trans=N
+        f2j.ssyrk("L", "N", M, K, 1.0f, sgeA, M, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyrk("L", "N", M, K, 1.0f, sgeA, M, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        // uplo=U, trans=T: C := alpha*A^T*A + beta*C, A is k x n (K x M), lda=K
+        f2j.ssyrk("U", "T", M, K, 1.0f, sgeAT, K, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyrk("U", "T", M, K, 1.0f, sgeAT, K, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        // uplo=L, trans=T
+        f2j.ssyrk("L", "T", M, K, 1.0f, sgeAT, K, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyrk("L", "T", M, K, 1.0f, sgeAT, K, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        // beta=0.0 cases
+        f2j.ssyrk("U", "N", M, K, 1.0f, sgeA, M, 0.0f, expected = ssyA.clone(), M);
+        blas.ssyrk("U", "N", M, K, 1.0f, sgeA, M, 0.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        f2j.ssyrk("L", "N", M, K, 1.0f, sgeA, M, 0.0f, expected = ssyA.clone(), M);
+        blas.ssyrk("L", "N", M, K, 1.0f, sgeA, M, 0.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        f2j.ssyrk("U", "T", M, K, 1.0f, sgeAT, K, 0.0f, expected = ssyA.clone(), M);
+        blas.ssyrk("U", "T", M, K, 1.0f, sgeAT, K, 0.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        f2j.ssyrk("L", "T", M, K, 1.0f, sgeAT, K, 0.0f, expected = ssyA.clone(), M);
+        blas.ssyrk("L", "T", M, K, 1.0f, sgeAT, K, 0.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
     }
 }

@@ -25,7 +25,6 @@
 
 package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +34,11 @@ public class SgetrfTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int[] ipiv = new int[N];
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        float[] a = sPositiveDefiniteMatrix.clone();
+        lapack.sgetrf(N, N, a, 0, N, ipiv, 0, info);
+
+        assertEquals(0, info.val, "LU factorization should succeed");
     }
 }

@@ -35,6 +35,8 @@ public class DstatsTest extends ARPACKTest {
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // dstats is a void method with no parameters - just verify it runs without error
+        assertDoesNotThrow(() -> f2j.dstats());
+        assertDoesNotThrow(() -> arpack.dstats());
     }
 }

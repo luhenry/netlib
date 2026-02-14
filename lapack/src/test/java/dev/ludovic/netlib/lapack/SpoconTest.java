@@ -35,6 +35,28 @@ public class SpoconTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // First factor the matrix using spotrf
+        float[] a = sPositiveDefiniteMatrix.clone();
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        f2j.spotrf("U", N, a, 0, N, info);
+
+        // Compute norm before factorization
+        float anorm = f2j.slansy("1", "U", N, sPositiveDefiniteMatrix, 0, N, new float[N], 0);
+
+        // Test condition number estimation
+        org.netlib.util.floatW rcond_expected = new org.netlib.util.floatW(0.0f);
+        float[] work_expected = new float[3 * N];
+        int[] iwork_expected = new int[N];
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.spocon("U", N, a, 0, N, anorm, rcond_expected, work_expected, 0, iwork_expected, 0, info_expected);
+
+        org.netlib.util.floatW rcond_actual = new org.netlib.util.floatW(0.0f);
+        float[] work_actual = new float[3 * N];
+        int[] iwork_actual = new int[N];
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.spocon("U", N, a, 0, N, anorm, rcond_actual, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(rcond_expected.val, rcond_actual.val, sepsilon);
     }
 }

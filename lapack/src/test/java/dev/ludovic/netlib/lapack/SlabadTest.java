@@ -35,6 +35,16 @@ public class SlabadTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test safe scaling bounds computation
+        org.netlib.util.floatW small_expected = new org.netlib.util.floatW(1e-10f);
+        org.netlib.util.floatW large_expected = new org.netlib.util.floatW(1e10f);
+        f2j.slabad(small_expected, large_expected);
+
+        org.netlib.util.floatW small_actual = new org.netlib.util.floatW(1e-10f);
+        org.netlib.util.floatW large_actual = new org.netlib.util.floatW(1e10f);
+        lapack.slabad(small_actual, large_actual);
+
+        assertEquals(small_expected.val, small_actual.val, sepsilon);
+        assertEquals(large_expected.val, large_actual.val, sepsilon);
     }
 }

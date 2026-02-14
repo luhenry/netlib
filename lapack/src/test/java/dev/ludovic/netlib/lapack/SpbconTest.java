@@ -35,6 +35,40 @@ public class SpbconTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create a positive definite banded matrix
+        int kd = 3;
+        int ldab = kd + 1;
+        float[] ab = new float[ldab * N];
+
+        // Fill banded storage format (upper triangular)
+        for (int j = 0; j < N; j++) {
+            for (int i = Math.max(0, j - kd); i <= j; i++) {
+                ab[kd + i - j + j * ldab] = sPositiveDefiniteMatrix[i + j * N];
+            }
+        }
+
+        // Compute norm before factorization
+        float anorm = f2j.slansb("1", "U", N, kd, ab, 0, ldab, new float[N], 0);
+
+        // First factor the banded matrix using spbtrf
+        float[] ab_factored = ab.clone();
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        f2j.spbtrf("U", N, kd, ab_factored, 0, ldab, info);
+
+        // Test condition number estimation
+        org.netlib.util.floatW rcond_expected = new org.netlib.util.floatW(0.0f);
+        float[] work_expected = new float[3 * N];
+        int[] iwork_expected = new int[N];
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.spbcon("U", N, kd, ab_factored, 0, ldab, anorm, rcond_expected, work_expected, 0, iwork_expected, 0, info_expected);
+
+        org.netlib.util.floatW rcond_actual = new org.netlib.util.floatW(0.0f);
+        float[] work_actual = new float[3 * N];
+        int[] iwork_actual = new int[N];
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.spbcon("U", N, kd, ab_factored, 0, ldab, anorm, rcond_actual, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(rcond_expected.val, rcond_actual.val, sepsilon);
     }
 }

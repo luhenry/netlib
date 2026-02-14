@@ -35,6 +35,26 @@ public class DtbmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dXcopy;
+
+        // uplo=U, trans=N, diag=N
+        f2j.dtbmv("U", "N", "N", M, KU, dtbAU, KU + 1, expected = dX.clone(), 1);
+        blas.dtbmv("U", "N", "N", M, KU, dtbAU, KU + 1, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        // uplo=L, trans=N, diag=N
+        f2j.dtbmv("L", "N", "N", M, KU, dtbAL, KU + 1, expected = dX.clone(), 1);
+        blas.dtbmv("L", "N", "N", M, KU, dtbAL, KU + 1, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        // uplo=U, trans=T, diag=N
+        f2j.dtbmv("U", "T", "N", M, KU, dtbAU, KU + 1, expected = dX.clone(), 1);
+        blas.dtbmv("U", "T", "N", M, KU, dtbAU, KU + 1, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        // uplo=L, trans=T, diag=U
+        f2j.dtbmv("L", "T", "U", M, KU, dtbAL, KU + 1, expected = dX.clone(), 1);
+        blas.dtbmv("L", "T", "U", M, KU, dtbAL, KU + 1, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
     }
 }

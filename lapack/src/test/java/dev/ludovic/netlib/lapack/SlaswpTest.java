@@ -35,6 +35,24 @@ public class SlaswpTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test row swapping with forward increment
+        int[] ipiv = new int[]{2, 1, 3};
+        float[] expected = sMatrix.clone();
+        f2j.slaswp(N, expected, 0, N, 1, 3, ipiv, 0, 1);
+
+        float[] actual = sMatrix.clone();
+        lapack.slaswp(N, actual, 0, N, 1, 3, ipiv, 0, 1);
+
+        assertArrayEquals(expected, actual, sepsilon);
+
+        // Test row swapping with backward increment
+        int[] ipiv2 = new int[]{3, 2, 1};
+        float[] expected_back = sMatrix.clone();
+        f2j.slaswp(N, expected_back, 0, N, 1, 3, ipiv2, 0, -1);
+
+        float[] actual_back = sMatrix.clone();
+        lapack.slaswp(N, actual_back, 0, N, 1, 3, ipiv2, 0, -1);
+
+        assertArrayEquals(expected_back, actual_back, sepsilon);
     }
 }

@@ -35,6 +35,31 @@ public class Slags2Test extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test computation of sine and cosine for generalized problem
+        org.netlib.util.booleanW upper = new org.netlib.util.booleanW(true);
+        org.netlib.util.floatW csu_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW snu_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW csv_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW snv_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW csq_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW snq_expected = new org.netlib.util.floatW(0.0f);
+
+        f2j.slags2(upper.val, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, csu_expected, snu_expected, csv_expected, snv_expected, csq_expected, snq_expected);
+
+        org.netlib.util.floatW csu_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW snu_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW csv_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW snv_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW csq_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW snq_actual = new org.netlib.util.floatW(0.0f);
+
+        lapack.slags2(upper.val, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, csu_actual, snu_actual, csv_actual, snv_actual, csq_actual, snq_actual);
+
+        assertEquals(csu_expected.val, csu_actual.val, sepsilon);
+        assertEquals(snu_expected.val, snu_actual.val, sepsilon);
+        assertEquals(csv_expected.val, csv_actual.val, sepsilon);
+        assertEquals(snv_expected.val, snv_actual.val, sepsilon);
+        assertEquals(csq_expected.val, csq_actual.val, sepsilon);
+        assertEquals(snq_expected.val, snq_actual.val, sepsilon);
     }
 }

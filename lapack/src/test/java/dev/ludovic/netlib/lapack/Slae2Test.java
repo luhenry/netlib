@@ -35,6 +35,24 @@ public class Slae2Test extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test 2x2 symmetric eigenvalue decomposition
+        // Matrix: [1.0, 2.0; 2.0, 3.0]
+        org.netlib.util.floatW rt1_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW rt2_expected = new org.netlib.util.floatW(0.0f);
+        f2j.slae2(1.0f, 2.0f, 3.0f, rt1_expected, rt2_expected);
+
+        org.netlib.util.floatW rt1_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW rt2_actual = new org.netlib.util.floatW(0.0f);
+        lapack.slae2(1.0f, 2.0f, 3.0f, rt1_actual, rt2_actual);
+
+        assertEquals(rt1_expected.val, rt1_actual.val, sepsilon);
+        assertEquals(rt2_expected.val, rt2_actual.val, sepsilon);
+
+        // Test with diagonal matrix
+        f2j.slae2(5.0f, 0.0f, 2.0f, rt1_expected, rt2_expected);
+        lapack.slae2(5.0f, 0.0f, 2.0f, rt1_actual, rt2_actual);
+
+        assertEquals(rt1_expected.val, rt1_actual.val, sepsilon);
+        assertEquals(rt2_expected.val, rt2_actual.val, sepsilon);
     }
 }

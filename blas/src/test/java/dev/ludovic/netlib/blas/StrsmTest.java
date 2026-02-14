@@ -35,6 +35,26 @@ public class StrsmTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, sgeBcopy;
+
+        // side=L, uplo=U, transa=N, diag=N
+        f2j.strsm("L", "U", "N", "N", M, N, 1.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strsm("L", "U", "N", "N", M, N, 1.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertRelArrayEquals(expected, sgeBcopy, ssolveEpsilon);
+
+        // side=L, uplo=L, transa=N, diag=N
+        f2j.strsm("L", "L", "N", "N", M, N, 1.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strsm("L", "L", "N", "N", M, N, 1.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertRelArrayEquals(expected, sgeBcopy, ssolveEpsilon);
+
+        // side=R, uplo=U, transa=N, diag=N
+        f2j.strsm("R", "U", "N", "N", M, N, 1.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strsm("R", "U", "N", "N", M, N, 1.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertRelArrayEquals(expected, sgeBcopy, ssolveEpsilon);
+
+        // side=L, uplo=U, transa=T, diag=N
+        f2j.strsm("L", "U", "T", "N", M, N, 1.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strsm("L", "U", "T", "N", M, N, 1.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertRelArrayEquals(expected, sgeBcopy, ssolveEpsilon);
     }
 }

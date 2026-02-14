@@ -35,6 +35,19 @@ public class SlarftTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int k = 5;
+        float[] v = generateMatrixFloat(N, k, 1.0f);
+        float[] tau = generateFloatArray(k, 1.0f);
+
+        float[] t_expected = new float[k * k];
+        f2j.slarft("F", "C", N, k, v, 0, N, tau, 0, t_expected, 0, k);
+
+        float[] t_actual = new float[k * k];
+        lapack.slarft("F", "C", N, k, v, 0, N, tau, 0, t_actual, 0, k);
+
+        // Find max value for relative epsilon
+        float maxVal = getMaxValue(t_expected);
+
+        assertArrayEquals(t_expected, t_actual, Math.scalb(sepsilon, Math.getExponent(maxVal)));
     }
 }

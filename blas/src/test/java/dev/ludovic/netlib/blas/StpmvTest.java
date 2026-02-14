@@ -35,6 +35,26 @@ public class StpmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, sXcopy;
+
+        // uplo=U, trans=N, diag=N
+        f2j.stpmv("U", "N", "N", M, sgeAU, expected = sX.clone(), 1);
+        blas.stpmv("U", "N", "N", M, sgeAU, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=L, trans=N, diag=N
+        f2j.stpmv("L", "N", "N", M, sgeAL, expected = sX.clone(), 1);
+        blas.stpmv("L", "N", "N", M, sgeAL, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=U, trans=T, diag=N
+        f2j.stpmv("U", "T", "N", M, sgeAU, expected = sX.clone(), 1);
+        blas.stpmv("U", "T", "N", M, sgeAU, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=L, trans=T, diag=U
+        f2j.stpmv("L", "T", "U", M, sgeAL, expected = sX.clone(), 1);
+        blas.stpmv("L", "T", "U", M, sgeAL, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
     }
 }

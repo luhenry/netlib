@@ -25,7 +25,6 @@
 
 package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +34,14 @@ public class DgbtrfTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int kl = 5;
+        int ku = 5;
+        int ldab = 2 * kl + ku + 1;
+        double[] ab = generateDoubleArray(ldab * N, 1.0);
+        int[] ipiv = new int[N];
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        lapack.dgbtrf(N, N, kl, ku, ab, 0, ldab, ipiv, 0, info);
+
+        assertEquals(0, info.val, "LU factorization should succeed");
     }
 }

@@ -35,6 +35,28 @@ public class Slag2Test extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test eigenvalues of 2x2 generalized problem
+        float[] a = new float[]{1.0f, 2.0f, 3.0f, 4.0f};  // 2x2 matrix in column-major
+        float[] b = new float[]{2.0f, 0.0f, 0.0f, 3.0f};  // 2x2 matrix in column-major
+        org.netlib.util.floatW safmin = new org.netlib.util.floatW(1.1754944e-38f);
+        org.netlib.util.floatW scale1_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW scale2_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW wr1_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW wr2_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW wi_expected = new org.netlib.util.floatW(0.0f);
+        f2j.slag2(a.clone(), 0, 2, b.clone(), 0, 2, safmin.val, scale1_expected, scale2_expected, wr1_expected, wr2_expected, wi_expected);
+
+        org.netlib.util.floatW scale1_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW scale2_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW wr1_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW wr2_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW wi_actual = new org.netlib.util.floatW(0.0f);
+        lapack.slag2(a.clone(), 0, 2, b.clone(), 0, 2, safmin.val, scale1_actual, scale2_actual, wr1_actual, wr2_actual, wi_actual);
+
+        assertEquals(scale1_expected.val, scale1_actual.val, sepsilon);
+        assertEquals(scale2_expected.val, scale2_actual.val, sepsilon);
+        assertEquals(wr1_expected.val, wr1_actual.val, sepsilon);
+        assertEquals(wr2_expected.val, wr2_actual.val, sepsilon);
+        assertEquals(wi_expected.val, wi_actual.val, sepsilon);
     }
 }

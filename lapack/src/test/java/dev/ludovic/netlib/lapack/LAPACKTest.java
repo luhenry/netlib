@@ -43,6 +43,30 @@ public class LAPACKTest {
 
   final static LAPACK f2j = F2jLAPACK.getInstance();
 
+  protected final int N = 50;
+  protected final int N_SMALL = 10;
+  protected final int M = 40;
+
+  protected final int[] intArray1 = generateIntArray(N, 1);
+  protected final int[] intArray2 = generateIntArray(N, 2);
+  protected final int[] intArray3 = new int[N];
+
+  protected final double[] dArray1 = generateDoubleArray(N, 1.0);
+  protected final double[] dArray2 = generateDoubleArray(N, 2.0);
+  protected final double[] dArray3 = new double[N];
+
+  protected final float[] sArray1 = generateFloatArray(N, 1.0f);
+  protected final float[] sArray2 = generateFloatArray(N, 2.0f);
+  protected final float[] sArray3 = new float[N];
+
+  protected final double[] dMatrix = generateMatrix(N, N, 1.0);
+  protected final double[] dSymmetricMatrix = generateSymmetricMatrix(N);
+  protected final double[] dPositiveDefiniteMatrix = generatePositiveDefiniteMatrix(N);
+
+  protected final float[] sMatrix = generateMatrixFloat(N, N, 1.0f);
+  protected final float[] sSymmetricMatrix = generateSymmetricMatrixFloat(N);
+  protected final float[] sPositiveDefiniteMatrix = generatePositiveDefiniteMatrixFloat(N);
+
   private static Stream<Arguments> LAPACKImplementations() {
     Stream instances = Stream.of(
       Arguments.of(Named.of("LAPACK", LAPACK.getInstance())),
@@ -53,5 +77,131 @@ public class LAPACKTest {
     );
 
     return instances;
+  }
+
+  protected static int[] generateIntArray(int n, int seed) {
+    int[] array = new int[n];
+    for (int i = 0; i < n; i++) {
+      array[i] = seed * (i + 1);
+    }
+    return array;
+  }
+
+  protected static double[] generateDoubleArray(int n, double scale) {
+    double[] array = new double[n];
+    for (int i = 0; i < n; i++) {
+      array[i] = scale * (i + 1);
+    }
+    return array;
+  }
+
+  protected static float[] generateFloatArray(int n, float scale) {
+    float[] array = new float[n];
+    for (int i = 0; i < n; i++) {
+      array[i] = scale * (i + 1);
+    }
+    return array;
+  }
+
+  protected static double[] generateMatrix(int m, int n, double scale) {
+    double[] matrix = new double[m * n];
+    for (int j = 0; j < n; j++) {
+      for (int i = 0; i < m; i++) {
+        matrix[i + j * m] = scale * (i + 1) * (j + 1);
+      }
+    }
+    return matrix;
+  }
+
+  protected static float[] generateMatrixFloat(int m, int n, float scale) {
+    float[] matrix = new float[m * n];
+    for (int j = 0; j < n; j++) {
+      for (int i = 0; i < m; i++) {
+        matrix[i + j * m] = scale * (i + 1) * (j + 1);
+      }
+    }
+    return matrix;
+  }
+
+  protected static double[] generateSymmetricMatrix(int n) {
+    double[] matrix = new double[n * n];
+    for (int j = 0; j < n; j++) {
+      for (int i = 0; i < n; i++) {
+        double value = (i <= j) ? (i + 1) * (j + 1) : (j + 1) * (i + 1);
+        matrix[i + j * n] = value;
+      }
+    }
+    return matrix;
+  }
+
+  protected static float[] generateSymmetricMatrixFloat(int n) {
+    float[] matrix = new float[n * n];
+    for (int j = 0; j < n; j++) {
+      for (int i = 0; i < n; i++) {
+        float value = (i <= j) ? (i + 1) * (j + 1) : (j + 1) * (i + 1);
+        matrix[i + j * n] = value;
+      }
+    }
+    return matrix;
+  }
+
+  protected static double[] generatePositiveDefiniteMatrix(int n) {
+    double[] matrix = new double[n * n];
+    for (int i = 0; i < n; i++) {
+      matrix[i + i * n] = n + 1.0;
+      for (int j = i + 1; j < n; j++) {
+        double value = 1.0 / (i + j + 2.0);
+        matrix[i + j * n] = value;
+        matrix[j + i * n] = value;
+      }
+    }
+    return matrix;
+  }
+
+  protected static float[] generatePositiveDefiniteMatrixFloat(int n) {
+    float[] matrix = new float[n * n];
+    for (int i = 0; i < n; i++) {
+      matrix[i + i * n] = n + 1.0f;
+      for (int j = i + 1; j < n; j++) {
+        float value = 1.0f / (i + j + 2.0f);
+        matrix[i + j * n] = value;
+        matrix[j + i * n] = value;
+      }
+    }
+    return matrix;
+  }
+
+  protected static void assertArrayEquals(double[] expected, double[] actual, double epsilon) {
+    org.junit.jupiter.api.Assertions.assertEquals(expected.length, actual.length, "Array lengths differ");
+    for (int i = 0; i < expected.length; i++) {
+      org.junit.jupiter.api.Assertions.assertEquals(expected[i], actual[i], epsilon, "Mismatch at index " + i);
+    }
+  }
+
+  protected static void assertArrayEquals(float[] expected, float[] actual, float epsilon) {
+    org.junit.jupiter.api.Assertions.assertEquals(expected.length, actual.length, "Array lengths differ");
+    for (int i = 0; i < expected.length; i++) {
+      org.junit.jupiter.api.Assertions.assertEquals(expected[i], actual[i], epsilon, "Mismatch at index " + i);
+    }
+  }
+
+  protected static void assertArrayEquals(int[] expected, int[] actual) {
+    org.junit.jupiter.api.Assertions.assertArrayEquals(expected, actual);
+  }
+
+  protected static double getMaxValue(double[] array) {
+    double maxVal = 0.0;
+    for (double val : array) {
+      maxVal = Math.max(maxVal, Math.abs(val));
+    }
+    return maxVal;
+  }
+
+  protected static float getMaxValue(float[] array) {
+    float maxVal = 0.0f;
+    for (float val : array) {
+      maxVal = Math.max(maxVal, Math.abs(val));
+    }
+    return maxVal;
   }
 }

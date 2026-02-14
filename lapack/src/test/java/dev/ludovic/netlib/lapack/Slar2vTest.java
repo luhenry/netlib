@@ -35,6 +35,25 @@ public class Slar2vTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Internal MRRR routine not exposed by NativeLAPACK
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal MRRR routine not exposed by " + lapack.getClass().getSimpleName());
+
+        int n = 10;
+        float[] x_expected = generateFloatArray(n, 1.0f);
+        float[] y_expected = generateFloatArray(n, 2.0f);
+        float[] z_expected = generateFloatArray(n, 3.0f);
+        float[] c = generateFloatArray(n, 0.6f);  // cos
+        float[] s = generateFloatArray(n, 0.8f);  // sin
+        f2j.slar2v(n, x_expected, 0, y_expected, 0, z_expected, 0, 1, c, 0, s, 0, 1);
+
+        float[] x_actual = generateFloatArray(n, 1.0f);
+        float[] y_actual = generateFloatArray(n, 2.0f);
+        float[] z_actual = generateFloatArray(n, 3.0f);
+        lapack.slar2v(n, x_actual, 0, y_actual, 0, z_actual, 0, 1, c, 0, s, 0, 1);
+
+        assertArrayEquals(x_expected, x_actual, sepsilon);
+        assertArrayEquals(y_expected, y_actual, sepsilon);
+        assertArrayEquals(z_expected, z_actual, sepsilon);
     }
 }

@@ -35,6 +35,26 @@ public class Slacn2Test extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test 1-norm estimation
+        float[] v_expected = new float[N_SMALL];
+        float[] x_expected = new float[N_SMALL];
+        int[] isgn_expected = new int[N_SMALL];
+        org.netlib.util.floatW est_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW kase_expected = new org.netlib.util.intW(0);
+        int[] isave_expected = new int[3];
+        f2j.slacn2(N_SMALL, v_expected, 0, x_expected, 0, isgn_expected, 0, est_expected, kase_expected, isave_expected, 0);
+
+        float[] v_actual = new float[N_SMALL];
+        float[] x_actual = new float[N_SMALL];
+        int[] isgn_actual = new int[N_SMALL];
+        org.netlib.util.floatW est_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW kase_actual = new org.netlib.util.intW(0);
+        int[] isave_actual = new int[3];
+        lapack.slacn2(N_SMALL, v_actual, 0, x_actual, 0, isgn_actual, 0, est_actual, kase_actual, isave_actual, 0);
+
+        assertEquals(est_expected.val, est_actual.val, sepsilon);
+        assertEquals(kase_expected.val, kase_actual.val);
+        assertArrayEquals(x_expected, x_actual, sepsilon);
+        assertArrayEquals(isgn_expected, isgn_actual);
     }
 }

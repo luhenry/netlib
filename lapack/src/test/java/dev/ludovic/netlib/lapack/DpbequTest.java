@@ -35,6 +35,33 @@ public class DpbequTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create a positive definite banded matrix
+        int kd = 3;
+        int ldab = kd + 1;
+        double[] ab = new double[ldab * N];
+
+        // Fill symmetric banded storage format (upper triangular)
+        for (int j = 0; j < N; j++) {
+            for (int i = Math.max(0, j - kd); i <= j; i++) {
+                ab[kd + i - j + j * ldab] = dPositiveDefiniteMatrix[i + j * N];
+            }
+        }
+
+        double[] s_expected = new double[N];
+        org.netlib.util.doubleW scond_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW amax_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.dpbequ("U", N, kd, ab, 0, ldab, s_expected, 0, scond_expected, amax_expected, info_expected);
+
+        double[] s_actual = new double[N];
+        org.netlib.util.doubleW scond_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW amax_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.dpbequ("U", N, kd, ab, 0, ldab, s_actual, 0, scond_actual, amax_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(s_expected, s_actual, depsilon);
+        assertEquals(scond_expected.val, scond_actual.val, depsilon);
+        assertEquals(amax_expected.val, amax_actual.val, depsilon);
     }
 }

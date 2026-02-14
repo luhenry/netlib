@@ -35,6 +35,19 @@ public class IlaenvTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test with DGETRF (LU factorization)
+        int expected = f2j.ilaenv(1, "DGETRF", " ", 100, 100, -1, -1);
+        int actual = lapack.ilaenv(1, "DGETRF", " ", 100, 100, -1, -1);
+        assertEquals(expected, actual);
+
+        // Test with DGEQRF (QR factorization)
+        expected = f2j.ilaenv(1, "DGEQRF", " ", 100, 100, -1, -1);
+        actual = lapack.ilaenv(1, "DGEQRF", " ", 100, 100, -1, -1);
+        assertEquals(expected, actual);
+
+        // Test with different ispec values
+        expected = f2j.ilaenv(2, "DGETRF", " ", 100, 100, -1, -1);
+        actual = lapack.ilaenv(2, "DGETRF", " ", 100, 100, -1, -1);
+        assertEquals(expected, actual);
     }
 }

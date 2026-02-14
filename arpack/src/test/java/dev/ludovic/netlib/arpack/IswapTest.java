@@ -35,6 +35,24 @@ public class IswapTest extends ARPACKTest {
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int[] expectedX, expectedY, actualX, actualY;
+
+        // Test swapping two arrays with increment 1
+        f2j.iswap(N, expectedX = intArray1.clone(), 1, expectedY = intArray2.clone(), 1);
+        arpack.iswap(N, actualX = intArray1.clone(), 1, actualY = intArray2.clone(), 1);
+        assertArrayEquals(expectedX, actualX);
+        assertArrayEquals(expectedY, actualY);
+
+        // Test swapping array with itself (should be no-op)
+        f2j.iswap(N, expectedX = intArray1.clone(), 1, expectedY = intArray1.clone(), 1);
+        arpack.iswap(N, actualX = intArray1.clone(), 1, actualY = intArray1.clone(), 1);
+        assertArrayEquals(expectedX, actualX);
+        assertArrayEquals(expectedY, actualY);
+
+        // Test with increment 2 (every other element)
+        f2j.iswap(N / 2, expectedX = intArray1.clone(), 2, expectedY = intArray2.clone(), 2);
+        arpack.iswap(N / 2, actualX = intArray1.clone(), 2, actualY = intArray2.clone(), 2);
+        assertArrayEquals(expectedX, actualX);
+        assertArrayEquals(expectedY, actualY);
     }
 }

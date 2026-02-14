@@ -35,6 +35,24 @@ public class DlamchTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test epsilon (relative machine precision)
+        double expected = f2j.dlamch("E");
+        double actual = lapack.dlamch("E");
+        assertEquals(expected, actual, depsilon);
+
+        // Test safe minimum
+        expected = f2j.dlamch("S");
+        actual = lapack.dlamch("S");
+        assertEquals(expected, actual, depsilon);
+
+        // Test base
+        expected = f2j.dlamch("B");
+        actual = lapack.dlamch("B");
+        assertEquals(expected, actual, depsilon);
+
+        // Test precision
+        expected = f2j.dlamch("P");
+        actual = lapack.dlamch("P");
+        assertEquals(expected, actual, depsilon);
     }
 }

@@ -35,6 +35,23 @@ public class Slaev2Test extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test 2x2 symmetric eigenvalue decomposition with eigenvectors
+        // Matrix: [1.0, 2.0; 2.0, 3.0]
+        org.netlib.util.floatW rt1_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW rt2_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW cs1_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW sn1_expected = new org.netlib.util.floatW(0.0f);
+        f2j.slaev2(1.0f, 2.0f, 3.0f, rt1_expected, rt2_expected, cs1_expected, sn1_expected);
+
+        org.netlib.util.floatW rt1_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW rt2_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW cs1_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW sn1_actual = new org.netlib.util.floatW(0.0f);
+        lapack.slaev2(1.0f, 2.0f, 3.0f, rt1_actual, rt2_actual, cs1_actual, sn1_actual);
+
+        assertEquals(rt1_expected.val, rt1_actual.val, sepsilon);
+        assertEquals(rt2_expected.val, rt2_actual.val, sepsilon);
+        assertEquals(cs1_expected.val, cs1_actual.val, sepsilon);
+        assertEquals(sn1_expected.val, sn1_actual.val, sepsilon);
     }
 }

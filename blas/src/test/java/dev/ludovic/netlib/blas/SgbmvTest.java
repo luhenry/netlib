@@ -35,6 +35,37 @@ public class SgbmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, sYcopy;
+        int lda = KL + KU + 1;
+
+        // trans=N, alpha=1.0f, beta=2.0f
+        f2j.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T, alpha=1.0f, beta=2.0f
+        f2j.sgbmv("T", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgbmv("T", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=N, alpha=1.0f, beta=0.0f
+        f2j.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T, alpha=1.0f, beta=0.0f
+        f2j.sgbmv("T", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.sgbmv("T", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=N, alpha=0.0f, beta=1.0f
+        f2j.sgbmv("N", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 1.0f, expected = sY.clone(), 1);
+        blas.sgbmv("N", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T, alpha=0.0f, beta=1.0f
+        f2j.sgbmv("T", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 1.0f, expected = sY.clone(), 1);
+        blas.sgbmv("T", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
     }
 }

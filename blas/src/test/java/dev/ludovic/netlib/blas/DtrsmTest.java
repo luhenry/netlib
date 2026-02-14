@@ -35,6 +35,26 @@ public class DtrsmTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dgeBcopy;
+
+        // side=L, uplo=U, transa=N, diag=N
+        f2j.dtrsm("L", "U", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "U", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=L, uplo=L, transa=N, diag=N
+        f2j.dtrsm("L", "L", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "L", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=R, uplo=U, transa=N, diag=N
+        f2j.dtrsm("R", "U", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "U", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=L, uplo=U, transa=T, diag=N
+        f2j.dtrsm("L", "U", "T", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "U", "T", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
     }
 }

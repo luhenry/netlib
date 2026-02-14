@@ -25,6 +25,8 @@
 
 package dev.ludovic.netlib.blas;
 
+import org.netlib.util.floatW;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -35,6 +37,92 @@ public class SrotmgTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test case 1: typical values
+        {
+            floatW esd1 = new floatW(2.0f);
+            floatW esd2 = new floatW(3.0f);
+            floatW esx1 = new floatW(4.0f);
+            float esy1 = 5.0f;
+            float[] expectedParam = new float[5];
+            f2j.srotmg(esd1, esd2, esx1, esy1, expectedParam);
+
+            floatW bsd1 = new floatW(2.0f);
+            floatW bsd2 = new floatW(3.0f);
+            floatW bsx1 = new floatW(4.0f);
+            float bsy1 = 5.0f;
+            float[] blasParam = new float[5];
+            blas.srotmg(bsd1, bsd2, bsx1, bsy1, blasParam);
+
+            assertEquals(esd1.val, bsd1.val, sepsilon);
+            assertEquals(esd2.val, bsd2.val, sepsilon);
+            assertEquals(esx1.val, bsx1.val, sepsilon);
+            assertArrayEquals(expectedParam, blasParam, sepsilon);
+        }
+
+        // Test case 2: sd1 negative (triggers rescaling)
+        {
+            floatW esd1 = new floatW(-1.0f);
+            floatW esd2 = new floatW(2.0f);
+            floatW esx1 = new floatW(3.0f);
+            float esy1 = 4.0f;
+            float[] expectedParam = new float[5];
+            f2j.srotmg(esd1, esd2, esx1, esy1, expectedParam);
+
+            floatW bsd1 = new floatW(-1.0f);
+            floatW bsd2 = new floatW(2.0f);
+            floatW bsx1 = new floatW(3.0f);
+            float bsy1 = 4.0f;
+            float[] blasParam = new float[5];
+            blas.srotmg(bsd1, bsd2, bsx1, bsy1, blasParam);
+
+            assertEquals(esd1.val, bsd1.val, sepsilon);
+            assertEquals(esd2.val, bsd2.val, sepsilon);
+            assertEquals(esx1.val, bsx1.val, sepsilon);
+            assertArrayEquals(expectedParam, blasParam, sepsilon);
+        }
+
+        // Test case 3: sy1 = 0 (should be identity-like)
+        {
+            floatW esd1 = new floatW(1.0f);
+            floatW esd2 = new floatW(1.0f);
+            floatW esx1 = new floatW(1.0f);
+            float esy1 = 0.0f;
+            float[] expectedParam = new float[5];
+            f2j.srotmg(esd1, esd2, esx1, esy1, expectedParam);
+
+            floatW bsd1 = new floatW(1.0f);
+            floatW bsd2 = new floatW(1.0f);
+            floatW bsx1 = new floatW(1.0f);
+            float bsy1 = 0.0f;
+            float[] blasParam = new float[5];
+            blas.srotmg(bsd1, bsd2, bsx1, bsy1, blasParam);
+
+            assertEquals(esd1.val, bsd1.val, sepsilon);
+            assertEquals(esd2.val, bsd2.val, sepsilon);
+            assertEquals(esx1.val, bsx1.val, sepsilon);
+            assertArrayEquals(expectedParam, blasParam, sepsilon);
+        }
+
+        // Test case 4: larger values
+        {
+            floatW esd1 = new floatW(5.0f);
+            floatW esd2 = new floatW(2.0f);
+            floatW esx1 = new floatW(10.0f);
+            float esy1 = 3.0f;
+            float[] expectedParam = new float[5];
+            f2j.srotmg(esd1, esd2, esx1, esy1, expectedParam);
+
+            floatW bsd1 = new floatW(5.0f);
+            floatW bsd2 = new floatW(2.0f);
+            floatW bsx1 = new floatW(10.0f);
+            float bsy1 = 3.0f;
+            float[] blasParam = new float[5];
+            blas.srotmg(bsd1, bsd2, bsx1, bsy1, blasParam);
+
+            assertEquals(esd1.val, bsd1.val, sepsilon);
+            assertEquals(esd2.val, bsd2.val, sepsilon);
+            assertEquals(esx1.val, bsx1.val, sepsilon);
+            assertArrayEquals(expectedParam, blasParam, sepsilon);
+        }
     }
 }

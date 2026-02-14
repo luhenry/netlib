@@ -30,11 +30,108 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.netlib.util.intW;
+
 public class DlaqrbTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Note: Some native implementations may have issues with output functions
+        org.junit.jupiter.api.Assumptions.assumeFalse(arpack instanceof NativeARPACK,
+                "Output function not fully supported by " + arpack.getClass().getSimpleName());
+
+        int n = 10;
+        int ldh = n;
+
+        // Test case 1: wantt=true, full range
+        {
+            double[] expected_h = generateUpperHessenberg(n);
+            double[] expected_wr = new double[n];
+            double[] expected_wi = new double[n];
+            double[] expected_z = new double[n];
+            intW expected_info = new intW(0);
+
+            f2j.dlaqrb(true, n, 1, n, expected_h, ldh, expected_wr, expected_wi, expected_z, expected_info);
+
+            double[] actual_h = generateUpperHessenberg(n);
+            double[] actual_wr = new double[n];
+            double[] actual_wi = new double[n];
+            double[] actual_z = new double[n];
+            intW actual_info = new intW(0);
+
+            arpack.dlaqrb(true, n, 1, n, actual_h, ldh, actual_wr, actual_wi, actual_z, actual_info);
+
+            assertArrayEquals(expected_h, actual_h, depsilon);
+            assertArrayEquals(expected_wr, actual_wr, depsilon);
+            assertArrayEquals(expected_wi, actual_wi, depsilon);
+            assertArrayEquals(expected_z, actual_z, depsilon);
+            assertEquals(expected_info.val, actual_info.val);
+        }
+
+        // Test case 2: wantt=false, full range
+        {
+            double[] expected_h = generateUpperHessenberg(n);
+            double[] expected_wr = new double[n];
+            double[] expected_wi = new double[n];
+            double[] expected_z = new double[n];
+            intW expected_info = new intW(0);
+
+            f2j.dlaqrb(false, n, 1, n, expected_h, ldh, expected_wr, expected_wi, expected_z, expected_info);
+
+            double[] actual_h = generateUpperHessenberg(n);
+            double[] actual_wr = new double[n];
+            double[] actual_wi = new double[n];
+            double[] actual_z = new double[n];
+            intW actual_info = new intW(0);
+
+            arpack.dlaqrb(false, n, 1, n, actual_h, ldh, actual_wr, actual_wi, actual_z, actual_info);
+
+            assertArrayEquals(expected_h, actual_h, depsilon);
+            assertArrayEquals(expected_wr, actual_wr, depsilon);
+            assertArrayEquals(expected_wi, actual_wi, depsilon);
+            assertArrayEquals(expected_z, actual_z, depsilon);
+            assertEquals(expected_info.val, actual_info.val);
+        }
+
+        // Test case 3: wantt=true, partial range
+        {
+            int ilo = 2;
+            int ihi = 8;
+            double[] expected_h = generateUpperHessenberg(n);
+            double[] expected_wr = new double[n];
+            double[] expected_wi = new double[n];
+            double[] expected_z = new double[n];
+            intW expected_info = new intW(0);
+
+            f2j.dlaqrb(true, n, ilo, ihi, expected_h, ldh, expected_wr, expected_wi, expected_z, expected_info);
+
+            double[] actual_h = generateUpperHessenberg(n);
+            double[] actual_wr = new double[n];
+            double[] actual_wi = new double[n];
+            double[] actual_z = new double[n];
+            intW actual_info = new intW(0);
+
+            arpack.dlaqrb(true, n, ilo, ihi, actual_h, ldh, actual_wr, actual_wi, actual_z, actual_info);
+
+            assertArrayEquals(expected_h, actual_h, depsilon);
+            assertArrayEquals(expected_wr, actual_wr, depsilon);
+            assertArrayEquals(expected_wi, actual_wi, depsilon);
+            assertArrayEquals(expected_z, actual_z, depsilon);
+            assertEquals(expected_info.val, actual_info.val);
+        }
+    }
+
+    private static double[] generateUpperHessenberg(int n) {
+        double[] h = new double[n * n];
+        // Create upper Hessenberg matrix (zeros below first subdiagonal)
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (j >= i - 1) {
+                    h[i * n + j] = 1.0 + i * 0.1 + j * 0.05;
+                }
+            }
+        }
+        return h;
     }
 }

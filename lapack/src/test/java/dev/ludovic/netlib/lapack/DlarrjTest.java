@@ -35,6 +35,26 @@ public class DlarrjTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        // Test refinement of eigenvalue subset
+        double[] d = generateDoubleArray(N_SMALL, 1.0);
+        double[] e2 = generateDoubleArray(N_SMALL - 1, 0.01);
+        double[] w = generateDoubleArray(N_SMALL, 1.0);
+        double[] werr = new double[N_SMALL];
+        double[] work = new double[2 * N_SMALL];
+        int[] iwork = new int[2 * N_SMALL];
+        double pivmin = 1e-10;
+        double spdiam = 100.0;
+        double rtol = 1e-8;
+
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.dlarrj(N_SMALL, d, 0, e2, 0, 1, N_SMALL, rtol, 0, w, 0, werr, 0, work, 0, iwork, 0, pivmin, spdiam, info_expected);
+
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.dlarrj(N_SMALL, d, 0, e2, 0, 1, N_SMALL, rtol, 0, w, 0, werr, 0, work, 0, iwork, 0, pivmin, spdiam, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
     }
 }
