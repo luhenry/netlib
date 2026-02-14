@@ -49,21 +49,21 @@ public class SlanstTest extends LAPACKTest {
         // Test 1-norm
         float expected = f2j.slanst("1", N, d, 0, e, 0);
         float actual = lapack.slanst("1", N, d, 0, e, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
 
         // Test Inf-norm
         expected = f2j.slanst("I", N, d, 0, e, 0);
         actual = lapack.slanst("I", N, d, 0, e, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
 
         // Test Frobenius norm
         expected = f2j.slanst("F", N, d, 0, e, 0);
         actual = lapack.slanst("F", N, d, 0, e, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
 
         // Test Max norm
         expected = f2j.slanst("M", N, d, 0, e, 0);
         actual = lapack.slanst("M", N, d, 0, e, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
     }
 }

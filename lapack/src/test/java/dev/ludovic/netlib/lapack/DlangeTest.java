@@ -42,22 +42,22 @@ public class DlangeTest extends LAPACKTest {
         // Test 1-norm
         double expected = f2j.dlange("1", N, N, dMatrix, 0, N, work, 0);
         double actual = lapack.dlange("1", N, N, dMatrix, 0, N, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Inf-norm
         expected = f2j.dlange("I", N, N, dMatrix, 0, N, work, 0);
         actual = lapack.dlange("I", N, N, dMatrix, 0, N, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Frobenius norm
         expected = f2j.dlange("F", N, N, dMatrix, 0, N, work, 0);
         actual = lapack.dlange("F", N, N, dMatrix, 0, N, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Max norm
         expected = f2j.dlange("M", N, N, dMatrix, 0, N, work, 0);
         actual = lapack.dlange("M", N, N, dMatrix, 0, N, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
     }
 
     @ParameterizedTest

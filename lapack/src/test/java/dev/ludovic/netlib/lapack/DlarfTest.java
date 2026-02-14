@@ -35,6 +35,24 @@ public class DlarfTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Generate a Householder vector first
+        double[] v = dArray1.clone();
+        org.netlib.util.doubleW alpha = new org.netlib.util.doubleW(1.0);
+        org.netlib.util.doubleW tau = new org.netlib.util.doubleW(0.0);
+        f2j.dlarfg(N, alpha, v, 0, 1, tau);
+
+        // Apply the reflector to a matrix (side = 'L')
+        double[] c_expected = dMatrix.clone();
+        double[] work_expected = new double[N];
+        f2j.dlarf("L", N, N, v, 0, 1, tau.val, c_expected, 0, N, work_expected, 0);
+
+        double[] c_actual = dMatrix.clone();
+        double[] work_actual = new double[N];
+        lapack.dlarf("L", N, N, v, 0, 1, tau.val, c_actual, 0, N, work_actual, 0);
+
+        // Find max value in expected array for relative epsilon
+        double maxVal = getMaxValue(c_expected);
+
+        assertArrayEquals(c_expected, c_actual, Math.scalb(depsilon, Math.getExponent(maxVal)));
     }
 }

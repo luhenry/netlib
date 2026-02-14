@@ -52,21 +52,21 @@ public class SlangbTest extends LAPACKTest {
         // Test 1-norm
         float expected = f2j.slangb("1", N, kl, ku, ab, 0, ldab, work, 0);
         float actual = lapack.slangb("1", N, kl, ku, ab, 0, ldab, work, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
 
         // Test Inf-norm
         expected = f2j.slangb("I", N, kl, ku, ab, 0, ldab, work, 0);
         actual = lapack.slangb("I", N, kl, ku, ab, 0, ldab, work, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
 
         // Test Frobenius norm
         expected = f2j.slangb("F", N, kl, ku, ab, 0, ldab, work, 0);
         actual = lapack.slangb("F", N, kl, ku, ab, 0, ldab, work, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
 
         // Test Max norm
         expected = f2j.slangb("M", N, kl, ku, ab, 0, ldab, work, 0);
         actual = lapack.slangb("M", N, kl, ku, ab, 0, ldab, work, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
     }
 }

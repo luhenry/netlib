@@ -40,21 +40,21 @@ public class DlansyTest extends LAPACKTest {
         // Test 1-norm (upper triangular)
         double expected = f2j.dlansy("1", "U", N, dSymmetricMatrix, 0, N, work, 0);
         double actual = lapack.dlansy("1", "U", N, dSymmetricMatrix, 0, N, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Inf-norm (lower triangular)
         expected = f2j.dlansy("I", "L", N, dSymmetricMatrix, 0, N, work, 0);
         actual = lapack.dlansy("I", "L", N, dSymmetricMatrix, 0, N, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Frobenius norm
         expected = f2j.dlansy("F", "U", N, dSymmetricMatrix, 0, N, work, 0);
         actual = lapack.dlansy("F", "U", N, dSymmetricMatrix, 0, N, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Max norm
         expected = f2j.dlansy("M", "U", N, dSymmetricMatrix, 0, N, work, 0);
         actual = lapack.dlansy("M", "U", N, dSymmetricMatrix, 0, N, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
     }
 }

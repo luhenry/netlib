@@ -188,4 +188,20 @@ public class LAPACKTest {
   protected static void assertArrayEquals(int[] expected, int[] actual) {
     org.junit.jupiter.api.Assertions.assertArrayEquals(expected, actual);
   }
+
+  protected static double getMaxValue(double[] array) {
+    double maxVal = 0.0;
+    for (double val : array) {
+      maxVal = Math.max(maxVal, Math.abs(val));
+    }
+    return maxVal;
+  }
+
+  protected static float getMaxValue(float[] array) {
+    float maxVal = 0.0f;
+    for (float val : array) {
+      maxVal = Math.max(maxVal, Math.abs(val));
+    }
+    return maxVal;
+  }
 }

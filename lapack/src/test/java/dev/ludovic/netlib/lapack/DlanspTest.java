@@ -48,21 +48,21 @@ public class DlanspTest extends LAPACKTest {
         // Test 1-norm (upper triangular)
         double expected = f2j.dlansp("1", "U", N, ap, 0, work, 0);
         double actual = lapack.dlansp("1", "U", N, ap, 0, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Inf-norm
         expected = f2j.dlansp("I", "U", N, ap, 0, work, 0);
         actual = lapack.dlansp("I", "U", N, ap, 0, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Frobenius norm
         expected = f2j.dlansp("F", "U", N, ap, 0, work, 0);
         actual = lapack.dlansp("F", "U", N, ap, 0, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Max norm
         expected = f2j.dlansp("M", "U", N, ap, 0, work, 0);
         actual = lapack.dlansp("M", "U", N, ap, 0, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
     }
 }

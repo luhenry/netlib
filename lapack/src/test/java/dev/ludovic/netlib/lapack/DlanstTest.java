@@ -49,21 +49,21 @@ public class DlanstTest extends LAPACKTest {
         // Test 1-norm
         double expected = f2j.dlanst("1", N, d, 0, e, 0);
         double actual = lapack.dlanst("1", N, d, 0, e, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Inf-norm
         expected = f2j.dlanst("I", N, d, 0, e, 0);
         actual = lapack.dlanst("I", N, d, 0, e, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Frobenius norm
         expected = f2j.dlanst("F", N, d, 0, e, 0);
         actual = lapack.dlanst("F", N, d, 0, e, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Max norm
         expected = f2j.dlanst("M", N, d, 0, e, 0);
         actual = lapack.dlanst("M", N, d, 0, e, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
     }
 }

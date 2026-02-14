@@ -51,21 +51,21 @@ public class DlansbTest extends LAPACKTest {
         // Test 1-norm
         double expected = f2j.dlansb("1", "U", N, k, ab, 0, ldab, work, 0);
         double actual = lapack.dlansb("1", "U", N, k, ab, 0, ldab, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Inf-norm
         expected = f2j.dlansb("I", "U", N, k, ab, 0, ldab, work, 0);
         actual = lapack.dlansb("I", "U", N, k, ab, 0, ldab, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Frobenius norm
         expected = f2j.dlansb("F", "U", N, k, ab, 0, ldab, work, 0);
         actual = lapack.dlansb("F", "U", N, k, ab, 0, ldab, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
 
         // Test Max norm
         expected = f2j.dlansb("M", "U", N, k, ab, 0, ldab, work, 0);
         actual = lapack.dlansb("M", "U", N, k, ab, 0, ldab, work, 0);
-        assertEquals(expected, actual, Math.max(depsilon, Math.abs(expected) * depsilon));
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
     }
 }

@@ -48,21 +48,21 @@ public class SlantpTest extends LAPACKTest {
         // Test 1-norm (upper, non-unit diagonal)
         float expected = f2j.slantp("1", "U", "N", N, ap, 0, work, 0);
         float actual = lapack.slantp("1", "U", "N", N, ap, 0, work, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
 
         // Test Inf-norm
         expected = f2j.slantp("I", "U", "N", N, ap, 0, work, 0);
         actual = lapack.slantp("I", "U", "N", N, ap, 0, work, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
 
         // Test Frobenius norm (unit diagonal)
         expected = f2j.slantp("F", "U", "U", N, ap, 0, work, 0);
         actual = lapack.slantp("F", "U", "U", N, ap, 0, work, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
 
         // Test Max norm
         expected = f2j.slantp("M", "U", "N", N, ap, 0, work, 0);
         actual = lapack.slantp("M", "U", "N", N, ap, 0, work, 0);
-        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
     }
 }
