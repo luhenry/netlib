@@ -35,6 +35,31 @@ public class DlarrcTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        // Test counting eigenvalues in interval
+        double[] d = generateDoubleArray(N_SMALL, 1.0);
+        double[] e = generateDoubleArray(N_SMALL - 1, 0.1);
+        double vl = 5.0;
+        double vu = 50.0;
+        double pivmin = 1e-10;
+
+        org.netlib.util.intW eigcnt_expected = new org.netlib.util.intW(0);
+        org.netlib.util.intW lcnt_expected = new org.netlib.util.intW(0);
+        org.netlib.util.intW rcnt_expected = new org.netlib.util.intW(0);
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.dlarrc("T", N_SMALL, vl, vu, d, 0, e, 0, pivmin, eigcnt_expected, lcnt_expected, rcnt_expected, info_expected);
+
+        org.netlib.util.intW eigcnt_actual = new org.netlib.util.intW(0);
+        org.netlib.util.intW lcnt_actual = new org.netlib.util.intW(0);
+        org.netlib.util.intW rcnt_actual = new org.netlib.util.intW(0);
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.dlarrc("T", N_SMALL, vl, vu, d, 0, e, 0, pivmin, eigcnt_actual, lcnt_actual, rcnt_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(eigcnt_expected.val, eigcnt_actual.val);
+        assertEquals(lcnt_expected.val, lcnt_actual.val);
+        assertEquals(rcnt_expected.val, rcnt_actual.val);
     }
 }

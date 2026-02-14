@@ -35,6 +35,19 @@ public class DlarrrTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        // Test relative representation
+        double[] d = generateDoubleArray(N_SMALL, 1.0);
+        double[] e = generateDoubleArray(N_SMALL - 1, 0.1);
+
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.dlarrr(N_SMALL, d, 0, e, 0, info_expected);
+
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.dlarrr(N_SMALL, d, 0, e, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
     }
 }

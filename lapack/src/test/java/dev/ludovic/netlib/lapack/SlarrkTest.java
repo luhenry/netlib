@@ -35,6 +35,29 @@ public class SlarrkTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        // Test computing one eigenvalue by bisection
+        float[] d = generateFloatArray(N_SMALL, 1.0f);
+        float[] e2 = generateFloatArray(N_SMALL - 1, 0.01f);
+        float gl = 0.0f;
+        float gu = 100.0f;
+        float pivmin = 1e-10f;
+        float reltol = 1e-6f;
+
+        org.netlib.util.floatW w_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW werr_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.slarrk(N_SMALL, 1, gl, gu, d, 0, e2, 0, pivmin, reltol, w_expected, werr_expected, info_expected);
+
+        org.netlib.util.floatW w_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW werr_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.slarrk(N_SMALL, 1, gl, gu, d, 0, e2, 0, pivmin, reltol, w_actual, werr_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(w_expected.val, w_actual.val, sepsilon);
+        assertEquals(werr_expected.val, werr_actual.val, sepsilon);
     }
 }

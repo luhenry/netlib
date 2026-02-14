@@ -35,6 +35,44 @@ public class SlarreTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        // Test representation tree for eigenvalues
+        float[] d = generateFloatArray(N_SMALL + 1, 1.0f);
+        float[] e = generateFloatArray(N_SMALL, 0.1f);
+        float[] e2 = generateFloatArray(N_SMALL, 0.01f);
+        int[] isplit = new int[N_SMALL + 1];
+        float[] w = new float[N_SMALL + 1];
+        float[] werr = new float[N_SMALL + 1];
+        float[] wgap = new float[N_SMALL + 1];
+        int[] iblock = new int[N_SMALL + 1];
+        int[] indexw = new int[N_SMALL + 1];
+        float[] gers = new float[2 * N_SMALL];
+        float[] work = new float[6 * N_SMALL];
+        int[] iwork = new int[5 * N_SMALL];
+
+        org.netlib.util.floatW vl_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW vu_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW nsplit_expected = new org.netlib.util.intW(0);
+        org.netlib.util.intW m_expected = new org.netlib.util.intW(0);
+        org.netlib.util.floatW pivmin_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.slarre("A", N_SMALL, vl_expected, vu_expected, 0, 0, d, 0, e, 0, e2, 0, 1e-6f, 1e-6f, 1e-6f,
+                   nsplit_expected, isplit, 0, m_expected, w, 0, werr, 0, wgap, 0, iblock, 0, indexw, 0,
+                   gers, 0, pivmin_expected, work, 0, iwork, 0, info_expected);
+
+        org.netlib.util.floatW vl_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW vu_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW nsplit_actual = new org.netlib.util.intW(0);
+        org.netlib.util.intW m_actual = new org.netlib.util.intW(0);
+        org.netlib.util.floatW pivmin_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.slarre("A", N_SMALL, vl_actual, vu_actual, 0, 0, d, 0, e, 0, e2, 0, 1e-6f, 1e-6f, 1e-6f,
+                      nsplit_actual, isplit, 0, m_actual, w, 0, werr, 0, wgap, 0, iblock, 0, indexw, 0,
+                      gers, 0, pivmin_actual, work, 0, iwork, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(m_expected.val, m_actual.val);
     }
 }

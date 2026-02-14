@@ -35,6 +35,28 @@ public class SlasclTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test scaling full matrix
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        float[] expected = sMatrix.clone();
+        f2j.slascl("G", 0, 0, 1.0f, 2.0f, N, N, expected, 0, N, info_expected);
+
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        float[] actual = sMatrix.clone();
+        lapack.slascl("G", 0, 0, 1.0f, 2.0f, N, N, actual, 0, N, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(expected, actual, sepsilon);
+
+        // Test scaling upper triangular part
+        info_expected.val = 0;
+        float[] expected_upper = sMatrix.clone();
+        f2j.slascl("U", 0, 0, 2.0f, 3.0f, N, N, expected_upper, 0, N, info_expected);
+
+        info_actual.val = 0;
+        float[] actual_upper = sMatrix.clone();
+        lapack.slascl("U", 0, 0, 2.0f, 3.0f, N, N, actual_upper, 0, N, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(expected_upper, actual_upper, sepsilon);
     }
 }
