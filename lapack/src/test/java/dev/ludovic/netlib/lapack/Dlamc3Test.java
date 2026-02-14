@@ -35,6 +35,19 @@ public class Dlamc3Test extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test basic addition
+        double expected = f2j.dlamc3(1.0, 2.0);
+        double actual = lapack.dlamc3(1.0, 2.0);
+        assertEquals(expected, actual, depsilon);
+
+        // Test with small values
+        expected = f2j.dlamc3(1e-10, 1e-11);
+        actual = lapack.dlamc3(1e-10, 1e-11);
+        assertEquals(expected, actual, depsilon);
+
+        // Test with larger values
+        expected = f2j.dlamc3(100.0, 200.0);
+        actual = lapack.dlamc3(100.0, 200.0);
+        assertEquals(expected, actual, depsilon);
     }
 }

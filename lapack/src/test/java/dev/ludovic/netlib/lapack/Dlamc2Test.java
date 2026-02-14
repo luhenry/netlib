@@ -35,6 +35,37 @@ public class Dlamc2Test extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        org.netlib.util.intW beta_expected = new org.netlib.util.intW(0);
+        org.netlib.util.intW t_expected = new org.netlib.util.intW(0);
+        org.netlib.util.booleanW rnd_expected = new org.netlib.util.booleanW(false);
+        org.netlib.util.doubleW eps_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.intW emin_expected = new org.netlib.util.intW(0);
+        org.netlib.util.doubleW rmin_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.intW emax_expected = new org.netlib.util.intW(0);
+        org.netlib.util.doubleW rmax_expected = new org.netlib.util.doubleW(0.0);
+
+        org.netlib.util.intW beta_actual = new org.netlib.util.intW(0);
+        org.netlib.util.intW t_actual = new org.netlib.util.intW(0);
+        org.netlib.util.booleanW rnd_actual = new org.netlib.util.booleanW(false);
+        org.netlib.util.doubleW eps_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.intW emin_actual = new org.netlib.util.intW(0);
+        org.netlib.util.doubleW rmin_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.intW emax_actual = new org.netlib.util.intW(0);
+        org.netlib.util.doubleW rmax_actual = new org.netlib.util.doubleW(0.0);
+
+        f2j.dlamc2(beta_expected, t_expected, rnd_expected, eps_expected, emin_expected, rmin_expected, emax_expected, rmax_expected);
+        lapack.dlamc2(beta_actual, t_actual, rnd_actual, eps_actual, emin_actual, rmin_actual, emax_actual, rmax_actual);
+
+        assertEquals(beta_expected.val, beta_actual.val);
+        assertEquals(t_expected.val, t_actual.val);
+        assertEquals(rnd_expected.val, rnd_actual.val);
+        assertEquals(eps_expected.val, eps_actual.val, depsilon);
+        assertEquals(emin_expected.val, emin_actual.val);
+        assertEquals(rmin_expected.val, rmin_actual.val, depsilon);
+        assertEquals(emax_expected.val, emax_actual.val);
+        assertEquals(rmax_expected.val, rmax_actual.val, depsilon);
     }
 }

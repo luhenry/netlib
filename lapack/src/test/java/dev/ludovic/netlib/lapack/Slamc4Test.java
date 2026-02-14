@@ -35,6 +35,22 @@ public class Slamc4Test extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        org.netlib.util.intW emin_expected = new org.netlib.util.intW(0);
+        org.netlib.util.intW emin_actual = new org.netlib.util.intW(0);
+
+        // Test with base 2
+        f2j.slamc4(emin_expected, 1.0f, 2);
+        lapack.slamc4(emin_actual, 1.0f, 2);
+        assertEquals(emin_expected.val, emin_actual.val);
+
+        // Test with base 10
+        emin_expected.val = 0;
+        emin_actual.val = 0;
+        f2j.slamc4(emin_expected, 1.0f, 10);
+        lapack.slamc4(emin_actual, 1.0f, 10);
+        assertEquals(emin_expected.val, emin_actual.val);
     }
 }
