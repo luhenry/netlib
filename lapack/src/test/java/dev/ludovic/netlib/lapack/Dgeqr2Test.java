@@ -25,16 +25,19 @@
 
 package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class Dgeqr2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] tau = new double[Math.min(N, N)];
+        double[] work = new double[N];
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        double[] a = dMatrix.clone();
+        lapack.dgeqr2(N, N, a, 0, N, tau, 0, work, 0, info);
+        // No assertion - just verify it runs without crashing
     }
 }

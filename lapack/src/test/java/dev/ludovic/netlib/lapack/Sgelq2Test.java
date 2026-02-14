@@ -25,16 +25,19 @@
 
 package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class Sgelq2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] tau = new float[Math.min(N, N)];
+        float[] work = new float[N];
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        float[] a = sMatrix.clone();
+        lapack.sgelq2(N, N, a, 0, N, tau, 0, work, 0, info);
+        // No assertion - just verify it runs without crashing
     }
 }

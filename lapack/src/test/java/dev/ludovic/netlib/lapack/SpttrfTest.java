@@ -35,6 +35,12 @@ public class SpttrfTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        float[] d = generateFloatArray(n, 2.0f);
+        float[] e = generateFloatArray(n - 1, 1.0f);
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        lapack.spttrf(n, d, 0, e, 0, info);
+
+        assertEquals(0, info.val, "Cholesky factorization should succeed");
     }
 }

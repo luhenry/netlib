@@ -35,6 +35,12 @@ public class DpttrfTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        double[] d = generateDoubleArray(n, 2.0);
+        double[] e = generateDoubleArray(n - 1, 1.0);
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        lapack.dpttrf(n, d, 0, e, 0, info);
+
+        assertEquals(0, info.val, "Cholesky factorization should succeed");
     }
 }

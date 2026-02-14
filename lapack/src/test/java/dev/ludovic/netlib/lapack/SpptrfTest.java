@@ -35,6 +35,23 @@ public class SpptrfTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        // Create a diagonal-dominant positive definite matrix in packed format
+        float[] ap = new float[n * (n + 1) / 2];
+        int idx = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                if (i == j) {
+                    ap[idx] = n + 1.0f; // Diagonal elements
+                } else {
+                    ap[idx] = 1.0f; // Off-diagonal elements
+                }
+                idx++;
+            }
+        }
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        lapack.spptrf("U", n, ap, 0, info);
+
+        assertEquals(0, info.val, "Cholesky factorization should succeed");
     }
 }

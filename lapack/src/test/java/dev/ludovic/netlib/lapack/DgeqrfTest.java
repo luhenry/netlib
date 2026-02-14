@@ -25,7 +25,6 @@
 
 package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +34,12 @@ public class DgeqrfTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] tau = new double[Math.min(N, N)];
+        double[] work = new double[N];
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        double[] a = dMatrix.clone();
+        lapack.dgeqrf(N, N, a, 0, N, tau, 0, work, 0, N, info);
+
+        assertEquals(0, info.val, "QR factorization should succeed");
     }
 }
