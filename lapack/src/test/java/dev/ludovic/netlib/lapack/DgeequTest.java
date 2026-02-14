@@ -35,6 +35,27 @@ public class DgeequTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] r_expected = new double[N];
+        double[] c_expected = new double[N];
+        org.netlib.util.doubleW rowcnd_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW colcnd_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW amax_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.dgeequ(N, N, dMatrix, 0, N, r_expected, 0, c_expected, 0, rowcnd_expected, colcnd_expected, amax_expected, info_expected);
+
+        double[] r_actual = new double[N];
+        double[] c_actual = new double[N];
+        org.netlib.util.doubleW rowcnd_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW colcnd_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW amax_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.dgeequ(N, N, dMatrix, 0, N, r_actual, 0, c_actual, 0, rowcnd_actual, colcnd_actual, amax_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(r_expected, r_actual, depsilon);
+        assertArrayEquals(c_expected, c_actual, depsilon);
+        assertEquals(rowcnd_expected.val, rowcnd_actual.val, depsilon);
+        assertEquals(colcnd_expected.val, colcnd_actual.val, depsilon);
+        assertEquals(amax_expected.val, amax_actual.val, depsilon);
     }
 }

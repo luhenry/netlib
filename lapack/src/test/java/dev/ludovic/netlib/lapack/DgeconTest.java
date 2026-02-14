@@ -35,6 +35,29 @@ public class DgeconTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // First factor the matrix using dgetrf
+        double[] a = dPositiveDefiniteMatrix.clone();
+        int[] ipiv = new int[N];
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        f2j.dgetrf(N, N, a, 0, N, ipiv, 0, info);
+
+        // Compute 1-norm before factorization
+        double anorm = f2j.dlange("1", N, N, dPositiveDefiniteMatrix, 0, N, new double[N], 0);
+
+        // Test condition number estimation with 1-norm
+        org.netlib.util.doubleW rcond_expected = new org.netlib.util.doubleW(0.0);
+        double[] work_expected = new double[4 * N];
+        int[] iwork_expected = new int[N];
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.dgecon("1", N, a, 0, N, anorm, rcond_expected, work_expected, 0, iwork_expected, 0, info_expected);
+
+        org.netlib.util.doubleW rcond_actual = new org.netlib.util.doubleW(0.0);
+        double[] work_actual = new double[4 * N];
+        int[] iwork_actual = new int[N];
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.dgecon("1", N, a, 0, N, anorm, rcond_actual, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(rcond_expected.val, rcond_actual.val, depsilon);
     }
 }

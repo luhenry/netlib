@@ -35,6 +35,26 @@ public class SlansyTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] work = new float[N];
+
+        // Test 1-norm (upper triangular)
+        float expected = f2j.slansy("1", "U", N, sSymmetricMatrix, 0, N, work, 0);
+        float actual = lapack.slansy("1", "U", N, sSymmetricMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+
+        // Test Inf-norm (lower triangular)
+        expected = f2j.slansy("I", "L", N, sSymmetricMatrix, 0, N, work, 0);
+        actual = lapack.slansy("I", "L", N, sSymmetricMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+
+        // Test Frobenius norm
+        expected = f2j.slansy("F", "U", N, sSymmetricMatrix, 0, N, work, 0);
+        actual = lapack.slansy("F", "U", N, sSymmetricMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
+
+        // Test Max norm
+        expected = f2j.slansy("M", "U", N, sSymmetricMatrix, 0, N, work, 0);
+        actual = lapack.slansy("M", "U", N, sSymmetricMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.max(sepsilon, Math.abs(expected) * sepsilon));
     }
 }

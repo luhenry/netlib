@@ -35,6 +35,38 @@ public class DptconTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create symmetric positive definite tridiagonal matrix
+        double[] d = new double[N];
+        double[] e = new double[N - 1];
+
+        for (int i = 0; i < N; i++) {
+            d[i] = (N + 1) * 2.0;
+        }
+        for (int i = 0; i < N - 1; i++) {
+            e[i] = 1.0;
+        }
+
+        // Compute norm before factorization
+        double anorm = f2j.dlanst("1", N, d, 0, e, 0);
+
+        // First factor the matrix using dpttrf
+        double[] d_copy = d.clone();
+        double[] e_copy = e.clone();
+        org.netlib.util.intW info = new org.netlib.util.intW(0);
+        f2j.dpttrf(N, d_copy, 0, e_copy, 0, info);
+
+        // Test condition number estimation
+        org.netlib.util.doubleW rcond_expected = new org.netlib.util.doubleW(0.0);
+        double[] work_expected = new double[N];
+        org.netlib.util.intW info_expected = new org.netlib.util.intW(0);
+        f2j.dptcon(N, d_copy, 0, e_copy, 0, anorm, rcond_expected, work_expected, 0, info_expected);
+
+        org.netlib.util.doubleW rcond_actual = new org.netlib.util.doubleW(0.0);
+        double[] work_actual = new double[N];
+        org.netlib.util.intW info_actual = new org.netlib.util.intW(0);
+        lapack.dptcon(N, d_copy, 0, e_copy, 0, anorm, rcond_actual, work_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(rcond_expected.val, rcond_actual.val, depsilon);
     }
 }
