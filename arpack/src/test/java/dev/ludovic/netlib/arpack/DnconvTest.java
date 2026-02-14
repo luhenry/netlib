@@ -30,11 +30,90 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.netlib.util.intW;
+
 public class DnconvTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 10;
+        double tol = 1e-6;
+
+        // Test case 1: All values converge (bounds < tol * |ritz|)
+        {
+            double[] ritzr = generateDoubleArray(n, 5.0);  // Real parts
+            double[] ritzi = generateDoubleArray(n, 2.0);  // Imaginary parts
+            double[] bounds = generateDoubleArray(n, 1e-7); // Very small bounds
+            intW expected_nconv = new intW(0);
+            intW actual_nconv = new intW(0);
+
+            f2j.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), tol, expected_nconv);
+            arpack.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), tol, actual_nconv);
+
+            assertEquals(expected_nconv.val, actual_nconv.val);
+        }
+
+        // Test case 2: No values converge (large bounds)
+        {
+            double[] ritzr = generateDoubleArray(n, 1.0);
+            double[] ritzi = generateDoubleArray(n, 0.5);
+            double[] bounds = generateDoubleArray(n, 1.0); // Large bounds
+            intW expected_nconv = new intW(0);
+            intW actual_nconv = new intW(0);
+
+            f2j.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), tol, expected_nconv);
+            arpack.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), tol, actual_nconv);
+
+            assertEquals(expected_nconv.val, actual_nconv.val);
+        }
+
+        // Test case 3: Mixed convergence with complex eigenvalues
+        {
+            double[] ritzr = new double[n];
+            double[] ritzi = new double[n];
+            double[] bounds = new double[n];
+            for (int i = 0; i < n; i++) {
+                ritzr[i] = 1.0 + i * 0.5;
+                ritzi[i] = 0.5 + i * 0.2;
+                bounds[i] = (i < n/2) ? 1e-8 : 1e-4; // Half converge, half don't
+            }
+            intW expected_nconv = new intW(0);
+            intW actual_nconv = new intW(0);
+
+            f2j.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), tol, expected_nconv);
+            arpack.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), tol, actual_nconv);
+
+            assertEquals(expected_nconv.val, actual_nconv.val);
+        }
+
+        // Test case 4: Purely real eigenvalues (imaginary parts zero)
+        {
+            double[] ritzr = generateDoubleArray(n, 3.0);
+            double[] ritzi = new double[n]; // All zeros
+            double[] bounds = generateDoubleArray(n, 1e-7);
+            intW expected_nconv = new intW(0);
+            intW actual_nconv = new intW(0);
+
+            f2j.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), tol, expected_nconv);
+            arpack.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), tol, actual_nconv);
+
+            assertEquals(expected_nconv.val, actual_nconv.val);
+        }
+
+        // Test case 5: Different tolerance
+        {
+            double strict_tol = 1e-10;
+            double[] ritzr = generateDoubleArray(n, 2.0);
+            double[] ritzi = generateDoubleArray(n, 1.0);
+            double[] bounds = generateDoubleArray(n, 1e-8);
+            intW expected_nconv = new intW(0);
+            intW actual_nconv = new intW(0);
+
+            f2j.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), strict_tol, expected_nconv);
+            arpack.dnconv(n, ritzr.clone(), ritzi.clone(), bounds.clone(), strict_tol, actual_nconv);
+
+            assertEquals(expected_nconv.val, actual_nconv.val);
+        }
     }
 }

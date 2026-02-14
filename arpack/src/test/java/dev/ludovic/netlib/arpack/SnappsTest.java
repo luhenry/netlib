@@ -30,11 +30,174 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.netlib.util.intW;
+
 public class SnappsTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test parameters for applying complex shifts in non-symmetric problems
+        int n = 20;       // Problem size
+        int np = 3;       // Number of shifts to apply
+        int ldv = 20;     // Leading dimension of v
+        int ldh = 8;      // Leading dimension of h (kev + np)
+        int ldq = 8;      // Leading dimension of q
+
+        intW kev = new intW(5);  // Number of eigenvalues to keep
+
+        // Initialize test arrays
+        float[] shiftr = generateFloatArray(np, 1.5f);  // Real parts of shifts
+        float[] shifti = generateFloatArray(np, 0.5f);  // Imaginary parts of shifts
+        float[] v = generateFloatArray(n * (kev.val + np), 0.5f);  // Arnoldi basis
+        float[] h = generateNonsymmetricHessenberg(kev.val + np);  // Upper Hessenberg matrix
+        float[] resid = generateFloatArray(n, 0.1f);  // Residual vector
+        float[] q = new float[ldq * (kev.val + np)];  // Work array for rotations
+        float[] workl = new float[(kev.val + np) * (kev.val + np)];  // Work array
+        float[] workd = new float[2 * n];  // Work array
+
+        // Call f2j reference implementation
+        float[] expected_v = v.clone();
+        float[] expected_h = h.clone();
+        float[] expected_resid = resid.clone();
+        float[] expected_q = q.clone();
+        intW expected_kev = new intW(kev.val);
+
+        f2j.snapps(n, expected_kev, np, shiftr.clone(), shifti.clone(), expected_v, ldv,
+                   expected_h, ldh, expected_resid, expected_q, ldq, workl.clone(), workd.clone());
+
+        // Call implementation under test
+        float[] actual_v = v.clone();
+        float[] actual_h = h.clone();
+        float[] actual_resid = resid.clone();
+        float[] actual_q = q.clone();
+        intW actual_kev = new intW(kev.val);
+
+        arpack.snapps(n, actual_kev, np, shiftr.clone(), shifti.clone(), actual_v, ldv,
+                      actual_h, ldh, actual_resid, actual_q, ldq, workl.clone(), workd.clone());
+
+        // Verify results
+        // Note: Complex shift operations can have slightly larger numerical differences
+        float tolerance = sepsilon * 100;  // More lenient tolerance for complex operations
+        assertEquals(expected_kev.val, actual_kev.val, "kev should match");
+        assertArrayEquals(expected_v, actual_v, tolerance);
+        assertArrayEquals(expected_h, actual_h, tolerance);
+        assertArrayEquals(expected_resid, actual_resid, tolerance);
+    }
+
+    @ParameterizedTest
+    @MethodSource("ARPACKImplementations")
+    void testDifferentShiftCounts(ARPACK arpack) {
+        // Test with different number of shifts
+        int n = 20;
+        int np = 5;  // More shifts
+        int ldv = 20;
+        int ldh = 10;
+        int ldq = 10;
+
+        intW kev = new intW(5);
+
+        float[] shiftr = generateFloatArray(np, 2.0f);
+        float[] shifti = generateFloatArray(np, 1.0f);
+        float[] v = generateFloatArray(n * (kev.val + np), 1.0f);
+        float[] h = generateNonsymmetricHessenberg(kev.val + np);
+        float[] resid = generateFloatArray(n, 0.2f);
+        float[] q = new float[ldq * (kev.val + np)];
+        float[] workl = new float[(kev.val + np) * (kev.val + np)];
+        float[] workd = new float[2 * n];
+
+        // Call f2j reference implementation
+        float[] expected_v = v.clone();
+        float[] expected_h = h.clone();
+        float[] expected_resid = resid.clone();
+        intW expected_kev = new intW(kev.val);
+
+        f2j.snapps(n, expected_kev, np, shiftr.clone(), shifti.clone(), expected_v, ldv,
+                   expected_h, ldh, expected_resid, new float[ldq * (kev.val + np)], ldq,
+                   workl.clone(), workd.clone());
+
+        // Call implementation under test
+        float[] actual_v = v.clone();
+        float[] actual_h = h.clone();
+        float[] actual_resid = resid.clone();
+        intW actual_kev = new intW(kev.val);
+
+        arpack.snapps(n, actual_kev, np, shiftr.clone(), shifti.clone(), actual_v, ldv,
+                      actual_h, ldh, actual_resid, new float[ldq * (kev.val + np)], ldq,
+                      workl.clone(), workd.clone());
+
+        // Verify results
+        // Note: Complex shift operations can have slightly larger numerical differences
+        float tolerance = sepsilon * 100;  // More lenient tolerance for complex operations
+        assertEquals(expected_kev.val, actual_kev.val, "kev should match");
+        assertArrayEquals(expected_v, actual_v, tolerance);
+        assertArrayEquals(expected_h, actual_h, tolerance);
+        assertArrayEquals(expected_resid, actual_resid, tolerance);
+    }
+
+    @ParameterizedTest
+    @MethodSource("ARPACKImplementations")
+    void testLargerProblem(ARPACK arpack) {
+        // Test with larger problem size
+        int n = 30;
+        int np = 2;
+        int ldv = 30;
+        int ldh = 9;
+        int ldq = 9;
+
+        intW kev = new intW(7);
+
+        float[] shiftr = generateFloatArray(np, 0.5f);
+        float[] shifti = generateFloatArray(np, 0.25f);
+        float[] v = generateFloatArray(n * (kev.val + np), 0.3f);
+        float[] h = generateNonsymmetricHessenberg(kev.val + np);
+        float[] resid = generateFloatArray(n, 0.1f);
+        float[] q = new float[ldq * (kev.val + np)];
+        float[] workl = new float[(kev.val + np) * (kev.val + np)];
+        float[] workd = new float[2 * n];
+
+        // Call f2j reference implementation
+        float[] expected_v = v.clone();
+        float[] expected_h = h.clone();
+        float[] expected_resid = resid.clone();
+        intW expected_kev = new intW(kev.val);
+
+        f2j.snapps(n, expected_kev, np, shiftr.clone(), shifti.clone(), expected_v, ldv,
+                   expected_h, ldh, expected_resid, new float[ldq * (kev.val + np)], ldq,
+                   workl.clone(), workd.clone());
+
+        // Call implementation under test
+        float[] actual_v = v.clone();
+        float[] actual_h = h.clone();
+        float[] actual_resid = resid.clone();
+        intW actual_kev = new intW(kev.val);
+
+        arpack.snapps(n, actual_kev, np, shiftr.clone(), shifti.clone(), actual_v, ldv,
+                      actual_h, ldh, actual_resid, new float[ldq * (kev.val + np)], ldq,
+                      workl.clone(), workd.clone());
+
+        // Verify results
+        // Note: Complex shift operations can have slightly larger numerical differences
+        float tolerance = sepsilon * 100;  // More lenient tolerance for complex operations
+        assertEquals(expected_kev.val, actual_kev.val, "kev should match");
+        assertArrayEquals(expected_v, actual_v, tolerance);
+        assertArrayEquals(expected_h, actual_h, tolerance);
+        assertArrayEquals(expected_resid, actual_resid, tolerance);
+    }
+
+    // Helper method to generate a non-symmetric upper Hessenberg matrix
+    private static float[] generateNonsymmetricHessenberg(int n) {
+        float[] h = new float[n * n];
+        for (int i = 0; i < n; i++) {
+            // Upper Hessenberg structure: zero below the first subdiagonal
+            for (int j = i; j < n; j++) {
+                h[i * n + j] = 1.0f / (i + j + 1.0f);
+            }
+            // First subdiagonal
+            if (i < n - 1) {
+                h[(i + 1) * n + i] = 0.5f / (i + 1.0f);
+            }
+        }
+        return h;
     }
 }

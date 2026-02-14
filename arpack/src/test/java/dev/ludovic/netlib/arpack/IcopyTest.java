@@ -35,6 +35,16 @@ public class IcopyTest extends ARPACKTest {
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int[] expected, actual;
+
+        // Test basic copy with inc=1
+        f2j.icopy(N, intArray1, 1, expected = new int[N], 1);
+        arpack.icopy(N, intArray1, 1, actual = new int[N], 1);
+        assertArrayEquals(expected, actual);
+
+        // Test copy with inc=2
+        f2j.icopy(N/2, intArray1, 2, expected = new int[N], 2);
+        arpack.icopy(N/2, intArray1, 2, actual = new int[N], 2);
+        assertArrayEquals(expected, actual);
     }
 }

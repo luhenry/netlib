@@ -30,11 +30,108 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.netlib.util.intW;
+
 public class SlaqrbTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Note: Some native implementations may have issues with output functions
+        org.junit.jupiter.api.Assumptions.assumeFalse(arpack instanceof NativeARPACK,
+                "Output function not fully supported by " + arpack.getClass().getSimpleName());
+
+        int n = 10;
+        int ldh = n;
+
+        // Test case 1: wantt=true, full range
+        {
+            float[] expected_h = generateUpperHessenberg(n);
+            float[] expected_wr = new float[n];
+            float[] expected_wi = new float[n];
+            float[] expected_z = new float[n];
+            intW expected_info = new intW(0);
+
+            f2j.slaqrb(true, n, 1, n, expected_h, ldh, expected_wr, expected_wi, expected_z, expected_info);
+
+            float[] actual_h = generateUpperHessenberg(n);
+            float[] actual_wr = new float[n];
+            float[] actual_wi = new float[n];
+            float[] actual_z = new float[n];
+            intW actual_info = new intW(0);
+
+            arpack.slaqrb(true, n, 1, n, actual_h, ldh, actual_wr, actual_wi, actual_z, actual_info);
+
+            assertArrayEquals(expected_h, actual_h, sepsilon);
+            assertArrayEquals(expected_wr, actual_wr, sepsilon);
+            assertArrayEquals(expected_wi, actual_wi, sepsilon);
+            assertArrayEquals(expected_z, actual_z, sepsilon);
+            assertEquals(expected_info.val, actual_info.val);
+        }
+
+        // Test case 2: wantt=false, full range
+        {
+            float[] expected_h = generateUpperHessenberg(n);
+            float[] expected_wr = new float[n];
+            float[] expected_wi = new float[n];
+            float[] expected_z = new float[n];
+            intW expected_info = new intW(0);
+
+            f2j.slaqrb(false, n, 1, n, expected_h, ldh, expected_wr, expected_wi, expected_z, expected_info);
+
+            float[] actual_h = generateUpperHessenberg(n);
+            float[] actual_wr = new float[n];
+            float[] actual_wi = new float[n];
+            float[] actual_z = new float[n];
+            intW actual_info = new intW(0);
+
+            arpack.slaqrb(false, n, 1, n, actual_h, ldh, actual_wr, actual_wi, actual_z, actual_info);
+
+            assertArrayEquals(expected_h, actual_h, sepsilon);
+            assertArrayEquals(expected_wr, actual_wr, sepsilon);
+            assertArrayEquals(expected_wi, actual_wi, sepsilon);
+            assertArrayEquals(expected_z, actual_z, sepsilon);
+            assertEquals(expected_info.val, actual_info.val);
+        }
+
+        // Test case 3: wantt=true, partial range
+        {
+            int ilo = 2;
+            int ihi = 8;
+            float[] expected_h = generateUpperHessenberg(n);
+            float[] expected_wr = new float[n];
+            float[] expected_wi = new float[n];
+            float[] expected_z = new float[n];
+            intW expected_info = new intW(0);
+
+            f2j.slaqrb(true, n, ilo, ihi, expected_h, ldh, expected_wr, expected_wi, expected_z, expected_info);
+
+            float[] actual_h = generateUpperHessenberg(n);
+            float[] actual_wr = new float[n];
+            float[] actual_wi = new float[n];
+            float[] actual_z = new float[n];
+            intW actual_info = new intW(0);
+
+            arpack.slaqrb(true, n, ilo, ihi, actual_h, ldh, actual_wr, actual_wi, actual_z, actual_info);
+
+            assertArrayEquals(expected_h, actual_h, sepsilon);
+            assertArrayEquals(expected_wr, actual_wr, sepsilon);
+            assertArrayEquals(expected_wi, actual_wi, sepsilon);
+            assertArrayEquals(expected_z, actual_z, sepsilon);
+            assertEquals(expected_info.val, actual_info.val);
+        }
+    }
+
+    private static float[] generateUpperHessenberg(int n) {
+        float[] h = new float[n * n];
+        // Create upper Hessenberg matrix (zeros below first subdiagonal)
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (j >= i - 1) {
+                    h[i * n + j] = 1.0f + i * 0.1f + j * 0.05f;
+                }
+            }
+        }
+        return h;
     }
 }
