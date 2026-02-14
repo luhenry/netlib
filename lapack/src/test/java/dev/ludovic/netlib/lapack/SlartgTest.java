@@ -35,6 +35,27 @@ public class SlartgTest extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test Givens rotation generation
+        org.netlib.util.floatW cs_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW sn_expected = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW r_expected = new org.netlib.util.floatW(0.0f);
+        f2j.slartg(3.0f, 4.0f, cs_expected, sn_expected, r_expected);
+
+        org.netlib.util.floatW cs_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW sn_actual = new org.netlib.util.floatW(0.0f);
+        org.netlib.util.floatW r_actual = new org.netlib.util.floatW(0.0f);
+        lapack.slartg(3.0f, 4.0f, cs_actual, sn_actual, r_actual);
+
+        assertEquals(cs_expected.val, cs_actual.val, sepsilon);
+        assertEquals(sn_expected.val, sn_actual.val, sepsilon);
+        assertEquals(r_expected.val, r_actual.val, sepsilon);
+
+        // Test with zero second element
+        f2j.slartg(5.0f, 0.0f, cs_expected, sn_expected, r_expected);
+        lapack.slartg(5.0f, 0.0f, cs_actual, sn_actual, r_actual);
+
+        assertEquals(cs_expected.val, cs_actual.val, sepsilon);
+        assertEquals(sn_expected.val, sn_actual.val, sepsilon);
+        assertEquals(r_expected.val, r_actual.val, sepsilon);
     }
 }

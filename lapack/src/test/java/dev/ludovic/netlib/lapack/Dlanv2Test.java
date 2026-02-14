@@ -35,6 +35,40 @@ public class Dlanv2Test extends LAPACKTest {
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test standardization of 2x2 real Schur block
+        org.netlib.util.doubleW a_expected = new org.netlib.util.doubleW(1.0);
+        org.netlib.util.doubleW b_expected = new org.netlib.util.doubleW(2.0);
+        org.netlib.util.doubleW c_expected = new org.netlib.util.doubleW(3.0);
+        org.netlib.util.doubleW d_expected = new org.netlib.util.doubleW(4.0);
+        org.netlib.util.doubleW rt1r_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW rt1i_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW rt2r_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW rt2i_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW cs_expected = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW sn_expected = new org.netlib.util.doubleW(0.0);
+        f2j.dlanv2(a_expected, b_expected, c_expected, d_expected, rt1r_expected, rt1i_expected, rt2r_expected, rt2i_expected, cs_expected, sn_expected);
+
+        org.netlib.util.doubleW a_actual = new org.netlib.util.doubleW(1.0);
+        org.netlib.util.doubleW b_actual = new org.netlib.util.doubleW(2.0);
+        org.netlib.util.doubleW c_actual = new org.netlib.util.doubleW(3.0);
+        org.netlib.util.doubleW d_actual = new org.netlib.util.doubleW(4.0);
+        org.netlib.util.doubleW rt1r_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW rt1i_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW rt2r_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW rt2i_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW cs_actual = new org.netlib.util.doubleW(0.0);
+        org.netlib.util.doubleW sn_actual = new org.netlib.util.doubleW(0.0);
+        lapack.dlanv2(a_actual, b_actual, c_actual, d_actual, rt1r_actual, rt1i_actual, rt2r_actual, rt2i_actual, cs_actual, sn_actual);
+
+        assertEquals(a_expected.val, a_actual.val, depsilon);
+        assertEquals(b_expected.val, b_actual.val, depsilon);
+        assertEquals(c_expected.val, c_actual.val, depsilon);
+        assertEquals(d_expected.val, d_actual.val, depsilon);
+        assertEquals(rt1r_expected.val, rt1r_actual.val, depsilon);
+        assertEquals(rt1i_expected.val, rt1i_actual.val, depsilon);
+        assertEquals(rt2r_expected.val, rt2r_actual.val, depsilon);
+        assertEquals(rt2i_expected.val, rt2i_actual.val, depsilon);
+        assertEquals(cs_expected.val, cs_actual.val, depsilon);
+        assertEquals(sn_expected.val, sn_actual.val, depsilon);
     }
 }
