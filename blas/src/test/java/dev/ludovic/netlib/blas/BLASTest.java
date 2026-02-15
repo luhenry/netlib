@@ -39,7 +39,9 @@ import org.junit.jupiter.params.provider.Arguments;
 public class BLASTest {
 
   final static double depsilon = 1e-11d;
+  final static double dsolveEpsilon = 1e-10d;
   final static float sepsilon = 1e-3f;
+  final static float ssolveEpsilon = 1e-1f;
 
   final static BLAS f2j = F2jBLAS.getInstance();
 
@@ -148,12 +150,48 @@ public class BLASTest {
     return result;
   }
 
-  protected static final void dumpArray(String name, double[] arr) {
-    System.out.print(name + ": ");
-    for(double e : arr) {
-      System.out.print(String.format("%.3f,", e));
+  protected static final double[] extractBand(double[] ge, int m, int n, int kl, int ku, int ldge) {
+    int ldab = kl + ku + 1;
+    double[] ab = new double[ldab * n];
+    for (int j = 0; j < n; j += 1) {
+      for (int i = Math.max(0, j - ku); i <= Math.min(m - 1, j + kl); i += 1) {
+        ab[(ku + i - j) + j * ldab] = ge[i + j * ldge];
+      }
     }
-    System.out.println();
+    return ab;
+  }
+
+  protected static final double[] extractSymBand(String uplo, double[] sy, int n, int k, int ldsy) {
+    int ldab = k + 1;
+    double[] ab = new double[ldab * n];
+    if (uplo.equals("U")) {
+      for (int j = 0; j < n; j += 1) {
+        for (int i = Math.max(0, j - k); i <= j; i += 1) {
+          ab[(k + i - j) + j * ldab] = sy[i + j * ldsy];
+        }
+      }
+    } else {
+      for (int j = 0; j < n; j += 1) {
+        for (int i = j; i <= Math.min(n - 1, j + k); i += 1) {
+          ab[(i - j) + j * ldab] = sy[i + j * ldsy];
+        }
+      }
+    }
+    return ab;
+  }
+
+  protected static void assertRelArrayEquals(double[] expected, double[] actual, double relEpsilon) {
+    org.junit.jupiter.api.Assertions.assertEquals(expected.length, actual.length);
+    for (int i = 0; i < expected.length; i++) {
+      org.junit.jupiter.api.Assertions.assertEquals(expected[i], actual[i], Math.max(Math.abs(expected[i]) * relEpsilon, depsilon));
+    }
+  }
+
+  protected static void assertRelArrayEquals(float[] expected, float[] actual, float relEpsilon) {
+    org.junit.jupiter.api.Assertions.assertEquals(expected.length, actual.length);
+    for (int i = 0; i < expected.length; i++) {
+      org.junit.jupiter.api.Assertions.assertEquals(expected[i], actual[i], Math.max(Math.abs(expected[i]) * relEpsilon, sepsilon));
+    }
   }
 
   protected final int M = 103;
@@ -185,6 +223,20 @@ public class BLASTest {
   // double[m, m][L]
   protected final double[] dgeAL = extractUPLO("L", dgeA, M, M);
 
+  protected final int KL = 2;
+  protected final int KU = 2;
+
+  // double[(kl+ku+1), n] - general band storage of dgeA
+  protected final double[] dgbA = extractBand(dgeA, M, N, KL, KU, M);
+  // double[(ku+1), m] - symmetric band storage (upper) of dsyA
+  protected final double[] dsbAU = extractSymBand("U", dsyA, M, KU, M);
+  // double[(ku+1), m] - symmetric band storage (lower) of dsyA
+  protected final double[] dsbAL = extractSymBand("L", dsyA, M, KU, M);
+  // double[(ku+1), m] - triangular band storage (upper) of dgeA
+  protected final double[] dtbAU = extractSymBand("U", dgeA, M, KU, M);
+  // double[(ku+1), m] - triangular band storage (lower) of dgeA
+  protected final double[] dtbAL = extractSymBand("L", dgeA, M, KU, M);
+
   // float[m, k]
   protected final float[] sgeA = convertToFloat(dgeA);
   // float[k, n]
@@ -209,4 +261,15 @@ public class BLASTest {
   protected final float[] sgeAU = convertToFloat(dgeAU);
   // float[m, k][L]
   protected final float[] sgeAL = convertToFloat(dgeAL);
+
+  // float[(kl+ku+1), n] - general band storage
+  protected final float[] sgbA = convertToFloat(dgbA);
+  // float[(ku+1), m] - symmetric band storage (upper)
+  protected final float[] ssbAU = convertToFloat(dsbAU);
+  // float[(ku+1), m] - symmetric band storage (lower)
+  protected final float[] ssbAL = convertToFloat(dsbAL);
+  // float[(ku+1), m] - triangular band storage (upper)
+  protected final float[] stbAU = convertToFloat(dtbAU);
+  // float[(ku+1), m] - triangular band storage (lower)
+  protected final float[] stbAL = convertToFloat(dtbAL);
 }

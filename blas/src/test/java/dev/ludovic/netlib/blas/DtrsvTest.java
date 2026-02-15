@@ -35,6 +35,63 @@ public class DtrsvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dXcopy;
+
+        // uplo=U, trans=N, diag=N
+        f2j.dtrsv("U", "N", "N", M, dsyA, M, expected = dX.clone(), 1);
+        blas.dtrsv("U", "N", "N", M, dsyA, M, dXcopy = dX.clone(), 1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        // uplo=L, trans=N, diag=N
+        f2j.dtrsv("L", "N", "N", M, dsyA, M, expected = dX.clone(), 1);
+        blas.dtrsv("L", "N", "N", M, dsyA, M, dXcopy = dX.clone(), 1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        // uplo=U, trans=T, diag=N
+        f2j.dtrsv("U", "T", "N", M, dsyA, M, expected = dX.clone(), 1);
+        blas.dtrsv("U", "T", "N", M, dsyA, M, dXcopy = dX.clone(), 1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        // uplo=L, trans=T, diag=U
+        f2j.dtrsv("L", "T", "U", M, dsyA, M, expected = dX.clone(), 1);
+        blas.dtrsv("L", "T", "U", M, dsyA, M, dXcopy = dX.clone(), 1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAllUploTransCombinations(BLAS blas) {
+        double[] expected, dXcopy;
+
+        // uplo=L, trans=T, diag=N
+        f2j.dtrsv("L", "T", "N", M, dsyA, M, expected = dX.clone(), 1);
+        blas.dtrsv("L", "T", "N", M, dsyA, M, dXcopy = dX.clone(), 1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testUnitDiagonal(BLAS blas) {
+        double[] expected, dXcopy;
+
+        // uplo=U, trans=N, diag=U
+        f2j.dtrsv("U", "N", "U", M, dsyA, M, expected = dX.clone(), 1);
+        blas.dtrsv("U", "N", "U", M, dsyA, M, dXcopy = dX.clone(), 1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        // uplo=L, trans=N, diag=U
+        f2j.dtrsv("L", "N", "U", M, dsyA, M, expected = dX.clone(), 1);
+        blas.dtrsv("L", "N", "U", M, dsyA, M, dXcopy = dX.clone(), 1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        // uplo=U, trans=T, diag=U
+        f2j.dtrsv("U", "T", "U", M, dsyA, M, expected = dX.clone(), 1);
+        blas.dtrsv("U", "T", "U", M, dsyA, M, dXcopy = dX.clone(), 1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        // uplo=L, trans=T, diag=U (already in sanity, but included for completeness)
+        f2j.dtrsv("L", "T", "U", M, dsyA, M, expected = dX.clone(), 1);
+        blas.dtrsv("L", "T", "U", M, dsyA, M, dXcopy = dX.clone(), 1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
     }
 }

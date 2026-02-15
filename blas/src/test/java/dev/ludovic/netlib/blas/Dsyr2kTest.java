@@ -35,6 +35,68 @@ public class Dsyr2kTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dsyAcopy;
+
+        // uplo=U, trans=N: C := alpha*A*B^T + alpha*B*A^T + beta*C
+        // A is n x k (M x K), lda=M; B is n x k (M x K), ldb=M
+        f2j.dsyr2k("U", "N", M, K, 1.0, dgeA, M, dgeB, M, 2.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("U", "N", M, K, 1.0, dgeA, M, dgeB, M, 2.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        // uplo=L, trans=N
+        f2j.dsyr2k("L", "N", M, K, 1.0, dgeA, M, dgeB, M, 2.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("L", "N", M, K, 1.0, dgeA, M, dgeB, M, 2.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        // uplo=U, trans=T: C := alpha*A^T*B + alpha*B^T*A + beta*C
+        // A is k x n (K x M), lda=K; B is k x n (K x M), ldb=K
+        f2j.dsyr2k("U", "T", M, K, 1.0, dgeAT, K, dgeBT, K, 2.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("U", "T", M, K, 1.0, dgeAT, K, dgeBT, K, 2.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        // uplo=L, trans=T
+        f2j.dsyr2k("L", "T", M, K, 1.0, dgeAT, K, dgeBT, K, 2.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("L", "T", M, K, 1.0, dgeAT, K, dgeBT, K, 2.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        // beta=0.0 cases
+        f2j.dsyr2k("U", "N", M, K, 1.0, dgeA, M, dgeB, M, 0.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("U", "N", M, K, 1.0, dgeA, M, dgeB, M, 0.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2k("L", "N", M, K, 1.0, dgeA, M, dgeB, M, 0.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("L", "N", M, K, 1.0, dgeA, M, dgeB, M, 0.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2k("U", "T", M, K, 1.0, dgeAT, K, dgeBT, K, 0.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("U", "T", M, K, 1.0, dgeAT, K, dgeBT, K, 0.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2k("L", "T", M, K, 1.0, dgeAT, K, dgeBT, K, 0.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("L", "T", M, K, 1.0, dgeAT, K, dgeBT, K, 0.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaScale(BLAS blas) {
+        double[] expected, dsyAcopy;
+
+        // alpha=0.0, beta=2.0: should just scale C by 2.0
+        f2j.dsyr2k("U", "N", M, K, 0.0, dgeA, M, dgeB, M, 2.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("U", "N", M, K, 0.0, dgeA, M, dgeB, M, 2.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2k("L", "N", M, K, 0.0, dgeA, M, dgeB, M, 2.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("L", "N", M, K, 0.0, dgeA, M, dgeB, M, 2.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2k("U", "T", M, K, 0.0, dgeAT, K, dgeBT, K, 2.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("U", "T", M, K, 0.0, dgeAT, K, dgeBT, K, 2.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2k("L", "T", M, K, 0.0, dgeAT, K, dgeBT, K, 2.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("L", "T", M, K, 0.0, dgeAT, K, dgeBT, K, 2.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
     }
 }

@@ -35,6 +35,84 @@ public class SgbmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, sYcopy;
+        int lda = KL + KU + 1;
+
+        // trans=N, alpha=1.0f, beta=2.0f
+        f2j.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T, alpha=1.0f, beta=2.0f
+        f2j.sgbmv("T", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.sgbmv("T", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=N, alpha=1.0f, beta=0.0f
+        f2j.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T, alpha=1.0f, beta=0.0f
+        f2j.sgbmv("T", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.sgbmv("T", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=N, alpha=0.0f, beta=1.0f
+        f2j.sgbmv("N", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 1.0f, expected = sY.clone(), 1);
+        blas.sgbmv("N", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T, alpha=0.0f, beta=1.0f
+        f2j.sgbmv("T", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 1.0f, expected = sY.clone(), 1);
+        blas.sgbmv("T", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaTwo(BLAS blas) {
+        float[] expected, sYcopy;
+        int lda = KL + KU + 1;
+
+        // trans=N, alpha=2.0f, beta=1.0f
+        f2j.sgbmv("N", M, N, KL, KU, 2.0f, sgbA, lda, sX, 1, 1.0f, expected = sY.clone(), 1);
+        blas.sgbmv("N", M, N, KL, KU, 2.0f, sgbA, lda, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T, alpha=2.0f, beta=1.0f
+        f2j.sgbmv("T", M, N, KL, KU, 2.0f, sgbA, lda, sX, 1, 1.0f, expected = sY.clone(), 1);
+        blas.sgbmv("T", M, N, KL, KU, 2.0f, sgbA, lda, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=N, alpha=2.0f, beta=0.0f
+        f2j.sgbmv("N", M, N, KL, KU, 2.0f, sgbA, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.sgbmv("N", M, N, KL, KU, 2.0f, sgbA, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T, alpha=2.0f, beta=0.0f
+        f2j.sgbmv("T", M, N, KL, KU, 2.0f, sgbA, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.sgbmv("T", M, N, KL, KU, 2.0f, sgbA, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        float[] expected, sYcopy;
+        int lda = KL + KU + 1;
+        // With incx=2 and incy=2, strided access needs (dim-1)*2 + 1 entries.
+        // sX and sY have M=103 elements, so max dim = (M-1)/2 + 1 = 52.
+        int smallDim = (M - 1) / 2 + 1;
+
+        // trans=N: x has smallDim elements (stride 2), y has smallDim elements (stride 2)
+        f2j.sgbmv("N", smallDim, smallDim, KL, KU, 1.0f, sgbA, lda, sX, 2, 1.0f, expected = sY.clone(), 2);
+        blas.sgbmv("N", smallDim, smallDim, KL, KU, 1.0f, sgbA, lda, sX, 2, 1.0f, sYcopy = sY.clone(), 2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T: x has smallDim elements (stride 2), y has smallDim elements (stride 2)
+        f2j.sgbmv("T", smallDim, smallDim, KL, KU, 1.0f, sgbA, lda, sX, 2, 1.0f, expected = sY.clone(), 2);
+        blas.sgbmv("T", smallDim, smallDim, KL, KU, 1.0f, sgbA, lda, sX, 2, 1.0f, sYcopy = sY.clone(), 2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
     }
 }

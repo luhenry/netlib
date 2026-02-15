@@ -35,6 +35,28 @@ public class IdamaxTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        assertEquals(f2j.idamax(M, dX, 1), blas.idamax(M, dX, 1), depsilon);
+        assertEquals(f2j.idamax(M, dX, 1), blas.idamax(M, dX, 1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testStridedAccess(BLAS blas) {
+        // incx=2: strided access, only processes M/2 elements with stride 2
+        int n = M / 2;
+        assertEquals(f2j.idamax(n, dX, 2), blas.idamax(n, dX, 2));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testSingleElement(BLAS blas) {
+        // n=1: single element should always return index 0
+        assertEquals(f2j.idamax(1, dX, 1), blas.idamax(1, dX, 1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroElements(BLAS blas) {
+        // n=0: should return -1
+        assertEquals(f2j.idamax(0, dX, 1), blas.idamax(0, dX, 1));
     }
 }

@@ -35,6 +35,28 @@ public class IsamaxTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        assertEquals(f2j.isamax(M, sX, 1), blas.isamax(M, sX, 1), sepsilon);
+        assertEquals(f2j.isamax(M, sX, 1), blas.isamax(M, sX, 1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testStridedAccess(BLAS blas) {
+        // incx=2: strided access, only processes M/2 elements with stride 2
+        int n = M / 2;
+        assertEquals(f2j.isamax(n, sX, 2), blas.isamax(n, sX, 2));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testSingleElement(BLAS blas) {
+        // n=1: single element should always return index 0
+        assertEquals(f2j.isamax(1, sX, 1), blas.isamax(1, sX, 1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroElements(BLAS blas) {
+        // n=0: should return -1
+        assertEquals(f2j.isamax(0, sX, 1), blas.isamax(0, sX, 1));
     }
 }

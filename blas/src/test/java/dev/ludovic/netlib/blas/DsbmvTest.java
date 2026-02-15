@@ -35,6 +35,69 @@ public class DsbmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dYcopy;
+        int lda = KU + 1;
+
+        // uplo=U, alpha=1.0, beta=2.0
+        f2j.dsbmv("U", M, KU, 1.0, dsbAU, lda, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dsbmv("U", M, KU, 1.0, dsbAU, lda, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // uplo=L, alpha=1.0, beta=2.0
+        f2j.dsbmv("L", M, KU, 1.0, dsbAL, lda, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dsbmv("L", M, KU, 1.0, dsbAL, lda, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // uplo=U, alpha=1.0, beta=0.0
+        f2j.dsbmv("U", M, KU, 1.0, dsbAU, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dsbmv("U", M, KU, 1.0, dsbAU, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // uplo=L, alpha=1.0, beta=0.0
+        f2j.dsbmv("L", M, KU, 1.0, dsbAL, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dsbmv("L", M, KU, 1.0, dsbAL, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // uplo=U, alpha=0.0, beta=1.0
+        f2j.dsbmv("U", M, KU, 0.0, dsbAU, lda, dX, 1, 1.0, expected = dY.clone(), 1);
+        blas.dsbmv("U", M, KU, 0.0, dsbAU, lda, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // uplo=L, alpha=0.0, beta=1.0
+        f2j.dsbmv("L", M, KU, 0.0, dsbAL, lda, dX, 1, 1.0, expected = dY.clone(), 1);
+        blas.dsbmv("L", M, KU, 0.0, dsbAL, lda, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaTwo(BLAS blas) {
+        double[] expected, dYcopy;
+        int lda = KU + 1;
+
+        // alpha=0.0, beta=2.0: should just scale y by 2.0
+        f2j.dsbmv("U", M, KU, 0.0, dsbAU, lda, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dsbmv("U", M, KU, 0.0, dsbAU, lda, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        f2j.dsbmv("L", M, KU, 0.0, dsbAL, lda, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dsbmv("L", M, KU, 0.0, dsbAL, lda, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaTwoBetaZero(BLAS blas) {
+        double[] expected, dYcopy;
+        int lda = KU + 1;
+
+        // alpha=2.0, beta=0.0: y = 2.0 * A * x
+        f2j.dsbmv("U", M, KU, 2.0, dsbAU, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dsbmv("U", M, KU, 2.0, dsbAU, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        f2j.dsbmv("L", M, KU, 2.0, dsbAL, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dsbmv("L", M, KU, 2.0, dsbAL, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
     }
 }

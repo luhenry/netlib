@@ -45,4 +45,34 @@ public class SsyrTest extends BLASTest {
         blas.ssyr("L", M, 2.0f, sX, 1, ssyAcopy = ssyA.clone(), M);
         assertArrayEquals(expected, ssyAcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZero(BLAS blas) {
+        float[] expected, ssyAcopy;
+
+        // alpha=0.0f should be a no-op (C unchanged)
+        f2j.ssyr("U", M, 0.0f, sX, 1, expected = ssyA.clone(), M);
+        blas.ssyr("U", M, 0.0f, sX, 1, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        f2j.ssyr("L", M, 0.0f, sX, 1, expected = ssyA.clone(), M);
+        blas.ssyr("L", M, 0.0f, sX, 1, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaNegative(BLAS blas) {
+        float[] expected, ssyAcopy;
+
+        // alpha=-1.0f
+        f2j.ssyr("U", M, -1.0f, sX, 1, expected = ssyA.clone(), M);
+        blas.ssyr("U", M, -1.0f, sX, 1, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        f2j.ssyr("L", M, -1.0f, sX, 1, expected = ssyA.clone(), M);
+        blas.ssyr("L", M, -1.0f, sX, 1, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+    }
 }

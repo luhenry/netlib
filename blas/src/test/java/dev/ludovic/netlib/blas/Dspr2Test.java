@@ -45,4 +45,19 @@ public class Dspr2Test extends BLASTest {
         blas.dspr2("L", M, 2.0, dX, 1, dY, 1, dgeAcopy = dgeAL.clone());
         assertArrayEquals(expected, dgeAcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZero(BLAS blas) {
+        double[] expected, dgeAcopy;
+
+        // alpha=0.0 should be a no-op
+        f2j.dspr2("U", M, 0.0, dX, 1, dY, 1, expected = dgeAU.clone());
+        blas.dspr2("U", M, 0.0, dX, 1, dY, 1, dgeAcopy = dgeAU.clone());
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+
+        f2j.dspr2("L", M, 0.0, dX, 1, dY, 1, expected = dgeAL.clone());
+        blas.dspr2("L", M, 0.0, dX, 1, dY, 1, dgeAcopy = dgeAL.clone());
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+    }
 }

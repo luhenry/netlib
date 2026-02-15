@@ -45,4 +45,34 @@ public class Dsyr2Test extends BLASTest {
         blas.dsyr2("L", M, 2.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), M);
         assertArrayEquals(expected, dsyAcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZero(BLAS blas) {
+        double[] expected, dsyAcopy;
+
+        // alpha=0.0 should be a no-op
+        f2j.dsyr2("U", M, 0.0, dX, 1, dY, 1, expected = dsyA.clone(), M);
+        blas.dsyr2("U", M, 0.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2("L", M, 0.0, dX, 1, dY, 1, expected = dsyA.clone(), M);
+        blas.dsyr2("L", M, 0.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaNegative(BLAS blas) {
+        double[] expected, dsyAcopy;
+
+        // alpha=-1.0
+        f2j.dsyr2("U", M, -1.0, dX, 1, dY, 1, expected = dsyA.clone(), M);
+        blas.dsyr2("U", M, -1.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2("L", M, -1.0, dX, 1, dY, 1, expected = dsyA.clone(), M);
+        blas.dsyr2("L", M, -1.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+    }
 }
