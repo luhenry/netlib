@@ -35,6 +35,63 @@ public class DtpmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dXcopy;
+
+        // uplo=U, trans=N, diag=N
+        f2j.dtpmv("U", "N", "N", M, dgeAU, expected = dX.clone(), 1);
+        blas.dtpmv("U", "N", "N", M, dgeAU, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        // uplo=L, trans=N, diag=N
+        f2j.dtpmv("L", "N", "N", M, dgeAL, expected = dX.clone(), 1);
+        blas.dtpmv("L", "N", "N", M, dgeAL, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        // uplo=U, trans=T, diag=N
+        f2j.dtpmv("U", "T", "N", M, dgeAU, expected = dX.clone(), 1);
+        blas.dtpmv("U", "T", "N", M, dgeAU, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        // uplo=L, trans=T, diag=U
+        f2j.dtpmv("L", "T", "U", M, dgeAL, expected = dX.clone(), 1);
+        blas.dtpmv("L", "T", "U", M, dgeAL, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAllUploTransCombinations(BLAS blas) {
+        double[] expected, dXcopy;
+
+        // uplo=L, trans=T, diag=N
+        f2j.dtpmv("L", "T", "N", M, dgeAL, expected = dX.clone(), 1);
+        blas.dtpmv("L", "T", "N", M, dgeAL, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testUnitDiagonal(BLAS blas) {
+        double[] expected, dXcopy;
+
+        // uplo=U, trans=N, diag=U
+        f2j.dtpmv("U", "N", "U", M, dgeAU, expected = dX.clone(), 1);
+        blas.dtpmv("U", "N", "U", M, dgeAU, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        // uplo=L, trans=N, diag=U
+        f2j.dtpmv("L", "N", "U", M, dgeAL, expected = dX.clone(), 1);
+        blas.dtpmv("L", "N", "U", M, dgeAL, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        // uplo=U, trans=T, diag=U
+        f2j.dtpmv("U", "T", "U", M, dgeAU, expected = dX.clone(), 1);
+        blas.dtpmv("U", "T", "U", M, dgeAU, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        // uplo=L, trans=T, diag=U (already in sanity, but included for completeness)
+        f2j.dtpmv("L", "T", "U", M, dgeAL, expected = dX.clone(), 1);
+        blas.dtpmv("L", "T", "U", M, dgeAL, dXcopy = dX.clone(), 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
     }
 }

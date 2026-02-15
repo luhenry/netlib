@@ -85,4 +85,42 @@ public class DsymmTest extends BLASTest {
         blas.dsymm("R", "L", M, N, 0.0, dsyA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaZero(BLAS blas) {
+        double[] expected, dgeCcopy;
+
+        // alpha=0.0, beta=0.0: C should be zeroed out
+        f2j.dsymm("L", "U", M, N, 0.0, dsyA, M, dgeB, K, 0.0, expected = dgeC.clone(), M);
+        blas.dsymm("L", "U", M, N, 0.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dsymm("R", "L", M, N, 0.0, dsyA, M, dgeB, K, 0.0, expected = dgeC.clone(), M);
+        blas.dsymm("R", "L", M, N, 0.0, dsyA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaTwoBetaHalf(BLAS blas) {
+        double[] expected, dgeCcopy;
+
+        // alpha=2.0, beta=0.5
+        f2j.dsymm("L", "U", M, N, 2.0, dsyA, M, dgeB, K, 0.5, expected = dgeC.clone(), M);
+        blas.dsymm("L", "U", M, N, 2.0, dsyA, M, dgeB, K, 0.5, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dsymm("L", "L", M, N, 2.0, dsyA, M, dgeB, K, 0.5, expected = dgeC.clone(), M);
+        blas.dsymm("L", "L", M, N, 2.0, dsyA, M, dgeB, K, 0.5, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dsymm("R", "U", M, N, 2.0, dsyA, M, dgeB, K, 0.5, expected = dgeC.clone(), M);
+        blas.dsymm("R", "U", M, N, 2.0, dsyA, M, dgeB, K, 0.5, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dsymm("R", "L", M, N, 2.0, dsyA, M, dgeB, K, 0.5, expected = dgeC.clone(), M);
+        blas.dsymm("R", "L", M, N, 2.0, dsyA, M, dgeB, K, 0.5, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+    }
 }

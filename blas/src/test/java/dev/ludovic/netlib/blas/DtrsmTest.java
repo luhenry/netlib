@@ -35,6 +35,129 @@ public class DtrsmTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dgeBcopy;
+
+        // side=L, uplo=U, transa=N, diag=N
+        f2j.dtrsm("L", "U", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "U", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=L, uplo=L, transa=N, diag=N
+        f2j.dtrsm("L", "L", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "L", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=R, uplo=U, transa=N, diag=N
+        f2j.dtrsm("R", "U", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "U", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=L, uplo=U, transa=T, diag=N
+        f2j.dtrsm("L", "U", "T", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "U", "T", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAllSideUploTransCombinations(BLAS blas) {
+        double[] expected, dgeBcopy;
+
+        // side=R, uplo=L, transa=N, diag=N
+        f2j.dtrsm("R", "L", "N", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "L", "N", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=L, uplo=L, transa=T, diag=N
+        f2j.dtrsm("L", "L", "T", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "L", "T", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=R, uplo=U, transa=T, diag=N
+        f2j.dtrsm("R", "U", "T", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "U", "T", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=R, uplo=L, transa=T, diag=N
+        f2j.dtrsm("R", "L", "T", "N", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "L", "T", "N", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testUnitDiagonal(BLAS blas) {
+        double[] expected, dgeBcopy;
+
+        // side=L, uplo=U, transa=N, diag=U
+        f2j.dtrsm("L", "U", "N", "U", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "U", "N", "U", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=L, uplo=L, transa=N, diag=U
+        f2j.dtrsm("L", "L", "N", "U", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "L", "N", "U", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=R, uplo=U, transa=N, diag=U
+        f2j.dtrsm("R", "U", "N", "U", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "U", "N", "U", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=R, uplo=L, transa=N, diag=U
+        f2j.dtrsm("R", "L", "N", "U", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "L", "N", "U", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=L, uplo=U, transa=T, diag=U
+        f2j.dtrsm("L", "U", "T", "U", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "U", "T", "U", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=L, uplo=L, transa=T, diag=U
+        f2j.dtrsm("L", "L", "T", "U", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "L", "T", "U", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=R, uplo=U, transa=T, diag=U
+        f2j.dtrsm("R", "U", "T", "U", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "U", "T", "U", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // side=R, uplo=L, transa=T, diag=U
+        f2j.dtrsm("R", "L", "T", "U", M, N, 1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "L", "T", "U", M, N, 1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaScaling(BLAS blas) {
+        double[] expected, dgeBcopy;
+
+        // alpha=2.0: side=L, uplo=U, transa=N, diag=N
+        f2j.dtrsm("L", "U", "N", "N", M, N, 2.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "U", "N", "N", M, N, 2.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // alpha=2.0: side=R, uplo=L, transa=T, diag=N
+        f2j.dtrsm("R", "L", "T", "N", M, N, 2.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "L", "T", "N", M, N, 2.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // alpha=2.0: side=L, uplo=L, transa=N, diag=U
+        f2j.dtrsm("L", "L", "N", "U", M, N, 2.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "L", "N", "U", M, N, 2.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // alpha=2.0: side=R, uplo=U, transa=T, diag=U
+        f2j.dtrsm("R", "U", "T", "U", M, N, 2.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "U", "T", "U", M, N, 2.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // alpha=-1.0: side=L, uplo=U, transa=N, diag=N
+        f2j.dtrsm("L", "U", "N", "N", M, N, -1.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "U", "N", "N", M, N, -1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
     }
 }

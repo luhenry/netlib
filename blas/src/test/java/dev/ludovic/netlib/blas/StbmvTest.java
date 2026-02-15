@@ -35,6 +35,63 @@ public class StbmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, sXcopy;
+
+        // uplo=U, trans=N, diag=N
+        f2j.stbmv("U", "N", "N", M, KU, stbAU, KU + 1, expected = sX.clone(), 1);
+        blas.stbmv("U", "N", "N", M, KU, stbAU, KU + 1, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=L, trans=N, diag=N
+        f2j.stbmv("L", "N", "N", M, KU, stbAL, KU + 1, expected = sX.clone(), 1);
+        blas.stbmv("L", "N", "N", M, KU, stbAL, KU + 1, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=U, trans=T, diag=N
+        f2j.stbmv("U", "T", "N", M, KU, stbAU, KU + 1, expected = sX.clone(), 1);
+        blas.stbmv("U", "T", "N", M, KU, stbAU, KU + 1, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=L, trans=T, diag=U
+        f2j.stbmv("L", "T", "U", M, KU, stbAL, KU + 1, expected = sX.clone(), 1);
+        blas.stbmv("L", "T", "U", M, KU, stbAL, KU + 1, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAllUploTransCombinations(BLAS blas) {
+        float[] expected, sXcopy;
+
+        // uplo=L, trans=T, diag=N
+        f2j.stbmv("L", "T", "N", M, KU, stbAL, KU + 1, expected = sX.clone(), 1);
+        blas.stbmv("L", "T", "N", M, KU, stbAL, KU + 1, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testUnitDiagonal(BLAS blas) {
+        float[] expected, sXcopy;
+
+        // uplo=U, trans=N, diag=U
+        f2j.stbmv("U", "N", "U", M, KU, stbAU, KU + 1, expected = sX.clone(), 1);
+        blas.stbmv("U", "N", "U", M, KU, stbAU, KU + 1, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=L, trans=N, diag=U
+        f2j.stbmv("L", "N", "U", M, KU, stbAL, KU + 1, expected = sX.clone(), 1);
+        blas.stbmv("L", "N", "U", M, KU, stbAL, KU + 1, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=U, trans=T, diag=U
+        f2j.stbmv("U", "T", "U", M, KU, stbAU, KU + 1, expected = sX.clone(), 1);
+        blas.stbmv("U", "T", "U", M, KU, stbAU, KU + 1, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        // uplo=L, trans=T, diag=U (already in sanity, but included for completeness)
+        f2j.stbmv("L", "T", "U", M, KU, stbAL, KU + 1, expected = sX.clone(), 1);
+        blas.stbmv("L", "T", "U", M, KU, stbAL, KU + 1, sXcopy = sX.clone(), 1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
     }
 }

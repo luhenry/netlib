@@ -240,10 +240,21 @@ abstract class AbstractBLAS implements BLAS {
 
   public void dgbmv(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (debug) System.err.println("dgbmv");
+    checkArgument("DGBMV", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("DGBMV", 2, m >= 0);
+    checkArgument("DGBMV", 3, n >= 0);
+    checkArgument("DGBMV", 4, kl >= 0);
+    checkArgument("DGBMV", 5, ku >= 0);
+    checkArgument("DGBMV", 8, lda >= (kl + ku + 1));
+    checkArgument("DGBMV", 10, incx != 0);
+    checkArgument("DGBMV", 13, incy != 0);
+    if (m == 0 || n == 0) {
+      return;
+    }
     requireNonNull(a);
     requireNonNull(x);
     requireNonNull(y);
-    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offseta + (n - 1) * lda + (kl + ku), a.length);
     checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     dgbmvK(trans, m, n, kl, ku, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
@@ -258,10 +269,21 @@ abstract class AbstractBLAS implements BLAS {
 
   public void sgbmv(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (debug) System.err.println("sgbmv");
+    checkArgument("SGBMV", 1, lsame("N", trans) || lsame("T", trans) || lsame("C", trans));
+    checkArgument("SGBMV", 2, m >= 0);
+    checkArgument("SGBMV", 3, n >= 0);
+    checkArgument("SGBMV", 4, kl >= 0);
+    checkArgument("SGBMV", 5, ku >= 0);
+    checkArgument("SGBMV", 8, lda >= (kl + ku + 1));
+    checkArgument("SGBMV", 10, incx != 0);
+    checkArgument("SGBMV", 13, incy != 0);
+    if (m == 0 || n == 0) {
+      return;
+    }
     requireNonNull(a);
     requireNonNull(x);
     requireNonNull(y);
-    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offseta + (n - 1) * lda + (kl + ku), a.length);
     checkIndex(offsetx + ((lsame("N", trans) ? n : m) - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + ((lsame("N", trans) ? m : n) - 1) * Math.abs(incy), y.length);
     sgbmvK(trans, m, n, kl, ku, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
@@ -581,6 +603,9 @@ abstract class AbstractBLAS implements BLAS {
 
   public void drotm(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] param, int offsetparam) {
     if (debug) System.err.println("drotm");
+    if (n <= 0) {
+      return;
+    }
     requireNonNull(x);
     requireNonNull(y);
     requireNonNull(param);
@@ -599,6 +624,9 @@ abstract class AbstractBLAS implements BLAS {
 
   public void srotm(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] param, int offsetparam) {
     if (debug) System.err.println("srotm");
+    if (n <= 0) {
+      return;
+    }
     requireNonNull(x);
     requireNonNull(y);
     requireNonNull(param);
@@ -651,10 +679,19 @@ abstract class AbstractBLAS implements BLAS {
 
   public void dsbmv(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
     if (debug) System.err.println("dsbmv");
+    checkArgument("DSBMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("DSBMV", 2, n >= 0);
+    checkArgument("DSBMV", 3, k >= 0);
+    checkArgument("DSBMV", 6, lda >= (k + 1));
+    checkArgument("DSBMV", 8, incx != 0);
+    checkArgument("DSBMV", 11, incy != 0);
+    if (n == 0) {
+      return;
+    }
     requireNonNull(a);
     requireNonNull(x);
     requireNonNull(y);
-    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offseta + (n - 1) * lda + k, a.length);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     dsbmvK(uplo, n, k, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
@@ -669,10 +706,19 @@ abstract class AbstractBLAS implements BLAS {
 
   public void ssbmv(String uplo, int n, int k, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
     if (debug) System.err.println("ssbmv");
+    checkArgument("SSBMV", 1, lsame("U", uplo) || lsame("L", uplo));
+    checkArgument("SSBMV", 2, n >= 0);
+    checkArgument("SSBMV", 3, k >= 0);
+    checkArgument("SSBMV", 6, lda >= (k + 1));
+    checkArgument("SSBMV", 8, incx != 0);
+    checkArgument("SSBMV", 11, incy != 0);
+    if (n == 0) {
+      return;
+    }
     requireNonNull(a);
     requireNonNull(x);
     requireNonNull(y);
-    checkIndex(offseta + n * lda - 1, a.length);
+    checkIndex(offseta + (n - 1) * lda + k, a.length);
     checkIndex(offsetx + (n - 1) * Math.abs(incx), x.length);
     checkIndex(offsety + (n - 1) * Math.abs(incy), y.length);
     ssbmvK(uplo, n, k, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
@@ -1236,7 +1282,7 @@ abstract class AbstractBLAS implements BLAS {
     checkArgument("DTBMV", 3, lsame("U", diag) || lsame("N", diag));
     checkArgument("DTBMV", 4, n >= 0);
     checkArgument("DTBMV", 5, k >= 0);
-    checkArgument("DTBMV", 7, lda >= Math.max(1, k));
+    checkArgument("DTBMV", 7, lda >= (k + 1));
     checkArgument("DTBMV", 9, incx != 0);
     if (n == 0) {
       return;
@@ -1262,7 +1308,7 @@ abstract class AbstractBLAS implements BLAS {
     checkArgument("STBMV", 3, lsame("U", diag) || lsame("N", diag));
     checkArgument("STBMV", 4, n >= 0);
     checkArgument("STBMV", 5, k >= 0);
-    checkArgument("STBMV", 7, lda >= Math.max(1, k));
+    checkArgument("STBMV", 7, lda >= (k + 1));
     checkArgument("STBMV", 9, incx != 0);
     if (n == 0) {
       return;
@@ -1288,7 +1334,7 @@ abstract class AbstractBLAS implements BLAS {
     checkArgument("DTBSV", 3, lsame("U", diag) || lsame("N", diag));
     checkArgument("DTBSV", 4, n >= 0);
     checkArgument("DTBSV", 5, k >= 0);
-    checkArgument("DTBSV", 7, lda >= Math.max(1, k));
+    checkArgument("DTBSV", 7, lda >= (k + 1));
     checkArgument("DTBSV", 9, incx != 0);
     if (n == 0) {
       return;
@@ -1314,7 +1360,7 @@ abstract class AbstractBLAS implements BLAS {
     checkArgument("STBSV", 3, lsame("U", diag) || lsame("N", diag));
     checkArgument("STBSV", 4, n >= 0);
     checkArgument("STBSV", 5, k >= 0);
-    checkArgument("STBSV", 7, lda >= Math.max(1, k));
+    checkArgument("STBSV", 7, lda >= (k + 1));
     checkArgument("STBSV", 9, incx != 0);
     if (n == 0) {
       return;

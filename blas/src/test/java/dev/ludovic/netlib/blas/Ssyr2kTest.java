@@ -35,6 +35,68 @@ public class Ssyr2kTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, ssyAcopy;
+
+        // uplo=U, trans=N: C := alpha*A*B^T + alpha*B*A^T + beta*C
+        // A is n x k (M x K), lda=M; B is n x k (M x K), ldb=M
+        f2j.ssyr2k("U", "N", M, K, 1.0f, sgeA, M, sgeB, M, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("U", "N", M, K, 1.0f, sgeA, M, sgeB, M, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        // uplo=L, trans=N
+        f2j.ssyr2k("L", "N", M, K, 1.0f, sgeA, M, sgeB, M, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("L", "N", M, K, 1.0f, sgeA, M, sgeB, M, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        // uplo=U, trans=T: C := alpha*A^T*B + alpha*B^T*A + beta*C
+        // A is k x n (K x M), lda=K; B is k x n (K x M), ldb=K
+        f2j.ssyr2k("U", "T", M, K, 1.0f, sgeAT, K, sgeBT, K, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("U", "T", M, K, 1.0f, sgeAT, K, sgeBT, K, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        // uplo=L, trans=T
+        f2j.ssyr2k("L", "T", M, K, 1.0f, sgeAT, K, sgeBT, K, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("L", "T", M, K, 1.0f, sgeAT, K, sgeBT, K, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        // beta=0.0 cases
+        f2j.ssyr2k("U", "N", M, K, 1.0f, sgeA, M, sgeB, M, 0.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("U", "N", M, K, 1.0f, sgeA, M, sgeB, M, 0.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        f2j.ssyr2k("L", "N", M, K, 1.0f, sgeA, M, sgeB, M, 0.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("L", "N", M, K, 1.0f, sgeA, M, sgeB, M, 0.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        f2j.ssyr2k("U", "T", M, K, 1.0f, sgeAT, K, sgeBT, K, 0.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("U", "T", M, K, 1.0f, sgeAT, K, sgeBT, K, 0.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        f2j.ssyr2k("L", "T", M, K, 1.0f, sgeAT, K, sgeBT, K, 0.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("L", "T", M, K, 1.0f, sgeAT, K, sgeBT, K, 0.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaScale(BLAS blas) {
+        float[] expected, ssyAcopy;
+
+        // alpha=0.0f, beta=2.0f: should just scale C by 2.0
+        f2j.ssyr2k("U", "N", M, K, 0.0f, sgeA, M, sgeB, M, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("U", "N", M, K, 0.0f, sgeA, M, sgeB, M, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        f2j.ssyr2k("L", "N", M, K, 0.0f, sgeA, M, sgeB, M, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("L", "N", M, K, 0.0f, sgeA, M, sgeB, M, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        f2j.ssyr2k("U", "T", M, K, 0.0f, sgeAT, K, sgeBT, K, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("U", "T", M, K, 0.0f, sgeAT, K, sgeBT, K, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
+
+        f2j.ssyr2k("L", "T", M, K, 0.0f, sgeAT, K, sgeBT, K, 2.0f, expected = ssyA.clone(), M);
+        blas.ssyr2k("L", "T", M, K, 0.0f, sgeAT, K, sgeBT, K, 2.0f, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, 2 * sepsilon);
     }
 }

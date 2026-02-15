@@ -35,6 +35,69 @@ public class SsbmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] expected, sYcopy;
+        int lda = KU + 1;
+
+        // uplo=U, alpha=1.0f, beta=2.0f
+        f2j.ssbmv("U", M, KU, 1.0f, ssbAU, lda, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.ssbmv("U", M, KU, 1.0f, ssbAU, lda, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // uplo=L, alpha=1.0f, beta=2.0f
+        f2j.ssbmv("L", M, KU, 1.0f, ssbAL, lda, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.ssbmv("L", M, KU, 1.0f, ssbAL, lda, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // uplo=U, alpha=1.0f, beta=0.0f
+        f2j.ssbmv("U", M, KU, 1.0f, ssbAU, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.ssbmv("U", M, KU, 1.0f, ssbAU, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // uplo=L, alpha=1.0f, beta=0.0f
+        f2j.ssbmv("L", M, KU, 1.0f, ssbAL, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.ssbmv("L", M, KU, 1.0f, ssbAL, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // uplo=U, alpha=0.0f, beta=1.0f
+        f2j.ssbmv("U", M, KU, 0.0f, ssbAU, lda, sX, 1, 1.0f, expected = sY.clone(), 1);
+        blas.ssbmv("U", M, KU, 0.0f, ssbAU, lda, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // uplo=L, alpha=0.0f, beta=1.0f
+        f2j.ssbmv("L", M, KU, 0.0f, ssbAL, lda, sX, 1, 1.0f, expected = sY.clone(), 1);
+        blas.ssbmv("L", M, KU, 0.0f, ssbAL, lda, sX, 1, 1.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaTwo(BLAS blas) {
+        float[] expected, sYcopy;
+        int lda = KU + 1;
+
+        // alpha=0.0f, beta=2.0f: should just scale y by 2.0
+        f2j.ssbmv("U", M, KU, 0.0f, ssbAU, lda, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.ssbmv("U", M, KU, 0.0f, ssbAU, lda, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.ssbmv("L", M, KU, 0.0f, ssbAL, lda, sX, 1, 2.0f, expected = sY.clone(), 1);
+        blas.ssbmv("L", M, KU, 0.0f, ssbAL, lda, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaTwoBetaZero(BLAS blas) {
+        float[] expected, sYcopy;
+        int lda = KU + 1;
+
+        // alpha=2.0f, beta=0.0f: y = 2.0 * A * x
+        f2j.ssbmv("U", M, KU, 2.0f, ssbAU, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.ssbmv("U", M, KU, 2.0f, ssbAU, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.ssbmv("L", M, KU, 2.0f, ssbAL, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.ssbmv("L", M, KU, 2.0f, ssbAL, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
     }
 }

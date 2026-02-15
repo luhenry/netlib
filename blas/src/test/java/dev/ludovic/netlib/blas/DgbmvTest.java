@@ -35,6 +35,84 @@ public class DgbmvTest extends BLASTest {
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] expected, dYcopy;
+        int lda = KL + KU + 1;
+
+        // trans=N, alpha=1.0, beta=2.0
+        f2j.dgbmv("N", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dgbmv("N", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T, alpha=1.0, beta=2.0
+        f2j.dgbmv("T", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 2.0, expected = dY.clone(), 1);
+        blas.dgbmv("T", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=N, alpha=1.0, beta=0.0
+        f2j.dgbmv("N", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dgbmv("N", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T, alpha=1.0, beta=0.0
+        f2j.dgbmv("T", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dgbmv("T", M, N, KL, KU, 1.0, dgbA, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=N, alpha=0.0, beta=1.0
+        f2j.dgbmv("N", M, N, KL, KU, 0.0, dgbA, lda, dX, 1, 1.0, expected = dY.clone(), 1);
+        blas.dgbmv("N", M, N, KL, KU, 0.0, dgbA, lda, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T, alpha=0.0, beta=1.0
+        f2j.dgbmv("T", M, N, KL, KU, 0.0, dgbA, lda, dX, 1, 1.0, expected = dY.clone(), 1);
+        blas.dgbmv("T", M, N, KL, KU, 0.0, dgbA, lda, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaTwo(BLAS blas) {
+        double[] expected, dYcopy;
+        int lda = KL + KU + 1;
+
+        // trans=N, alpha=2.0, beta=1.0
+        f2j.dgbmv("N", M, N, KL, KU, 2.0, dgbA, lda, dX, 1, 1.0, expected = dY.clone(), 1);
+        blas.dgbmv("N", M, N, KL, KU, 2.0, dgbA, lda, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T, alpha=2.0, beta=1.0
+        f2j.dgbmv("T", M, N, KL, KU, 2.0, dgbA, lda, dX, 1, 1.0, expected = dY.clone(), 1);
+        blas.dgbmv("T", M, N, KL, KU, 2.0, dgbA, lda, dX, 1, 1.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=N, alpha=2.0, beta=0.0
+        f2j.dgbmv("N", M, N, KL, KU, 2.0, dgbA, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dgbmv("N", M, N, KL, KU, 2.0, dgbA, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T, alpha=2.0, beta=0.0
+        f2j.dgbmv("T", M, N, KL, KU, 2.0, dgbA, lda, dX, 1, 0.0, expected = dY.clone(), 1);
+        blas.dgbmv("T", M, N, KL, KU, 2.0, dgbA, lda, dX, 1, 0.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        double[] expected, dYcopy;
+        int lda = KL + KU + 1;
+        // With incx=2 and incy=2, strided access needs (dim-1)*2 + 1 entries.
+        // dX and dY have M=103 elements, so max dim = (M-1)/2 + 1 = 52.
+        int smallDim = (M - 1) / 2 + 1;
+
+        // trans=N: x has smallDim elements (stride 2), y has smallDim elements (stride 2)
+        f2j.dgbmv("N", smallDim, smallDim, KL, KU, 1.0, dgbA, lda, dX, 2, 1.0, expected = dY.clone(), 2);
+        blas.dgbmv("N", smallDim, smallDim, KL, KU, 1.0, dgbA, lda, dX, 2, 1.0, dYcopy = dY.clone(), 2);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T: x has smallDim elements (stride 2), y has smallDim elements (stride 2)
+        f2j.dgbmv("T", smallDim, smallDim, KL, KU, 1.0, dgbA, lda, dX, 2, 1.0, expected = dY.clone(), 2);
+        blas.dgbmv("T", smallDim, smallDim, KL, KU, 1.0, dgbA, lda, dX, 2, 1.0, dYcopy = dY.clone(), 2);
+        assertArrayEquals(expected, dYcopy, depsilon);
     }
 }

@@ -45,4 +45,19 @@ public class Sspr2Test extends BLASTest {
         blas.sspr2("L", M, 2.0f, sX, 1, sY, 1, sgeAcopy = sgeAL.clone());
         assertArrayEquals(expected, sgeAcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZero(BLAS blas) {
+        float[] expected, sgeAcopy;
+
+        // alpha=0.0f should be a no-op
+        f2j.sspr2("U", M, 0.0f, sX, 1, sY, 1, expected = sgeAU.clone());
+        blas.sspr2("U", M, 0.0f, sX, 1, sY, 1, sgeAcopy = sgeAU.clone());
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+
+        f2j.sspr2("L", M, 0.0f, sX, 1, sY, 1, expected = sgeAL.clone());
+        blas.sspr2("L", M, 0.0f, sX, 1, sY, 1, sgeAcopy = sgeAL.clone());
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+    }
 }

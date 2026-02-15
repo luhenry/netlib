@@ -238,10 +238,81 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dgbmvK(String trans, int m, int n, int kl, int ku, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    org.netlib.blas.Dgbmv.dgbmv(trans, m, n, kl, ku, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
+    // y := alpha*A*x + beta*y (trans="N") or y := alpha*A'*x + beta*y (trans="T"/"C")
+    // A is m-by-n stored in band format with kl sub-diags and ku super-diags
+    int leny = lsame("N", trans) ? m : n;
+    // Scale y by beta
+    for (int i = 0, iy = incy < 0 ? (leny - 1) * -incy : 0; i < leny; i += 1, iy += incy) {
+      if (beta == 0.0) {
+        y[offsety + iy] = 0.0;
+      } else if (beta != 1.0) {
+        y[offsety + iy] = beta * y[offsety + iy];
+      }
+    }
+    if (alpha == 0.0) {
+      return;
+    }
+    if (lsame("N", trans)) {
+      // y := alpha*A*x + y, loop over columns j of A
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0; j < n; j += 1, jx += incx) {
+        double temp = alpha * x[offsetx + jx];
+        int istart = Math.max(0, j - ku);
+        int iend = Math.min(m - 1, j + kl);
+        int iy = incy < 0 ? (leny - 1) * -incy + istart * incy : istart * incy;
+        for (int i = istart; i <= iend; i += 1, iy += incy) {
+          y[offsety + iy] += temp * a[offseta + (ku + i - j) + j * lda];
+        }
+      }
+    } else {
+      // y := alpha*A'*x + y, loop over columns j of A (rows of A')
+      for (int j = 0, jy = incy < 0 ? (n - 1) * -incy : 0; j < n; j += 1, jy += incy) {
+        double temp = 0.0;
+        int istart = Math.max(0, j - ku);
+        int iend = Math.min(m - 1, j + kl);
+        int ix = incx < 0 ? (m - 1) * -incx + istart * incx : istart * incx;
+        for (int i = istart; i <= iend; i += 1, ix += incx) {
+          temp += a[offseta + (ku + i - j) + j * lda] * x[offsetx + ix];
+        }
+        y[offsety + jy] += alpha * temp;
+      }
+    }
   }
   protected void sgbmvK(String trans, int m, int n, int kl, int ku, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    org.netlib.blas.Sgbmv.sgbmv(trans, m, n, kl, ku, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
+    // y := alpha*A*x + beta*y (trans="N") or y := alpha*A'*x + beta*y (trans="T"/"C")
+    int leny = lsame("N", trans) ? m : n;
+    // Scale y by beta
+    for (int i = 0, iy = incy < 0 ? (leny - 1) * -incy : 0; i < leny; i += 1, iy += incy) {
+      if (beta == 0.0f) {
+        y[offsety + iy] = 0.0f;
+      } else if (beta != 1.0f) {
+        y[offsety + iy] = beta * y[offsety + iy];
+      }
+    }
+    if (alpha == 0.0f) {
+      return;
+    }
+    if (lsame("N", trans)) {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0; j < n; j += 1, jx += incx) {
+        float temp = alpha * x[offsetx + jx];
+        int istart = Math.max(0, j - ku);
+        int iend = Math.min(m - 1, j + kl);
+        int iy = incy < 0 ? (leny - 1) * -incy + istart * incy : istart * incy;
+        for (int i = istart; i <= iend; i += 1, iy += incy) {
+          y[offsety + iy] += temp * a[offseta + (ku + i - j) + j * lda];
+        }
+      }
+    } else {
+      for (int j = 0, jy = incy < 0 ? (n - 1) * -incy : 0; j < n; j += 1, jy += incy) {
+        float temp = 0.0f;
+        int istart = Math.max(0, j - ku);
+        int iend = Math.min(m - 1, j + kl);
+        int ix = incx < 0 ? (m - 1) * -incx + istart * incx : istart * incx;
+        for (int i = istart; i <= iend; i += 1, ix += incx) {
+          temp += a[offseta + (ku + i - j) + j * lda] * x[offsetx + ix];
+        }
+        y[offsety + jy] += alpha * temp;
+      }
+    }
   }
 
   protected void dgemmK(String transa, String transb, int m, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
@@ -3013,27 +3084,395 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void drotmK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] param, int offsetparam) {
-    org.netlib.blas.Drotm.drotm(n, x, offsetx, incx, y, offsety, incy, param, offsetparam);
+    double flag = param[offsetparam];
+    if (flag == -2.0) {
+      return;
+    }
+    double h11, h12, h21, h22;
+    if (flag == -1.0) {
+      h11 = param[offsetparam + 1];
+      h21 = param[offsetparam + 2];
+      h12 = param[offsetparam + 3];
+      h22 = param[offsetparam + 4];
+    } else if (flag == 0.0) {
+      h11 = 1.0;
+      h21 = param[offsetparam + 2];
+      h12 = param[offsetparam + 3];
+      h22 = 1.0;
+    } else {
+      h11 = param[offsetparam + 1];
+      h21 = -1.0;
+      h12 = 1.0;
+      h22 = param[offsetparam + 4];
+    }
+    if (incx == 1 && incy == 1) {
+      for (int i = 0; i < n; i += 1) {
+        double w = x[offsetx + i];
+        double z = y[offsety + i];
+        x[offsetx + i] = h11 * w + h12 * z;
+        y[offsety + i] = h21 * w + h22 * z;
+      }
+    } else {
+      for (int i = 0,
+               ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           i < n;
+           i += 1, ix += incx, iy += incy) {
+        double w = x[offsetx + ix];
+        double z = y[offsety + iy];
+        x[offsetx + ix] = h11 * w + h12 * z;
+        y[offsety + iy] = h21 * w + h22 * z;
+      }
+    }
   }
 
   protected void srotmK(int n, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] param, int offsetparam) {
-    org.netlib.blas.Srotm.srotm(n, x, offsetx, incx, y, offsety, incy, param, offsetparam);
+    float flag = param[offsetparam];
+    if (flag == -2.0f) {
+      return;
+    }
+    float h11, h12, h21, h22;
+    if (flag == -1.0f) {
+      h11 = param[offsetparam + 1];
+      h21 = param[offsetparam + 2];
+      h12 = param[offsetparam + 3];
+      h22 = param[offsetparam + 4];
+    } else if (flag == 0.0f) {
+      h11 = 1.0f;
+      h21 = param[offsetparam + 2];
+      h12 = param[offsetparam + 3];
+      h22 = 1.0f;
+    } else {
+      h11 = param[offsetparam + 1];
+      h21 = -1.0f;
+      h12 = 1.0f;
+      h22 = param[offsetparam + 4];
+    }
+    if (incx == 1 && incy == 1) {
+      for (int i = 0; i < n; i += 1) {
+        float w = x[offsetx + i];
+        float z = y[offsety + i];
+        x[offsetx + i] = h11 * w + h12 * z;
+        y[offsety + i] = h21 * w + h22 * z;
+      }
+    } else {
+      for (int i = 0,
+               ix = incx < 0 ? (n - 1) * -incx : 0,
+               iy = incy < 0 ? (n - 1) * -incy : 0;
+           i < n;
+           i += 1, ix += incx, iy += incy) {
+        float w = x[offsetx + ix];
+        float z = y[offsety + iy];
+        x[offsetx + ix] = h11 * w + h12 * z;
+        y[offsety + iy] = h21 * w + h22 * z;
+      }
+    }
   }
 
   protected void drotmgK(org.netlib.util.doubleW dd1, org.netlib.util.doubleW dd2, org.netlib.util.doubleW dx1, double dy1, double[] param, int offsetparam) {
-    org.netlib.blas.Drotmg.drotmg(dd1, dd2, dx1, dy1, param, offsetparam);
+    final double gam = 4096.0;
+    final double gamsq = 16777216.0;
+    final double rgamsq = 5.9604645e-8;
+    double dflag, dh11 = 0.0, dh12 = 0.0, dh21 = 0.0, dh22 = 0.0;
+    if (dd1.val < 0.0) {
+      dflag = -1.0;
+      dh11 = 0.0; dh12 = 0.0; dh21 = 0.0; dh22 = 0.0;
+      dd1.val = 0.0; dd2.val = 0.0; dx1.val = 0.0;
+    } else {
+      double dp2 = dd2.val * dy1;
+      if (dp2 == 0.0) {
+        dflag = -2.0;
+        param[offsetparam + 0] = dflag;
+        return;
+      }
+      double dp1 = dd1.val * dx1.val;
+      double dq2 = dp2 * dy1;
+      double dq1 = dp1 * dx1.val;
+      if (Math.abs(dq1) > Math.abs(dq2)) {
+        dh21 = -dy1 / dx1.val;
+        dh12 = dp2 / dp1;
+        double du = 1.0 - dh12 * dh21;
+        if (du > 0.0) {
+          dflag = 0.0;
+          dd1.val = dd1.val / du;
+          dd2.val = dd2.val / du;
+          dx1.val = dx1.val * du;
+        } else {
+          dflag = -1.0;
+          dh11 = 0.0; dh12 = 0.0; dh21 = 0.0; dh22 = 0.0;
+          dd1.val = 0.0; dd2.val = 0.0; dx1.val = 0.0;
+        }
+      } else {
+        if (dq2 < 0.0) {
+          dflag = -1.0;
+          dh11 = 0.0; dh12 = 0.0; dh21 = 0.0; dh22 = 0.0;
+          dd1.val = 0.0; dd2.val = 0.0; dx1.val = 0.0;
+        } else {
+          dflag = 1.0;
+          dh11 = dp1 / dp2;
+          dh22 = dx1.val / dy1;
+          double du = 1.0 + dh11 * dh22;
+          double dtemp = dd2.val / du;
+          dd2.val = dd1.val / du;
+          dd1.val = dtemp;
+          dx1.val = dy1 * du;
+        }
+      }
+      // Rescaling for dd1
+      if (dd1.val != 0.0) {
+        while (dd1.val <= rgamsq || dd1.val >= gamsq) {
+          if (dflag == 0.0) {
+            dh11 = 1.0; dh22 = 1.0; dflag = -1.0;
+          } else if (dflag > 0.0) {
+            dh21 = -1.0; dh12 = 1.0; dflag = -1.0;
+          }
+          if (dd1.val <= rgamsq) {
+            dd1.val = dd1.val * gam * gam;
+            dx1.val = dx1.val / gam;
+            dh11 = dh11 / gam;
+            dh12 = dh12 / gam;
+          } else {
+            dd1.val = dd1.val / (gam * gam);
+            dx1.val = dx1.val * gam;
+            dh11 = dh11 * gam;
+            dh12 = dh12 * gam;
+          }
+        }
+      }
+      // Rescaling for dd2
+      if (dd2.val != 0.0) {
+        while (Math.abs(dd2.val) <= rgamsq || Math.abs(dd2.val) >= gamsq) {
+          if (dflag == 0.0) {
+            dh11 = 1.0; dh22 = 1.0; dflag = -1.0;
+          } else if (dflag > 0.0) {
+            dh21 = -1.0; dh12 = 1.0; dflag = -1.0;
+          }
+          if (Math.abs(dd2.val) <= rgamsq) {
+            dd2.val = dd2.val * gam * gam;
+            dh21 = dh21 / gam;
+            dh22 = dh22 / gam;
+          } else {
+            dd2.val = dd2.val / (gam * gam);
+            dh21 = dh21 * gam;
+            dh22 = dh22 * gam;
+          }
+        }
+      }
+    }
+    if (dflag < 0.0) {
+      param[offsetparam + 1] = dh11;
+      param[offsetparam + 2] = dh21;
+      param[offsetparam + 3] = dh12;
+      param[offsetparam + 4] = dh22;
+    } else if (dflag == 0.0) {
+      param[offsetparam + 2] = dh21;
+      param[offsetparam + 3] = dh12;
+    } else {
+      param[offsetparam + 1] = dh11;
+      param[offsetparam + 4] = dh22;
+    }
+    param[offsetparam + 0] = dflag;
   }
 
   protected void srotmgK(org.netlib.util.floatW sd1, org.netlib.util.floatW sd2, org.netlib.util.floatW sx1, float sy1, float[] param, int offsetparam) {
-    org.netlib.blas.Srotmg.srotmg(sd1, sd2, sx1, sy1, param, offsetparam);
+    final float gam = 4096.0f;
+    final float gamsq = 16777216.0f;
+    final float rgamsq = 5.9604645e-8f;
+    float sflag, sh11 = 0.0f, sh12 = 0.0f, sh21 = 0.0f, sh22 = 0.0f;
+    if (sd1.val < 0.0f) {
+      sflag = -1.0f;
+      sh11 = 0.0f; sh12 = 0.0f; sh21 = 0.0f; sh22 = 0.0f;
+      sd1.val = 0.0f; sd2.val = 0.0f; sx1.val = 0.0f;
+    } else {
+      float sp2 = sd2.val * sy1;
+      if (sp2 == 0.0f) {
+        sflag = -2.0f;
+        param[offsetparam + 0] = sflag;
+        return;
+      }
+      float sp1 = sd1.val * sx1.val;
+      float sq2 = sp2 * sy1;
+      float sq1 = sp1 * sx1.val;
+      if (Math.abs(sq1) > Math.abs(sq2)) {
+        sh21 = -sy1 / sx1.val;
+        sh12 = sp2 / sp1;
+        float su = 1.0f - sh12 * sh21;
+        if (su > 0.0f) {
+          sflag = 0.0f;
+          sd1.val = sd1.val / su;
+          sd2.val = sd2.val / su;
+          sx1.val = sx1.val * su;
+        } else {
+          sflag = -1.0f;
+          sh11 = 0.0f; sh12 = 0.0f; sh21 = 0.0f; sh22 = 0.0f;
+          sd1.val = 0.0f; sd2.val = 0.0f; sx1.val = 0.0f;
+        }
+      } else {
+        if (sq2 < 0.0f) {
+          sflag = -1.0f;
+          sh11 = 0.0f; sh12 = 0.0f; sh21 = 0.0f; sh22 = 0.0f;
+          sd1.val = 0.0f; sd2.val = 0.0f; sx1.val = 0.0f;
+        } else {
+          sflag = 1.0f;
+          sh11 = sp1 / sp2;
+          sh22 = sx1.val / sy1;
+          float su = 1.0f + sh11 * sh22;
+          float stemp = sd2.val / su;
+          sd2.val = sd1.val / su;
+          sd1.val = stemp;
+          sx1.val = sy1 * su;
+        }
+      }
+      // Rescaling for sd1
+      if (sd1.val != 0.0f) {
+        while (sd1.val <= rgamsq || sd1.val >= gamsq) {
+          if (sflag == 0.0f) {
+            sh11 = 1.0f; sh22 = 1.0f; sflag = -1.0f;
+          } else if (sflag > 0.0f) {
+            sh21 = -1.0f; sh12 = 1.0f; sflag = -1.0f;
+          }
+          if (sd1.val <= rgamsq) {
+            sd1.val = sd1.val * gam * gam;
+            sx1.val = sx1.val / gam;
+            sh11 = sh11 / gam;
+            sh12 = sh12 / gam;
+          } else {
+            sd1.val = sd1.val / (gam * gam);
+            sx1.val = sx1.val * gam;
+            sh11 = sh11 * gam;
+            sh12 = sh12 * gam;
+          }
+        }
+      }
+      // Rescaling for sd2
+      if (sd2.val != 0.0f) {
+        while (Math.abs(sd2.val) <= rgamsq || Math.abs(sd2.val) >= gamsq) {
+          if (sflag == 0.0f) {
+            sh11 = 1.0f; sh22 = 1.0f; sflag = -1.0f;
+          } else if (sflag > 0.0f) {
+            sh21 = -1.0f; sh12 = 1.0f; sflag = -1.0f;
+          }
+          if (Math.abs(sd2.val) <= rgamsq) {
+            sd2.val = sd2.val * gam * gam;
+            sh21 = sh21 / gam;
+            sh22 = sh22 / gam;
+          } else {
+            sd2.val = sd2.val / (gam * gam);
+            sh21 = sh21 * gam;
+            sh22 = sh22 * gam;
+          }
+        }
+      }
+    }
+    if (sflag < 0.0f) {
+      param[offsetparam + 1] = sh11;
+      param[offsetparam + 2] = sh21;
+      param[offsetparam + 3] = sh12;
+      param[offsetparam + 4] = sh22;
+    } else if (sflag == 0.0f) {
+      param[offsetparam + 2] = sh21;
+      param[offsetparam + 3] = sh12;
+    } else {
+      param[offsetparam + 1] = sh11;
+      param[offsetparam + 4] = sh22;
+    }
+    param[offsetparam + 0] = sflag;
   }
 
   protected void dsbmvK(String uplo, int n, int k, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
-    org.netlib.blas.Dsbmv.dsbmv(uplo, n, k, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
+    // Scale y by beta
+    for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+      if (beta == 0.0) {
+        y[offsety + iy] = 0.0;
+      } else if (beta != 1.0) {
+        y[offsety + iy] = beta * y[offsety + iy];
+      }
+    }
+    if (alpha == 0.0) {
+      return;
+    }
+    if (lsame("U", uplo)) {
+      // Upper triangle band storage: a(k+i-j, j) for max(0,j-k) <= i <= j
+      // Diagonal at a(k, j), off-diag row i < j at a(k+i-j, j)
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+           j < n; j += 1, jx += incx, jy += incy) {
+        double temp1 = alpha * x[offsetx + jx];
+        double temp2 = 0.0;
+        int istart = Math.max(0, j - k);
+        int ix = incx < 0 ? (n - 1) * -incx + istart * incx : istart * incx;
+        int iy = incy < 0 ? (n - 1) * -incy + istart * incy : istart * incy;
+        for (int i = istart; i < j; i += 1, ix += incx, iy += incy) {
+          double aij = a[offseta + (k + i - j) + j * lda];
+          y[offsety + iy] += temp1 * aij;
+          temp2 += aij * x[offsetx + ix];
+        }
+        y[offsety + jy] += temp1 * a[offseta + k + j * lda] + alpha * temp2;
+      }
+    } else {
+      // Lower triangle band storage: a(i-j, j) for j <= i <= min(n-1,j+k)
+      // Diagonal at a(0, j), off-diag row i > j at a(i-j, j)
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+           j < n; j += 1, jx += incx, jy += incy) {
+        double temp1 = alpha * x[offsetx + jx];
+        double temp2 = 0.0;
+        y[offsety + jy] += temp1 * a[offseta + 0 + j * lda];
+        int iend = Math.min(n - 1, j + k);
+        int ix = jx + incx;
+        int iy = jy + incy;
+        for (int i = j + 1; i <= iend; i += 1, ix += incx, iy += incy) {
+          double aij = a[offseta + (i - j) + j * lda];
+          y[offsety + iy] += temp1 * aij;
+          temp2 += aij * x[offsetx + ix];
+        }
+        y[offsety + jy] += alpha * temp2;
+      }
+    }
   }
 
   protected void ssbmvK(String uplo, int n, int k, float alpha, float[] a, int offseta, int lda, float[] x, int offsetx, int incx, float beta, float[] y, int offsety, int incy) {
-    org.netlib.blas.Ssbmv.ssbmv(uplo, n, k, alpha, a, offseta, lda, x, offsetx, incx, beta, y, offsety, incy);
+    // Scale y by beta
+    for (int i = 0, iy = incy < 0 ? (n - 1) * -incy : 0; i < n; i += 1, iy += incy) {
+      if (beta == 0.0f) {
+        y[offsety + iy] = 0.0f;
+      } else if (beta != 1.0f) {
+        y[offsety + iy] = beta * y[offsety + iy];
+      }
+    }
+    if (alpha == 0.0f) {
+      return;
+    }
+    if (lsame("U", uplo)) {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+           j < n; j += 1, jx += incx, jy += incy) {
+        float temp1 = alpha * x[offsetx + jx];
+        float temp2 = 0.0f;
+        int istart = Math.max(0, j - k);
+        int ix = incx < 0 ? (n - 1) * -incx + istart * incx : istart * incx;
+        int iy = incy < 0 ? (n - 1) * -incy + istart * incy : istart * incy;
+        for (int i = istart; i < j; i += 1, ix += incx, iy += incy) {
+          float aij = a[offseta + (k + i - j) + j * lda];
+          y[offsety + iy] += temp1 * aij;
+          temp2 += aij * x[offsetx + ix];
+        }
+        y[offsety + jy] += temp1 * a[offseta + k + j * lda] + alpha * temp2;
+      }
+    } else {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+           j < n; j += 1, jx += incx, jy += incy) {
+        float temp1 = alpha * x[offsetx + jx];
+        float temp2 = 0.0f;
+        y[offsety + jy] += temp1 * a[offseta + 0 + j * lda];
+        int iend = Math.min(n - 1, j + k);
+        int ix = jx + incx;
+        int iy = jy + incy;
+        for (int i = j + 1; i <= iend; i += 1, ix += incx, iy += incy) {
+          float aij = a[offseta + (i - j) + j * lda];
+          y[offsety + iy] += temp1 * aij;
+          temp2 += aij * x[offsetx + ix];
+        }
+        y[offsety + jy] += alpha * temp2;
+      }
+    }
   }
 
   protected void dscalK(int n, double alpha, double[] x, int offsetx, int incx) {
@@ -3437,19 +3876,131 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dsprK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta) {
-    org.netlib.blas.Dspr.dspr(uplo, n, alpha, x, offsetx, incx, a, offseta);
+    if (alpha == 0.0) {
+      return;
+    }
+    if (lsame("U", uplo)) {
+      // Upper triangle packed: A(i,j) at index i + j*(j+1)/2
+      int ix = incx < 0 ? (n - 1) * -incx : 0;
+      for (int col = 0; col < n; col += 1, ix += incx) {
+        double alphaxix = alpha * x[offsetx + ix];
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int row = 0; row < col; row += 1, jx += incx) {
+          a[offseta + row + col * (col + 1) / 2] += alphaxix * x[offsetx + jx];
+        }
+        a[offseta + col + col * (col + 1) / 2] += alphaxix * x[offsetx + jx];
+      }
+    } else if (lsame("L", uplo)) {
+      // Lower triangle packed: A(i,j) at index i + j*(2*n-j-1)/2
+      int ix = incx < 0 ? (n - 1) * -incx : 0;
+      for (int col = 0; col < n; col += 1, ix += incx) {
+        double alphaxix = alpha * x[offsetx + ix];
+        a[offseta + col + col * (2 * n - col - 1) / 2] += alphaxix * x[offsetx + ix];
+        int jx = ix + incx;
+        for (int row = col + 1; row < n; row += 1, jx += incx) {
+          a[offseta + row + col * (2 * n - col - 1) / 2] += alphaxix * x[offsetx + jx];
+        }
+      }
+    }
   }
 
   protected void ssprK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta) {
-    org.netlib.blas.Sspr.sspr(uplo, n, alpha, x, offsetx, incx, a, offseta);
+    if (alpha == 0.0f) {
+      return;
+    }
+    if (lsame("U", uplo)) {
+      // Upper triangle packed: A(i,j) at index i + j*(j+1)/2
+      int ix = incx < 0 ? (n - 1) * -incx : 0;
+      for (int col = 0; col < n; col += 1, ix += incx) {
+        float alphaxix = alpha * x[offsetx + ix];
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int row = 0; row < col; row += 1, jx += incx) {
+          a[offseta + row + col * (col + 1) / 2] += alphaxix * x[offsetx + jx];
+        }
+        a[offseta + col + col * (col + 1) / 2] += alphaxix * x[offsetx + jx];
+      }
+    } else if (lsame("L", uplo)) {
+      // Lower triangle packed: A(i,j) at index i + j*(2*n-j-1)/2
+      int ix = incx < 0 ? (n - 1) * -incx : 0;
+      for (int col = 0; col < n; col += 1, ix += incx) {
+        float alphaxix = alpha * x[offsetx + ix];
+        a[offseta + col + col * (2 * n - col - 1) / 2] += alphaxix * x[offsetx + ix];
+        int jx = ix + incx;
+        for (int row = col + 1; row < n; row += 1, jx += incx) {
+          a[offseta + row + col * (2 * n - col - 1) / 2] += alphaxix * x[offsetx + jx];
+        }
+      }
+    }
   }
 
   protected void dspr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta) {
-    org.netlib.blas.Dspr2.dspr2(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta);
+    if (alpha == 0.0) {
+      return;
+    }
+    if (lsame("U", uplo)) {
+      // Upper triangle packed: A(i,j) at index i + j*(j+1)/2
+      int ix = incx < 0 ? (n - 1) * -incx : 0;
+      int iy = incy < 0 ? (n - 1) * -incy : 0;
+      for (int col = 0; col < n; col += 1, ix += incx, iy += incy) {
+        double alphaxix = alpha * x[offsetx + ix];
+        double alphayiy = alpha * y[offsety + iy];
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        int jy = incy < 0 ? (n - 1) * -incy : 0;
+        for (int row = 0; row < col; row += 1, jx += incx, jy += incy) {
+          a[offseta + row + col * (col + 1) / 2] += alphaxix * y[offsety + jy] + alphayiy * x[offsetx + jx];
+        }
+        a[offseta + col + col * (col + 1) / 2] += alphaxix * y[offsety + jy] + alphayiy * x[offsetx + jx];
+      }
+    } else if (lsame("L", uplo)) {
+      // Lower triangle packed: A(i,j) at index i + j*(2*n-j-1)/2
+      int ix = incx < 0 ? (n - 1) * -incx : 0;
+      int iy = incy < 0 ? (n - 1) * -incy : 0;
+      for (int col = 0; col < n; col += 1, ix += incx, iy += incy) {
+        double alphaxix = alpha * x[offsetx + ix];
+        double alphayiy = alpha * y[offsety + iy];
+        a[offseta + col + col * (2 * n - col - 1) / 2] += alphaxix * y[offsety + iy] + alphayiy * x[offsetx + ix];
+        int jx = ix + incx;
+        int jy = iy + incy;
+        for (int row = col + 1; row < n; row += 1, jx += incx, jy += incy) {
+          a[offseta + row + col * (2 * n - col - 1) / 2] += alphaxix * y[offsety + jy] + alphayiy * x[offsetx + jx];
+        }
+      }
+    }
   }
 
   protected void sspr2K(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta) {
-    org.netlib.blas.Sspr2.sspr2(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta);
+    if (alpha == 0.0f) {
+      return;
+    }
+    if (lsame("U", uplo)) {
+      // Upper triangle packed: A(i,j) at index i + j*(j+1)/2
+      int ix = incx < 0 ? (n - 1) * -incx : 0;
+      int iy = incy < 0 ? (n - 1) * -incy : 0;
+      for (int col = 0; col < n; col += 1, ix += incx, iy += incy) {
+        float alphaxix = alpha * x[offsetx + ix];
+        float alphayiy = alpha * y[offsety + iy];
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        int jy = incy < 0 ? (n - 1) * -incy : 0;
+        for (int row = 0; row < col; row += 1, jx += incx, jy += incy) {
+          a[offseta + row + col * (col + 1) / 2] += alphaxix * y[offsety + jy] + alphayiy * x[offsetx + jx];
+        }
+        a[offseta + col + col * (col + 1) / 2] += alphaxix * y[offsety + jy] + alphayiy * x[offsetx + jx];
+      }
+    } else if (lsame("L", uplo)) {
+      // Lower triangle packed: A(i,j) at index i + j*(2*n-j-1)/2
+      int ix = incx < 0 ? (n - 1) * -incx : 0;
+      int iy = incy < 0 ? (n - 1) * -incy : 0;
+      for (int col = 0; col < n; col += 1, ix += incx, iy += incy) {
+        float alphaxix = alpha * x[offsetx + ix];
+        float alphayiy = alpha * y[offsety + iy];
+        a[offseta + col + col * (2 * n - col - 1) / 2] += alphaxix * y[offsety + iy] + alphayiy * x[offsetx + ix];
+        int jx = ix + incx;
+        int jy = iy + incy;
+        for (int row = col + 1; row < n; row += 1, jx += incx, jy += incy) {
+          a[offseta + row + col * (2 * n - col - 1) / 2] += alphaxix * y[offsety + jy] + alphayiy * x[offsetx + jx];
+        }
+      }
+    }
   }
 
   protected void dswapK(int n, double[] x, int offsetx, int incx, double[] y, int offsety, int incy) {
@@ -4082,13 +4633,121 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dsymmRU(int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    // C := alpha*B*A + beta*C
-    org.netlib.blas.Dsymm.dsymm("R", "U", m, n, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
+    // C := alpha*B*A + beta*C where A is symmetric, upper triangle stored
+    for (int j = 0; j < n; j += 1) {
+      double ajj = a[offseta + j + j * lda];
+      int i = 0;
+      for (; i < loopBound(m, 4); i += 4) {
+        double temp0 = alpha * ajj * b[offsetb + (i + 0) + j * ldb];
+        double temp1 = alpha * ajj * b[offsetb + (i + 1) + j * ldb];
+        double temp2 = alpha * ajj * b[offsetb + (i + 2) + j * ldb];
+        double temp3 = alpha * ajj * b[offsetb + (i + 3) + j * ldb];
+        if (beta != 0.0) {
+          c[offsetc + (i + 0) + j * ldc] = temp0 + beta * c[offsetc + (i + 0) + j * ldc];
+          c[offsetc + (i + 1) + j * ldc] = temp1 + beta * c[offsetc + (i + 1) + j * ldc];
+          c[offsetc + (i + 2) + j * ldc] = temp2 + beta * c[offsetc + (i + 2) + j * ldc];
+          c[offsetc + (i + 3) + j * ldc] = temp3 + beta * c[offsetc + (i + 3) + j * ldc];
+        } else {
+          c[offsetc + (i + 0) + j * ldc] = temp0;
+          c[offsetc + (i + 1) + j * ldc] = temp1;
+          c[offsetc + (i + 2) + j * ldc] = temp2;
+          c[offsetc + (i + 3) + j * ldc] = temp3;
+        }
+      }
+      for (; i < m; i += 1) {
+        double temp = alpha * ajj * b[offsetb + i + j * ldb];
+        if (beta != 0.0) {
+          c[offsetc + i + j * ldc] = temp + beta * c[offsetc + i + j * ldc];
+        } else {
+          c[offsetc + i + j * ldc] = temp;
+        }
+      }
+      for (int k = 0; k < j; k += 1) {
+        double akj = a[offseta + k + j * lda];
+        double alphaa = alpha * akj;
+        i = 0;
+        for (; i < loopBound(m, 4); i += 4) {
+          c[offsetc + (i + 0) + j * ldc] += alphaa * b[offsetb + (i + 0) + k * ldb];
+          c[offsetc + (i + 1) + j * ldc] += alphaa * b[offsetb + (i + 1) + k * ldb];
+          c[offsetc + (i + 2) + j * ldc] += alphaa * b[offsetb + (i + 2) + k * ldb];
+          c[offsetc + (i + 3) + j * ldc] += alphaa * b[offsetb + (i + 3) + k * ldb];
+          c[offsetc + (i + 0) + k * ldc] += alphaa * b[offsetb + (i + 0) + j * ldb];
+          c[offsetc + (i + 1) + k * ldc] += alphaa * b[offsetb + (i + 1) + j * ldb];
+          c[offsetc + (i + 2) + k * ldc] += alphaa * b[offsetb + (i + 2) + j * ldb];
+          c[offsetc + (i + 3) + k * ldc] += alphaa * b[offsetb + (i + 3) + j * ldb];
+        }
+        for (; i < m; i += 1) {
+          c[offsetc + i + j * ldc] += alphaa * b[offsetb + i + k * ldb];
+          c[offsetc + i + k * ldc] += alphaa * b[offsetb + i + j * ldb];
+        }
+      }
+    }
   }
 
   protected void dsymmRL(int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    // C := alpha*B*A + beta*C
-    org.netlib.blas.Dsymm.dsymm("R", "L", m, n, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
+    // C := alpha*B*A + beta*C where A is symmetric, lower triangle stored
+    // For each column j: C[..][j] = beta*C[..][j] + alpha * sum_k(B[..][k] * A[k][j])
+    // A is lower triangle: A[k][j] = a[k + j*lda] for k >= j, A[k][j] = a[j + k*lda] for k < j
+    for (int j = 0; j < n; j += 1) {
+      // First, handle beta*C and diagonal term ajj
+      double ajj = a[offseta + j + j * lda];
+      int i = 0;
+      for (; i < loopBound(m, 4); i += 4) {
+        double temp0 = alpha * ajj * b[offsetb + (i + 0) + j * ldb];
+        double temp1 = alpha * ajj * b[offsetb + (i + 1) + j * ldb];
+        double temp2 = alpha * ajj * b[offsetb + (i + 2) + j * ldb];
+        double temp3 = alpha * ajj * b[offsetb + (i + 3) + j * ldb];
+        if (beta != 0.0) {
+          c[offsetc + (i + 0) + j * ldc] = temp0 + beta * c[offsetc + (i + 0) + j * ldc];
+          c[offsetc + (i + 1) + j * ldc] = temp1 + beta * c[offsetc + (i + 1) + j * ldc];
+          c[offsetc + (i + 2) + j * ldc] = temp2 + beta * c[offsetc + (i + 2) + j * ldc];
+          c[offsetc + (i + 3) + j * ldc] = temp3 + beta * c[offsetc + (i + 3) + j * ldc];
+        } else {
+          c[offsetc + (i + 0) + j * ldc] = temp0;
+          c[offsetc + (i + 1) + j * ldc] = temp1;
+          c[offsetc + (i + 2) + j * ldc] = temp2;
+          c[offsetc + (i + 3) + j * ldc] = temp3;
+        }
+      }
+      for (; i < m; i += 1) {
+        double temp = alpha * ajj * b[offsetb + i + j * ldb];
+        if (beta != 0.0) {
+          c[offsetc + i + j * ldc] = temp + beta * c[offsetc + i + j * ldc];
+        } else {
+          c[offsetc + i + j * ldc] = temp;
+        }
+      }
+      // Off-diagonal: k < j (upper part, A[j][k] = a[j + k*lda] for lower storage)
+      for (int k = 0; k < j; k += 1) {
+        double akj = a[offseta + j + k * lda]; // A[j][k] = A[k][j] from lower triangle
+        double alphaa = alpha * akj;
+        i = 0;
+        for (; i < loopBound(m, 4); i += 4) {
+          c[offsetc + (i + 0) + j * ldc] += alphaa * b[offsetb + (i + 0) + k * ldb];
+          c[offsetc + (i + 1) + j * ldc] += alphaa * b[offsetb + (i + 1) + k * ldb];
+          c[offsetc + (i + 2) + j * ldc] += alphaa * b[offsetb + (i + 2) + k * ldb];
+          c[offsetc + (i + 3) + j * ldc] += alphaa * b[offsetb + (i + 3) + k * ldb];
+        }
+        for (; i < m; i += 1) {
+          c[offsetc + i + j * ldc] += alphaa * b[offsetb + i + k * ldb];
+        }
+      }
+      // Off-diagonal: k > j (lower part, A[k][j] = a[k + j*lda])
+      for (int k = j + 1; k < n; k += 1) {
+        double akj = a[offseta + k + j * lda];
+        double alphaa = alpha * akj;
+        i = 0;
+        for (; i < loopBound(m, 4); i += 4) {
+          c[offsetc + (i + 0) + j * ldc] += alphaa * b[offsetb + (i + 0) + k * ldb];
+          c[offsetc + (i + 1) + j * ldc] += alphaa * b[offsetb + (i + 1) + k * ldb];
+          c[offsetc + (i + 2) + j * ldc] += alphaa * b[offsetb + (i + 2) + k * ldb];
+          c[offsetc + (i + 3) + j * ldc] += alphaa * b[offsetb + (i + 3) + k * ldb];
+        }
+        for (; i < m; i += 1) {
+          c[offsetc + i + j * ldc] += alphaa * b[offsetb + i + k * ldb];
+        }
+      }
+    }
   }
 
   protected void ssymmK(String side, String uplo, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
@@ -4670,13 +5329,118 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void ssymmRU(int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    // C := alpha*B*A + beta*C
-    org.netlib.blas.Ssymm.ssymm("R", "U", m, n, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
+    // C := alpha*B*A + beta*C where A is symmetric, upper triangle stored
+    for (int j = 0; j < n; j += 1) {
+      float ajj = a[offseta + j + j * lda];
+      int i = 0;
+      for (; i < loopBound(m, 4); i += 4) {
+        float temp0 = alpha * ajj * b[offsetb + (i + 0) + j * ldb];
+        float temp1 = alpha * ajj * b[offsetb + (i + 1) + j * ldb];
+        float temp2 = alpha * ajj * b[offsetb + (i + 2) + j * ldb];
+        float temp3 = alpha * ajj * b[offsetb + (i + 3) + j * ldb];
+        if (beta != 0.0f) {
+          c[offsetc + (i + 0) + j * ldc] = temp0 + beta * c[offsetc + (i + 0) + j * ldc];
+          c[offsetc + (i + 1) + j * ldc] = temp1 + beta * c[offsetc + (i + 1) + j * ldc];
+          c[offsetc + (i + 2) + j * ldc] = temp2 + beta * c[offsetc + (i + 2) + j * ldc];
+          c[offsetc + (i + 3) + j * ldc] = temp3 + beta * c[offsetc + (i + 3) + j * ldc];
+        } else {
+          c[offsetc + (i + 0) + j * ldc] = temp0;
+          c[offsetc + (i + 1) + j * ldc] = temp1;
+          c[offsetc + (i + 2) + j * ldc] = temp2;
+          c[offsetc + (i + 3) + j * ldc] = temp3;
+        }
+      }
+      for (; i < m; i += 1) {
+        float temp = alpha * ajj * b[offsetb + i + j * ldb];
+        if (beta != 0.0f) {
+          c[offsetc + i + j * ldc] = temp + beta * c[offsetc + i + j * ldc];
+        } else {
+          c[offsetc + i + j * ldc] = temp;
+        }
+      }
+      for (int k = 0; k < j; k += 1) {
+        float akj = a[offseta + k + j * lda];
+        float alphaa = alpha * akj;
+        i = 0;
+        for (; i < loopBound(m, 4); i += 4) {
+          c[offsetc + (i + 0) + j * ldc] += alphaa * b[offsetb + (i + 0) + k * ldb];
+          c[offsetc + (i + 1) + j * ldc] += alphaa * b[offsetb + (i + 1) + k * ldb];
+          c[offsetc + (i + 2) + j * ldc] += alphaa * b[offsetb + (i + 2) + k * ldb];
+          c[offsetc + (i + 3) + j * ldc] += alphaa * b[offsetb + (i + 3) + k * ldb];
+          c[offsetc + (i + 0) + k * ldc] += alphaa * b[offsetb + (i + 0) + j * ldb];
+          c[offsetc + (i + 1) + k * ldc] += alphaa * b[offsetb + (i + 1) + j * ldb];
+          c[offsetc + (i + 2) + k * ldc] += alphaa * b[offsetb + (i + 2) + j * ldb];
+          c[offsetc + (i + 3) + k * ldc] += alphaa * b[offsetb + (i + 3) + j * ldb];
+        }
+        for (; i < m; i += 1) {
+          c[offsetc + i + j * ldc] += alphaa * b[offsetb + i + k * ldb];
+          c[offsetc + i + k * ldc] += alphaa * b[offsetb + i + j * ldb];
+        }
+      }
+    }
   }
 
   protected void ssymmRL(int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    // C := alpha*B*A + beta*C
-    org.netlib.blas.Ssymm.ssymm("R", "L", m, n, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
+    // C := alpha*B*A + beta*C where A is symmetric, lower triangle stored
+    for (int j = 0; j < n; j += 1) {
+      float ajj = a[offseta + j + j * lda];
+      int i = 0;
+      for (; i < loopBound(m, 4); i += 4) {
+        float temp0 = alpha * ajj * b[offsetb + (i + 0) + j * ldb];
+        float temp1 = alpha * ajj * b[offsetb + (i + 1) + j * ldb];
+        float temp2 = alpha * ajj * b[offsetb + (i + 2) + j * ldb];
+        float temp3 = alpha * ajj * b[offsetb + (i + 3) + j * ldb];
+        if (beta != 0.0f) {
+          c[offsetc + (i + 0) + j * ldc] = temp0 + beta * c[offsetc + (i + 0) + j * ldc];
+          c[offsetc + (i + 1) + j * ldc] = temp1 + beta * c[offsetc + (i + 1) + j * ldc];
+          c[offsetc + (i + 2) + j * ldc] = temp2 + beta * c[offsetc + (i + 2) + j * ldc];
+          c[offsetc + (i + 3) + j * ldc] = temp3 + beta * c[offsetc + (i + 3) + j * ldc];
+        } else {
+          c[offsetc + (i + 0) + j * ldc] = temp0;
+          c[offsetc + (i + 1) + j * ldc] = temp1;
+          c[offsetc + (i + 2) + j * ldc] = temp2;
+          c[offsetc + (i + 3) + j * ldc] = temp3;
+        }
+      }
+      for (; i < m; i += 1) {
+        float temp = alpha * ajj * b[offsetb + i + j * ldb];
+        if (beta != 0.0f) {
+          c[offsetc + i + j * ldc] = temp + beta * c[offsetc + i + j * ldc];
+        } else {
+          c[offsetc + i + j * ldc] = temp;
+        }
+      }
+      // Off-diagonal: k < j
+      for (int k = 0; k < j; k += 1) {
+        float akj = a[offseta + j + k * lda];
+        float alphaa = alpha * akj;
+        i = 0;
+        for (; i < loopBound(m, 4); i += 4) {
+          c[offsetc + (i + 0) + j * ldc] += alphaa * b[offsetb + (i + 0) + k * ldb];
+          c[offsetc + (i + 1) + j * ldc] += alphaa * b[offsetb + (i + 1) + k * ldb];
+          c[offsetc + (i + 2) + j * ldc] += alphaa * b[offsetb + (i + 2) + k * ldb];
+          c[offsetc + (i + 3) + j * ldc] += alphaa * b[offsetb + (i + 3) + k * ldb];
+        }
+        for (; i < m; i += 1) {
+          c[offsetc + i + j * ldc] += alphaa * b[offsetb + i + k * ldb];
+        }
+      }
+      // Off-diagonal: k > j
+      for (int k = j + 1; k < n; k += 1) {
+        float akj = a[offseta + k + j * lda];
+        float alphaa = alpha * akj;
+        i = 0;
+        for (; i < loopBound(m, 4); i += 4) {
+          c[offsetc + (i + 0) + j * ldc] += alphaa * b[offsetb + (i + 0) + k * ldb];
+          c[offsetc + (i + 1) + j * ldc] += alphaa * b[offsetb + (i + 1) + k * ldb];
+          c[offsetc + (i + 2) + j * ldc] += alphaa * b[offsetb + (i + 2) + k * ldb];
+          c[offsetc + (i + 3) + j * ldc] += alphaa * b[offsetb + (i + 3) + k * ldb];
+        }
+        for (; i < m; i += 1) {
+          c[offsetc + i + j * ldc] += alphaa * b[offsetb + i + k * ldb];
+        }
+      }
+    }
   }
 
   protected void dsymvK(String uplo, int n, double alpha, double[] a, int offseta, int lda, double[] x, int offsetx, int incx, double beta, double[] y, int offsety, int incy) {
@@ -5050,106 +5814,2042 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
   }
 
   protected void dsyrK(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] a, int offseta, int lda) {
-    org.netlib.blas.Dsyr.dsyr(uplo, n, alpha, x, offsetx, incx, a, offseta, lda);
+    // A := alpha*x*x' + A (symmetric rank-1 update)
+    if (lsame("U", uplo)) {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0; j < n; j += 1, jx += incx) {
+        double temp = alpha * x[offsetx + jx];
+        for (int i = 0, ix = incx < 0 ? (n - 1) * -incx : 0; i <= j; i += 1, ix += incx) {
+          a[offseta + i + j * lda] += x[offsetx + ix] * temp;
+        }
+      }
+    } else {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0; j < n; j += 1, jx += incx) {
+        double temp = alpha * x[offsetx + jx];
+        for (int i = j, ix = incx < 0 ? (n - 1) * -incx + j * incx : j * incx; i < n; i += 1, ix += incx) {
+          a[offseta + i + j * lda] += x[offsetx + ix] * temp;
+        }
+      }
+    }
   }
 
   protected void ssyrK(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] a, int offseta, int lda) {
-    org.netlib.blas.Ssyr.ssyr(uplo, n, alpha, x, offsetx, incx, a, offseta, lda);
+    // A := alpha*x*x' + A (symmetric rank-1 update)
+    if (lsame("U", uplo)) {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0; j < n; j += 1, jx += incx) {
+        float temp = alpha * x[offsetx + jx];
+        for (int i = 0, ix = incx < 0 ? (n - 1) * -incx : 0; i <= j; i += 1, ix += incx) {
+          a[offseta + i + j * lda] += x[offsetx + ix] * temp;
+        }
+      }
+    } else {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0; j < n; j += 1, jx += incx) {
+        float temp = alpha * x[offsetx + jx];
+        for (int i = j, ix = incx < 0 ? (n - 1) * -incx + j * incx : j * incx; i < n; i += 1, ix += incx) {
+          a[offseta + i + j * lda] += x[offsetx + ix] * temp;
+        }
+      }
+    }
   }
 
   protected void dsyr2K(String uplo, int n, double alpha, double[] x, int offsetx, int incx, double[] y, int offsety, int incy, double[] a, int offseta, int lda) {
-    org.netlib.blas.Dsyr2.dsyr2(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    // A := alpha*x*y' + alpha*y*x' + A (symmetric rank-2 update)
+    if (lsame("U", uplo)) {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+           j < n; j += 1, jx += incx, jy += incy) {
+        double temp1 = alpha * y[offsety + jy];
+        double temp2 = alpha * x[offsetx + jx];
+        for (int i = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+             i <= j; i += 1, ix += incx, iy += incy) {
+          a[offseta + i + j * lda] += x[offsetx + ix] * temp1 + y[offsety + iy] * temp2;
+        }
+      }
+    } else {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+           j < n; j += 1, jx += incx, jy += incy) {
+        double temp1 = alpha * y[offsety + jy];
+        double temp2 = alpha * x[offsetx + jx];
+        for (int i = j, ix = incx < 0 ? (n - 1) * -incx + j * incx : j * incx,
+                        iy = incy < 0 ? (n - 1) * -incy + j * incy : j * incy;
+             i < n; i += 1, ix += incx, iy += incy) {
+          a[offseta + i + j * lda] += x[offsetx + ix] * temp1 + y[offsety + iy] * temp2;
+        }
+      }
+    }
   }
 
   protected void ssyr2K(String uplo, int n, float alpha, float[] x, int offsetx, int incx, float[] y, int offsety, int incy, float[] a, int offseta, int lda) {
-    org.netlib.blas.Ssyr2.ssyr2(uplo, n, alpha, x, offsetx, incx, y, offsety, incy, a, offseta, lda);
+    // A := alpha*x*y' + alpha*y*x' + A (symmetric rank-2 update)
+    if (lsame("U", uplo)) {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+           j < n; j += 1, jx += incx, jy += incy) {
+        float temp1 = alpha * y[offsety + jy];
+        float temp2 = alpha * x[offsetx + jx];
+        for (int i = 0, ix = incx < 0 ? (n - 1) * -incx : 0, iy = incy < 0 ? (n - 1) * -incy : 0;
+             i <= j; i += 1, ix += incx, iy += incy) {
+          a[offseta + i + j * lda] += x[offsetx + ix] * temp1 + y[offsety + iy] * temp2;
+        }
+      }
+    } else {
+      for (int j = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
+           j < n; j += 1, jx += incx, jy += incy) {
+        float temp1 = alpha * y[offsety + jy];
+        float temp2 = alpha * x[offsetx + jx];
+        for (int i = j, ix = incx < 0 ? (n - 1) * -incx + j * incx : j * incx,
+                        iy = incy < 0 ? (n - 1) * -incy + j * incy : j * incy;
+             i < n; i += 1, ix += incx, iy += incy) {
+          a[offseta + i + j * lda] += x[offsetx + ix] * temp1 + y[offsety + iy] * temp2;
+        }
+      }
+    }
   }
 
   protected void dsyr2kK(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb, double beta, double[] c, int offsetc, int ldc) {
-    org.netlib.blas.Dsyr2k.dsyr2k(uplo, trans, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
+    // C := alpha*A*B' + alpha*B*A' + beta*C (trans="N") or C := alpha*A'*B + alpha*B'*A + beta*C (trans="T"/"C")
+    // Only upper or lower triangle of C is updated
+    if (lsame("U", uplo)) {
+      if (lsame("N", trans)) {
+        // C := alpha*A*B' + alpha*B*A' + beta*C, upper triangle, A,B are n-by-k
+        for (int j = 0; j < n; j += 1) {
+          // Scale column j of upper triangle by beta
+          if (beta != 1.0) {
+            if (beta == 0.0) {
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] = 0.0;
+              }
+            } else {
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] = beta * c[offsetc + i + j * ldc];
+              }
+            }
+          }
+          if (alpha != 0.0) {
+            for (int l = 0; l < k; l += 1) {
+              double temp1 = alpha * b[offsetb + j + l * ldb];
+              double temp2 = alpha * a[offseta + j + l * lda];
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] += a[offseta + i + l * lda] * temp1
+                                         +  b[offsetb + i + l * ldb] * temp2;
+              }
+            }
+          }
+        }
+      } else {
+        // C := alpha*A'*B + alpha*B'*A + beta*C, upper triangle, A,B are k-by-n
+        for (int j = 0; j < n; j += 1) {
+          for (int i = 0; i <= j; i += 1) {
+            double temp1 = 0.0;
+            double temp2 = 0.0;
+            for (int l = 0; l < k; l += 1) {
+              temp1 += a[offseta + l + i * lda] * b[offsetb + l + j * ldb];
+              temp2 += b[offsetb + l + i * ldb] * a[offseta + l + j * lda];
+            }
+            if (beta == 0.0) {
+              c[offsetc + i + j * ldc] = alpha * temp1 + alpha * temp2;
+            } else {
+              c[offsetc + i + j * ldc] = alpha * temp1 + alpha * temp2 + beta * c[offsetc + i + j * ldc];
+            }
+          }
+        }
+      }
+    } else {
+      if (lsame("N", trans)) {
+        // C := alpha*A*B' + alpha*B*A' + beta*C, lower triangle, A,B are n-by-k
+        for (int j = 0; j < n; j += 1) {
+          // Scale column j of lower triangle by beta
+          if (beta != 1.0) {
+            if (beta == 0.0) {
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] = 0.0;
+              }
+            } else {
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] = beta * c[offsetc + i + j * ldc];
+              }
+            }
+          }
+          if (alpha != 0.0) {
+            for (int l = 0; l < k; l += 1) {
+              double temp1 = alpha * b[offsetb + j + l * ldb];
+              double temp2 = alpha * a[offseta + j + l * lda];
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] += a[offseta + i + l * lda] * temp1
+                                         +  b[offsetb + i + l * ldb] * temp2;
+              }
+            }
+          }
+        }
+      } else {
+        // C := alpha*A'*B + alpha*B'*A + beta*C, lower triangle, A,B are k-by-n
+        for (int j = 0; j < n; j += 1) {
+          for (int i = j; i < n; i += 1) {
+            double temp1 = 0.0;
+            double temp2 = 0.0;
+            for (int l = 0; l < k; l += 1) {
+              temp1 += a[offseta + l + i * lda] * b[offsetb + l + j * ldb];
+              temp2 += b[offsetb + l + i * ldb] * a[offseta + l + j * lda];
+            }
+            if (beta == 0.0) {
+              c[offsetc + i + j * ldc] = alpha * temp1 + alpha * temp2;
+            } else {
+              c[offsetc + i + j * ldc] = alpha * temp1 + alpha * temp2 + beta * c[offsetc + i + j * ldc];
+            }
+          }
+        }
+      }
+    }
   }
 
   protected void ssyr2kK(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb, float beta, float[] c, int offsetc, int ldc) {
-    org.netlib.blas.Ssyr2k.ssyr2k(uplo, trans, n, k, alpha, a, offseta, lda, b, offsetb, ldb, beta, c, offsetc, ldc);
+    // C := alpha*A*B' + alpha*B*A' + beta*C (trans="N") or C := alpha*A'*B + alpha*B'*A + beta*C (trans="T"/"C")
+    // Only upper or lower triangle of C is updated
+    if (lsame("U", uplo)) {
+      if (lsame("N", trans)) {
+        // C := alpha*A*B' + alpha*B*A' + beta*C, upper triangle, A,B are n-by-k
+        for (int j = 0; j < n; j += 1) {
+          if (beta != 1.0f) {
+            if (beta == 0.0f) {
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] = 0.0f;
+              }
+            } else {
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] = beta * c[offsetc + i + j * ldc];
+              }
+            }
+          }
+          if (alpha != 0.0f) {
+            for (int l = 0; l < k; l += 1) {
+              float temp1 = alpha * b[offsetb + j + l * ldb];
+              float temp2 = alpha * a[offseta + j + l * lda];
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] += a[offseta + i + l * lda] * temp1
+                                         +  b[offsetb + i + l * ldb] * temp2;
+              }
+            }
+          }
+        }
+      } else {
+        // C := alpha*A'*B + alpha*B'*A + beta*C, upper triangle, A,B are k-by-n
+        for (int j = 0; j < n; j += 1) {
+          for (int i = 0; i <= j; i += 1) {
+            float temp1 = 0.0f;
+            float temp2 = 0.0f;
+            for (int l = 0; l < k; l += 1) {
+              temp1 += a[offseta + l + i * lda] * b[offsetb + l + j * ldb];
+              temp2 += b[offsetb + l + i * ldb] * a[offseta + l + j * lda];
+            }
+            if (beta == 0.0f) {
+              c[offsetc + i + j * ldc] = alpha * temp1 + alpha * temp2;
+            } else {
+              c[offsetc + i + j * ldc] = alpha * temp1 + alpha * temp2 + beta * c[offsetc + i + j * ldc];
+            }
+          }
+        }
+      }
+    } else {
+      if (lsame("N", trans)) {
+        // C := alpha*A*B' + alpha*B*A' + beta*C, lower triangle, A,B are n-by-k
+        for (int j = 0; j < n; j += 1) {
+          if (beta != 1.0f) {
+            if (beta == 0.0f) {
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] = 0.0f;
+              }
+            } else {
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] = beta * c[offsetc + i + j * ldc];
+              }
+            }
+          }
+          if (alpha != 0.0f) {
+            for (int l = 0; l < k; l += 1) {
+              float temp1 = alpha * b[offsetb + j + l * ldb];
+              float temp2 = alpha * a[offseta + j + l * lda];
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] += a[offseta + i + l * lda] * temp1
+                                         +  b[offsetb + i + l * ldb] * temp2;
+              }
+            }
+          }
+        }
+      } else {
+        // C := alpha*A'*B + alpha*B'*A + beta*C, lower triangle, A,B are k-by-n
+        for (int j = 0; j < n; j += 1) {
+          for (int i = j; i < n; i += 1) {
+            float temp1 = 0.0f;
+            float temp2 = 0.0f;
+            for (int l = 0; l < k; l += 1) {
+              temp1 += a[offseta + l + i * lda] * b[offsetb + l + j * ldb];
+              temp2 += b[offsetb + l + i * ldb] * a[offseta + l + j * lda];
+            }
+            if (beta == 0.0f) {
+              c[offsetc + i + j * ldc] = alpha * temp1 + alpha * temp2;
+            } else {
+              c[offsetc + i + j * ldc] = alpha * temp1 + alpha * temp2 + beta * c[offsetc + i + j * ldc];
+            }
+          }
+        }
+      }
+    }
   }
 
   protected void dsyrkK(String uplo, String trans, int n, int k, double alpha, double[] a, int offseta, int lda, double beta, double[] c, int offsetc, int ldc) {
-    org.netlib.blas.Dsyrk.dsyrk(uplo, trans, n, k, alpha, a, offseta, lda, beta, c, offsetc, ldc);
+    // C := alpha*A*A' + beta*C (trans="N") or C := alpha*A'*A + beta*C (trans="T"/"C")
+    // Only upper or lower triangle of C is updated
+    if (lsame("U", uplo)) {
+      if (lsame("N", trans)) {
+        // C := alpha*A*A' + beta*C, upper triangle, A is n-by-k
+        for (int j = 0; j < n; j += 1) {
+          // Scale column j of upper triangle by beta
+          if (beta != 1.0) {
+            if (beta == 0.0) {
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] = 0.0;
+              }
+            } else {
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] = beta * c[offsetc + i + j * ldc];
+              }
+            }
+          }
+          if (alpha != 0.0) {
+            for (int l = 0; l < k; l += 1) {
+              double temp = alpha * a[offseta + j + l * lda];
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] += temp * a[offseta + i + l * lda];
+              }
+            }
+          }
+        }
+      } else {
+        // C := alpha*A'*A + beta*C, upper triangle, A is k-by-n
+        for (int j = 0; j < n; j += 1) {
+          for (int i = 0; i <= j; i += 1) {
+            double temp = 0.0;
+            for (int l = 0; l < k; l += 1) {
+              temp += a[offseta + l + i * lda] * a[offseta + l + j * lda];
+            }
+            if (beta == 0.0) {
+              c[offsetc + i + j * ldc] = alpha * temp;
+            } else {
+              c[offsetc + i + j * ldc] = alpha * temp + beta * c[offsetc + i + j * ldc];
+            }
+          }
+        }
+      }
+    } else {
+      if (lsame("N", trans)) {
+        // C := alpha*A*A' + beta*C, lower triangle, A is n-by-k
+        for (int j = 0; j < n; j += 1) {
+          // Scale column j of lower triangle by beta
+          if (beta != 1.0) {
+            if (beta == 0.0) {
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] = 0.0;
+              }
+            } else {
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] = beta * c[offsetc + i + j * ldc];
+              }
+            }
+          }
+          if (alpha != 0.0) {
+            for (int l = 0; l < k; l += 1) {
+              double temp = alpha * a[offseta + j + l * lda];
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] += temp * a[offseta + i + l * lda];
+              }
+            }
+          }
+        }
+      } else {
+        // C := alpha*A'*A + beta*C, lower triangle, A is k-by-n
+        for (int j = 0; j < n; j += 1) {
+          for (int i = j; i < n; i += 1) {
+            double temp = 0.0;
+            for (int l = 0; l < k; l += 1) {
+              temp += a[offseta + l + i * lda] * a[offseta + l + j * lda];
+            }
+            if (beta == 0.0) {
+              c[offsetc + i + j * ldc] = alpha * temp;
+            } else {
+              c[offsetc + i + j * ldc] = alpha * temp + beta * c[offsetc + i + j * ldc];
+            }
+          }
+        }
+      }
+    }
   }
 
   protected void ssyrkK(String uplo, String trans, int n, int k, float alpha, float[] a, int offseta, int lda, float beta, float[] c, int offsetc, int ldc) {
-    org.netlib.blas.Ssyrk.ssyrk(uplo, trans, n, k, alpha, a, offseta, lda, beta, c, offsetc, ldc);
+    // C := alpha*A*A' + beta*C (trans="N") or C := alpha*A'*A + beta*C (trans="T"/"C")
+    // Only upper or lower triangle of C is updated
+    if (lsame("U", uplo)) {
+      if (lsame("N", trans)) {
+        // C := alpha*A*A' + beta*C, upper triangle, A is n-by-k
+        for (int j = 0; j < n; j += 1) {
+          if (beta != 1.0f) {
+            if (beta == 0.0f) {
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] = 0.0f;
+              }
+            } else {
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] = beta * c[offsetc + i + j * ldc];
+              }
+            }
+          }
+          if (alpha != 0.0f) {
+            for (int l = 0; l < k; l += 1) {
+              float temp = alpha * a[offseta + j + l * lda];
+              for (int i = 0; i <= j; i += 1) {
+                c[offsetc + i + j * ldc] += temp * a[offseta + i + l * lda];
+              }
+            }
+          }
+        }
+      } else {
+        // C := alpha*A'*A + beta*C, upper triangle, A is k-by-n
+        for (int j = 0; j < n; j += 1) {
+          for (int i = 0; i <= j; i += 1) {
+            float temp = 0.0f;
+            for (int l = 0; l < k; l += 1) {
+              temp += a[offseta + l + i * lda] * a[offseta + l + j * lda];
+            }
+            if (beta == 0.0f) {
+              c[offsetc + i + j * ldc] = alpha * temp;
+            } else {
+              c[offsetc + i + j * ldc] = alpha * temp + beta * c[offsetc + i + j * ldc];
+            }
+          }
+        }
+      }
+    } else {
+      if (lsame("N", trans)) {
+        // C := alpha*A*A' + beta*C, lower triangle, A is n-by-k
+        for (int j = 0; j < n; j += 1) {
+          if (beta != 1.0f) {
+            if (beta == 0.0f) {
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] = 0.0f;
+              }
+            } else {
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] = beta * c[offsetc + i + j * ldc];
+              }
+            }
+          }
+          if (alpha != 0.0f) {
+            for (int l = 0; l < k; l += 1) {
+              float temp = alpha * a[offseta + j + l * lda];
+              for (int i = j; i < n; i += 1) {
+                c[offsetc + i + j * ldc] += temp * a[offseta + i + l * lda];
+              }
+            }
+          }
+        }
+      } else {
+        // C := alpha*A'*A + beta*C, lower triangle, A is k-by-n
+        for (int j = 0; j < n; j += 1) {
+          for (int i = j; i < n; i += 1) {
+            float temp = 0.0f;
+            for (int l = 0; l < k; l += 1) {
+              temp += a[offseta + l + i * lda] * a[offseta + l + j * lda];
+            }
+            if (beta == 0.0f) {
+              c[offsetc + i + j * ldc] = alpha * temp;
+            } else {
+              c[offsetc + i + j * ldc] = alpha * temp + beta * c[offsetc + i + j * ldc];
+            }
+          }
+        }
+      }
+    }
   }
 
   protected void dtbmvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    org.netlib.blas.Dtbmv.dtbmv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // x := A*x
+      if (lsame("U", uplo)) {
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0) {
+            double temp = x[offsetx + jx];
+            int istart = Math.max(0, j - k);
+            int ix = incx < 0 ? (n - 1 - istart) * -incx : istart * incx;
+            for (int i = istart; i < j; i++, ix += incx) {
+              x[offsetx + ix] += temp * a[offseta + (k + i - j) + j * lda];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + k + j * lda];
+            }
+          }
+        }
+      } else {
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          if (x[offsetx + jx] != 0.0) {
+            double temp = x[offsetx + jx];
+            int iend = Math.min(n - 1, j + k);
+            int ix = incx < 0 ? (n - 1 - iend) * -incx : iend * incx;
+            for (int i = iend; i > j; i--, ix -= incx) {
+              x[offsetx + ix] += temp * a[offseta + (i - j) + j * lda];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + j * lda];
+            }
+          }
+        }
+      }
+    } else {
+      // x := A'*x
+      if (lsame("U", uplo)) {
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          double temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + k + j * lda];
+          }
+          int istart = Math.max(0, j - k);
+          int ix = incx < 0 ? (n - 1 - istart) * -incx : istart * incx;
+          for (int i = istart; i < j; i++, ix += incx) {
+            temp += a[offseta + (k + i - j) + j * lda] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          double temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + j * lda];
+          }
+          int iend = Math.min(n - 1, j + k);
+          int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+          for (int i = j + 1; i <= iend; i++, ix += incx) {
+            temp += a[offseta + (i - j) + j * lda] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected void stbmvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    org.netlib.blas.Stbmv.stbmv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // x := A*x
+      if (lsame("U", uplo)) {
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            float temp = x[offsetx + jx];
+            int istart = Math.max(0, j - k);
+            int ix = incx < 0 ? (n - 1 - istart) * -incx : istart * incx;
+            for (int i = istart; i < j; i++, ix += incx) {
+              x[offsetx + ix] += temp * a[offseta + (k + i - j) + j * lda];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + k + j * lda];
+            }
+          }
+        }
+      } else {
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            float temp = x[offsetx + jx];
+            int iend = Math.min(n - 1, j + k);
+            int ix = incx < 0 ? (n - 1 - iend) * -incx : iend * incx;
+            for (int i = iend; i > j; i--, ix -= incx) {
+              x[offsetx + ix] += temp * a[offseta + (i - j) + j * lda];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + j * lda];
+            }
+          }
+        }
+      }
+    } else {
+      // x := A'*x
+      if (lsame("U", uplo)) {
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          float temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + k + j * lda];
+          }
+          int istart = Math.max(0, j - k);
+          int ix = incx < 0 ? (n - 1 - istart) * -incx : istart * incx;
+          for (int i = istart; i < j; i++, ix += incx) {
+            temp += a[offseta + (k + i - j) + j * lda] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          float temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + j * lda];
+          }
+          int iend = Math.min(n - 1, j + k);
+          int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+          for (int i = j + 1; i <= iend; i++, ix += incx) {
+            temp += a[offseta + (i - j) + j * lda] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected void dtbsvK(String uplo, String trans, String diag, int n, int k, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    org.netlib.blas.Dtbsv.dtbsv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // Solve A*x = b
+      if (lsame("U", uplo)) {
+        // Back-substitution, upper band
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          if (x[offsetx + jx] != 0.0) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + k + j * lda];
+            }
+            double temp = x[offsetx + jx];
+            int istart = Math.max(0, j - k);
+            int ix = incx < 0 ? (n - 1 - istart) * -incx : istart * incx;
+            for (int i = istart; i < j; i++, ix += incx) {
+              x[offsetx + ix] -= temp * a[offseta + (k + i - j) + j * lda];
+            }
+          }
+        }
+      } else {
+        // Forward-substitution, lower band
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + j * lda];
+            }
+            double temp = x[offsetx + jx];
+            int iend = Math.min(n - 1, j + k);
+            int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+            for (int i = j + 1; i <= iend; i++, ix += incx) {
+              x[offsetx + ix] -= temp * a[offseta + (i - j) + j * lda];
+            }
+          }
+        }
+      }
+    } else {
+      // Solve A'*x = b
+      if (lsame("U", uplo)) {
+        // Forward-substitution
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          double temp = x[offsetx + jx];
+          int istart = Math.max(0, j - k);
+          int ix = incx < 0 ? (n - 1 - istart) * -incx : istart * incx;
+          for (int i = istart; i < j; i++, ix += incx) {
+            temp -= a[offseta + (k + i - j) + j * lda] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + k + j * lda];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        // Back-substitution
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          double temp = x[offsetx + jx];
+          int iend = Math.min(n - 1, j + k);
+          int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+          for (int i = j + 1; i <= iend; i++, ix += incx) {
+            temp -= a[offseta + (i - j) + j * lda] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + j * lda];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected void stbsvK(String uplo, String trans, String diag, int n, int k, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    org.netlib.blas.Stbsv.stbsv(uplo, trans, diag, n, k, a, offseta, lda, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // Solve A*x = b
+      if (lsame("U", uplo)) {
+        // Back-substitution, upper band
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + k + j * lda];
+            }
+            float temp = x[offsetx + jx];
+            int istart = Math.max(0, j - k);
+            int ix = incx < 0 ? (n - 1 - istart) * -incx : istart * incx;
+            for (int i = istart; i < j; i++, ix += incx) {
+              x[offsetx + ix] -= temp * a[offseta + (k + i - j) + j * lda];
+            }
+          }
+        }
+      } else {
+        // Forward-substitution, lower band
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + j * lda];
+            }
+            float temp = x[offsetx + jx];
+            int iend = Math.min(n - 1, j + k);
+            int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+            for (int i = j + 1; i <= iend; i++, ix += incx) {
+              x[offsetx + ix] -= temp * a[offseta + (i - j) + j * lda];
+            }
+          }
+        }
+      }
+    } else {
+      // Solve A'*x = b
+      if (lsame("U", uplo)) {
+        // Forward-substitution
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          float temp = x[offsetx + jx];
+          int istart = Math.max(0, j - k);
+          int ix = incx < 0 ? (n - 1 - istart) * -incx : istart * incx;
+          for (int i = istart; i < j; i++, ix += incx) {
+            temp -= a[offseta + (k + i - j) + j * lda] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + k + j * lda];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        // Back-substitution
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          float temp = x[offsetx + jx];
+          int iend = Math.min(n - 1, j + k);
+          int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+          for (int i = j + 1; i <= iend; i++, ix += incx) {
+            temp -= a[offseta + (i - j) + j * lda] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + j * lda];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected void dtpmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
-    org.netlib.blas.Dtpmv.dtpmv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // x := A*x
+      if (lsame("U", uplo)) {
+        // Upper triangular packed: column j stored at a[j*(j+1)/2] .. a[j*(j+1)/2 + j]
+        int kk = 0;
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0) {
+            double temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1) * -incx : 0;
+            for (int i = 0; i < j; i++, ix += incx) {
+              x[offsetx + ix] += temp * a[offseta + kk + i];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + kk + j];
+            }
+          }
+          kk += j + 1;
+        }
+      } else {
+        // Lower triangular packed: column j stored at a[kk] .. a[kk + (n-1-j)]
+        int kk = n * (n + 1) / 2;
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          kk -= (n - j);
+          if (x[offsetx + jx] != 0.0) {
+            double temp = x[offsetx + jx];
+            int ix = incx < 0 ? 0 : (n - 1) * incx;
+            for (int i = n - 1; i > j; i--, ix -= incx) {
+              x[offsetx + ix] += temp * a[offseta + kk + (i - j)];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + kk];
+            }
+          }
+        }
+      }
+    } else {
+      // x := A'*x
+      if (lsame("U", uplo)) {
+        int kk = n * (n + 1) / 2;
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          kk -= (j + 1);
+          double temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + kk + j];
+          }
+          int ix = incx < 0 ? (n - 1 - (j - 1)) * -incx : (j - 1) * incx;
+          for (int i = j - 1; i >= 0; i--, ix -= incx) {
+            temp += a[offseta + kk + i] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        int kk = 0;
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          double temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + kk];
+          }
+          int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+          for (int i = j + 1; i < n; i++, ix += incx) {
+            temp += a[offseta + kk + (i - j)] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+          kk += (n - j);
+        }
+      }
+    }
   }
 
   protected void stpmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
-    org.netlib.blas.Stpmv.stpmv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // x := A*x
+      if (lsame("U", uplo)) {
+        int kk = 0;
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            float temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1) * -incx : 0;
+            for (int i = 0; i < j; i++, ix += incx) {
+              x[offsetx + ix] += temp * a[offseta + kk + i];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + kk + j];
+            }
+          }
+          kk += j + 1;
+        }
+      } else {
+        int kk = n * (n + 1) / 2;
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          kk -= (n - j);
+          if (x[offsetx + jx] != 0.0f) {
+            float temp = x[offsetx + jx];
+            int ix = incx < 0 ? 0 : (n - 1) * incx;
+            for (int i = n - 1; i > j; i--, ix -= incx) {
+              x[offsetx + ix] += temp * a[offseta + kk + (i - j)];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + kk];
+            }
+          }
+        }
+      }
+    } else {
+      // x := A'*x
+      if (lsame("U", uplo)) {
+        int kk = n * (n + 1) / 2;
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          kk -= (j + 1);
+          float temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + kk + j];
+          }
+          int ix = incx < 0 ? (n - 1 - (j - 1)) * -incx : (j - 1) * incx;
+          for (int i = j - 1; i >= 0; i--, ix -= incx) {
+            temp += a[offseta + kk + i] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        int kk = 0;
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          float temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + kk];
+          }
+          int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+          for (int i = j + 1; i < n; i++, ix += incx) {
+            temp += a[offseta + kk + (i - j)] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+          kk += (n - j);
+        }
+      }
+    }
   }
 
   protected void dtpsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, double[] x, int offsetx, int incx) {
-    org.netlib.blas.Dtpsv.dtpsv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // Solve A*x = b
+      if (lsame("U", uplo)) {
+        // Back-substitution, upper packed
+        int kk = n * (n + 1) / 2;
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          kk -= (j + 1);
+          if (x[offsetx + jx] != 0.0) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + kk + j];
+            }
+            double temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1 - (j - 1)) * -incx : (j - 1) * incx;
+            for (int i = j - 1; i >= 0; i--, ix -= incx) {
+              x[offsetx + ix] -= temp * a[offseta + kk + i];
+            }
+          }
+        }
+      } else {
+        // Forward-substitution, lower packed
+        int kk = 0;
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + kk];
+            }
+            double temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+            for (int i = j + 1; i < n; i++, ix += incx) {
+              x[offsetx + ix] -= temp * a[offseta + kk + (i - j)];
+            }
+          }
+          kk += (n - j);
+        }
+      }
+    } else {
+      // Solve A'*x = b
+      if (lsame("U", uplo)) {
+        // Forward-substitution
+        int kk = 0;
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          double temp = x[offsetx + jx];
+          int ix = incx < 0 ? (n - 1) * -incx : 0;
+          for (int i = 0; i < j; i++, ix += incx) {
+            temp -= a[offseta + kk + i] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + kk + j];
+          }
+          x[offsetx + jx] = temp;
+          kk += j + 1;
+        }
+      } else {
+        // Back-substitution
+        int kk = n * (n + 1) / 2;
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          kk -= (n - j);
+          double temp = x[offsetx + jx];
+          int ix = incx < 0 ? 0 : (n - 1) * incx;
+          for (int i = n - 1; i > j; i--, ix -= incx) {
+            temp -= a[offseta + kk + (i - j)] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + kk];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected void stpsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, float[] x, int offsetx, int incx) {
-    org.netlib.blas.Stpsv.stpsv(uplo, trans, diag, n, a, offseta, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // Solve A*x = b
+      if (lsame("U", uplo)) {
+        // Back-substitution, upper packed
+        int kk = n * (n + 1) / 2;
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          kk -= (j + 1);
+          if (x[offsetx + jx] != 0.0f) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + kk + j];
+            }
+            float temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1 - (j - 1)) * -incx : (j - 1) * incx;
+            for (int i = j - 1; i >= 0; i--, ix -= incx) {
+              x[offsetx + ix] -= temp * a[offseta + kk + i];
+            }
+          }
+        }
+      } else {
+        // Forward-substitution, lower packed
+        int kk = 0;
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + kk];
+            }
+            float temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+            for (int i = j + 1; i < n; i++, ix += incx) {
+              x[offsetx + ix] -= temp * a[offseta + kk + (i - j)];
+            }
+          }
+          kk += (n - j);
+        }
+      }
+    } else {
+      // Solve A'*x = b
+      if (lsame("U", uplo)) {
+        // Forward-substitution
+        int kk = 0;
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          float temp = x[offsetx + jx];
+          int ix = incx < 0 ? (n - 1) * -incx : 0;
+          for (int i = 0; i < j; i++, ix += incx) {
+            temp -= a[offseta + kk + i] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + kk + j];
+          }
+          x[offsetx + jx] = temp;
+          kk += j + 1;
+        }
+      } else {
+        // Back-substitution
+        int kk = n * (n + 1) / 2;
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          kk -= (n - j);
+          float temp = x[offsetx + jx];
+          int ix = incx < 0 ? 0 : (n - 1) * incx;
+          for (int i = n - 1; i > j; i--, ix -= incx) {
+            temp -= a[offseta + kk + (i - j)] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + kk];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected void dtrmmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
-    org.netlib.blas.Dtrmm.dtrmm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
+    boolean nounit = lsame("N", diag);
+    // When alpha is zero, set B to zero
+    if (alpha == 0.0) {
+      for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i++) {
+          b[offsetb + i + j * ldb] = 0.0;
+        }
+      }
+      return;
+    }
+    if (lsame("L", side)) {
+      if (lsame("N", transa)) {
+        // B := alpha*A*B
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            for (int k = 0; k < m; k++) {
+              if (b[offsetb + k + j * ldb] != 0.0) {
+                double temp = alpha * b[offsetb + k + j * ldb];
+                for (int i = 0; i < k; i++) {
+                  b[offsetb + i + j * ldb] += temp * a[offseta + i + k * lda];
+                }
+                if (nounit) {
+                  b[offsetb + k + j * ldb] = temp * a[offseta + k + k * lda];
+                } else {
+                  b[offsetb + k + j * ldb] = temp;
+                }
+              }
+            }
+          }
+        } else {
+          // Lower
+          for (int j = 0; j < n; j++) {
+            for (int k = m - 1; k >= 0; k--) {
+              if (b[offsetb + k + j * ldb] != 0.0) {
+                double temp = alpha * b[offsetb + k + j * ldb];
+                if (nounit) {
+                  b[offsetb + k + j * ldb] = temp * a[offseta + k + k * lda];
+                } else {
+                  b[offsetb + k + j * ldb] = temp;
+                }
+                for (int i = k + 1; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp * a[offseta + i + k * lda];
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // B := alpha*A'*B
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            for (int i = m - 1; i >= 0; i--) {
+              double temp = b[offsetb + i + j * ldb];
+              if (nounit) {
+                temp *= a[offseta + i + i * lda];
+              }
+              for (int k = 0; k < i; k++) {
+                temp += a[offseta + k + i * lda] * b[offsetb + k + j * ldb];
+              }
+              b[offsetb + i + j * ldb] = alpha * temp;
+            }
+          }
+        } else {
+          // Lower
+          for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+              double temp = b[offsetb + i + j * ldb];
+              if (nounit) {
+                temp *= a[offseta + i + i * lda];
+              }
+              for (int k = i + 1; k < m; k++) {
+                temp += a[offseta + k + i * lda] * b[offsetb + k + j * ldb];
+              }
+              b[offsetb + i + j * ldb] = alpha * temp;
+            }
+          }
+        }
+      }
+    } else {
+      // side = "R": B := alpha*B*op(A)
+      if (lsame("N", transa)) {
+        // B := alpha*B*A
+        if (lsame("U", uplo)) {
+          for (int j = n - 1; j >= 0; j--) {
+            double temp = alpha;
+            if (nounit) {
+              temp *= a[offseta + j + j * lda];
+            }
+            for (int i = 0; i < m; i++) {
+              b[offsetb + i + j * ldb] = temp * b[offsetb + i + j * ldb];
+            }
+            for (int k = 0; k < j; k++) {
+              if (a[offseta + k + j * lda] != 0.0) {
+                double temp2 = alpha * a[offseta + k + j * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp2 * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+          }
+        } else {
+          // Lower
+          for (int j = 0; j < n; j++) {
+            double temp = alpha;
+            if (nounit) {
+              temp *= a[offseta + j + j * lda];
+            }
+            for (int i = 0; i < m; i++) {
+              b[offsetb + i + j * ldb] = temp * b[offsetb + i + j * ldb];
+            }
+            for (int k = j + 1; k < n; k++) {
+              if (a[offseta + k + j * lda] != 0.0) {
+                double temp2 = alpha * a[offseta + k + j * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp2 * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // B := alpha*B*A'
+        if (lsame("U", uplo)) {
+          for (int k = 0; k < n; k++) {
+            for (int j = 0; j < k; j++) {
+              if (a[offseta + j + k * lda] != 0.0) {
+                double temp = alpha * a[offseta + j + k * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            double temp = alpha;
+            if (nounit) {
+              temp *= a[offseta + k + k * lda];
+            }
+            if (temp != 1.0) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = temp * b[offsetb + i + k * ldb];
+              }
+            }
+          }
+        } else {
+          // Lower
+          for (int k = n - 1; k >= 0; k--) {
+            for (int j = k + 1; j < n; j++) {
+              if (a[offseta + j + k * lda] != 0.0) {
+                double temp = alpha * a[offseta + j + k * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            double temp = alpha;
+            if (nounit) {
+              temp *= a[offseta + k + k * lda];
+            }
+            if (temp != 1.0) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = temp * b[offsetb + i + k * ldb];
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   protected void strmmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
-    org.netlib.blas.Strmm.strmm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
+    boolean nounit_s = lsame("N", diag);
+    // When alpha is zero, set B to zero
+    if (alpha == 0.0f) {
+      for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i++) {
+          b[offsetb + i + j * ldb] = 0.0f;
+        }
+      }
+      return;
+    }
+    if (lsame("L", side)) {
+      if (lsame("N", transa)) {
+        // B := alpha*A*B
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            for (int k = 0; k < m; k++) {
+              if (b[offsetb + k + j * ldb] != 0.0f) {
+                float temp = alpha * b[offsetb + k + j * ldb];
+                for (int i = 0; i < k; i++) {
+                  b[offsetb + i + j * ldb] += temp * a[offseta + i + k * lda];
+                }
+                if (nounit_s) {
+                  b[offsetb + k + j * ldb] = temp * a[offseta + k + k * lda];
+                } else {
+                  b[offsetb + k + j * ldb] = temp;
+                }
+              }
+            }
+          }
+        } else {
+          // Lower
+          for (int j = 0; j < n; j++) {
+            for (int k = m - 1; k >= 0; k--) {
+              if (b[offsetb + k + j * ldb] != 0.0f) {
+                float temp = alpha * b[offsetb + k + j * ldb];
+                if (nounit_s) {
+                  b[offsetb + k + j * ldb] = temp * a[offseta + k + k * lda];
+                } else {
+                  b[offsetb + k + j * ldb] = temp;
+                }
+                for (int i = k + 1; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp * a[offseta + i + k * lda];
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // B := alpha*A'*B
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            for (int i = m - 1; i >= 0; i--) {
+              float temp = b[offsetb + i + j * ldb];
+              if (nounit_s) {
+                temp *= a[offseta + i + i * lda];
+              }
+              for (int k = 0; k < i; k++) {
+                temp += a[offseta + k + i * lda] * b[offsetb + k + j * ldb];
+              }
+              b[offsetb + i + j * ldb] = alpha * temp;
+            }
+          }
+        } else {
+          // Lower
+          for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+              float temp = b[offsetb + i + j * ldb];
+              if (nounit_s) {
+                temp *= a[offseta + i + i * lda];
+              }
+              for (int k = i + 1; k < m; k++) {
+                temp += a[offseta + k + i * lda] * b[offsetb + k + j * ldb];
+              }
+              b[offsetb + i + j * ldb] = alpha * temp;
+            }
+          }
+        }
+      }
+    } else {
+      // side = "R": B := alpha*B*op(A)
+      if (lsame("N", transa)) {
+        // B := alpha*B*A
+        if (lsame("U", uplo)) {
+          for (int j = n - 1; j >= 0; j--) {
+            float temp = alpha;
+            if (nounit_s) {
+              temp *= a[offseta + j + j * lda];
+            }
+            for (int i = 0; i < m; i++) {
+              b[offsetb + i + j * ldb] = temp * b[offsetb + i + j * ldb];
+            }
+            for (int k = 0; k < j; k++) {
+              if (a[offseta + k + j * lda] != 0.0f) {
+                float temp2 = alpha * a[offseta + k + j * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp2 * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+          }
+        } else {
+          // Lower
+          for (int j = 0; j < n; j++) {
+            float temp = alpha;
+            if (nounit_s) {
+              temp *= a[offseta + j + j * lda];
+            }
+            for (int i = 0; i < m; i++) {
+              b[offsetb + i + j * ldb] = temp * b[offsetb + i + j * ldb];
+            }
+            for (int k = j + 1; k < n; k++) {
+              if (a[offseta + k + j * lda] != 0.0f) {
+                float temp2 = alpha * a[offseta + k + j * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp2 * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // B := alpha*B*A'
+        if (lsame("U", uplo)) {
+          for (int k = 0; k < n; k++) {
+            for (int j = 0; j < k; j++) {
+              if (a[offseta + j + k * lda] != 0.0f) {
+                float temp = alpha * a[offseta + j + k * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            float temp = alpha;
+            if (nounit_s) {
+              temp *= a[offseta + k + k * lda];
+            }
+            if (temp != 1.0f) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = temp * b[offsetb + i + k * ldb];
+              }
+            }
+          }
+        } else {
+          // Lower
+          for (int k = n - 1; k >= 0; k--) {
+            for (int j = k + 1; j < n; j++) {
+              if (a[offseta + j + k * lda] != 0.0f) {
+                float temp = alpha * a[offseta + j + k * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] += temp * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            float temp = alpha;
+            if (nounit_s) {
+              temp *= a[offseta + k + k * lda];
+            }
+            if (temp != 1.0f) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = temp * b[offsetb + i + k * ldb];
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   protected void dtrmvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    org.netlib.blas.Dtrmv.dtrmv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // x := A*x
+      if (lsame("U", uplo)) {
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0) {
+            double temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1) * -incx : 0;
+            for (int i = 0; i < j; i++, ix += incx) {
+              x[offsetx + ix] += temp * a[offseta + i + j * lda];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + j + j * lda];
+            }
+          }
+        }
+      } else {
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          if (x[offsetx + jx] != 0.0) {
+            double temp = x[offsetx + jx];
+            int ix = incx < 0 ? 0 : (n - 1) * incx;
+            for (int i = n - 1; i > j; i--, ix -= incx) {
+              x[offsetx + ix] += temp * a[offseta + i + j * lda];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + j + j * lda];
+            }
+          }
+        }
+      }
+    } else {
+      // x := A'*x
+      if (lsame("U", uplo)) {
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          double temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + j + j * lda];
+          }
+          int ix = incx < 0 ? (n - 1 - (j - 1)) * -incx : (j - 1) * incx;
+          for (int i = j - 1; i >= 0; i--, ix -= incx) {
+            temp += a[offseta + i + j * lda] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          double temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + j + j * lda];
+          }
+          int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+          for (int i = j + 1; i < n; i++, ix += incx) {
+            temp += a[offseta + i + j * lda] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected void strmvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    org.netlib.blas.Strmv.strmv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // x := A*x
+      if (lsame("U", uplo)) {
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            float temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1) * -incx : 0;
+            for (int i = 0; i < j; i++, ix += incx) {
+              x[offsetx + ix] += temp * a[offseta + i + j * lda];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + j + j * lda];
+            }
+          }
+        }
+      } else {
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            float temp = x[offsetx + jx];
+            int ix = incx < 0 ? 0 : (n - 1) * incx;
+            for (int i = n - 1; i > j; i--, ix -= incx) {
+              x[offsetx + ix] += temp * a[offseta + i + j * lda];
+            }
+            if (nounit) {
+              x[offsetx + jx] *= a[offseta + j + j * lda];
+            }
+          }
+        }
+      }
+    } else {
+      // x := A'*x
+      if (lsame("U", uplo)) {
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          float temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + j + j * lda];
+          }
+          int ix = incx < 0 ? (n - 1 - (j - 1)) * -incx : (j - 1) * incx;
+          for (int i = j - 1; i >= 0; i--, ix -= incx) {
+            temp += a[offseta + i + j * lda] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          float temp = x[offsetx + jx];
+          if (nounit) {
+            temp *= a[offseta + j + j * lda];
+          }
+          int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+          for (int i = j + 1; i < n; i++, ix += incx) {
+            temp += a[offseta + i + j * lda] * x[offsetx + ix];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected void dtrsmK(String side, String uplo, String transa, String diag, int m, int n, double alpha, double[] a, int offseta, int lda, double[] b, int offsetb, int ldb) {
-    org.netlib.blas.Dtrsm.dtrsm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
+    boolean nounit = lsame("N", diag);
+    if (alpha == 0.0) {
+      for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i++) {
+          b[offsetb + i + j * ldb] = 0.0;
+        }
+      }
+      return;
+    }
+    if (lsame("L", side)) {
+      if (lsame("N", transa)) {
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            if (alpha != 1.0) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = alpha * b[offsetb + i + j * ldb];
+              }
+            }
+            for (int k = m - 1; k >= 0; k--) {
+              if (b[offsetb + k + j * ldb] != 0.0) {
+                if (nounit) {
+                  b[offsetb + k + j * ldb] /= a[offseta + k + k * lda];
+                }
+                for (int i = 0; i < k; i++) {
+                  b[offsetb + i + j * ldb] -= b[offsetb + k + j * ldb] * a[offseta + i + k * lda];
+                }
+              }
+            }
+          }
+        } else {
+          for (int j = 0; j < n; j++) {
+            if (alpha != 1.0) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = alpha * b[offsetb + i + j * ldb];
+              }
+            }
+            for (int k = 0; k < m; k++) {
+              if (b[offsetb + k + j * ldb] != 0.0) {
+                if (nounit) {
+                  b[offsetb + k + j * ldb] /= a[offseta + k + k * lda];
+                }
+                for (int i = k + 1; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= b[offsetb + k + j * ldb] * a[offseta + i + k * lda];
+                }
+              }
+            }
+          }
+        }
+      } else {
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+              double temp = alpha * b[offsetb + i + j * ldb];
+              for (int k = 0; k < i; k++) {
+                temp -= a[offseta + k + i * lda] * b[offsetb + k + j * ldb];
+              }
+              if (nounit) {
+                temp /= a[offseta + i + i * lda];
+              }
+              b[offsetb + i + j * ldb] = temp;
+            }
+          }
+        } else {
+          for (int j = 0; j < n; j++) {
+            for (int i = m - 1; i >= 0; i--) {
+              double temp = alpha * b[offsetb + i + j * ldb];
+              for (int k = i + 1; k < m; k++) {
+                temp -= a[offseta + k + i * lda] * b[offsetb + k + j * ldb];
+              }
+              if (nounit) {
+                temp /= a[offseta + i + i * lda];
+              }
+              b[offsetb + i + j * ldb] = temp;
+            }
+          }
+        }
+      }
+    } else {
+      if (lsame("N", transa)) {
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            if (alpha != 1.0) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = alpha * b[offsetb + i + j * ldb];
+              }
+            }
+            for (int k = 0; k < j; k++) {
+              if (a[offseta + k + j * lda] != 0.0) {
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= a[offseta + k + j * lda] * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            if (nounit) {
+              double temp = 1.0 / a[offseta + j + j * lda];
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = temp * b[offsetb + i + j * ldb];
+              }
+            }
+          }
+        } else {
+          for (int j = n - 1; j >= 0; j--) {
+            if (alpha != 1.0) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = alpha * b[offsetb + i + j * ldb];
+              }
+            }
+            for (int k = j + 1; k < n; k++) {
+              if (a[offseta + k + j * lda] != 0.0) {
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= a[offseta + k + j * lda] * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            if (nounit) {
+              double temp = 1.0 / a[offseta + j + j * lda];
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = temp * b[offsetb + i + j * ldb];
+              }
+            }
+          }
+        }
+      } else {
+        if (lsame("U", uplo)) {
+          for (int k = n - 1; k >= 0; k--) {
+            if (nounit) {
+              double temp = 1.0 / a[offseta + k + k * lda];
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = temp * b[offsetb + i + k * ldb];
+              }
+            }
+            for (int j = 0; j < k; j++) {
+              if (a[offseta + j + k * lda] != 0.0) {
+                double temp2 = a[offseta + j + k * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= temp2 * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            if (alpha != 1.0) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = alpha * b[offsetb + i + k * ldb];
+              }
+            }
+          }
+        } else {
+          for (int k = 0; k < n; k++) {
+            if (nounit) {
+              double temp = 1.0 / a[offseta + k + k * lda];
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = temp * b[offsetb + i + k * ldb];
+              }
+            }
+            for (int j = k + 1; j < n; j++) {
+              if (a[offseta + j + k * lda] != 0.0) {
+                double temp2 = a[offseta + j + k * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= temp2 * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            if (alpha != 1.0) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = alpha * b[offsetb + i + k * ldb];
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   protected void strsmK(String side, String uplo, String transa, String diag, int m, int n, float alpha, float[] a, int offseta, int lda, float[] b, int offsetb, int ldb) {
-    org.netlib.blas.Strsm.strsm(side, uplo, transa, diag, m, n, alpha, a, offseta, lda, b, offsetb, ldb);
+    boolean nounit_s = lsame("N", diag);
+    if (alpha == 0.0f) {
+      for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i++) {
+          b[offsetb + i + j * ldb] = 0.0f;
+        }
+      }
+      return;
+    }
+    if (lsame("L", side)) {
+      if (lsame("N", transa)) {
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            if (alpha != 1.0f) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = alpha * b[offsetb + i + j * ldb];
+              }
+            }
+            for (int k = m - 1; k >= 0; k--) {
+              if (b[offsetb + k + j * ldb] != 0.0f) {
+                if (nounit_s) {
+                  b[offsetb + k + j * ldb] /= a[offseta + k + k * lda];
+                }
+                for (int i = 0; i < k; i++) {
+                  b[offsetb + i + j * ldb] -= b[offsetb + k + j * ldb] * a[offseta + i + k * lda];
+                }
+              }
+            }
+          }
+        } else {
+          for (int j = 0; j < n; j++) {
+            if (alpha != 1.0f) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = alpha * b[offsetb + i + j * ldb];
+              }
+            }
+            for (int k = 0; k < m; k++) {
+              if (b[offsetb + k + j * ldb] != 0.0f) {
+                if (nounit_s) {
+                  b[offsetb + k + j * ldb] /= a[offseta + k + k * lda];
+                }
+                for (int i = k + 1; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= b[offsetb + k + j * ldb] * a[offseta + i + k * lda];
+                }
+              }
+            }
+          }
+        }
+      } else {
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+              float temp = alpha * b[offsetb + i + j * ldb];
+              for (int k = 0; k < i; k++) {
+                temp -= a[offseta + k + i * lda] * b[offsetb + k + j * ldb];
+              }
+              if (nounit_s) {
+                temp /= a[offseta + i + i * lda];
+              }
+              b[offsetb + i + j * ldb] = temp;
+            }
+          }
+        } else {
+          for (int j = 0; j < n; j++) {
+            for (int i = m - 1; i >= 0; i--) {
+              float temp = alpha * b[offsetb + i + j * ldb];
+              for (int k = i + 1; k < m; k++) {
+                temp -= a[offseta + k + i * lda] * b[offsetb + k + j * ldb];
+              }
+              if (nounit_s) {
+                temp /= a[offseta + i + i * lda];
+              }
+              b[offsetb + i + j * ldb] = temp;
+            }
+          }
+        }
+      }
+    } else {
+      if (lsame("N", transa)) {
+        if (lsame("U", uplo)) {
+          for (int j = 0; j < n; j++) {
+            if (alpha != 1.0f) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = alpha * b[offsetb + i + j * ldb];
+              }
+            }
+            for (int k = 0; k < j; k++) {
+              if (a[offseta + k + j * lda] != 0.0f) {
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= a[offseta + k + j * lda] * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            if (nounit_s) {
+              float temp = 1.0f / a[offseta + j + j * lda];
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = temp * b[offsetb + i + j * ldb];
+              }
+            }
+          }
+        } else {
+          for (int j = n - 1; j >= 0; j--) {
+            if (alpha != 1.0f) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = alpha * b[offsetb + i + j * ldb];
+              }
+            }
+            for (int k = j + 1; k < n; k++) {
+              if (a[offseta + k + j * lda] != 0.0f) {
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= a[offseta + k + j * lda] * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            if (nounit_s) {
+              float temp = 1.0f / a[offseta + j + j * lda];
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + j * ldb] = temp * b[offsetb + i + j * ldb];
+              }
+            }
+          }
+        }
+      } else {
+        if (lsame("U", uplo)) {
+          for (int k = n - 1; k >= 0; k--) {
+            if (nounit_s) {
+              float temp = 1.0f / a[offseta + k + k * lda];
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = temp * b[offsetb + i + k * ldb];
+              }
+            }
+            for (int j = 0; j < k; j++) {
+              if (a[offseta + j + k * lda] != 0.0f) {
+                float temp2 = a[offseta + j + k * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= temp2 * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            if (alpha != 1.0f) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = alpha * b[offsetb + i + k * ldb];
+              }
+            }
+          }
+        } else {
+          for (int k = 0; k < n; k++) {
+            if (nounit_s) {
+              float temp = 1.0f / a[offseta + k + k * lda];
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = temp * b[offsetb + i + k * ldb];
+              }
+            }
+            for (int j = k + 1; j < n; j++) {
+              if (a[offseta + j + k * lda] != 0.0f) {
+                float temp2 = a[offseta + j + k * lda];
+                for (int i = 0; i < m; i++) {
+                  b[offsetb + i + j * ldb] -= temp2 * b[offsetb + i + k * ldb];
+                }
+              }
+            }
+            if (alpha != 1.0f) {
+              for (int i = 0; i < m; i++) {
+                b[offsetb + i + k * ldb] = alpha * b[offsetb + i + k * ldb];
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   protected void dtrsvK(String uplo, String trans, String diag, int n, double[] a, int offseta, int lda, double[] x, int offsetx, int incx) {
-    org.netlib.blas.Dtrsv.dtrsv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // Solve A*x = b
+      if (lsame("U", uplo)) {
+        // Back-substitution
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          if (x[offsetx + jx] != 0.0) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + j + j * lda];
+            }
+            double temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1 - (j - 1)) * -incx : (j - 1) * incx;
+            for (int i = j - 1; i >= 0; i--, ix -= incx) {
+              x[offsetx + ix] -= temp * a[offseta + i + j * lda];
+            }
+          }
+        }
+      } else {
+        // Forward-substitution
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + j + j * lda];
+            }
+            double temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+            for (int i = j + 1; i < n; i++, ix += incx) {
+              x[offsetx + ix] -= temp * a[offseta + i + j * lda];
+            }
+          }
+        }
+      }
+    } else {
+      // Solve A'*x = b
+      if (lsame("U", uplo)) {
+        // Forward-substitution
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          double temp = x[offsetx + jx];
+          int ix = incx < 0 ? (n - 1) * -incx : 0;
+          for (int i = 0; i < j; i++, ix += incx) {
+            temp -= a[offseta + i + j * lda] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + j + j * lda];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        // Back-substitution
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          double temp = x[offsetx + jx];
+          int ix = incx < 0 ? 0 : (n - 1) * incx;
+          for (int i = n - 1; i > j; i--, ix -= incx) {
+            temp -= a[offseta + i + j * lda] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + j + j * lda];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected void strsvK(String uplo, String trans, String diag, int n, float[] a, int offseta, int lda, float[] x, int offsetx, int incx) {
-    org.netlib.blas.Strsv.strsv(uplo, trans, diag, n, a, offseta, lda, x, offsetx, incx);
+    boolean nounit = lsame("N", diag);
+    if (lsame("N", trans)) {
+      // Solve A*x = b
+      if (lsame("U", uplo)) {
+        // Back-substitution
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + j + j * lda];
+            }
+            float temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1 - (j - 1)) * -incx : (j - 1) * incx;
+            for (int i = j - 1; i >= 0; i--, ix -= incx) {
+              x[offsetx + ix] -= temp * a[offseta + i + j * lda];
+            }
+          }
+        }
+      } else {
+        // Forward-substitution
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          if (x[offsetx + jx] != 0.0f) {
+            if (nounit) {
+              x[offsetx + jx] /= a[offseta + j + j * lda];
+            }
+            float temp = x[offsetx + jx];
+            int ix = incx < 0 ? (n - 1 - (j + 1)) * -incx : (j + 1) * incx;
+            for (int i = j + 1; i < n; i++, ix += incx) {
+              x[offsetx + ix] -= temp * a[offseta + i + j * lda];
+            }
+          }
+        }
+      }
+    } else {
+      // Solve A'*x = b
+      if (lsame("U", uplo)) {
+        // Forward-substitution
+        int jx = incx < 0 ? (n - 1) * -incx : 0;
+        for (int j = 0; j < n; j++, jx += incx) {
+          float temp = x[offsetx + jx];
+          int ix = incx < 0 ? (n - 1) * -incx : 0;
+          for (int i = 0; i < j; i++, ix += incx) {
+            temp -= a[offseta + i + j * lda] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + j + j * lda];
+          }
+          x[offsetx + jx] = temp;
+        }
+      } else {
+        // Back-substitution
+        int jx = incx < 0 ? 0 : (n - 1) * incx;
+        for (int j = n - 1; j >= 0; j--, jx -= incx) {
+          float temp = x[offsetx + jx];
+          int ix = incx < 0 ? 0 : (n - 1) * incx;
+          for (int i = n - 1; i > j; i--, ix -= incx) {
+            temp -= a[offseta + i + j * lda] * x[offsetx + ix];
+          }
+          if (nounit) {
+            temp /= a[offseta + j + j * lda];
+          }
+          x[offsetx + jx] = temp;
+        }
+      }
+    }
   }
 
   protected int idamaxK(int n, double[] x, int offsetx, int incx) {
-    return org.netlib.blas.Idamax.idamax(n, x, offsetx, incx);
+    int imax = 1;
+    if (incx == 1) {
+      double max = Math.abs(x[offsetx]);
+      for (int ix = 1; ix < n; ix += 1) {
+        double absval = Math.abs(x[offsetx + ix]);
+        if (absval > max) {
+          imax = ix + 1;
+          max = absval;
+        }
+      }
+    } else {
+      double max = Math.abs(x[offsetx]);
+      for (int i = 1, ix = incx; i < n; i += 1, ix += incx) {
+        double absval = Math.abs(x[offsetx + ix]);
+        if (absval > max) {
+          imax = i + 1;
+          max = absval;
+        }
+      }
+    }
+    return imax;
   }
 
   protected int isamaxK(int n, float[] x, int offsetx, int incx) {
-    return org.netlib.blas.Isamax.isamax(n, x, offsetx, incx);
+    int imax = 1;
+    if (incx == 1) {
+      float max = Math.abs(x[offsetx]);
+      for (int ix = 1; ix < n; ix += 1) {
+        float absval = Math.abs(x[offsetx + ix]);
+        if (absval > max) {
+          imax = ix + 1;
+          max = absval;
+        }
+      }
+    } else {
+      float max = Math.abs(x[offsetx]);
+      for (int i = 1, ix = incx; i < n; i += 1, ix += incx) {
+        float absval = Math.abs(x[offsetx + ix]);
+        if (absval > max) {
+          imax = i + 1;
+          max = absval;
+        }
+      }
+    }
+    return imax;
   }
 }

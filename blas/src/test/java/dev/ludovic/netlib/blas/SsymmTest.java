@@ -85,4 +85,43 @@ public class SsymmTest extends BLASTest {
         blas.ssymm("R", "L", M, N, 0.0f, ssyA, N, sgeB, M, 1.0f, sgeCcopy = sgeC.clone(), M);
         assertArrayEquals(expected, sgeCcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaZero(BLAS blas) {
+        float[] expected, sgeCcopy;
+
+        // alpha=0.0f, beta=0.0f: C should be zeroed out
+        f2j.ssymm("L", "U", M, N, 0.0f, ssyA, M, sgeB, M, 0.0f, expected = sgeC.clone(), M);
+        blas.ssymm("L", "U", M, N, 0.0f, ssyA, M, sgeB, M, 0.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
+
+        f2j.ssymm("R", "L", M, N, 0.0f, ssyA, N, sgeB, M, 0.0f, expected = sgeC.clone(), M);
+        blas.ssymm("R", "L", M, N, 0.0f, ssyA, N, sgeB, M, 0.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaTwoBetaHalf(BLAS blas) {
+        float[] expected, sgeCcopy;
+
+        // alpha=2.0f, beta=0.5f
+        // Use relative tolerance since alpha=2 amplifies values, making absolute sepsilon too tight
+        f2j.ssymm("L", "U", M, N, 2.0f, ssyA, M, sgeB, M, 0.5f, expected = sgeC.clone(), M);
+        blas.ssymm("L", "U", M, N, 2.0f, ssyA, M, sgeB, M, 0.5f, sgeCcopy = sgeC.clone(), M);
+        assertRelArrayEquals(expected, sgeCcopy, sepsilon);
+
+        f2j.ssymm("L", "L", M, N, 2.0f, ssyA, M, sgeB, M, 0.5f, expected = sgeC.clone(), M);
+        blas.ssymm("L", "L", M, N, 2.0f, ssyA, M, sgeB, M, 0.5f, sgeCcopy = sgeC.clone(), M);
+        assertRelArrayEquals(expected, sgeCcopy, sepsilon);
+
+        f2j.ssymm("R", "U", M, N, 2.0f, ssyA, N, sgeB, M, 0.5f, expected = sgeC.clone(), M);
+        blas.ssymm("R", "U", M, N, 2.0f, ssyA, N, sgeB, M, 0.5f, sgeCcopy = sgeC.clone(), M);
+        assertRelArrayEquals(expected, sgeCcopy, sepsilon);
+
+        f2j.ssymm("R", "L", M, N, 2.0f, ssyA, N, sgeB, M, 0.5f, expected = sgeC.clone(), M);
+        blas.ssymm("R", "L", M, N, 2.0f, ssyA, N, sgeB, M, 0.5f, sgeCcopy = sgeC.clone(), M);
+        assertRelArrayEquals(expected, sgeCcopy, sepsilon);
+    }
 }
