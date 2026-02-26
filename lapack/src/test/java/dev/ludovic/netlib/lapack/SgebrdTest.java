@@ -29,12 +29,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SgebrdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N;
+        int n = N;
+        int minmn = Math.min(m, n);
+        float[] a = sMatrix.clone();
+        float[] d = new float[minmn];
+        float[] e = new float[minmn - 1];
+        float[] tauq = new float[minmn];
+        float[] taup = new float[minmn];
+        float[] work = new float[Math.max(m, n)];
+        intW info = new intW(0);
+
+        lapack.sgebrd(m, n, a, 0, m, d, 0, e, 0, tauq, 0, taup, 0, work, 0, Math.max(m, n), info);
+
+        assertEquals(0, info.val, "sgebrd should succeed");
     }
 }

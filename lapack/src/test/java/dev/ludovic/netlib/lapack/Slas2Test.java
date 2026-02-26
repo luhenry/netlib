@@ -29,12 +29,33 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slas2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test SVD of 2x2 triangular matrix
+        // Computes singular values of [f, g; 0, h]
+        floatW ssmin_expected = new floatW(0.0f);
+        floatW ssmax_expected = new floatW(0.0f);
+        f2j.slas2(3.0f, 4.0f, 5.0f, ssmin_expected, ssmax_expected);
+
+        floatW ssmin_actual = new floatW(0.0f);
+        floatW ssmax_actual = new floatW(0.0f);
+        lapack.slas2(3.0f, 4.0f, 5.0f, ssmin_actual, ssmax_actual);
+
+        assertEquals(ssmin_expected.val, ssmin_actual.val, sepsilon);
+        assertEquals(ssmax_expected.val, ssmax_actual.val, sepsilon);
+
+        // Test with different values
+        f2j.slas2(1.0f, 2.0f, 3.0f, ssmin_expected, ssmax_expected);
+        lapack.slas2(1.0f, 2.0f, 3.0f, ssmin_actual, ssmax_actual);
+
+        assertEquals(ssmin_expected.val, ssmin_actual.val, sepsilon);
+        assertEquals(ssmax_expected.val, ssmax_actual.val, sepsilon);
     }
 }

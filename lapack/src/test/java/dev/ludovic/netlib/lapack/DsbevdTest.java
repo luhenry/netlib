@@ -29,12 +29,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsbevdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testEigenvaluesOnly(LAPACK lapack) {
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        double[] ab = generateBandedSymmetricMatrix(n, kd, n + 10.0, 0.5);
+
+        int lwork = Math.max(1, 2 * n);
+        int liwork = 1;
+
+        double[] ab_expected = ab.clone();
+        double[] ab_actual = ab.clone();
+        double[] w_expected = new double[n];
+        double[] w_actual = new double[n];
+        double[] z_expected = new double[1];
+        double[] z_actual = new double[1];
+        double[] work_expected = new double[lwork];
+        double[] work_actual = new double[lwork];
+        int[] iwork_expected = new int[liwork];
+        int[] iwork_actual = new int[liwork];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsbevd("N", "U", n, kd, ab_expected, ldab, w_expected, z_expected, 1, work_expected, lwork, iwork_expected, liwork, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsbevd("N", "U", n, kd, ab_actual, ldab, w_actual, z_actual, 1, work_actual, lwork, iwork_actual, liwork, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(w_expected, w_actual, 1e-13);
     }
 }

@@ -30,11 +30,28 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Slar2vTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 10;
+        float[] x_expected = generateFloatArray(n, 1.0f);
+        float[] y_expected = generateFloatArray(n, 2.0f);
+        float[] z_expected = generateFloatArray(n, 3.0f);
+        float[] c = generateFloatArray(n, 0.6f);  // cos
+        float[] s = generateFloatArray(n, 0.8f);  // sin
+        f2j.slar2v(n, x_expected, 0, y_expected, 0, z_expected, 0, 1, c, 0, s, 0, 1);
+
+        float[] x_actual = generateFloatArray(n, 1.0f);
+        float[] y_actual = generateFloatArray(n, 2.0f);
+        float[] z_actual = generateFloatArray(n, 3.0f);
+        lapack.slar2v(n, x_actual, 0, y_actual, 0, z_actual, 0, 1, c, 0, s, 0, 1);
+
+        assertRelArrayEquals(x_expected, x_actual, sepsilon);
+        assertRelArrayEquals(y_expected, y_actual, sepsilon);
+        assertRelArrayEquals(z_expected, z_actual, sepsilon);
     }
 }

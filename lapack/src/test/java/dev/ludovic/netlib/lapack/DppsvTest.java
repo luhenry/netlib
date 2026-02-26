@@ -29,12 +29,46 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DppsvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // DPPSV solves A*X = B for symmetric positive definite matrix in packed storage
+        // Packed storage stores upper triangle: AP(i + (j-1)*j/2) = A(i,j) for i<=j
+        int np = N * (N + 1) / 2;
+        double[] ap_expected = new double[np];
+        double[] ap_actual = new double[np];
+
+        // Fill packed matrix from positive definite matrix
+        int k = 0;
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap_expected[k] = dPositiveDefiniteMatrix[i + j * N];
+                ap_actual[k] = dPositiveDefiniteMatrix[i + j * N];
+                k++;
+            }
+        }
+
+        // Create right-hand side B
+        double[] b_expected = generateDoubleArray(N, 1.0);
+        double[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        intW info = new intW(0);
+        f2j.dppsv("U", N, 1, ap_expected, 0, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.dppsv("U", N, 1, ap_actual, 0, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(b_expected, b_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(b_expected)) + 2));
     }
 }

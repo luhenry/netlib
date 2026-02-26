@@ -29,12 +29,35 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Sptts2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        float[] d = new float[n];
+        float[] e = new float[n - 1];
+        for (int i = 0; i < n; i++) {
+            d[i] = 4.0f;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            e[i] = 1.0f;
+        }
+
+        intW info = new intW(0);
+        f2j.spttrf(n, d, e, info);
+        assertEquals(0, info.val);
+
+        float[] b_expected = generateFloatArray(n, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        f2j.sptts2(n, 1, d, e, b_expected, n);
+        lapack.sptts2(n, 1, d, e, b_actual, n);
+
+        assertArrayEquals(b_expected, b_actual, sepsilon);
     }
 }

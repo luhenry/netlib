@@ -30,11 +30,44 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlangtTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create tridiagonal matrix: dl (subdiagonal), d (diagonal), du (superdiagonal)
+        double[] dl = new double[N - 1];
+        double[] d = new double[N];
+        double[] du = new double[N - 1];
+
+        for (int i = 0; i < N; i++) {
+            d[i] = (i + 1) * 2.0;
+        }
+        for (int i = 0; i < N - 1; i++) {
+            dl[i] = -(i + 1);
+            du[i] = (i + 1);
+        }
+
+        // Test 1-norm
+        double expected = f2j.dlangt("1", N, dl, 0, d, 0, du, 0);
+        double actual = lapack.dlangt("1", N, dl, 0, d, 0, du, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Inf-norm
+        expected = f2j.dlangt("I", N, dl, 0, d, 0, du, 0);
+        actual = lapack.dlangt("I", N, dl, 0, d, 0, du, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Frobenius norm
+        expected = f2j.dlangt("F", N, dl, 0, d, 0, du, 0);
+        actual = lapack.dlangt("F", N, dl, 0, d, 0, du, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Max norm
+        expected = f2j.dlangt("M", N, dl, 0, d, 0, du, 0);
+        actual = lapack.dlangt("M", N, dl, 0, d, 0, du, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
     }
 }

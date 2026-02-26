@@ -30,11 +30,31 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlapmtTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test forward column permutation
+        int[] piv = new int[]{3, 1, 2};
+        double[] expected = generateMatrix(N, 3, 1.0);
+        f2j.dlapmt(true, N, 3, expected, 0, N, piv, 0);
+
+        double[] actual = generateMatrix(N, 3, 1.0);
+        lapack.dlapmt(true, N, 3, actual, 0, N, piv, 0);
+
+        assertArrayEquals(expected, actual, depsilon);
+
+        // Test backward column permutation
+        int[] piv2 = new int[]{2, 3, 1};
+        double[] expected_back = generateMatrix(N, 3, 1.0);
+        f2j.dlapmt(false, N, 3, expected_back, 0, N, piv2, 0);
+
+        double[] actual_back = generateMatrix(N, 3, 1.0);
+        lapack.dlapmt(false, N, 3, actual_back, 0, N, piv2, 0);
+
+        assertArrayEquals(expected_back, actual_back, depsilon);
     }
 }

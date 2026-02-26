@@ -29,12 +29,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlarrdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test computing eigenvalue clusters
+        double[] gers = new double[2 * N_SMALL];
+        double[] d = generateDoubleArray(N_SMALL, 1.0);
+        double[] e = generateDoubleArray(N_SMALL - 1, 0.1);
+        double[] e2 = generateDoubleArray(N_SMALL - 1, 0.01);
+        int[] isplit = new int[N_SMALL];
+        double[] w = new double[N_SMALL];
+        double[] werr = new double[N_SMALL];
+        int[] iblock = new int[N_SMALL];
+        int[] indexw = new int[N_SMALL];
+        double[] work = new double[4 * N_SMALL];
+        int[] iwork = new int[3 * N_SMALL];
+
+        intW m_expected = new intW(0);
+        doubleW wl_expected = new doubleW(0.0);
+        doubleW wu_expected = new doubleW(0.0);
+        intW info_expected = new intW(0);
+        f2j.dlarrd("A", "B", N_SMALL, 0.0, 0.0, 0, 0, gers, 0, 1e-8, d, 0, e, 0, e2, 0, 1e-10, 1, isplit, 0,
+                   m_expected, w, 0, werr, 0, wl_expected, wu_expected, iblock, 0, indexw, 0, work, 0, iwork, 0, info_expected);
+
+        intW m_actual = new intW(0);
+        doubleW wl_actual = new doubleW(0.0);
+        doubleW wu_actual = new doubleW(0.0);
+        intW info_actual = new intW(0);
+        lapack.dlarrd("A", "B", N_SMALL, 0.0, 0.0, 0, 0, gers, 0, 1e-8, d, 0, e, 0, e2, 0, 1e-10, 1, isplit, 0,
+                      m_actual, w, 0, werr, 0, wl_actual, wu_actual, iblock, 0, indexw, 0, work, 0, iwork, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(m_expected.val, m_actual.val);
     }
 }

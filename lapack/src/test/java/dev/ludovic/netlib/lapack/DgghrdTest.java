@@ -29,12 +29,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgghrdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Reduce (A, B) to Hessenberg-Triangular form, B must be upper triangular
+        int n = 4;
+        double[] a_expected = {
+            4.0, 1.0, 2.0, 0.5,
+            2.0, 3.0, 1.0, 0.3,
+            1.0, 0.5, 5.0, 0.2,
+            0.3, 0.2, 0.8, 2.0
+        };
+        double[] a_actual = a_expected.clone();
+        // Upper triangular B
+        double[] b_expected = {
+            3.0, 0.0, 0.0, 0.0,
+            1.0, 2.0, 0.0, 0.0,
+            0.5, 0.3, 4.0, 0.0,
+            0.2, 0.1, 0.5, 1.0
+        };
+        double[] b_actual = b_expected.clone();
+        double[] q = new double[1];
+        double[] z = new double[1];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dgghrd("N", "N", n, 1, n, a_expected, n, b_expected, n, q, 1, z, 1, info_expected);
+        lapack.dgghrd("N", "N", n, 1, n, a_actual, n, b_actual, n, q, 1, z, 1, info_actual);
+
+        assertEquals(0, info_expected.val);
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(a_expected, a_actual, depsilon);
+        assertArrayEquals(b_expected, b_actual, depsilon);
     }
 }

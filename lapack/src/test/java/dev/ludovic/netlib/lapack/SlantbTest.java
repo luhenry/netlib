@@ -30,11 +30,24 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlantbTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testOneNorm(LAPACK lapack) {
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        float[] ab = generateBandedSymmetricMatrixFloat(n, kd, n + 10.0f, 1.0f);
+
+        float[] work = new float[n];
+
+        float expected = f2j.slantb("1", "U", "N", n, kd, ab, ldab, work);
+        float actual = lapack.slantb("1", "U", "N", n, kd, ab, ldab, work);
+
+        assertEquals(expected, actual, sepsilon);
     }
 }

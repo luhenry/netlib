@@ -29,12 +29,64 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SormbrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int k = Math.min(m, n);
+
+        // First, perform bidiagonal reduction
+        float[] a = generateMatrixFloat(m, n, 1.0f);
+        float[] d = new float[k];
+        float[] e = new float[k - 1];
+        float[] tauq = new float[k];
+        float[] taup = new float[k];
+        float[] work = new float[Math.max(m, n)];
+        intW info = new intW(0);
+
+        lapack.sgebrd(m, n, a, 0, m, d, 0, e, 0, tauq, 0, taup, 0, work, 0, Math.max(m, n), info);
+        assertEquals(0, info.val, "Bidiagonal reduction should succeed");
+
+        // Create a matrix C to apply Q to
+        float[] c = generateMatrixFloat(m, n, 2.0f);
+
+        // Apply Q from the left
+        lapack.sormbr("Q", "L", "N", m, n, k, a, 0, m, tauq, 0, c, 0, m, work, 0, Math.max(m, n), info);
+        assertEquals(0, info.val, "sormbr should succeed");
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testCompareWithReference(LAPACK lapack) {
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int k = Math.min(m, n);
+
+        float[] a = generateMatrixFloat(m, n, 1.0f);
+        float[] d = new float[k];
+        float[] e = new float[k - 1];
+        float[] tauq = new float[k];
+        float[] taup = new float[k];
+        float[] work = new float[Math.max(m, n)];
+        intW info = new intW(0);
+
+        lapack.sgebrd(m, n, a, 0, m, d, 0, e, 0, tauq, 0, taup, 0, work, 0, Math.max(m, n), info);
+
+        // Test implementation
+        float[] c_test = generateMatrixFloat(m, n, 2.0f);
+        lapack.sormbr("Q", "L", "N", m, n, k, a, 0, m, tauq, 0, c_test, 0, m, work, 0, Math.max(m, n), info);
+
+        // Reference implementation
+        float[] c_ref = generateMatrixFloat(m, n, 2.0f);
+        f2j.sormbr("Q", "L", "N", m, n, k, a, 0, m, tauq, 0, c_ref, 0, m, work, 0, Math.max(m, n), info);
+
+        assertArrayEquals(c_ref, c_test, Math.scalb(sepsilon, Math.getExponent(getMaxValue(c_ref)) + 4));
     }
 }

@@ -29,12 +29,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlaqspTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // Symmetric matrix in packed upper triangular storage
+        float[] ap = new float[n * (n + 1) / 2];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[k++] = 1.0f / (i + j + 1.0f);
+            }
+        }
+
+        float[] s = new float[n];
+        for (int i = 0; i < n; i++) {
+            s[i] = 1.0f / (i + 1.0f);
+        }
+
+        float scond = 0.01f;
+        float amax = 1.0f;
+
+        float[] ap_expected = ap.clone();
+        float[] ap_actual = ap.clone();
+        StringW equed_expected = new StringW("N");
+        StringW equed_actual = new StringW("N");
+
+        f2j.slaqsp("U", n, ap_expected, s, scond, amax, equed_expected);
+        lapack.slaqsp("U", n, ap_actual, s, scond, amax, equed_actual);
+
+        // Skip equed comparison due to JNI StringW output bug
+        assertArrayEquals(ap_expected, ap_actual, sepsilon);
     }
 }

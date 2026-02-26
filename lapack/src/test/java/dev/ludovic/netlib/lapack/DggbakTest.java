@@ -29,12 +29,44 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DggbakTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        // First balance the matrix pair
+        double[] a = generateMatrix(n, n, 1.0);
+        double[] b = generateMatrix(n, n, 2.0);
+        intW ilo = new intW(0);
+        intW ihi = new intW(0);
+        double[] lscale = new double[n];
+        double[] rscale = new double[n];
+        double[] work = new double[6 * n];
+        intW info = new intW(0);
+
+        f2j.dggbal("B", n, a, n, b, n, ilo, ihi, lscale, rscale, work, info);
+        assertEquals(0, info.val);
+
+        // Create eigenvector matrix (identity as placeholder)
+        int m = n;
+        double[] v_expected = new double[n * m];
+        for (int i = 0; i < n; i++) v_expected[i + i * n] = 1.0;
+        double[] v_actual = v_expected.clone();
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dggbak("B", "R", n, ilo.val, ihi.val, lscale, rscale, m, v_expected, n, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dggbak("B", "R", n, ilo.val, ihi.val, lscale, rscale, m, v_actual, n, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(v_expected, v_actual, depsilon);
     }
 }

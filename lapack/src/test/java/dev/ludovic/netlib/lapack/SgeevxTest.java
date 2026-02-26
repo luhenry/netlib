@@ -29,12 +29,62 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SgeevxTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Eigenvalues with balancing, no eigenvectors, no condition numbers
+        int n = 4;
+        float[] a_expected = {
+            4.0f, 1.0f, 0.0f, 0.5f,
+            2.0f, 3.0f, 1.0f, 0.0f,
+            0.0f, 0.5f, 5.0f, 0.3f,
+            0.3f, 0.0f, 0.2f, 2.0f
+        };
+        float[] a_actual = a_expected.clone();
+        float[] wr_expected = new float[n];
+        float[] wr_actual = new float[n];
+        float[] wi_expected = new float[n];
+        float[] wi_actual = new float[n];
+        float[] vl = new float[1];
+        float[] vr = new float[1];
+        intW ilo_expected = new intW(0);
+        intW ilo_actual = new intW(0);
+        intW ihi_expected = new intW(0);
+        intW ihi_actual = new intW(0);
+        float[] scale_expected = new float[n];
+        float[] scale_actual = new float[n];
+        floatW abnrm_expected = new floatW(0);
+        floatW abnrm_actual = new floatW(0);
+        float[] rconde = new float[n];
+        float[] rcondv = new float[n];
+        int lwork = 4 * n;
+        float[] work_expected = new float[lwork];
+        float[] work_actual = new float[lwork];
+        int[] iwork = new int[2 * n - 2];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sgeevx("N", "N", "N", "N", n, a_expected, n,
+                   wr_expected, wi_expected, vl, 1, vr, 1,
+                   ilo_expected, ihi_expected, scale_expected,
+                   abnrm_expected, rconde, rcondv,
+                   work_expected, lwork, iwork, info_expected);
+        lapack.sgeevx("N", "N", "N", "N", n, a_actual, n,
+                      wr_actual, wi_actual, vl, 1, vr, 1,
+                      ilo_actual, ihi_actual, scale_actual,
+                      abnrm_actual, rconde, rcondv,
+                      work_actual, lwork, iwork, info_actual);
+
+        assertEquals(0, info_expected.val);
+        assertEquals(info_expected.val, info_actual.val);
+        java.util.Arrays.sort(wr_expected);
+        java.util.Arrays.sort(wr_actual);
+        assertArrayEquals(wr_expected, wr_actual, sepsilon);
     }
 }

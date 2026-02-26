@@ -29,12 +29,49 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlasq1Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // Diagonal and off-diagonal of a bidiagonal matrix
+        double[] d_expected = new double[n];
+        double[] e_expected = new double[n];
+        for (int i = 0; i < n; i++) {
+            d_expected[i] = (i + 1) * 2.0;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            e_expected[i] = 0.5;
+        }
+        e_expected[n - 1] = 0.0;
+
+        double[] work_expected = new double[4 * n];
+        intW info_expected = new intW(0);
+
+        f2j.dlasq1(n, d_expected, 0, e_expected, 0, work_expected, 0, info_expected);
+
+        double[] d_actual = new double[n];
+        double[] e_actual = new double[n];
+        for (int i = 0; i < n; i++) {
+            d_actual[i] = (i + 1) * 2.0;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            e_actual[i] = 0.5;
+        }
+        e_actual[n - 1] = 0.0;
+
+        double[] work_actual = new double[4 * n];
+        intW info_actual = new intW(0);
+
+        lapack.dlasq1(n, d_actual, 0, e_actual, 0, work_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(d_expected))));
     }
 }

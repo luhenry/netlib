@@ -29,12 +29,54 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgtconTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create tridiagonal matrix
+        double[] dl = new double[N - 1];
+        double[] d = new double[N];
+        double[] du = new double[N - 1];
+
+        for (int i = 0; i < N; i++) {
+            d[i] = (i + 1) * 2.0;
+        }
+        for (int i = 0; i < N - 1; i++) {
+            dl[i] = -(i + 1);
+            du[i] = (i + 1);
+        }
+
+        // Compute norm before factorization
+        double anorm = f2j.dlangt("1", N, dl, 0, d, 0, du, 0);
+
+        // First factor the tridiagonal matrix using dgttrf
+        double[] dl_copy = dl.clone();
+        double[] d_copy = d.clone();
+        double[] du_copy = du.clone();
+        double[] du2 = new double[N - 2];
+        int[] ipiv = new int[N];
+        intW info = new intW(0);
+        f2j.dgttrf(N, dl_copy, 0, d_copy, 0, du_copy, 0, du2, 0, ipiv, 0, info);
+
+        // Test condition number estimation
+        doubleW rcond_expected = new doubleW(0.0);
+        double[] work_expected = new double[2 * N];
+        int[] iwork_expected = new int[N];
+        intW info_expected = new intW(0);
+        f2j.dgtcon("1", N, dl_copy, 0, d_copy, 0, du_copy, 0, du2, 0, ipiv, 0, anorm, rcond_expected, work_expected, 0, iwork_expected, 0, info_expected);
+
+        doubleW rcond_actual = new doubleW(0.0);
+        double[] work_actual = new double[2 * N];
+        int[] iwork_actual = new int[N];
+        intW info_actual = new intW(0);
+        lapack.dgtcon("1", N, dl_copy, 0, d_copy, 0, du_copy, 0, du2, 0, ipiv, 0, anorm, rcond_actual, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(rcond_expected.val, rcond_actual.val, depsilon);
     }
 }

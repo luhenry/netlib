@@ -29,12 +29,42 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dsygs2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        // Factor B with dpotrf first
+        double[] b = new double[n * n];
+        for (int j = 0; j < n; j++)
+            for (int i = 0; i < n; i++)
+                b[i + j * n] = dPositiveDefiniteMatrix[i + j * N];
+        intW info = new intW(0);
+        f2j.dpotrf("U", n, b, 0, n, info);
+        assertEquals(0, info.val, "dpotrf should succeed");
+
+        double[] a_expected = new double[n * n];
+        double[] a_actual = new double[n * n];
+        for (int j = 0; j < n; j++)
+            for (int i = 0; i < n; i++) {
+                a_expected[i + j * n] = dSymmetricMatrix[i + j * N];
+                a_actual[i + j * n] = dSymmetricMatrix[i + j * N];
+            }
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsygs2(1, "U", n, a_expected, 0, n, b, 0, n, info_expected);
+        assertEquals(0, info_expected.val, "Reference dsygs2 should succeed");
+
+        lapack.dsygs2(1, "U", n, a_actual, 0, n, b, 0, n, info_actual);
+        assertEquals(0, info_actual.val, "dsygs2 should succeed");
+
+        assertArrayEquals(a_expected, a_actual, depsilon);
     }
 }

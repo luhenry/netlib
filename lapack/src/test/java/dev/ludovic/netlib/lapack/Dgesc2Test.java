@@ -30,11 +30,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Dgesc2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // dgesc2 depends on dgetc2 pivoting which differs between LAPACK versions.
+        // Higher-level routines (dtgsy2, dtgsyl) that use dgesc2 are already tested.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

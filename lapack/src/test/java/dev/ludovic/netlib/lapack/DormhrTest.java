@@ -29,12 +29,58 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DormhrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        int ilo = 1;
+        int ihi = n;
+
+        // First, perform Hessenberg reduction
+        double[] a = dSymmetricMatrix.clone();
+        double[] tau = new double[n - 1];
+        double[] work = new double[n];
+        intW info = new intW(0);
+
+        lapack.dgehrd(n, ilo, ihi, a, 0, n, tau, 0, work, 0, n, info);
+        assertEquals(0, info.val, "Hessenberg reduction should succeed");
+
+        // Create a matrix C to apply Q to
+        double[] c = generateMatrix(n, n, 2.0);
+
+        // Apply Q from the left
+        lapack.dormhr("L", "N", n, n, ilo, ihi, a, 0, n, tau, 0, c, 0, n, work, 0, n, info);
+        assertEquals(0, info.val, "dormhr should succeed");
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testCompareWithReference(LAPACK lapack) {
+        int n = N_SMALL;
+        int ilo = 1;
+        int ihi = n;
+
+        double[] a = dSymmetricMatrix.clone();
+        double[] tau = new double[n - 1];
+        double[] work = new double[n];
+        intW info = new intW(0);
+
+        lapack.dgehrd(n, ilo, ihi, a, 0, n, tau, 0, work, 0, n, info);
+
+        // Test implementation
+        double[] c_test = generateMatrix(n, n, 2.0);
+        lapack.dormhr("L", "N", n, n, ilo, ihi, a, 0, n, tau, 0, c_test, 0, n, work, 0, n, info);
+
+        // Reference implementation
+        double[] c_ref = generateMatrix(n, n, 2.0);
+        f2j.dormhr("L", "N", n, n, ilo, ihi, a, 0, n, tau, 0, c_ref, 0, n, work, 0, n, info);
+
+        assertArrayEquals(c_ref, c_test, depsilon * n * n);
     }
 }

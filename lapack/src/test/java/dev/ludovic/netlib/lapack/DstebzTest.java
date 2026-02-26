@@ -29,12 +29,44 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DstebzTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        // range = "A", order = "B": all eigenvalues, ordered by block
+        double[] d_expected = generateDoubleArray(n, 1.0);
+        double[] e_expected = generateDoubleArray(n - 1, 0.5);
+        double[] w_expected = new double[n];
+        int[] iblock_expected = new int[n];
+        int[] isplit_expected = new int[n];
+        double[] work_expected = new double[4 * n];
+        int[] iwork_expected = new int[3 * n];
+        intW m_expected = new intW(0);
+        intW nsplit_expected = new intW(0);
+        intW info_expected = new intW(0);
+        f2j.dstebz("A", "B", n, 0.0, 0.0, 0, 0, 0.0, d_expected, 0, e_expected, 0, m_expected, nsplit_expected, w_expected, 0, iblock_expected, 0, isplit_expected, 0, work_expected, 0, iwork_expected, 0, info_expected);
+
+        double[] d_actual = generateDoubleArray(n, 1.0);
+        double[] e_actual = generateDoubleArray(n - 1, 0.5);
+        double[] w_actual = new double[n];
+        int[] iblock_actual = new int[n];
+        int[] isplit_actual = new int[n];
+        double[] work_actual = new double[4 * n];
+        int[] iwork_actual = new int[3 * n];
+        intW m_actual = new intW(0);
+        intW nsplit_actual = new intW(0);
+        intW info_actual = new intW(0);
+        lapack.dstebz("A", "B", n, 0.0, 0.0, 0, 0, 0.0, d_actual, 0, e_actual, 0, m_actual, nsplit_actual, w_actual, 0, iblock_actual, 0, isplit_actual, 0, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(m_expected.val, m_actual.val);
+        assertEquals(nsplit_expected.val, nsplit_actual.val);
+        assertArrayEquals(w_expected, w_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(w_expected))));
     }
 }

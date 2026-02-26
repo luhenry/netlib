@@ -29,12 +29,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SstedcTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        // compz = "N": eigenvalues only
+        int lwork = 1;
+        int liwork = 1;
+        float[] d_expected = generateFloatArray(n, 1.0f);
+        float[] e_expected = generateFloatArray(n - 1, 0.5f);
+        float[] z_expected = new float[n * n];
+        float[] work_expected = new float[lwork];
+        int[] iwork_expected = new int[liwork];
+        intW info_expected = new intW(0);
+        f2j.sstedc("N", n, d_expected, 0, e_expected, 0, z_expected, 0, n, work_expected, 0, lwork, iwork_expected, 0, liwork, info_expected);
+
+        float[] d_actual = generateFloatArray(n, 1.0f);
+        float[] e_actual = generateFloatArray(n - 1, 0.5f);
+        float[] z_actual = new float[n * n];
+        float[] work_actual = new float[lwork];
+        int[] iwork_actual = new int[liwork];
+        intW info_actual = new intW(0);
+        lapack.sstedc("N", n, d_actual, 0, e_actual, 0, z_actual, 0, n, work_actual, 0, lwork, iwork_actual, 0, liwork, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(d_expected))));
     }
 }

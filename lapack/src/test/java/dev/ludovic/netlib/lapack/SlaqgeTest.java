@@ -29,12 +29,47 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlaqgeTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = N_SMALL;
+
+        float[] a = new float[m * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                a[i + j * m] = 1.0f / (i + j + 1.0f);
+            }
+        }
+
+        float[] r = new float[m];
+        for (int i = 0; i < m; i++) {
+            r[i] = 1.0f / (i + 1.0f);
+        }
+
+        float[] c = new float[n];
+        for (int j = 0; j < n; j++) {
+            c[j] = 1.0f / (j + 1.0f);
+        }
+
+        float rowcnd = 0.01f;
+        float colcnd = 0.01f;
+        float amax = 1.0f;
+
+        float[] a_expected = a.clone();
+        float[] a_actual = a.clone();
+        StringW equed_expected = new StringW("N");
+        StringW equed_actual = new StringW("N");
+
+        f2j.slaqge(m, n, a_expected, m, r, c, rowcnd, colcnd, amax, equed_expected);
+        lapack.slaqge(m, n, a_actual, m, r, c, rowcnd, colcnd, amax, equed_actual);
+
+        assertArrayEquals(a_expected, a_actual, sepsilon);
     }
 }

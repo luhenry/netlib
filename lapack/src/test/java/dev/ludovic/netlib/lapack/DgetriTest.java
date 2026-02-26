@@ -29,12 +29,48 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgetriTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // First, factor the matrix using dgetrf
+        double[] a_expected = dPositiveDefiniteMatrix.clone();
+        double[] a_actual = dPositiveDefiniteMatrix.clone();
+        int[] ipiv_expected = new int[N];
+        int[] ipiv_actual = new int[N];
+
+        intW info = new intW(0);
+        f2j.dgetrf(N, N, a_expected, 0, N, ipiv_expected, 0, info);
+        assertEquals(0, info.val, "Reference factorization should succeed");
+
+        info.val = 0;
+        lapack.dgetrf(N, N, a_actual, 0, N, ipiv_actual, 0, info);
+        assertEquals(0, info.val, "Factorization should succeed");
+
+        // Query workspace size
+        double[] work = new double[1];
+        info.val = 0;
+        lapack.dgetri(N, a_actual, 0, N, ipiv_actual, 0, work, 0, -1, info);
+        int lwork = (int) work[0];
+        work = new double[lwork];
+
+        // Invert using reference implementation
+        double[] work_ref = new double[lwork];
+        info.val = 0;
+        f2j.dgetri(N, a_expected, 0, N, ipiv_expected, 0, work_ref, 0, lwork, info);
+        assertEquals(0, info.val, "Reference inversion should succeed");
+
+        // Invert using test implementation
+        info.val = 0;
+        lapack.dgetri(N, a_actual, 0, N, ipiv_actual, 0, work, 0, lwork, info);
+        assertEquals(0, info.val, "Inversion should succeed");
+
+        // Compare inverted matrices
+        assertArrayEquals(a_expected, a_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(a_expected))));
     }
 }

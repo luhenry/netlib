@@ -25,16 +25,53 @@
 
 package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgerqfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        double[] a_orig = generateMatrix(n, n, 1.0);
+        double[] a = a_orig.clone();
+        double[] tau = new double[n];
+        int lwork = n * n;
+        double[] work = new double[lwork];
+        intW info = new intW(0);
+
+        lapack.dgerqf(n, n, a, 0, n, tau, 0, work, 0, lwork, info);
+        assertEquals(0, info.val, "RQ factorization should succeed");
+
+        double[] r = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                r[i + j * n] = a[i + j * n];
+            }
+        }
+
+        double[] q = a.clone();
+        double[] work2 = new double[lwork];
+        intW info2 = new intW(0);
+        lapack.dorgrq(n, n, n, q, 0, n, tau, 0, work2, 0, lwork, info2);
+        assertEquals(0, info2.val);
+
+        double[] rq = matrixMultiply(r, q, n, n, n);
+        double normA = 0.0;
+        double normDiff = 0.0;
+        for (int i = 0; i < n * n; i++) {
+            normA += a_orig[i] * a_orig[i];
+            double d = a_orig[i] - rq[i];
+            normDiff += d * d;
+        }
+        normA = Math.sqrt(normA);
+        normDiff = Math.sqrt(normDiff);
+        assertTrue(normDiff < depsilon * 100 * normA,
+            "||A - R*Q|| = " + normDiff + " should be < " + (depsilon * 100 * normA));
     }
 }

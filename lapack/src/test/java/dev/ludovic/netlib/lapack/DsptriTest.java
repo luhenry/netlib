@@ -29,12 +29,80 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsptriTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        // DSPTRI: compute inverse of packed symmetric indefinite matrix
+        int n = N_SMALL;
+        int ap_len = n * (n + 1) / 2;
+
+        double[] ap = new double[ap_len];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[k++] = (i == j) ? (i % 2 == 0 ? 10.0 : -5.0) : 1.0 / (i + j + 1.0);
+            }
+        }
+
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.dsptrf("U", n, ap, ipiv, info);
+        assertEquals(0, info.val);
+
+        double[] ap_expected = ap.clone();
+        double[] ap_actual = ap.clone();
+        double[] work_expected = new double[n];
+        double[] work_actual = new double[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsptri("U", n, ap_expected, ipiv, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsptri("U", n, ap_actual, ipiv, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ap_expected, ap_actual, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+        int ap_len = n * (n + 1) / 2;
+
+        double[] ap = new double[ap_len];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = j; i < n; i++) {
+                ap[k++] = (i == j) ? (i % 2 == 0 ? 10.0 : -5.0) : 1.0 / (i + j + 1.0);
+            }
+        }
+
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.dsptrf("L", n, ap, ipiv, info);
+        assertEquals(0, info.val);
+
+        double[] ap_expected = ap.clone();
+        double[] ap_actual = ap.clone();
+        double[] work_expected = new double[n];
+        double[] work_actual = new double[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsptri("L", n, ap_expected, ipiv, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsptri("L", n, ap_actual, ipiv, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ap_expected, ap_actual, depsilon);
     }
 }

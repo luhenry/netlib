@@ -30,11 +30,28 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlagtmTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // B := alpha * T * X + beta * B for tridiagonal T
+        int n = 5;
+        int nrhs = 2;
+        double[] dl = { 0.5, 0.5, 0.5, 0.5 }; // sub-diagonal (n-1)
+        double[] d = { 4.0, 5.0, 6.0, 7.0, 8.0 }; // diagonal
+        double[] du = { 1.0, 1.0, 1.0, 1.0 }; // super-diagonal (n-1)
+        double[] x = new double[n * nrhs];
+        for (int i = 0; i < n * nrhs; i++) x[i] = (i + 1) * 0.1;
+        double[] b_expected = new double[n * nrhs];
+        for (int i = 0; i < n * nrhs; i++) b_expected[i] = 1.0;
+        double[] b_actual = b_expected.clone();
+
+        f2j.dlagtm("N", n, nrhs, 1.0, dl, d, du, x, n, 1.0, b_expected, n);
+        lapack.dlagtm("N", n, nrhs, 1.0, dl, d, du, x, n, 1.0, b_actual, n);
+
+        assertArrayEquals(b_expected, b_actual, depsilon);
     }
 }

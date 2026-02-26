@@ -29,12 +29,82 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Sorml2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int k = Math.min(m, n);
+
+        // First, perform LQ factorization to get elementary reflectors
+        float[] a = sMatrix.clone();
+        float[] tau = new float[k];
+        float[] work = new float[n];
+        intW info = new intW(0);
+
+        lapack.sgelqf(m, n, a, 0, m, tau, 0, work, 0, n, info);
+        assertEquals(0, info.val, "LQ factorization should succeed");
+
+        // Create a matrix C to apply Q to
+        float[] c = generateMatrixFloat(m, n, 2.0f);
+        float[] c_copy = c.clone();
+
+        // Apply Q from the left: C := Q * C
+        lapack.sorml2("L", "N", m, n, k, a, 0, m, tau, 0, c, 0, m, work, 0, info);
+        assertEquals(0, info.val, "sorml2 should succeed");
+
+        // Verify by generating explicit Q and multiplying
+        float[] q = a.clone();
+        lapack.sorglq(m, n, k, q, 0, m, tau, 0, work, 0, n, info);
+
+        // Compute Q * C_copy manually
+        float[] expected = new float[m * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                float sum = 0.0f;
+                for (int l = 0; l < n; l++) {
+                    sum += q[i + l * m] * c_copy[l + j * m];
+                }
+                expected[i + j * m] = sum;
+            }
+        }
+
+        // Compare results
+        assertArrayEquals(expected, c, sepsilon * m * n * 10);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testCompareWithReference(LAPACK lapack) {
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int k = Math.min(m, n);
+
+        // Generate LQ factorization
+        float[] a = generateMatrixFloat(m, n, 1.0f);
+        float[] tau = new float[k];
+        float[] work = new float[n];
+        intW info = new intW(0);
+
+        lapack.sgelqf(m, n, a, 0, m, tau, 0, work, 0, n, info);
+
+        // Create matrix C
+        float[] c_test = generateMatrixFloat(m, n, 2.0f);
+        float[] c_ref = c_test.clone();
+
+        // Apply with test implementation
+        lapack.sorml2("L", "N", m, n, k, a, 0, m, tau, 0, c_test, 0, m, work, 0, info);
+
+        // Apply with reference implementation
+        f2j.sorml2("L", "N", m, n, k, a, 0, m, tau, 0, c_ref, 0, m, work, 0, info);
+
+        // Compare results
+        assertArrayEquals(c_ref, c_test, Math.scalb(sepsilon, Math.getExponent(getMaxValue(c_ref)) + 4));
     }
 }

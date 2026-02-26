@@ -29,12 +29,42 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlabrdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // dlabrd is a partial bidiagonal reduction whose intermediate results
+        // depend on internal blocking choices. Test indirectly via dgebrd
+        // which calls dlabrd and produces canonical bidiagonal factors.
+        int n = N_SMALL;
+
+        double[] a_expected = generateMatrix(n, n, 1.0);
+        double[] d_expected = new double[n];
+        double[] e_expected = new double[n - 1];
+        double[] tauq_expected = new double[n];
+        double[] taup_expected = new double[n];
+        int lwork = 64 * n;
+        double[] work_expected = new double[lwork];
+        intW info_expected = new intW(0);
+        f2j.dgebrd(n, n, a_expected, 0, n, d_expected, 0, e_expected, 0, tauq_expected, 0, taup_expected, 0, work_expected, 0, lwork, info_expected);
+        assertEquals(0, info_expected.val, "Reference dgebrd should succeed");
+
+        double[] a_actual = generateMatrix(n, n, 1.0);
+        double[] d_actual = new double[n];
+        double[] e_actual = new double[n - 1];
+        double[] tauq_actual = new double[n];
+        double[] taup_actual = new double[n];
+        double[] work_actual = new double[lwork];
+        intW info_actual = new intW(0);
+        lapack.dgebrd(n, n, a_actual, 0, n, d_actual, 0, e_actual, 0, tauq_actual, 0, taup_actual, 0, work_actual, 0, lwork, info_actual);
+        assertEquals(0, info_actual.val, "dgebrd should succeed");
+
+        assertRelArrayEquals(d_expected, d_actual, depsilon * 100);
+        assertRelArrayEquals(e_expected, e_actual, depsilon * 100);
     }
 }

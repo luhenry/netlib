@@ -30,11 +30,31 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlamchTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test epsilon (relative machine precision)
+        float expected = f2j.slamch("E");
+        float actual = lapack.slamch("E");
+        assertEquals(expected, actual, sepsilon);
+
+        // Test safe minimum
+        expected = f2j.slamch("S");
+        actual = lapack.slamch("S");
+        assertEquals(expected, actual, sepsilon);
+
+        // Test base
+        expected = f2j.slamch("B");
+        actual = lapack.slamch("B");
+        assertEquals(expected, actual, sepsilon);
+
+        // Test precision
+        expected = f2j.slamch("P");
+        actual = lapack.slamch("P");
+        assertEquals(expected, actual, sepsilon);
     }
 }

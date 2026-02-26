@@ -29,12 +29,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slaed4Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Solve secular equation for rank-one update of diagonal matrix
+        int n = 5;
+        float[] d = { 1.0f, 2.0f, 3.0f, 5.0f, 8.0f };
+        float[] z = { 0.5f, 0.4f, 0.3f, 0.2f, 0.1f };
+        float rho = 1.0f;
+
+        for (int i = 1; i <= n; i++) {
+            float[] delta_expected = new float[n];
+            float[] delta_actual = new float[n];
+            floatW dlam_expected = new floatW(0);
+            floatW dlam_actual = new floatW(0);
+            intW info_expected = new intW(0);
+            intW info_actual = new intW(0);
+
+            f2j.slaed4(n, i, d, z, delta_expected, rho, dlam_expected, info_expected);
+            lapack.slaed4(n, i, d, z, delta_actual, rho, dlam_actual, info_actual);
+
+            assertEquals(0, info_expected.val);
+            assertEquals(info_expected.val, info_actual.val);
+            assertEquals(dlam_expected.val, dlam_actual.val, sepsilon);
+            assertArrayEquals(delta_expected, delta_actual, sepsilon);
+        }
     }
 }

@@ -29,12 +29,38 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SopgtrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        int n = N_SMALL;
+        float[] ap = generatePackedSymmetricMatrixFloat(n, n + 10.0f);
+
+        float[] d = new float[n];
+        float[] e = new float[n - 1];
+        float[] tau = new float[n - 1];
+        intW info = new intW(0);
+        f2j.ssptrd("U", n, ap, d, e, tau, info);
+        assertEquals(0, info.val);
+
+        float[] q_expected = new float[n * n];
+        float[] q_actual = new float[n * n];
+        float[] work_expected = new float[n - 1];
+        float[] work_actual = new float[n - 1];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sopgtr("U", n, ap, tau, q_expected, n, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sopgtr("U", n, ap, tau, q_actual, n, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(q_expected, q_actual, sepsilon);
     }
 }

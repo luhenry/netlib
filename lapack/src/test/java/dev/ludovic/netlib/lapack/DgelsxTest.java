@@ -29,12 +29,71 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgelsxTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // DGELSX solves overdetermined/underdetermined systems using QR with column pivoting
+        // (deprecated, replaced by DGELSY)
+        int m = N_SMALL + 2;
+        int n = N_SMALL;
+        int nrhs = 1;
+
+        // Generate a well-conditioned tall matrix A (m x n) in column-major order
+        double[] a_expected = new double[m * n];
+        double[] a_actual = new double[m * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                double val = ((i + 1) * 0.5 + (j + 1) * 0.3) / (n + 1);
+                if (i == j) val += 1.0;
+                a_expected[i + j * m] = val;
+                a_actual[i + j * m] = val;
+            }
+        }
+
+        // Generate right-hand side b (max(m,n) x nrhs)
+        int ldb = Math.max(m, n);
+        double[] b_expected = new double[ldb * nrhs];
+        double[] b_actual = new double[ldb * nrhs];
+        for (int i = 0; i < m; i++) {
+            b_expected[i] = (i + 1) * 1.0;
+            b_actual[i] = (i + 1) * 1.0;
+        }
+
+        // Column pivoting array (initialized to 0 means free columns)
+        int[] jpvt_expected = new int[n];
+        int[] jpvt_actual = new int[n];
+
+        double rcond = -1.0; // use machine precision
+        intW rank_expected = new intW(0);
+        intW rank_actual = new intW(0);
+
+        double[] work_expected = new double[Math.max(1, Math.min(m, n) + 3 * n)];
+        double[] work_actual = new double[Math.max(1, Math.min(m, n) + 3 * n)];
+
+        // Solve using reference implementation
+        intW info = new intW(0);
+        f2j.dgelsx(m, n, nrhs, a_expected, 0, m, b_expected, 0, ldb, jpvt_expected, 0, rcond, rank_expected, work_expected, 0, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.dgelsx(m, n, nrhs, a_actual, 0, m, b_actual, 0, ldb, jpvt_actual, 0, rcond, rank_actual, work_actual, 0, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare rank
+        assertEquals(rank_expected.val, rank_actual.val, "Rank should match");
+
+        // Compare the solution vector x (first n entries of b)
+        double[] x_expected = new double[n];
+        double[] x_actual = new double[n];
+        System.arraycopy(b_expected, 0, x_expected, 0, n);
+        System.arraycopy(b_actual, 0, x_actual, 0, n);
+        assertArrayEquals(x_expected, x_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(x_expected)) + 2));
     }
 }

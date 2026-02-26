@@ -29,12 +29,33 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlas2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test SVD of 2x2 triangular matrix
+        // Computes singular values of [f, g; 0, h]
+        doubleW ssmin_expected = new doubleW(0.0);
+        doubleW ssmax_expected = new doubleW(0.0);
+        f2j.dlas2(3.0, 4.0, 5.0, ssmin_expected, ssmax_expected);
+
+        doubleW ssmin_actual = new doubleW(0.0);
+        doubleW ssmax_actual = new doubleW(0.0);
+        lapack.dlas2(3.0, 4.0, 5.0, ssmin_actual, ssmax_actual);
+
+        assertEquals(ssmin_expected.val, ssmin_actual.val, depsilon);
+        assertEquals(ssmax_expected.val, ssmax_actual.val, depsilon);
+
+        // Test with different values
+        f2j.dlas2(1.0, 2.0, 3.0, ssmin_expected, ssmax_expected);
+        lapack.dlas2(1.0, 2.0, 3.0, ssmin_actual, ssmax_actual);
+
+        assertEquals(ssmin_expected.val, ssmin_actual.val, depsilon);
+        assertEquals(ssmax_expected.val, ssmax_actual.val, depsilon);
     }
 }

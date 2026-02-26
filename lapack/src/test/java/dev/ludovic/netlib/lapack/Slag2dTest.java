@@ -29,12 +29,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slag2dTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // SLAG2D: convert single precision matrix to double precision
+        int m = N_SMALL;
+        int n = N_SMALL;
+
+        float[] sa = generateMatrixFloat(m, n, 1.0f);
+
+        double[] a_expected = new double[m * n];
+        double[] a_actual = new double[m * n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.slag2d(m, n, sa, m, a_expected, m, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.slag2d(m, n, sa, m, a_actual, m, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(a_expected, a_actual, 0.0);
     }
 }

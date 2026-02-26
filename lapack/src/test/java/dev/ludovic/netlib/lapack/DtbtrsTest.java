@@ -29,12 +29,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DtbtrsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create an upper triangular banded matrix with 3 superdiagonals
+        int kd = 3;
+        int ldab = kd + 1;
+        double[] ab = new double[ldab * N];
+
+        // Fill banded storage: for upper triangular, row 0 is kd superdiagonals, row kd is diagonal
+        for (int j = 0; j < N; j++) {
+            for (int i = Math.max(0, j - kd); i <= j; i++) {
+                int row = kd + i - j;
+                ab[row + j * ldab] = (i == j) ? (N + 1.0) : (1.0 / (i + j + 2.0));
+            }
+        }
+
+        // Create right-hand side B
+        double[] b_expected = generateDoubleArray(N, 1.0);
+        double[] b_actual = b_expected.clone();
+
+        intW info_expected = new intW(0);
+        f2j.dtbtrs("U", "N", "N", N, kd, 1, ab, 0, ldab, b_expected, 0, N, info_expected);
+
+        intW info_actual = new intW(0);
+        lapack.dtbtrs("U", "N", "N", N, kd, 1, ab, 0, ldab, b_actual, 0, N, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(b_expected, b_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(b_expected))));
     }
 }

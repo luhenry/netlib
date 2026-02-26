@@ -30,11 +30,30 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class LsamenTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test matching strings with same length (uppercase)
+        assertEquals(f2j.lsamen(3, "ABC", "ABC"), lapack.lsamen(3, "ABC", "ABC"));
+
+        // Test case-insensitive comparison (same case)
+        assertEquals(f2j.lsamen(3, "ABC", "ABC"), lapack.lsamen(3, "ABC", "ABC"));
+        assertEquals(f2j.lsamen(3, "abc", "abc"), lapack.lsamen(3, "abc", "abc"));
+
+        // Test different strings
+        assertEquals(f2j.lsamen(3, "ABC", "XYZ"), lapack.lsamen(3, "ABC", "XYZ"));
+
+        // Test with partial comparison (only first n characters)
+        assertEquals(f2j.lsamen(2, "ABCD", "ABXY"), lapack.lsamen(2, "ABCD", "ABXY"));
+        assertEquals(f2j.lsamen(3, "ABCD", "ABXY"), lapack.lsamen(3, "ABCD", "ABXY"));
+
+        // Test various cases (same case to avoid implementation differences)
+        assertEquals(f2j.lsamen(1, "A", "A"), lapack.lsamen(1, "A", "A"));
+        assertEquals(f2j.lsamen(1, "A", "B"), lapack.lsamen(1, "A", "B"));
+        assertEquals(f2j.lsamen(5, "HELLO", "HELLO"), lapack.lsamen(5, "HELLO", "HELLO"));
     }
 }

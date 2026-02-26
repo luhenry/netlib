@@ -29,12 +29,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SsptrdTest extends LAPACKTest {
+
+    // Pack a symmetric matrix into upper packed storage
+    private float[] packUpperSymmetric(float[] matrix, int n) {
+        float[] ap = new float[n * (n + 1) / 2];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[k++] = matrix[i + j * n];
+            }
+        }
+        return ap;
+    }
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N;
+        float[] ap = packUpperSymmetric(sPositiveDefiniteMatrix, n);
+        float[] d = new float[n];
+        float[] e = new float[n - 1];
+        float[] tau = new float[n - 1];
+        intW info = new intW(0);
+
+        lapack.ssptrd("U", n, ap, 0, d, 0, e, 0, tau, 0, info);
+
+        assertEquals(0, info.val, "ssptrd should succeed");
     }
 }

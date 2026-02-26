@@ -30,11 +30,21 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class IeeeckTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // ieeeck checks IEEE arithmetic properties
+        // ispec=0: check infinity arithmetic; ispec=1: check NaN arithmetic
+        int expected = f2j.ieeeck(0, 0.0f, 1.0f);
+        int actual = lapack.ieeeck(0, 0.0f, 1.0f);
+        assertEquals(expected, actual);
+
+        expected = f2j.ieeeck(1, 0.0f, 1.0f);
+        actual = lapack.ieeeck(1, 0.0f, 1.0f);
+        assertEquals(expected, actual);
     }
 }

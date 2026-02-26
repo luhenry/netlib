@@ -29,12 +29,37 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DtrtriTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create an upper triangular matrix
+        double[] a_expected = new double[N * N];
+        double[] a_actual = new double[N * N];
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i <= j; i++) {
+                double value = (i == j) ? (N + 1.0) : (1.0 / (i + j + 2.0));
+                a_expected[i + j * N] = value;
+                a_actual[i + j * N] = value;
+            }
+        }
+
+        // Invert using reference implementation
+        intW info_expected = new intW(0);
+        f2j.dtrtri("U", "N", N, a_expected, 0, N, info_expected);
+        assertEquals(0, info_expected.val, "Reference inversion should succeed");
+
+        // Invert using test implementation
+        intW info_actual = new intW(0);
+        lapack.dtrtri("U", "N", N, a_actual, 0, N, info_actual);
+        assertEquals(0, info_actual.val, "Inversion should succeed");
+
+        // Compare inverted matrices
+        assertArrayEquals(a_expected, a_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(a_expected))));
     }
 }

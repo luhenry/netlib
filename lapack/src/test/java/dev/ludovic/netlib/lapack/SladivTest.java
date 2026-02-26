@@ -29,12 +29,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SladivTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        floatW p_expected = new floatW(0.0f);
+        floatW q_expected = new floatW(0.0f);
+        f2j.sladiv(3.0f, 4.0f, 1.0f, 2.0f, p_expected, q_expected);
+
+        floatW p_actual = new floatW(0.0f);
+        floatW q_actual = new floatW(0.0f);
+        lapack.sladiv(3.0f, 4.0f, 1.0f, 2.0f, p_actual, q_actual);
+
+        assertEquals(p_expected.val, p_actual.val, sepsilon);
+        assertEquals(q_expected.val, q_actual.val, sepsilon);
     }
 }

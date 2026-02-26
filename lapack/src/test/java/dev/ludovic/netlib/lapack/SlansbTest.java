@@ -30,11 +30,44 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlansbTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create a symmetric banded matrix with K super-diagonals
+        int k = 3;
+        int ldab = k + 1;
+        float[] ab = new float[ldab * N];
+
+        // Fill symmetric banded storage format (upper triangular)
+        for (int j = 0; j < N; j++) {
+            for (int i = Math.max(0, j - k); i <= j; i++) {
+                ab[k + i - j + j * ldab] = sSymmetricMatrix[i + j * N];
+            }
+        }
+        float[] work = new float[N];
+
+        // Test 1-norm
+        float expected = f2j.slansb("1", "U", N, k, ab, 0, ldab, work, 0);
+        float actual = lapack.slansb("1", "U", N, k, ab, 0, ldab, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Inf-norm
+        expected = f2j.slansb("I", "U", N, k, ab, 0, ldab, work, 0);
+        actual = lapack.slansb("I", "U", N, k, ab, 0, ldab, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Frobenius norm
+        expected = f2j.slansb("F", "U", N, k, ab, 0, ldab, work, 0);
+        actual = lapack.slansb("F", "U", N, k, ab, 0, ldab, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Max norm
+        expected = f2j.slansb("M", "U", N, k, ab, 0, ldab, work, 0);
+        actual = lapack.slansb("M", "U", N, k, ab, 0, ldab, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
     }
 }

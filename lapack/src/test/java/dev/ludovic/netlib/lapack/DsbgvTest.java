@@ -29,12 +29,46 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsbgvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testEigenvaluesOnly(LAPACK lapack) {
+        int n = N_SMALL;
+        int ka = 2;
+        int kb = 1;
+        int ldab = ka + 1;
+        int ldbb = kb + 1;
+
+        // Positive definite symmetric banded matrix A (upper, ka superdiagonals)
+        double[] ab = generateBandedSymmetricMatrix(n, ka, n + 10.0, 0.5);
+
+        // Positive definite symmetric banded matrix B (upper, kb superdiagonals)
+        double[] bb = generateBandedSymmetricMatrix(n, kb, n + 5.0, 0.3);
+
+        double[] ab_expected = ab.clone();
+        double[] ab_actual = ab.clone();
+        double[] bb_expected = bb.clone();
+        double[] bb_actual = bb.clone();
+        double[] w_expected = new double[n];
+        double[] w_actual = new double[n];
+        double[] z_expected = new double[1];
+        double[] z_actual = new double[1];
+        double[] work_expected = new double[3 * n];
+        double[] work_actual = new double[3 * n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsbgv("N", "U", n, ka, kb, ab_expected, ldab, bb_expected, ldbb, w_expected, z_expected, 1, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsbgv("N", "U", n, ka, kb, ab_actual, ldab, bb_actual, ldbb, w_actual, z_actual, 1, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(w_expected, w_actual, 1e-13);
     }
 }

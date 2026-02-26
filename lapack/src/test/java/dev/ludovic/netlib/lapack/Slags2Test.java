@@ -29,12 +29,40 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slags2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test computation of sine and cosine for generalized problem
+        booleanW upper = new booleanW(true);
+        floatW csu_expected = new floatW(0.0f);
+        floatW snu_expected = new floatW(0.0f);
+        floatW csv_expected = new floatW(0.0f);
+        floatW snv_expected = new floatW(0.0f);
+        floatW csq_expected = new floatW(0.0f);
+        floatW snq_expected = new floatW(0.0f);
+
+        f2j.slags2(upper.val, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, csu_expected, snu_expected, csv_expected, snv_expected, csq_expected, snq_expected);
+
+        floatW csu_actual = new floatW(0.0f);
+        floatW snu_actual = new floatW(0.0f);
+        floatW csv_actual = new floatW(0.0f);
+        floatW snv_actual = new floatW(0.0f);
+        floatW csq_actual = new floatW(0.0f);
+        floatW snq_actual = new floatW(0.0f);
+
+        lapack.slags2(upper.val, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, csu_actual, snu_actual, csv_actual, snv_actual, csq_actual, snq_actual);
+
+        assertEquals(csu_expected.val, csu_actual.val, sepsilon);
+        assertEquals(snu_expected.val, snu_actual.val, sepsilon);
+        assertEquals(csv_expected.val, csv_actual.val, sepsilon);
+        assertEquals(snv_expected.val, snv_actual.val, sepsilon);
+        assertEquals(csq_expected.val, csq_actual.val, sepsilon);
+        assertEquals(snq_expected.val, snq_actual.val, sepsilon);
     }
 }

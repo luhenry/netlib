@@ -25,16 +25,63 @@
 
 package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SgerqfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        float[] a_orig = generateMatrixFloat(n, n, 1.0f);
+        float[] a = a_orig.clone();
+        float[] tau = new float[n];
+        int lwork = n * n;
+        float[] work = new float[lwork];
+        intW info = new intW(0);
+
+        lapack.sgerqf(n, n, a, 0, n, tau, 0, work, 0, lwork, info);
+        assertEquals(0, info.val, "RQ factorization should succeed");
+
+        float[] r = new float[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                r[i + j * n] = a[i + j * n];
+            }
+        }
+
+        float[] q = a.clone();
+        float[] work2 = new float[lwork];
+        intW info2 = new intW(0);
+        lapack.sorgrq(n, n, n, q, 0, n, tau, 0, work2, 0, lwork, info2);
+        assertEquals(0, info2.val);
+
+        double[] rq = new double[n * n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                double sum = 0.0;
+                for (int k = 0; k < n; k++) {
+                    sum += (double) r[i + k * n] * (double) q[k + j * n];
+                }
+                rq[i + j * n] = sum;
+            }
+        }
+
+        double normA = 0.0;
+        double normDiff = 0.0;
+        for (int i = 0; i < n * n; i++) {
+            normA += (double) a_orig[i] * (double) a_orig[i];
+            double d = (double) a_orig[i] - rq[i];
+            normDiff += d * d;
+        }
+        normA = Math.sqrt(normA);
+        normDiff = Math.sqrt(normDiff);
+        assertTrue(normDiff < sepsilon * 10 * normA,
+            "||A - R*Q|| = " + normDiff + " should be < " + (sepsilon * 10 * normA));
     }
 }

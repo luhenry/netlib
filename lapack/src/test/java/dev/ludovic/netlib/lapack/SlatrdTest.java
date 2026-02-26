@@ -30,11 +30,32 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlatrdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // v3.1 uses SLARFP, v3.12 uses SLARFG, producing different but
+        // mathematically equivalent Householder vectors. Only compare the
+        // off-diagonal elements (e) which are deterministic.
+        int n = N_SMALL;
+        int nb = 3;
+
+        float[] a_expected = generateSymmetricMatrixFloat(n);
+        float[] e_expected = new float[n];
+        float[] tau_expected = new float[n];
+        float[] w_expected = new float[n * nb];
+        f2j.slatrd("U", n, nb, a_expected, 0, n, e_expected, 0, tau_expected, 0, w_expected, 0, n);
+
+        float[] a_actual = generateSymmetricMatrixFloat(n);
+        float[] e_actual = new float[n];
+        float[] tau_actual = new float[n];
+        float[] w_actual = new float[n * nb];
+        lapack.slatrd("U", n, nb, a_actual, 0, n, e_actual, 0, tau_actual, 0, w_actual, 0, n);
+
+        // Off-diagonal elements should match regardless of reflector convention
+        assertRelArrayEquals(e_expected, e_actual, sepsilon * 10);
     }
 }

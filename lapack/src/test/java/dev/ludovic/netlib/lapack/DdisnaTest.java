@@ -29,12 +29,75 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DdisnaTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testEigenvectors(LAPACK lapack) {
+        // DDISNA computes reciprocal condition numbers for eigenvectors
+        // of a symmetric matrix, given eigenvalues in decreasing order
+        int n = 5;
+        double[] d = {10.0, 7.0, 4.0, 2.0, 1.0}; // eigenvalues in decreasing order
+
+        double[] sep_expected = new double[n];
+        double[] sep_actual = new double[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ddisna("E", n, n, d, sep_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ddisna("E", n, n, d, sep_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(sep_expected, sep_actual, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLeftSingularVectors(LAPACK lapack) {
+        // Reciprocal condition numbers for left singular vectors
+        int m = 6, n = 4;
+        int minmn = Math.min(m, n);
+        double[] d = {10.0, 7.0, 3.0, 1.0}; // singular values in decreasing order
+
+        double[] sep_expected = new double[minmn];
+        double[] sep_actual = new double[minmn];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ddisna("L", m, n, d, sep_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ddisna("L", m, n, d, sep_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(sep_expected, sep_actual, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testRightSingularVectors(LAPACK lapack) {
+        // Reciprocal condition numbers for right singular vectors
+        int m = 4, n = 6;
+        int minmn = Math.min(m, n);
+        double[] d = {10.0, 7.0, 3.0, 1.0}; // singular values in decreasing order
+
+        double[] sep_expected = new double[minmn];
+        double[] sep_actual = new double[minmn];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ddisna("R", m, n, d, sep_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ddisna("R", m, n, d, sep_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(sep_expected, sep_actual, depsilon);
     }
 }

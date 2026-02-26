@@ -29,12 +29,35 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlarrkTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test computing one eigenvalue by bisection
+        float[] d = generateFloatArray(N_SMALL, 1.0f);
+        float[] e2 = generateFloatArray(N_SMALL - 1, 0.01f);
+        float gl = 0.0f;
+        float gu = 100.0f;
+        float pivmin = 1e-10f;
+        float reltol = 1e-6f;
+
+        floatW w_expected = new floatW(0.0f);
+        floatW werr_expected = new floatW(0.0f);
+        intW info_expected = new intW(0);
+        f2j.slarrk(N_SMALL, 1, gl, gu, d, 0, e2, 0, pivmin, reltol, w_expected, werr_expected, info_expected);
+
+        floatW w_actual = new floatW(0.0f);
+        floatW werr_actual = new floatW(0.0f);
+        intW info_actual = new intW(0);
+        lapack.slarrk(N_SMALL, 1, gl, gu, d, 0, e2, 0, pivmin, reltol, w_actual, werr_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(w_expected.val, w_actual.val, sepsilon);
+        assertEquals(werr_expected.val, werr_actual.val, sepsilon);
     }
 }

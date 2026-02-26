@@ -30,11 +30,24 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlanegTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Count negative pivots in L*D*L^T factorization of T - sigma*I
+        int n = 5;
+        double[] d = { 4.0, 5.0, 6.0, 7.0, 8.0 }; // diagonal of D
+        double[] lld = { 1.0, 2.0, 0.5, 1.5 }; // L(i)*L(i)*D(i), n-1 elements
+        double sigma = 3.0;
+        double pivmin = 1e-20;
+        int r = n; // twist index
+
+        int expected = f2j.dlaneg(n, d, lld, sigma, pivmin, r);
+        int actual = lapack.dlaneg(n, d, lld, sigma, pivmin, r);
+
+        assertEquals(expected, actual);
     }
 }

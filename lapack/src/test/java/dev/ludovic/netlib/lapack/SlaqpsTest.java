@@ -30,11 +30,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlaqpsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // slaqps uses column pivoting which can select different pivot columns between
+        // LAPACK 3.1 and 3.12 when column norms are similar. Same issue as sgeqpf/sgeqp3.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

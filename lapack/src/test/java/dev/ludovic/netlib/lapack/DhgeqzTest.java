@@ -29,12 +29,65 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DhgeqzTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // QZ iteration on Hessenberg-Triangular pair, eigenvalues only
+        int n = 4;
+        // Upper Hessenberg H (column-major)
+        double[] h_expected = {
+            4.0, 2.0, 0.0, 0.0,
+            1.0, 3.0, 1.0, 0.0,
+            0.0, 0.5, 5.0, 0.8,
+            0.0, 0.0, 0.3, 2.0
+        };
+        double[] h_actual = h_expected.clone();
+        // Upper triangular T (column-major)
+        double[] t_expected = {
+            2.0, 0.0, 0.0, 0.0,
+            1.0, 3.0, 0.0, 0.0,
+            0.0, 1.0, 1.0, 0.0,
+            0.0, 0.0, 0.5, 4.0
+        };
+        double[] t_actual = t_expected.clone();
+        double[] alphar_expected = new double[n];
+        double[] alphar_actual = new double[n];
+        double[] alphai_expected = new double[n];
+        double[] alphai_actual = new double[n];
+        double[] beta_expected = new double[n];
+        double[] beta_actual = new double[n];
+        double[] q = new double[1];
+        double[] z = new double[1];
+        double[] work_expected = new double[n];
+        double[] work_actual = new double[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dhgeqz("E", "N", "N", n, 1, n, h_expected, n, t_expected, n,
+                    alphar_expected, alphai_expected, beta_expected, q, 1, z, 1,
+                    work_expected, n, info_expected);
+        lapack.dhgeqz("E", "N", "N", n, 1, n, h_actual, n, t_actual, n,
+                      alphar_actual, alphai_actual, beta_actual, q, 1, z, 1,
+                      work_actual, n, info_actual);
+
+        assertEquals(0, info_expected.val);
+        assertEquals(info_expected.val, info_actual.val);
+
+        // Compute eigenvalue ratios and sort for comparison
+        double[] eig_expected = new double[n];
+        double[] eig_actual = new double[n];
+        for (int i = 0; i < n; i++) {
+            eig_expected[i] = alphar_expected[i] / beta_expected[i];
+            eig_actual[i] = alphar_actual[i] / beta_actual[i];
+        }
+        java.util.Arrays.sort(eig_expected);
+        java.util.Arrays.sort(eig_actual);
+        assertArrayEquals(eig_expected, eig_actual, depsilon);
     }
 }

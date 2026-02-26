@@ -29,12 +29,53 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DspconTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        // DSPCON: estimate reciprocal condition number of packed symmetric indefinite matrix
+        int n = N_SMALL;
+        int ap_len = n * (n + 1) / 2;
+
+        double[] ap = new double[ap_len];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[k++] = (i == j) ? (i % 2 == 0 ? 10.0 : -5.0) : 1.0 / (i + j + 1.0);
+            }
+        }
+
+        // Compute 1-norm before factoring
+        double[] work_norm = new double[n];
+        double anorm = f2j.dlansp("1", "U", n, ap, work_norm);
+
+        // Factor
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.dsptrf("U", n, ap, ipiv, info);
+        assertEquals(0, info.val);
+
+        // Estimate condition number
+        double[] work_expected = new double[2 * n];
+        double[] work_actual = new double[2 * n];
+        int[] iwork_expected = new int[n];
+        int[] iwork_actual = new int[n];
+        doubleW rcond_expected = new doubleW(0);
+        doubleW rcond_actual = new doubleW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dspcon("U", n, ap, ipiv, anorm, rcond_expected, work_expected, iwork_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dspcon("U", n, ap, ipiv, anorm, rcond_actual, work_actual, iwork_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(rcond_expected.val, rcond_actual.val, depsilon);
     }
 }

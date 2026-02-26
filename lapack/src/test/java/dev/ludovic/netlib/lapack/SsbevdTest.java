@@ -29,12 +29,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SsbevdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testEigenvaluesOnly(LAPACK lapack) {
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        float[] ab = generateBandedSymmetricMatrixFloat(n, kd, n + 10.0f, 0.5f);
+
+        int lwork = Math.max(1, 2 * n);
+        int liwork = 1;
+
+        float[] ab_expected = ab.clone();
+        float[] ab_actual = ab.clone();
+        float[] w_expected = new float[n];
+        float[] w_actual = new float[n];
+        float[] z_expected = new float[1];
+        float[] z_actual = new float[1];
+        float[] work_expected = new float[lwork];
+        float[] work_actual = new float[lwork];
+        int[] iwork_expected = new int[liwork];
+        int[] iwork_actual = new int[liwork];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ssbevd("N", "U", n, kd, ab_expected, ldab, w_expected, z_expected, 1, work_expected, lwork, iwork_expected, liwork, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ssbevd("N", "U", n, kd, ab_actual, ldab, w_actual, z_actual, 1, work_actual, lwork, iwork_actual, liwork, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(w_expected, w_actual, sepsilon);
     }
 }

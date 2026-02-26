@@ -29,12 +29,41 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DtgevcTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // S is upper triangular (quasi-triangular) with distinct eigenvalues
+        double[] s = generateUpperTriangularMatrix(n, 1.0, 1.0, 0.5);
+
+        // P is upper triangular with positive diagonal (well-conditioned)
+        double[] p = generateUpperTriangularMatrix(n, n + 1.0, 1.0, 0.3);
+
+        boolean[] select = new boolean[n];
+        double[] vl = new double[1];
+        double[] vr_expected = new double[n * n];
+        double[] vr_actual = new double[n * n];
+        double[] work_expected = new double[6 * n];
+        double[] work_actual = new double[6 * n];
+        intW m_expected = new intW(0);
+        intW m_actual = new intW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dtgevc("R", "A", select, n, s, n, p, n, vl, 1, vr_expected, n, n, m_expected, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dtgevc("R", "A", select, n, s, n, p, n, vl, 1, vr_actual, n, n, m_actual, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(m_expected.val, m_actual.val);
+        assertArrayEquals(vr_expected, vr_actual, depsilon);
     }
 }

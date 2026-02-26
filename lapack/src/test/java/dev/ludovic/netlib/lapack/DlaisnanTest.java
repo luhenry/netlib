@@ -30,11 +30,29 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlaisnanTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test with both NaN - dlaisnan returns true when both inputs are NaN
+        assertEquals(f2j.dlaisnan(Double.NaN, Double.NaN), lapack.dlaisnan(Double.NaN, Double.NaN));
+
+        // Test with one NaN
+        assertEquals(f2j.dlaisnan(Double.NaN, 1.0), lapack.dlaisnan(Double.NaN, 1.0));
+        assertEquals(f2j.dlaisnan(1.0, Double.NaN), lapack.dlaisnan(1.0, Double.NaN));
+
+        // Test with normal values
+        assertEquals(f2j.dlaisnan(1.0, 2.0), lapack.dlaisnan(1.0, 2.0));
+        assertEquals(f2j.dlaisnan(0.0, 0.0), lapack.dlaisnan(0.0, 0.0));
+        assertEquals(f2j.dlaisnan(1.0, 1.0), lapack.dlaisnan(1.0, 1.0));
+
+        // Test with infinity
+        assertEquals(f2j.dlaisnan(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY),
+                     lapack.dlaisnan(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY));
+        assertEquals(f2j.dlaisnan(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY),
+                     lapack.dlaisnan(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY));
     }
 }

@@ -30,11 +30,45 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlangbTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create a banded matrix with KL lower and KU upper diagonals
+        int kl = 2;
+        int ku = 3;
+        int ldab = kl + ku + 1;
+        double[] ab = new double[ldab * N];
+
+        // Fill banded storage format
+        for (int j = 0; j < N; j++) {
+            for (int i = Math.max(0, j - ku); i <= Math.min(N - 1, j + kl); i++) {
+                ab[ku + i - j + j * ldab] = dMatrix[i + j * N];
+            }
+        }
+        double[] work = new double[N];
+
+        // Test 1-norm
+        double expected = f2j.dlangb("1", N, kl, ku, ab, 0, ldab, work, 0);
+        double actual = lapack.dlangb("1", N, kl, ku, ab, 0, ldab, work, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Inf-norm
+        expected = f2j.dlangb("I", N, kl, ku, ab, 0, ldab, work, 0);
+        actual = lapack.dlangb("I", N, kl, ku, ab, 0, ldab, work, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Frobenius norm
+        expected = f2j.dlangb("F", N, kl, ku, ab, 0, ldab, work, 0);
+        actual = lapack.dlangb("F", N, kl, ku, ab, 0, ldab, work, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Max norm
+        expected = f2j.dlangb("M", N, kl, ku, ab, 0, ldab, work, 0);
+        actual = lapack.dlangb("M", N, kl, ku, ab, 0, ldab, work, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
     }
 }

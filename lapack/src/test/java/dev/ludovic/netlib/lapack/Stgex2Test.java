@@ -30,11 +30,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Stgex2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // stgex2 swaps adjacent diagonal blocks in generalized Schur form.
+        // The orthogonal transformation is only determined up to sign,
+        // and F2j (LAPACK 3.1) vs native (LAPACK 3.12) choose opposite signs.
+        // The higher-level stgexc (which calls stgex2) is already tested.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

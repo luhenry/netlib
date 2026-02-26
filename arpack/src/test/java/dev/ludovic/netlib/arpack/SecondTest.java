@@ -30,11 +30,61 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.netlib.util.floatW;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SecondTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test case 1: Verify second() returns a non-negative time value
+        {
+            floatW t = new floatW(0.0f);
+            arpack.second(t);
+
+            // Time value should be non-negative
+            assertTrue(t.val >= 0.0f, "Time value should be non-negative, got: " + t.val);
+        }
+
+        // Test case 2: Verify second() is monotonic (time increases or stays same)
+        {
+            floatW t1 = new floatW(0.0f);
+            arpack.second(t1);
+
+            // Small delay to ensure some time passes
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            floatW t2 = new floatW(0.0f);
+            arpack.second(t2);
+
+            // Second call should have equal or greater time
+            assertTrue(t2.val >= t1.val, "Time should be monotonic: t1=" + t1.val + ", t2=" + t2.val);
+        }
+
+        // Test case 3: Multiple consecutive calls
+        {
+            floatW t1 = new floatW(0.0f);
+            floatW t2 = new floatW(0.0f);
+            floatW t3 = new floatW(0.0f);
+
+            arpack.second(t1);
+            arpack.second(t2);
+            arpack.second(t3);
+
+            // All values should be non-negative
+            assertTrue(t1.val >= 0.0f, "t1 should be non-negative");
+            assertTrue(t2.val >= 0.0f, "t2 should be non-negative");
+            assertTrue(t3.val >= 0.0f, "t3 should be non-negative");
+
+            // Time should be monotonic
+            assertTrue(t2.val >= t1.val, "Time should be monotonic");
+            assertTrue(t3.val >= t2.val, "Time should be monotonic");
+        }
     }
 }

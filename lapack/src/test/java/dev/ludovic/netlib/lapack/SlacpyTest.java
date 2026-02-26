@@ -30,11 +30,38 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlacpyTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test copying full matrix
+        float[] expected = new float[N * N];
+        f2j.slacpy("A", N, N, sMatrix, 0, N, expected, 0, N);
+
+        float[] actual = new float[N * N];
+        lapack.slacpy("A", N, N, sMatrix, 0, N, actual, 0, N);
+
+        assertArrayEquals(expected, actual, sepsilon);
+
+        // Test copying upper triangular part
+        float[] expected_upper = new float[N * N];
+        f2j.slacpy("U", N, N, sMatrix, 0, N, expected_upper, 0, N);
+
+        float[] actual_upper = new float[N * N];
+        lapack.slacpy("U", N, N, sMatrix, 0, N, actual_upper, 0, N);
+
+        assertArrayEquals(expected_upper, actual_upper, sepsilon);
+
+        // Test copying lower triangular part
+        float[] expected_lower = new float[N * N];
+        f2j.slacpy("L", N, N, sMatrix, 0, N, expected_lower, 0, N);
+
+        float[] actual_lower = new float[N * N];
+        lapack.slacpy("L", N, N, sMatrix, 0, N, actual_lower, 0, N);
+
+        assertArrayEquals(expected_lower, actual_lower, sepsilon);
     }
 }

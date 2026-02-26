@@ -29,12 +29,79 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SsytrsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        int n = N_SMALL;
+
+        float[] a = new float[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                float val = (i == j) ? (i % 2 == 0 ? 10.0f : -5.0f) : 1.0f / (i + j + 1.0f);
+                a[i + j * n] = val;
+                a[j + i * n] = val;
+            }
+        }
+
+        int[] ipiv = new int[n];
+        float[] work = new float[n * 64];
+        intW info = new intW(0);
+        f2j.ssytrf("U", n, a, n, ipiv, work, work.length, info);
+        assertEquals(0, info.val);
+
+        float[] b_expected = generateFloatArray(n, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ssytrs("U", n, 1, a, n, ipiv, b_expected, n, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ssytrs("U", n, 1, a, n, ipiv, b_actual, n, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(b_expected, b_actual, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+
+        float[] a = new float[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                float val = (i == j) ? (i % 2 == 0 ? 10.0f : -5.0f) : 1.0f / (i + j + 1.0f);
+                a[i + j * n] = val;
+                a[j + i * n] = val;
+            }
+        }
+
+        int[] ipiv = new int[n];
+        float[] work = new float[n * 64];
+        intW info = new intW(0);
+        f2j.ssytrf("L", n, a, n, ipiv, work, work.length, info);
+        assertEquals(0, info.val);
+
+        float[] b_expected = generateFloatArray(n, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ssytrs("L", n, 1, a, n, ipiv, b_expected, n, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ssytrs("L", n, 1, a, n, ipiv, b_actual, n, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(b_expected, b_actual, sepsilon);
     }
 }

@@ -29,12 +29,48 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DtrsylTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = N_SMALL;
+
+        // A is m x m upper triangular (special case of quasi-triangular)
+        // with distinct diagonal entries to ensure well-conditioned problem
+        double[] a = generateUpperTriangularMatrix(m, 1.0, 1.0, 0.5);
+
+        // B is n x n upper triangular with distinct diagonal entries
+        // Eigenvalues of A and -B must not coincide (isgn=+1: A*X + X*B = scale*C)
+        double[] b = generateUpperTriangularMatrix(n, m + 1.0, 1.0, 0.3);
+
+        // C is m x n general matrix (right-hand side, overwritten with solution)
+        double[] c = new double[m * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                c[i + j * m] = 1.0 / (i + j + 1.0);
+            }
+        }
+
+        double[] c_expected = c.clone();
+        double[] c_actual = c.clone();
+        doubleW scale_expected = new doubleW(0.0);
+        doubleW scale_actual = new doubleW(0.0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dtrsyl("N", "N", 1, m, n, a, m, b, n, c_expected, m, scale_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dtrsyl("N", "N", 1, m, n, a, m, b, n, c_actual, m, scale_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(scale_expected.val, scale_actual.val, depsilon);
+        assertArrayEquals(c_expected, c_actual, depsilon);
     }
 }

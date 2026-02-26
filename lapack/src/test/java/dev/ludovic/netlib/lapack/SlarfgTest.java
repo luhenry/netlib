@@ -29,12 +29,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlarfgTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test Householder reflector generation
+        float[] x_expected = new float[N_SMALL];
+        for (int i = 0; i < N_SMALL; i++) {
+            x_expected[i] = (i + 1) * 1.0f;
+        }
+        floatW alpha_expected = new floatW(2.5f);
+        floatW tau_expected = new floatW(0.0f);
+        f2j.slarfg(N_SMALL, alpha_expected, x_expected, 0, 1, tau_expected);
+
+        float[] x_actual = new float[N_SMALL];
+        for (int i = 0; i < N_SMALL; i++) {
+            x_actual[i] = (i + 1) * 1.0f;
+        }
+        floatW alpha_actual = new floatW(2.5f);
+        floatW tau_actual = new floatW(0.0f);
+        lapack.slarfg(N_SMALL, alpha_actual, x_actual, 0, 1, tau_actual);
+
+        assertEquals(alpha_expected.val, alpha_actual.val, sepsilon);
+        assertEquals(tau_expected.val, tau_actual.val, sepsilon);
+        assertArrayEquals(x_expected, x_actual, sepsilon);
     }
 }

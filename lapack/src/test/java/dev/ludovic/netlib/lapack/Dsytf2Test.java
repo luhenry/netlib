@@ -29,12 +29,72 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dsytf2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        // DSYTF2: unblocked Bunch-Kaufman factorization A = U*D*U^T
+        int n = N_SMALL;
+
+        double[] a = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                double val = (i == j) ? (i % 2 == 0 ? 10.0 : -5.0) : 1.0 / (i + j + 1.0);
+                a[i + j * n] = val;
+                a[j + i * n] = val;
+            }
+        }
+
+        double[] a_expected = a.clone();
+        double[] a_actual = a.clone();
+        int[] ipiv_expected = new int[n];
+        int[] ipiv_actual = new int[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsytf2("U", n, a_expected, n, ipiv_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsytf2("U", n, a_actual, n, ipiv_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(a_expected, a_actual, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+
+        double[] a = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                double val = (i == j) ? (i % 2 == 0 ? 10.0 : -5.0) : 1.0 / (i + j + 1.0);
+                a[i + j * n] = val;
+                a[j + i * n] = val;
+            }
+        }
+
+        double[] a_expected = a.clone();
+        double[] a_actual = a.clone();
+        int[] ipiv_expected = new int[n];
+        int[] ipiv_actual = new int[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsytf2("L", n, a_expected, n, ipiv_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsytf2("L", n, a_actual, n, ipiv_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(a_expected, a_actual, depsilon);
     }
 }

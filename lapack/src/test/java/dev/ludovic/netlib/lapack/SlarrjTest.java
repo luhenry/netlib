@@ -29,12 +29,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlarrjTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test refinement of eigenvalue subset
+        float[] d = generateFloatArray(N_SMALL, 1.0f);
+        float[] e2 = generateFloatArray(N_SMALL - 1, 0.01f);
+        float[] w = generateFloatArray(N_SMALL, 1.0f);
+        float[] werr = new float[N_SMALL];
+        float[] work = new float[2 * N_SMALL];
+        int[] iwork = new int[2 * N_SMALL];
+        float pivmin = 1e-10f;
+        float spdiam = 100.0f;
+        float rtol = 1e-6f;
+
+        intW info_expected = new intW(0);
+        f2j.slarrj(N_SMALL, d, 0, e2, 0, 1, N_SMALL, rtol, 0, w, 0, werr, 0, work, 0, iwork, 0, pivmin, spdiam, info_expected);
+
+        intW info_actual = new intW(0);
+        lapack.slarrj(N_SMALL, d, 0, e2, 0, 1, N_SMALL, rtol, 0, w, 0, werr, 0, work, 0, iwork, 0, pivmin, spdiam, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
     }
 }

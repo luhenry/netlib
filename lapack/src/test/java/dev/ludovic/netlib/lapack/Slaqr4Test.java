@@ -30,11 +30,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Slaqr4Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // slaqr4 is the QR algorithm with aggressive deflation (LAPACK 3.2+). Internal to shseqr.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

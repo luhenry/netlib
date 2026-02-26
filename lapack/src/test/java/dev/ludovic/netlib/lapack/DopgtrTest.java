@@ -29,12 +29,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DopgtrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        // DOPGTR: generate orthogonal matrix Q from tridiagonal reduction by DSPTRD
+        int n = N_SMALL;
+
+        // Create symmetric packed matrix (upper) - positive definite for good conditioning
+        double[] ap = generatePackedSymmetricMatrix(n, n + 10.0);
+
+        // Reduce to tridiagonal form with dsptrd
+        double[] d = new double[n];
+        double[] e = new double[n - 1];
+        double[] tau = new double[n - 1];
+        intW info = new intW(0);
+        f2j.dsptrd("U", n, ap, d, e, tau, info);
+        assertEquals(0, info.val);
+
+        // Generate Q from the reflectors
+        double[] q_expected = new double[n * n];
+        double[] q_actual = new double[n * n];
+        double[] work_expected = new double[n - 1];
+        double[] work_actual = new double[n - 1];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dopgtr("U", n, ap, tau, q_expected, n, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dopgtr("U", n, ap, tau, q_actual, n, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(q_expected, q_actual, depsilon);
     }
 }

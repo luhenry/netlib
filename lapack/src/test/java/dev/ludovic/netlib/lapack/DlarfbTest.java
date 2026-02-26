@@ -30,11 +30,28 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlarfbTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int k = 5;  // number of reflectors
+        double[] v = generateMatrix(N, k, 1.0);
+        double[] t = generateMatrix(k, k, 1.0);
+
+        double[] c_expected = dMatrix.clone();
+        double[] work_expected = new double[N * k];
+        f2j.dlarfb("L", "N", "F", "C", N, N, k, v, 0, N, t, 0, k, c_expected, 0, N, work_expected, 0, N);
+
+        double[] c_actual = dMatrix.clone();
+        double[] work_actual = new double[N * k];
+        lapack.dlarfb("L", "N", "F", "C", N, N, k, v, 0, N, t, 0, k, c_actual, 0, N, work_actual, 0, N);
+
+        // Find max value in expected array for relative epsilon
+        double maxVal = getMaxValue(c_expected);
+
+        assertArrayEquals(c_expected, c_actual, Math.scalb(depsilon, Math.getExponent(maxVal)));
     }
 }

@@ -29,12 +29,55 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SpttrsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create tridiagonal positive definite matrix
+        float[] d_expected = new float[N];
+        float[] d_actual = new float[N];
+        float[] e_expected = new float[N - 1];
+        float[] e_actual = new float[N - 1];
+
+        // Fill diagonal and off-diagonal
+        for (int i = 0; i < N; i++) {
+            d_expected[i] = N + 1.0f;
+            d_actual[i] = N + 1.0f;
+        }
+        for (int i = 0; i < N - 1; i++) {
+            e_expected[i] = 0.5f;
+            e_actual[i] = 0.5f;
+        }
+
+        // First, factor using spttrf
+        intW info = new intW(0);
+        f2j.spttrf(N, d_expected, 0, e_expected, 0, info);
+        assertEquals(0, info.val, "Reference factorization should succeed");
+
+        info.val = 0;
+        lapack.spttrf(N, d_actual, 0, e_actual, 0, info);
+        assertEquals(0, info.val, "Factorization should succeed");
+
+        // Create right-hand side B
+        float[] b_expected = generateFloatArray(N, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        info.val = 0;
+        f2j.spttrs(N, 1, d_expected, 0, e_expected, 0, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.spttrs(N, 1, d_actual, 0, e_actual, 0, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(b_expected, b_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(b_expected))));
     }
 }

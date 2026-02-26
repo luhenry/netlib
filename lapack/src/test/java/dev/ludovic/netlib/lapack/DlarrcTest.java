@@ -29,12 +29,37 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlarrcTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test counting eigenvalues in interval
+        double[] d = generateDoubleArray(N_SMALL, 1.0);
+        double[] e = generateDoubleArray(N_SMALL - 1, 0.1);
+        double vl = 5.0;
+        double vu = 50.0;
+        double pivmin = 1e-10;
+
+        intW eigcnt_expected = new intW(0);
+        intW lcnt_expected = new intW(0);
+        intW rcnt_expected = new intW(0);
+        intW info_expected = new intW(0);
+        f2j.dlarrc("T", N_SMALL, vl, vu, d, 0, e, 0, pivmin, eigcnt_expected, lcnt_expected, rcnt_expected, info_expected);
+
+        intW eigcnt_actual = new intW(0);
+        intW lcnt_actual = new intW(0);
+        intW rcnt_actual = new intW(0);
+        intW info_actual = new intW(0);
+        lapack.dlarrc("T", N_SMALL, vl, vu, d, 0, e, 0, pivmin, eigcnt_actual, lcnt_actual, rcnt_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(eigcnt_expected.val, eigcnt_actual.val);
+        assertEquals(lcnt_expected.val, lcnt_actual.val);
+        assertEquals(rcnt_expected.val, rcnt_actual.val);
     }
 }

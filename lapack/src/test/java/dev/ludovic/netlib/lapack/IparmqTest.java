@@ -30,11 +30,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class IparmqTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        for (int ispec = 12; ispec <= 16; ispec++) {
+            int expected = f2j.iparmq(ispec, "DHSEQR", "SV", 100, 1, 100, 100);
+            int actual = lapack.iparmq(ispec, "DHSEQR", "SV", 100, 1, 100, 100);
+            assertEquals(expected, actual, "iparmq mismatch for ispec=" + ispec);
+        }
     }
 }

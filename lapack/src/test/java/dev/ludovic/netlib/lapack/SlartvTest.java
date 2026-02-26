@@ -30,11 +30,29 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlartvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 10;
+        float[] x_expected = generateFloatArray(n, 1.0f);
+        float[] y_expected = generateFloatArray(n, 2.0f);
+        float[] c = generateFloatArray(n, 0.6f);  // cos
+        float[] s = generateFloatArray(n, 0.8f);  // sin
+        f2j.slartv(n, x_expected, 0, 1, y_expected, 0, 1, c, 0, s, 0, 1);
+
+        float[] x_actual = generateFloatArray(n, 1.0f);
+        float[] y_actual = generateFloatArray(n, 2.0f);
+        lapack.slartv(n, x_actual, 0, 1, y_actual, 0, 1, c, 0, s, 0, 1);
+
+        // Find max values for relative epsilon
+        float maxX = getMaxValue(x_expected);
+        float maxY = getMaxValue(y_expected);
+
+        assertArrayEquals(x_expected, x_actual, Math.scalb(sepsilon, Math.getExponent(maxX)));
+        assertArrayEquals(y_expected, y_actual, Math.scalb(sepsilon, Math.getExponent(maxY)));
     }
 }

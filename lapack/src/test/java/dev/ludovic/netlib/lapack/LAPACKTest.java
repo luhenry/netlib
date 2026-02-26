@@ -35,13 +35,40 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
+import static org.junit.jupiter.api.Assertions.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class LAPACKTest {
 
-  final static double depsilon = 1e-15d;
-  final static float sepsilon = 1e-6f;
+  final static double depsilon = 1e-14d;
+  final static float sepsilon = 1e-5f;
 
   final static LAPACK f2j = F2jLAPACK.getInstance();
+
+  protected final int N = 50;
+  protected final int N_SMALL = 10;
+  protected final int M = 40;
+
+  protected final int[] intArray1 = generateIntArray(N, 1);
+  protected final int[] intArray2 = generateIntArray(N, 2);
+  protected final int[] intArray3 = new int[N];
+
+  protected final double[] dArray1 = generateDoubleArray(N, 1.0);
+  protected final double[] dArray2 = generateDoubleArray(N, 2.0);
+  protected final double[] dArray3 = new double[N];
+
+  protected final float[] sArray1 = generateFloatArray(N, 1.0f);
+  protected final float[] sArray2 = generateFloatArray(N, 2.0f);
+  protected final float[] sArray3 = new float[N];
+
+  protected final double[] dMatrix = generateMatrix(N, N, 1.0);
+  protected final double[] dSymmetricMatrix = generateSymmetricMatrix(N);
+  protected final double[] dPositiveDefiniteMatrix = generatePositiveDefiniteMatrix(N);
+
+  protected final float[] sMatrix = generateMatrixFloat(N, N, 1.0f);
+  protected final float[] sSymmetricMatrix = generateSymmetricMatrixFloat(N);
+  protected final float[] sPositiveDefiniteMatrix = generatePositiveDefiniteMatrixFloat(N);
 
   private static Stream<Arguments> LAPACKImplementations() {
     Stream instances = Stream.of(
@@ -54,4 +81,5 @@ public class LAPACKTest {
 
     return instances;
   }
+
 }

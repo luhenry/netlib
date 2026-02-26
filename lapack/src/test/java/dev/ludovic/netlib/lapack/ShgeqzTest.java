@@ -29,12 +29,62 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class ShgeqzTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // QZ iteration on Hessenberg-Triangular pair, eigenvalues only
+        int n = 4;
+        float[] h_expected = {
+            4.0f, 2.0f, 0.0f, 0.0f,
+            1.0f, 3.0f, 1.0f, 0.0f,
+            0.0f, 0.5f, 5.0f, 0.8f,
+            0.0f, 0.0f, 0.3f, 2.0f
+        };
+        float[] h_actual = h_expected.clone();
+        float[] t_expected = {
+            2.0f, 0.0f, 0.0f, 0.0f,
+            1.0f, 3.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.5f, 4.0f
+        };
+        float[] t_actual = t_expected.clone();
+        float[] alphar_expected = new float[n];
+        float[] alphar_actual = new float[n];
+        float[] alphai_expected = new float[n];
+        float[] alphai_actual = new float[n];
+        float[] beta_expected = new float[n];
+        float[] beta_actual = new float[n];
+        float[] q = new float[1];
+        float[] z = new float[1];
+        float[] work_expected = new float[n];
+        float[] work_actual = new float[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.shgeqz("E", "N", "N", n, 1, n, h_expected, n, t_expected, n,
+                    alphar_expected, alphai_expected, beta_expected, q, 1, z, 1,
+                    work_expected, n, info_expected);
+        lapack.shgeqz("E", "N", "N", n, 1, n, h_actual, n, t_actual, n,
+                      alphar_actual, alphai_actual, beta_actual, q, 1, z, 1,
+                      work_actual, n, info_actual);
+
+        assertEquals(0, info_expected.val);
+        assertEquals(info_expected.val, info_actual.val);
+
+        float[] eig_expected = new float[n];
+        float[] eig_actual = new float[n];
+        for (int i = 0; i < n; i++) {
+            eig_expected[i] = alphar_expected[i] / beta_expected[i];
+            eig_actual[i] = alphar_actual[i] / beta_actual[i];
+        }
+        java.util.Arrays.sort(eig_expected);
+        java.util.Arrays.sort(eig_actual);
+        assertArrayEquals(eig_expected, eig_actual, sepsilon);
     }
 }

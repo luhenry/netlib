@@ -29,12 +29,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsecndTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // dsecnd() crashes the JVM on macOS
+        assumeFalse(lapack instanceof NativeLAPACK && System.getProperty("os.name", "").toLowerCase().contains("mac"),
+            "dsecnd() crashes on macOS");
+
+        double t1 = lapack.dsecnd();
+        assertTrue(t1 >= 0.0, "dsecnd should return non-negative time");
+
+        double t2 = lapack.dsecnd();
+        assertTrue(t2 >= t1, "dsecnd should be monotonically non-decreasing");
     }
 }

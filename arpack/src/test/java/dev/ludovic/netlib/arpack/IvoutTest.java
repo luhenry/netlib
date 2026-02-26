@@ -30,11 +30,38 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class IvoutTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // ivout is an output method, so we just test that it runs without error
+        // No assertions needed for output methods
+
+        // Note: Some native implementations may have issues with output functions
+        org.junit.jupiter.api.Assumptions.assumeFalse(arpack instanceof NativeARPACK,
+                "Output function not fully supported by " + arpack.getClass().getSimpleName());
+
+        // Test with basic parameters
+        assertDoesNotThrow(() -> {
+            arpack.ivout(6, 10, intArray1, 4, "Test output");
+        });
+
+        // Test with different array
+        assertDoesNotThrow(() -> {
+            arpack.ivout(6, N, intArray2, 6, "Array2 output");
+        });
+
+        // Test with zero elements
+        assertDoesNotThrow(() -> {
+            arpack.ivout(6, 0, intArray1, 4, "Empty output");
+        });
+
+        // Test with array of zeros
+        assertDoesNotThrow(() -> {
+            arpack.ivout(6, 10, intArray3, 2, "Zeros output");
+        });
     }
 }

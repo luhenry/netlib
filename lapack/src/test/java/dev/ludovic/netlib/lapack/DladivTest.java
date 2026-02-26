@@ -29,12 +29,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DladivTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // dladiv computes complex division: (a+ib) / (c+id)
+        doubleW p_expected = new doubleW(0.0);
+        doubleW q_expected = new doubleW(0.0);
+        f2j.dladiv(3.0, 4.0, 1.0, 2.0, p_expected, q_expected);
+
+        doubleW p_actual = new doubleW(0.0);
+        doubleW q_actual = new doubleW(0.0);
+        lapack.dladiv(3.0, 4.0, 1.0, 2.0, p_actual, q_actual);
+
+        assertEquals(p_expected.val, p_actual.val, depsilon);
+        assertEquals(q_expected.val, q_actual.val, depsilon);
     }
 }

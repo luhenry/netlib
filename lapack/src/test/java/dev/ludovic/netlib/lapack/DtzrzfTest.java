@@ -29,12 +29,45 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DtzrzfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = 2 * N_SMALL;
+
+        // Upper trapezoidal matrix (m x n, m <= n)
+        double[] a = new double[m * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                if (i <= j) {
+                    a[i + j * m] = 1.0 / (i + j + 1.0);
+                }
+            }
+        }
+
+        double[] a_expected = a.clone();
+        double[] a_actual = a.clone();
+        double[] tau_expected = new double[m];
+        double[] tau_actual = new double[m];
+        int lwork = Math.max(1, m);
+        double[] work_expected = new double[lwork];
+        double[] work_actual = new double[lwork];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dtzrzf(m, n, a_expected, m, tau_expected, work_expected, lwork, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dtzrzf(m, n, a_actual, m, tau_actual, work_actual, lwork, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(a_expected, a_actual, depsilon);
+        assertArrayEquals(tau_expected, tau_actual, depsilon);
     }
 }

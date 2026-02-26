@@ -29,12 +29,48 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsbgstTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testNoTransformMatrix(LAPACK lapack) {
+        int n = N_SMALL;
+        int ka = 2;
+        int kb = 1;
+        int ldab = ka + 1;
+        int ldbb = kb + 1;
+
+        // Create positive definite symmetric banded matrix A (upper, ka superdiagonals)
+        double[] ab = generateBandedSymmetricMatrix(n, ka, n + 10.0, 0.5);
+
+        // Create positive definite symmetric banded matrix B (upper, kb superdiagonals)
+        double[] bb = generateBandedSymmetricMatrix(n, kb, n + 5.0, 0.3);
+
+        // Factor B with split Cholesky (dpbstf)
+        intW info = new intW(0);
+        f2j.dpbstf("U", n, kb, bb, ldbb, info);
+        assertEquals(0, info.val);
+
+        // Now reduce A to standard form
+        double[] ab_expected = ab.clone();
+        double[] ab_actual = ab.clone();
+        double[] x_expected = new double[1];
+        double[] x_actual = new double[1];
+        double[] work_expected = new double[2 * n];
+        double[] work_actual = new double[2 * n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsbgst("N", "U", n, ka, kb, ab_expected, ldab, bb, ldbb, x_expected, 1, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsbgst("N", "U", n, ka, kb, ab_actual, ldab, bb, ldbb, x_actual, 1, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ab_expected, ab_actual, 1e-13);
     }
 }

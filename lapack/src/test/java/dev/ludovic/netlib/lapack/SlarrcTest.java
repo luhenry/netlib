@@ -29,12 +29,37 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlarrcTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test counting eigenvalues in interval
+        float[] d = generateFloatArray(N_SMALL, 1.0f);
+        float[] e = generateFloatArray(N_SMALL - 1, 0.1f);
+        float vl = 5.0f;
+        float vu = 50.0f;
+        float pivmin = 1e-10f;
+
+        intW eigcnt_expected = new intW(0);
+        intW lcnt_expected = new intW(0);
+        intW rcnt_expected = new intW(0);
+        intW info_expected = new intW(0);
+        f2j.slarrc("T", N_SMALL, vl, vu, d, 0, e, 0, pivmin, eigcnt_expected, lcnt_expected, rcnt_expected, info_expected);
+
+        intW eigcnt_actual = new intW(0);
+        intW lcnt_actual = new intW(0);
+        intW rcnt_actual = new intW(0);
+        intW info_actual = new intW(0);
+        lapack.slarrc("T", N_SMALL, vl, vu, d, 0, e, 0, pivmin, eigcnt_actual, lcnt_actual, rcnt_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(eigcnt_expected.val, eigcnt_actual.val);
+        assertEquals(lcnt_expected.val, lcnt_actual.val);
+        assertEquals(rcnt_expected.val, rcnt_actual.val);
     }
 }

@@ -30,11 +30,28 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Dlaqr1Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Compute first column of (H - (sr1+i*si1)*I)*(H - (sr2+i*si2)*I)
+        // N must be 2 or 3; using N=3
+        int n = 3;
+        double[] h = {
+            4.0, 1.0, 0.0,
+            2.0, 3.0, 0.5,
+            0.0, 1.0, 5.0
+        };
+        double sr1 = 2.0, si1 = 0.5, sr2 = 2.0, si2 = -0.5;
+        double[] v_expected = new double[n];
+        double[] v_actual = new double[n];
+
+        f2j.dlaqr1(n, h, n, sr1, si1, sr2, si2, v_expected);
+        lapack.dlaqr1(n, h, n, sr1, si1, sr2, si2, v_actual);
+
+        assertArrayEquals(v_expected, v_actual, depsilon);
     }
 }

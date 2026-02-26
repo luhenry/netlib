@@ -30,11 +30,29 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SisnanTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test with NaN
+        assertEquals(f2j.sisnan(Float.NaN), lapack.sisnan(Float.NaN));
+        assertTrue(lapack.sisnan(Float.NaN));
+
+        // Test with normal values
+        assertEquals(f2j.sisnan(1.0f), lapack.sisnan(1.0f));
+        assertFalse(lapack.sisnan(1.0f));
+
+        assertEquals(f2j.sisnan(0.0f), lapack.sisnan(0.0f));
+        assertFalse(lapack.sisnan(0.0f));
+
+        assertEquals(f2j.sisnan(-1.0f), lapack.sisnan(-1.0f));
+        assertFalse(lapack.sisnan(-1.0f));
+
+        // Test with infinity
+        assertEquals(f2j.sisnan(Float.POSITIVE_INFINITY), lapack.sisnan(Float.POSITIVE_INFINITY));
+        assertEquals(f2j.sisnan(Float.NEGATIVE_INFINITY), lapack.sisnan(Float.NEGATIVE_INFINITY));
     }
 }

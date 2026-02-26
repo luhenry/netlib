@@ -29,12 +29,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlauumTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create an upper triangular matrix
+        float[] a_expected = new float[N * N];
+        float[] a_actual = new float[N * N];
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i <= j; i++) {
+                float val = (i == j) ? (N + 1.0f) : (1.0f / (i + j + 2.0f));
+                a_expected[i + j * N] = val;
+                a_actual[i + j * N] = val;
+            }
+        }
+
+        intW info = new intW(0);
+        f2j.slauum("U", N, a_expected, 0, N, info);
+        assertEquals(0, info.val);
+
+        info.val = 0;
+        lapack.slauum("U", N, a_actual, 0, N, info);
+        assertEquals(0, info.val);
+
+        assertArrayEquals(a_expected, a_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(a_expected))));
     }
 }

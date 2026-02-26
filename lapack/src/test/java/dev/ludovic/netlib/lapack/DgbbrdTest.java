@@ -29,12 +29,45 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgbbrdTest extends LAPACKTest {
+
+    // Pack a general matrix into banded storage with kl lower and ku upper diagonals
+    private double[] packGeneralBanded(double[] matrix, int m, int n, int kl, int ku) {
+        int ldab = kl + ku + 1;
+        double[] ab = new double[ldab * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = Math.max(0, j - ku); i <= Math.min(m - 1, j + kl); i++) {
+                ab[(kl + ku + i - j) + j * ldab] = matrix[i + j * m];
+            }
+        }
+        return ab;
+    }
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N;
+        int n = N;
+        int kl = 2;
+        int ku = 2;
+        int ncc = 0;
+        int ldab = kl + ku + 1;
+        int minmn = Math.min(m, n);
+        double[] ab = packGeneralBanded(dMatrix, m, n, kl, ku);
+        double[] d = new double[minmn];
+        double[] e = new double[minmn - 1];
+        double[] q = new double[m * m];
+        double[] pt = new double[n * n];
+        double[] c = new double[1];
+        double[] work = new double[2 * Math.max(m, n)];
+        intW info = new intW(0);
+
+        lapack.dgbbrd("N", m, n, ncc, kl, ku, ab, 0, ldab, d, 0, e, 0, q, 0, m, pt, 0, n, c, 0, 1, work, 0, info);
+
+        assertEquals(0, info.val, "dgbbrd should succeed");
     }
 }

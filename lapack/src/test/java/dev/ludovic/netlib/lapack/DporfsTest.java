@@ -29,12 +29,52 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DporfsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] a_orig = dPositiveDefiniteMatrix.clone();
+        double[] af_expected = dPositiveDefiniteMatrix.clone();
+        double[] af_actual = dPositiveDefiniteMatrix.clone();
+        intW info = new intW(0);
+        f2j.dpotrf("U", N, af_expected, 0, N, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.dpotrf("U", N, af_actual, 0, N, info);
+        assertEquals(0, info.val);
+        double[] b = generateDoubleArray(N, 1.0);
+        double[] x_expected = b.clone();
+        double[] x_actual = b.clone();
+        info.val = 0;
+        f2j.dpotrs("U", N, 1, af_expected, 0, N, x_expected, 0, N, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.dpotrs("U", N, 1, af_actual, 0, N, x_actual, 0, N, info);
+        assertEquals(0, info.val);
+        double[] ferr_expected = new double[1];
+        double[] ferr_actual = new double[1];
+        double[] berr_expected = new double[1];
+        double[] berr_actual = new double[1];
+        double[] work_expected = new double[3 * N];
+        double[] work_actual = new double[3 * N];
+        int[] iwork_expected = new int[N];
+        int[] iwork_actual = new int[N];
+        info.val = 0;
+        f2j.dporfs("U", N, 1, a_orig, 0, N, af_expected, 0, N, b, 0, N, x_expected, 0, N, ferr_expected, 0, berr_expected, 0, work_expected, 0, iwork_expected, 0, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.dporfs("U", N, 1, a_orig, 0, N, af_actual, 0, N, b, 0, N, x_actual, 0, N, ferr_actual, 0, berr_actual, 0, work_actual, 0, iwork_actual, 0, info);
+        assertEquals(0, info.val);
+        // Refined solution comparison
+        assertArrayEquals(x_expected, x_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(x_expected)) + 1));
+        // FERR: forward error estimate (can vary between implementations)
+        assertArrayEquals(ferr_expected, ferr_actual, Math.max(depsilon, Math.abs(getMaxValue(ferr_expected)) * 5));
+        // BERR: backward error (should be near machine epsilon)
+        assertArrayEquals(berr_expected, berr_actual, depsilon * 10);
     }
 }

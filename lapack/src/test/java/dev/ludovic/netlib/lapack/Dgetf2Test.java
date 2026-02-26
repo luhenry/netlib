@@ -29,12 +29,58 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dgetf2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // DGETF2 computes LU factorization of a general m×n matrix (unblocked)
+        // A = P * L * U with partial pivoting
+        int n = N_SMALL;
+        double[] a_expected = generatePositiveDefiniteMatrix(n);
+        double[] a_actual = a_expected.clone();
+        int[] ipiv_expected = new int[n];
+        int[] ipiv_actual = new int[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dgetf2(n, n, a_expected, n, ipiv_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dgetf2(n, n, a_actual, n, ipiv_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(a_expected, a_actual, depsilon * 100);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testRectangular(LAPACK lapack) {
+        // Test with m > n (tall matrix)
+        int m = 8, n = 5;
+        double[] a_expected = generateMatrix(m, n, 1.0);
+        // Make it non-singular by adding diagonal dominance
+        for (int i = 0; i < Math.min(m, n); i++) {
+            a_expected[i + i * m] += 10.0;
+        }
+        double[] a_actual = a_expected.clone();
+        int[] ipiv_expected = new int[Math.min(m, n)];
+        int[] ipiv_actual = new int[Math.min(m, n)];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dgetf2(m, n, a_expected, m, ipiv_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dgetf2(m, n, a_actual, m, ipiv_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(a_expected, a_actual, depsilon * 100);
     }
 }

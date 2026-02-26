@@ -59,6 +59,7 @@ information or have any questions.
   </scm>
 
   <modules>
+    <module>test-utils</module>
     <module>blas</module>
     <module>lapack</module>
     <module>arpack</module>

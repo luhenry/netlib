@@ -30,11 +30,38 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlacpyTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test copying full matrix
+        double[] expected = new double[N * N];
+        f2j.dlacpy("A", N, N, dMatrix, 0, N, expected, 0, N);
+
+        double[] actual = new double[N * N];
+        lapack.dlacpy("A", N, N, dMatrix, 0, N, actual, 0, N);
+
+        assertArrayEquals(expected, actual, depsilon);
+
+        // Test copying upper triangular part
+        double[] expected_upper = new double[N * N];
+        f2j.dlacpy("U", N, N, dMatrix, 0, N, expected_upper, 0, N);
+
+        double[] actual_upper = new double[N * N];
+        lapack.dlacpy("U", N, N, dMatrix, 0, N, actual_upper, 0, N);
+
+        assertArrayEquals(expected_upper, actual_upper, depsilon);
+
+        // Test copying lower triangular part
+        double[] expected_lower = new double[N * N];
+        f2j.dlacpy("L", N, N, dMatrix, 0, N, expected_lower, 0, N);
+
+        double[] actual_lower = new double[N * N];
+        lapack.dlacpy("L", N, N, dMatrix, 0, N, actual_lower, 0, N);
+
+        assertArrayEquals(expected_lower, actual_lower, depsilon);
     }
 }

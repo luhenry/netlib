@@ -30,11 +30,31 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlapmtTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test forward column permutation
+        int[] piv = new int[]{3, 1, 2};
+        float[] expected = generateMatrixFloat(N, 3, 1.0f);
+        f2j.slapmt(true, N, 3, expected, 0, N, piv, 0);
+
+        float[] actual = generateMatrixFloat(N, 3, 1.0f);
+        lapack.slapmt(true, N, 3, actual, 0, N, piv, 0);
+
+        assertArrayEquals(expected, actual, sepsilon);
+
+        // Test backward column permutation
+        int[] piv2 = new int[]{2, 3, 1};
+        float[] expected_back = generateMatrixFloat(N, 3, 1.0f);
+        f2j.slapmt(false, N, 3, expected_back, 0, N, piv2, 0);
+
+        float[] actual_back = generateMatrixFloat(N, 3, 1.0f);
+        lapack.slapmt(false, N, 3, actual_back, 0, N, piv2, 0);
+
+        assertArrayEquals(expected_back, actual_back, sepsilon);
     }
 }

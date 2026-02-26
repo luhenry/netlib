@@ -29,12 +29,45 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlasyfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        int nb = 4;
+
+        // Positive definite symmetric matrix (use upper part)
+        double[] a = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                a[i + j * n] = dPositiveDefiniteMatrix[i + j * N];
+            }
+        }
+
+        double[] a_expected = a.clone();
+        double[] a_actual = a.clone();
+        intW kb_expected = new intW(0);
+        intW kb_actual = new intW(0);
+        int[] ipiv_expected = new int[n];
+        int[] ipiv_actual = new int[n];
+        double[] w_expected = new double[n * nb];
+        double[] w_actual = new double[n * nb];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dlasyf("U", n, nb, kb_expected, a_expected, n, ipiv_expected, w_expected, n, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dlasyf("U", n, nb, kb_actual, a_actual, n, ipiv_actual, w_actual, n, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(kb_expected.val, kb_actual.val);
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(a_expected, a_actual, depsilon);
     }
 }

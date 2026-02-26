@@ -29,12 +29,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slaic1Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Incremental condition estimation: JOB=1 (largest singular value)
+        int j = 3;
+        float[] x = { 0.6f, 0.8f, 0.0f };
+        float sest = 5.0f;
+        float[] w = { 1.0f, 2.0f, 0.5f };
+        float gamma = 3.0f;
+
+        floatW sestpr_expected = new floatW(0.0f);
+        floatW sestpr_actual = new floatW(0.0f);
+        floatW s_expected = new floatW(0.0f);
+        floatW s_actual = new floatW(0.0f);
+        floatW c_expected = new floatW(0.0f);
+        floatW c_actual = new floatW(0.0f);
+
+        f2j.slaic1(1, j, x, sest, w, gamma, sestpr_expected, s_expected, c_expected);
+        lapack.slaic1(1, j, x, sest, w, gamma, sestpr_actual, s_actual, c_actual);
+
+        assertEquals(sestpr_expected.val, sestpr_actual.val, sepsilon);
+        assertEquals(s_expected.val, s_actual.val, sepsilon);
+        assertEquals(c_expected.val, c_actual.val, sepsilon);
     }
 }

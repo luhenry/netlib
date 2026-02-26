@@ -29,12 +29,82 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgbtrsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testNoTranspose(LAPACK lapack) {
+        // DGBTRS solves A*X = B using the LU factorization from DGBTRF
+        int n = N_SMALL;
+        int kl = 2, ku = 2;
+        int ldab = 2 * kl + ku + 1;
+
+        // Create diagonal-dominant banded matrix
+        double[] ab = new double[ldab * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = Math.max(0, j - ku); i <= Math.min(n - 1, j + kl); i++) {
+                int k = kl + ku + i - j;
+                ab[k + j * ldab] = (i == j) ? n + 10.0 : 1.0 / (Math.abs(i - j) + 1.0);
+            }
+        }
+
+        // Factor with f2j (common factorization for both)
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.dgbtrf(n, n, kl, ku, ab, ldab, ipiv, info);
+        assertEquals(0, info.val);
+
+        // Create RHS and solve
+        double[] b_expected = generateDoubleArray(n, 1.0);
+        double[] b_actual = b_expected.clone();
+
+        info.val = 0;
+        f2j.dgbtrs("N", n, kl, ku, 1, ab, ldab, ipiv, b_expected, n, info);
+        assertEquals(0, info.val);
+
+        info.val = 0;
+        lapack.dgbtrs("N", n, kl, ku, 1, ab, ldab, ipiv, b_actual, n, info);
+        assertEquals(0, info.val);
+
+        assertArrayEquals(b_expected, b_actual, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testTranspose(LAPACK lapack) {
+        // DGBTRS with TRANS='T' solves A^T * X = B
+        int n = N_SMALL;
+        int kl = 2, ku = 2;
+        int ldab = 2 * kl + ku + 1;
+
+        double[] ab = new double[ldab * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = Math.max(0, j - ku); i <= Math.min(n - 1, j + kl); i++) {
+                int k = kl + ku + i - j;
+                ab[k + j * ldab] = (i == j) ? n + 10.0 : 1.0 / (Math.abs(i - j) + 1.0);
+            }
+        }
+
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.dgbtrf(n, n, kl, ku, ab, ldab, ipiv, info);
+        assertEquals(0, info.val);
+
+        double[] b_expected = generateDoubleArray(n, 1.0);
+        double[] b_actual = b_expected.clone();
+
+        info.val = 0;
+        f2j.dgbtrs("T", n, kl, ku, 1, ab, ldab, ipiv, b_expected, n, info);
+        assertEquals(0, info.val);
+
+        info.val = 0;
+        lapack.dgbtrs("T", n, kl, ku, 1, ab, ldab, ipiv, b_actual, n, info);
+        assertEquals(0, info.val);
+
+        assertArrayEquals(b_expected, b_actual, depsilon);
     }
 }

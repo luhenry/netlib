@@ -29,12 +29,42 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DpotrsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // First, factor the matrix using dpotrf
+        double[] a_expected = dPositiveDefiniteMatrix.clone();
+        double[] a_actual = dPositiveDefiniteMatrix.clone();
+
+        intW info = new intW(0);
+        f2j.dpotrf("U", N, a_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference factorization should succeed");
+
+        info.val = 0;
+        lapack.dpotrf("U", N, a_actual, 0, N, info);
+        assertEquals(0, info.val, "Factorization should succeed");
+
+        // Create right-hand side B
+        double[] b_expected = generateDoubleArray(N, 1.0);
+        double[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        info.val = 0;
+        f2j.dpotrs("U", N, 1, a_expected, 0, N, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.dpotrs("U", N, 1, a_actual, 0, N, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions (small tolerance increase for O(N²) operations in solve)
+        assertArrayEquals(b_expected, b_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(b_expected)) + 1));
     }
 }

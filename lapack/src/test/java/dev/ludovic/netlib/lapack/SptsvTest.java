@@ -29,12 +29,47 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SptsvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // SPTSV solves A*X = B for symmetric positive definite tridiagonal matrix
+        // Matrix is stored as D (diagonal) and E (subdiagonal/superdiagonal)
+        float[] d_expected = new float[N];
+        float[] d_actual = new float[N];
+        float[] e_expected = new float[N - 1];
+        float[] e_actual = new float[N - 1];
+
+        // Fill positive definite tridiagonal matrix
+        for (int i = 0; i < N; i++) {
+            d_expected[i] = N + 5.0f;
+            d_actual[i] = N + 5.0f;
+            if (i < N - 1) {
+                e_expected[i] = 1.0f;
+                e_actual[i] = 1.0f;
+            }
+        }
+
+        // Create right-hand side B
+        float[] b_expected = generateFloatArray(N, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        intW info = new intW(0);
+        f2j.sptsv(N, 1, d_expected, 0, e_expected, 0, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.sptsv(N, 1, d_actual, 0, e_actual, 0, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(b_expected, b_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(b_expected)) + 2));
     }
 }

@@ -29,12 +29,45 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Spotf2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        int n = N_SMALL;
+        float[] a_expected = generatePositiveDefiniteMatrixFloat(n);
+        float[] a_actual = a_expected.clone();
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.spotf2("U", n, a_expected, n, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.spotf2("U", n, a_actual, n, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(a_expected, a_actual, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+        float[] a_expected = generatePositiveDefiniteMatrixFloat(n);
+        float[] a_actual = a_expected.clone();
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.spotf2("L", n, a_expected, n, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.spotf2("L", n, a_actual, n, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(a_expected, a_actual, sepsilon);
     }
 }

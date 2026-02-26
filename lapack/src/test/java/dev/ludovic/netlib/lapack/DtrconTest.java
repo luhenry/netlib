@@ -29,12 +29,41 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DtrconTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Use upper triangular part of positive definite matrix
+        double[] a = dPositiveDefiniteMatrix.clone();
+
+        // Test condition number estimation with 1-norm
+        doubleW rcond_expected = new doubleW(0.0);
+        double[] work_expected = new double[3 * N];
+        int[] iwork_expected = new int[N];
+        intW info_expected = new intW(0);
+        f2j.dtrcon("1", "U", "N", N, a, 0, N, rcond_expected, work_expected, 0, iwork_expected, 0, info_expected);
+
+        doubleW rcond_actual = new doubleW(0.0);
+        double[] work_actual = new double[3 * N];
+        int[] iwork_actual = new int[N];
+        intW info_actual = new intW(0);
+        lapack.dtrcon("1", "U", "N", N, a, 0, N, rcond_actual, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(rcond_expected.val, rcond_actual.val, depsilon);
+
+        // Test with Inf-norm
+        rcond_expected.val = 0.0;
+        rcond_actual.val = 0.0;
+        f2j.dtrcon("I", "U", "N", N, a, 0, N, rcond_expected, work_expected, 0, iwork_expected, 0, info_expected);
+        lapack.dtrcon("I", "U", "N", N, a, 0, N, rcond_actual, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(rcond_expected.val, rcond_actual.val, depsilon);
     }
 }

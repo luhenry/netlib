@@ -29,12 +29,72 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DptsvxTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // DPTSVX is the expert driver for symmetric positive definite tridiagonal matrices
+        double[] d_expected = new double[N];
+        double[] d_actual = new double[N];
+        double[] e_expected = new double[N - 1];
+        double[] e_actual = new double[N - 1];
+
+        // Fill positive definite tridiagonal matrix
+        for (int i = 0; i < N; i++) {
+            d_expected[i] = N + 5.0;
+            d_actual[i] = N + 5.0;
+            if (i < N - 1) {
+                e_expected[i] = 1.0;
+                e_actual[i] = 1.0;
+            }
+        }
+
+        // Factorization arrays
+        double[] df_expected = new double[N];
+        double[] df_actual = new double[N];
+        double[] ef_expected = new double[N - 1];
+        double[] ef_actual = new double[N - 1];
+
+        // Create right-hand side B and solution X
+        double[] b_expected = generateDoubleArray(N, 1.0);
+        double[] b_actual = b_expected.clone();
+        double[] x_expected = new double[N];
+        double[] x_actual = new double[N];
+
+        // Condition and error arrays
+        doubleW rcond_expected = new doubleW(0.0);
+        doubleW rcond_actual = new doubleW(0.0);
+        double[] ferr_expected = new double[1];
+        double[] ferr_actual = new double[1];
+        double[] berr_expected = new double[1];
+        double[] berr_actual = new double[1];
+        double[] work_expected = new double[2 * N];
+        double[] work_actual = new double[2 * N];
+
+        // Solve using reference implementation
+        intW info = new intW(0);
+        f2j.dptsvx("N", N, 1, d_expected, 0, e_expected, 0, df_expected, 0, ef_expected, 0,
+                   b_expected, 0, N, x_expected, 0, N, rcond_expected,
+                   ferr_expected, 0, berr_expected, 0, work_expected, 0, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.dptsvx("N", N, 1, d_actual, 0, e_actual, 0, df_actual, 0, ef_actual, 0,
+                      b_actual, 0, N, x_actual, 0, N, rcond_actual,
+                      ferr_actual, 0, berr_actual, 0, work_actual, 0, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(x_expected, x_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(x_expected)) + 3));
+
+        // Check that RCOND is reasonable
+        assertTrue(rcond_actual.val > 0.0, "RCOND should be positive");
+        assertEquals(rcond_expected.val, rcond_actual.val, Math.abs(rcond_expected.val) * 0.1, "RCOND should match");
     }
 }

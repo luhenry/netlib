@@ -30,11 +30,33 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlansyTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] work = new double[N];
+
+        // Test 1-norm (upper triangular)
+        double expected = f2j.dlansy("1", "U", N, dSymmetricMatrix, 0, N, work, 0);
+        double actual = lapack.dlansy("1", "U", N, dSymmetricMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Inf-norm (lower triangular)
+        expected = f2j.dlansy("I", "L", N, dSymmetricMatrix, 0, N, work, 0);
+        actual = lapack.dlansy("I", "L", N, dSymmetricMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Frobenius norm
+        expected = f2j.dlansy("F", "U", N, dSymmetricMatrix, 0, N, work, 0);
+        actual = lapack.dlansy("F", "U", N, dSymmetricMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Max norm
+        expected = f2j.dlansy("M", "U", N, dSymmetricMatrix, 0, N, work, 0);
+        actual = lapack.dlansy("M", "U", N, dSymmetricMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
     }
 }

@@ -29,12 +29,35 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlarrkTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test computing one eigenvalue by bisection
+        double[] d = generateDoubleArray(N_SMALL, 1.0);
+        double[] e2 = generateDoubleArray(N_SMALL - 1, 0.01);
+        double gl = 0.0;
+        double gu = 100.0;
+        double pivmin = 1e-10;
+        double reltol = 1e-8;
+
+        doubleW w_expected = new doubleW(0.0);
+        doubleW werr_expected = new doubleW(0.0);
+        intW info_expected = new intW(0);
+        f2j.dlarrk(N_SMALL, 1, gl, gu, d, 0, e2, 0, pivmin, reltol, w_expected, werr_expected, info_expected);
+
+        doubleW w_actual = new doubleW(0.0);
+        doubleW werr_actual = new doubleW(0.0);
+        intW info_actual = new intW(0);
+        lapack.dlarrk(N_SMALL, 1, gl, gu, d, 0, e2, 0, pivmin, reltol, w_actual, werr_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(w_expected.val, w_actual.val, depsilon);
+        assertEquals(werr_expected.val, werr_actual.val, depsilon);
     }
 }

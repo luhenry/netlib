@@ -30,11 +30,32 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlarzbTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Apply block reflector from the left with DIRECT='B', STOREV='R'
+        int m = 6;
+        int n = 4;
+        int k = 2; // number of reflectors
+        int l = 3; // meaningful columns in V
+        // V is k-by-l stored row-wise (ldv=k)
+        float[] v = { 0.5f, 0.3f, 0.7f, 0.2f, 0.4f, 0.6f }; // k=2 rows, l=3 cols, column-major
+        int ldv = k;
+        // T is k-by-k upper triangular
+        float[] t = { 1.5f, 0.0f, 0.3f, 1.2f }; // 2x2 column-major
+        int ldt = k;
+        float[] c_expected = generateMatrixFloat(m, n, 1.0f);
+        float[] c_actual = c_expected.clone();
+        float[] work_expected = new float[n * k];
+        float[] work_actual = new float[n * k];
+
+        f2j.slarzb("L", "N", "B", "R", m, n, k, l, v, ldv, t, ldt, c_expected, m, work_expected, n);
+        lapack.slarzb("L", "N", "B", "R", m, n, k, l, v, ldv, t, ldt, c_actual, m, work_actual, n);
+
+        assertArrayEquals(c_expected, c_actual, sepsilon);
     }
 }

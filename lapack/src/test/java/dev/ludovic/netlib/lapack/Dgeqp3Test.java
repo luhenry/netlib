@@ -30,11 +30,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Dgeqp3Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // dgeqp3 uses column pivoting where pivot selection differs between
+        // LAPACK 3.1 (F2j) and 3.12 (native) when column norms are similar.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

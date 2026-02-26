@@ -29,12 +29,46 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SppconTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Pack the positive definite matrix
+        float[] ap = new float[(N * (N + 1)) / 2];
+        int idx = 0;
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[idx++] = sPositiveDefiniteMatrix[i + j * N];
+            }
+        }
+
+        // Compute norm before factorization
+        float anorm = f2j.slansp("1", "U", N, ap, 0, new float[N], 0);
+
+        // First factor the packed matrix using spptrf
+        float[] ap_factored = ap.clone();
+        intW info = new intW(0);
+        f2j.spptrf("U", N, ap_factored, 0, info);
+
+        // Test condition number estimation
+        floatW rcond_expected = new floatW(0.0f);
+        float[] work_expected = new float[3 * N];
+        int[] iwork_expected = new int[N];
+        intW info_expected = new intW(0);
+        f2j.sppcon("U", N, ap_factored, 0, anorm, rcond_expected, work_expected, 0, iwork_expected, 0, info_expected);
+
+        floatW rcond_actual = new floatW(0.0f);
+        float[] work_actual = new float[3 * N];
+        int[] iwork_actual = new int[N];
+        intW info_actual = new intW(0);
+        lapack.sppcon("U", N, ap_factored, 0, anorm, rcond_actual, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(rcond_expected.val, rcond_actual.val, sepsilon);
     }
 }

@@ -29,12 +29,48 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SspsvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // SSPSV solves A*X = B for symmetric indefinite matrix in packed storage
+        int np = N * (N + 1) / 2;
+        float[] ap_expected = new float[np];
+        float[] ap_actual = new float[np];
+
+        // Fill packed matrix from positive definite matrix (which is symmetric and non-singular)
+        int k = 0;
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap_expected[k] = sPositiveDefiniteMatrix[i + j * N];
+                ap_actual[k] = sPositiveDefiniteMatrix[i + j * N];
+                k++;
+            }
+        }
+
+        int[] ipiv_expected = new int[N];
+        int[] ipiv_actual = new int[N];
+
+        // Create right-hand side B
+        float[] b_expected = generateFloatArray(N, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        intW info = new intW(0);
+        f2j.sspsv("U", N, 1, ap_expected, 0, ipiv_expected, 0, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.sspsv("U", N, 1, ap_actual, 0, ipiv_actual, 0, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(b_expected, b_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(b_expected)) + 3));
     }
 }

@@ -29,12 +29,68 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlaed7Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // dlaed7 computes updated eigensystem for the dense matrix D&C path.
+        // Test with ICOMPQ=0 (eigenvalues only) to avoid needing full tree state.
+        // Exercise it indirectly through dlaed0 with ICOMPQ=1 for a small problem.
+        int icompq = 1;
+        int n = 6;
+        int qsiz = n;
+
+        double[] d_expected = new double[n];
+        double[] e_expected = new double[n - 1];
+        for (int i = 0; i < n; i++) {
+            d_expected[i] = (i + 1) * 2.0;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            e_expected[i] = 1.0;
+        }
+
+        // For ICOMPQ=1, Q contains the orthogonal reduction matrix
+        double[] q_expected = generateIdentityMatrix(n);
+
+        double[] qstore_expected = new double[n * n];
+        // ICOMPQ=1: work >= 1 + 3*N + 2*N*lgN + 2*N^2, iwork >= 6 + 6*N + 5*N*lgN
+        // lgN = ceil(log2(N)) = 3 for N=6
+        int lgn = 3;
+        double[] work_expected = new double[1 + 3 * n + 2 * n * lgn + 2 * n * n];
+        int[] iwork_expected = new int[6 + 6 * n + 5 * n * lgn];
+        intW info_expected = new intW(0);
+
+        f2j.dlaed0(icompq, qsiz, n, d_expected, 0, e_expected, 0,
+            q_expected, 0, n, qstore_expected, 0, n,
+            work_expected, 0, iwork_expected, 0, info_expected);
+
+        double[] d_actual = new double[n];
+        double[] e_actual = new double[n - 1];
+        for (int i = 0; i < n; i++) {
+            d_actual[i] = (i + 1) * 2.0;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            e_actual[i] = 1.0;
+        }
+
+        double[] q_actual = generateIdentityMatrix(n);
+
+        double[] qstore_actual = new double[n * n];
+        double[] work_actual = new double[1 + 3 * n + 2 * n * lgn + 2 * n * n];
+        int[] iwork_actual = new int[6 + 6 * n + 5 * n * lgn];
+        intW info_actual = new intW(0);
+
+        lapack.dlaed0(icompq, qsiz, n, d_actual, 0, e_actual, 0,
+            q_actual, 0, n, qstore_actual, 0, n,
+            work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(d_expected))));
+        assertArrayEquals(q_expected, q_actual, Math.scalb(depsilon, Math.getExponent(Math.max(getMaxValue(q_expected), 1.0))));
     }
 }

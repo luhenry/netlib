@@ -29,12 +29,38 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlasv2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test SVD of 2x2 general matrix
+        // Computes SVD of [f, g; 0, h]
+        doubleW ssmin_expected = new doubleW(0.0);
+        doubleW ssmax_expected = new doubleW(0.0);
+        doubleW snr_expected = new doubleW(0.0);
+        doubleW csr_expected = new doubleW(0.0);
+        doubleW snl_expected = new doubleW(0.0);
+        doubleW csl_expected = new doubleW(0.0);
+        f2j.dlasv2(3.0, 4.0, 5.0, ssmin_expected, ssmax_expected, snr_expected, csr_expected, snl_expected, csl_expected);
+
+        doubleW ssmin_actual = new doubleW(0.0);
+        doubleW ssmax_actual = new doubleW(0.0);
+        doubleW snr_actual = new doubleW(0.0);
+        doubleW csr_actual = new doubleW(0.0);
+        doubleW snl_actual = new doubleW(0.0);
+        doubleW csl_actual = new doubleW(0.0);
+        lapack.dlasv2(3.0, 4.0, 5.0, ssmin_actual, ssmax_actual, snr_actual, csr_actual, snl_actual, csl_actual);
+
+        assertEquals(ssmin_expected.val, ssmin_actual.val, depsilon);
+        assertEquals(ssmax_expected.val, ssmax_actual.val, depsilon);
+        assertEquals(snr_expected.val, snr_actual.val, depsilon);
+        assertEquals(csr_expected.val, csr_actual.val, depsilon);
+        assertEquals(snl_expected.val, snl_actual.val, depsilon);
+        assertEquals(csl_expected.val, csl_actual.val, depsilon);
     }
 }

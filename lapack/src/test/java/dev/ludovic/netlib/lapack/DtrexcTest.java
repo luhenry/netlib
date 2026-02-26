@@ -29,12 +29,42 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DtrexcTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // Upper triangular matrix in Schur form with distinct eigenvalues
+        double[] t = generateUpperTriangularMatrix(n, (double) n, -1.0, 0.5);
+
+        double[] t_expected = t.clone();
+        double[] t_actual = t.clone();
+        double[] q_expected = new double[1];
+        double[] q_actual = new double[1];
+        double[] work_expected = new double[n];
+        double[] work_actual = new double[n];
+        // Move eigenvalue at position 1 to position n (1-based)
+        intW ifst_expected = new intW(1);
+        intW ifst_actual = new intW(1);
+        intW ilst_expected = new intW(n);
+        intW ilst_actual = new intW(n);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dtrexc("N", n, t_expected, n, q_expected, 1, ifst_expected, ilst_expected, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dtrexc("N", n, t_actual, n, q_actual, 1, ifst_actual, ilst_actual, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(ifst_expected.val, ifst_actual.val);
+        assertEquals(ilst_expected.val, ilst_actual.val);
+        assertArrayEquals(t_expected, t_actual, depsilon);
     }
 }

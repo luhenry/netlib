@@ -29,12 +29,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlaic1Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Incremental condition estimation: JOB=1 (largest singular value)
+        int j = 3;
+        double[] x = { 0.6, 0.8, 0.0 };
+        double sest = 5.0;
+        double[] w = { 1.0, 2.0, 0.5 };
+        double gamma = 3.0;
+
+        doubleW sestpr_expected = new doubleW(0.0);
+        doubleW sestpr_actual = new doubleW(0.0);
+        doubleW s_expected = new doubleW(0.0);
+        doubleW s_actual = new doubleW(0.0);
+        doubleW c_expected = new doubleW(0.0);
+        doubleW c_actual = new doubleW(0.0);
+
+        f2j.dlaic1(1, j, x, sest, w, gamma, sestpr_expected, s_expected, c_expected);
+        lapack.dlaic1(1, j, x, sest, w, gamma, sestpr_actual, s_actual, c_actual);
+
+        assertEquals(sestpr_expected.val, sestpr_actual.val, depsilon);
+        assertEquals(s_expected.val, s_actual.val, depsilon);
+        assertEquals(c_expected.val, c_actual.val, depsilon);
     }
 }

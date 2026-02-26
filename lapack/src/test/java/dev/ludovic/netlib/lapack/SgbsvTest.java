@@ -29,12 +29,53 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SgbsvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // SGBSV solves A*X = B for banded matrix using LU factorization
+        // Create a banded matrix with KL lower and KU upper diagonals
+        int kl = 2;  // number of subdiagonals
+        int ku = 2;  // number of superdiagonals
+        int ldab = 2 * kl + ku + 1;
+
+        // Create banded matrix in banded storage format
+        float[] ab_expected = new float[ldab * N];
+        float[] ab_actual = new float[ldab * N];
+
+        // Fill banded matrix (diagonal dominant for stability)
+        for (int j = 0; j < N; j++) {
+            for (int i = Math.max(0, j - ku); i <= Math.min(N - 1, j + kl); i++) {
+                int k = kl + ku + i - j;
+                float value = (i == j) ? N + 10.0f : 1.0f / (Math.abs(i - j) + 1.0f);
+                ab_expected[k + j * ldab] = value;
+                ab_actual[k + j * ldab] = value;
+            }
+        }
+
+        int[] ipiv_expected = new int[N];
+        int[] ipiv_actual = new int[N];
+
+        // Create right-hand side B
+        float[] b_expected = generateFloatArray(N, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        intW info = new intW(0);
+        f2j.sgbsv(N, kl, ku, 1, ab_expected, 0, ldab, ipiv_expected, 0, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.sgbsv(N, kl, ku, 1, ab_actual, 0, ldab, ipiv_actual, 0, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(b_expected, b_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(b_expected)) + 2));
     }
 }

@@ -29,12 +29,45 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DspgstTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testItype1Upper(LAPACK lapack) {
+        int n = N_SMALL;
+        int ap_len = n * (n + 1) / 2;
+
+        // Positive definite symmetric packed matrix A (upper)
+        double[] ap = generatePackedSymmetricMatrix(n, n + 10.0);
+
+        // Positive definite symmetric packed matrix B (upper), factor with dpptrf
+        double[] bp = new double[ap_len];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                bp[k++] = (i == j) ? n + 5.0 : 0.3 / (i + j + 1.0);
+            }
+        }
+
+        intW info = new intW(0);
+        f2j.dpptrf("U", n, bp, info);
+        assertEquals(0, info.val);
+
+        double[] ap_expected = ap.clone();
+        double[] ap_actual = ap.clone();
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dspgst(1, "U", n, ap_expected, bp, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dspgst(1, "U", n, ap_actual, bp, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ap_expected, ap_actual, depsilon);
     }
 }

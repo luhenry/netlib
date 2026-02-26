@@ -29,12 +29,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlaed5Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Secular equation for 2x2 rank-one update: diag(D) + RHO * Z * Z^T
+        double[] d = { 1.0, 3.0 }; // D(1) < D(2)
+        double norm = Math.sqrt(0.6 * 0.6 + 0.8 * 0.8);
+        double[] z = { 0.6 / norm, 0.8 / norm }; // unit vector
+        double rho = 2.0;
+
+        for (int i = 1; i <= 2; i++) {
+            double[] delta_expected = new double[2];
+            double[] delta_actual = new double[2];
+            doubleW dlam_expected = new doubleW(0);
+            doubleW dlam_actual = new doubleW(0);
+
+            f2j.dlaed5(i, d, z, delta_expected, rho, dlam_expected);
+            lapack.dlaed5(i, d, z, delta_actual, rho, dlam_actual);
+
+            assertEquals(dlam_expected.val, dlam_actual.val, depsilon);
+            assertArrayEquals(delta_expected, delta_actual, depsilon);
+        }
     }
 }

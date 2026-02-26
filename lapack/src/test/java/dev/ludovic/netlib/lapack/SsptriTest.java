@@ -29,12 +29,79 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SsptriTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        int n = N_SMALL;
+        int ap_len = n * (n + 1) / 2;
+
+        float[] ap = new float[ap_len];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[k++] = (i == j) ? (i % 2 == 0 ? 10.0f : -5.0f) : 1.0f / (i + j + 1.0f);
+            }
+        }
+
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.ssptrf("U", n, ap, ipiv, info);
+        assertEquals(0, info.val);
+
+        float[] ap_expected = ap.clone();
+        float[] ap_actual = ap.clone();
+        float[] work_expected = new float[n];
+        float[] work_actual = new float[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ssptri("U", n, ap_expected, ipiv, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ssptri("U", n, ap_actual, ipiv, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ap_expected, ap_actual, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+        int ap_len = n * (n + 1) / 2;
+
+        float[] ap = new float[ap_len];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = j; i < n; i++) {
+                ap[k++] = (i == j) ? (i % 2 == 0 ? 10.0f : -5.0f) : 1.0f / (i + j + 1.0f);
+            }
+        }
+
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.ssptrf("L", n, ap, ipiv, info);
+        assertEquals(0, info.val);
+
+        float[] ap_expected = ap.clone();
+        float[] ap_actual = ap.clone();
+        float[] work_expected = new float[n];
+        float[] work_actual = new float[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ssptri("L", n, ap_expected, ipiv, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ssptri("L", n, ap_actual, ipiv, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ap_expected, ap_actual, sepsilon);
     }
 }

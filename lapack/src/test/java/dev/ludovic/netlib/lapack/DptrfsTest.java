@@ -29,12 +29,57 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DptrfsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        double[] d_orig = generateDoubleArray(n, 2.0);
+        double[] e_orig = generateDoubleArray(n - 1, 0.5);
+
+        double[] d_expected = d_orig.clone();
+        double[] e_expected = e_orig.clone();
+        intW info = new intW(0);
+        f2j.dpttrf(n, d_expected, 0, e_expected, 0, info);
+        assertEquals(0, info.val);
+
+        double[] d_actual = d_orig.clone();
+        double[] e_actual = e_orig.clone();
+        info.val = 0;
+        lapack.dpttrf(n, d_actual, 0, e_actual, 0, info);
+        assertEquals(0, info.val);
+
+        double[] b = generateDoubleArray(n, 1.0);
+        double[] x_expected = b.clone();
+        double[] x_actual = b.clone();
+        info.val = 0;
+        f2j.dpttrs(n, 1, d_expected, 0, e_expected, 0, x_expected, 0, n, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.dpttrs(n, 1, d_actual, 0, e_actual, 0, x_actual, 0, n, info);
+        assertEquals(0, info.val);
+
+        double[] ferr_expected = new double[1];
+        double[] ferr_actual = new double[1];
+        double[] berr_expected = new double[1];
+        double[] berr_actual = new double[1];
+        double[] work_expected = new double[2 * n];
+        double[] work_actual = new double[2 * n];
+
+        info.val = 0;
+        f2j.dptrfs(n, 1, d_orig, 0, e_orig, 0, d_expected, 0, e_expected, 0, b, 0, n, x_expected, 0, n, ferr_expected, 0, berr_expected, 0, work_expected, 0, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.dptrfs(n, 1, d_orig, 0, e_orig, 0, d_actual, 0, e_actual, 0, b, 0, n, x_actual, 0, n, ferr_actual, 0, berr_actual, 0, work_actual, 0, info);
+        assertEquals(0, info.val);
+
+        assertArrayEquals(x_expected, x_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(x_expected))));
+        assertArrayEquals(ferr_expected, ferr_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(ferr_expected))));
+        assertArrayEquals(berr_expected, berr_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(berr_expected))));
     }
 }

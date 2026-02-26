@@ -30,11 +30,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Dlaqr0Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // dlaqr0 is the aggressive early deflation QR algorithm (LAPACK 3.2+). Internal to dhseqr which is tested at a higher level.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

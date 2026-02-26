@@ -29,12 +29,77 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsytrfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        // DSYTRF: Bunch-Kaufman factorization A = U*D*U^T for symmetric indefinite matrix
+        int n = N_SMALL;
+
+        // Create symmetric indefinite matrix (not positive definite)
+        double[] a = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                double val = (i == j) ? (i % 2 == 0 ? 10.0 : -5.0) : 1.0 / (i + j + 1.0);
+                a[i + j * n] = val;
+                a[j + i * n] = val;
+            }
+        }
+
+        double[] a_expected = a.clone();
+        double[] a_actual = a.clone();
+        int[] ipiv_expected = new int[n];
+        int[] ipiv_actual = new int[n];
+        double[] work_expected = new double[n * 64];
+        double[] work_actual = new double[n * 64];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsytrf("U", n, a_expected, n, ipiv_expected, work_expected, work_expected.length, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsytrf("U", n, a_actual, n, ipiv_actual, work_actual, work_actual.length, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(a_expected, a_actual, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+
+        double[] a = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                double val = (i == j) ? (i % 2 == 0 ? 10.0 : -5.0) : 1.0 / (i + j + 1.0);
+                a[i + j * n] = val;
+                a[j + i * n] = val;
+            }
+        }
+
+        double[] a_expected = a.clone();
+        double[] a_actual = a.clone();
+        int[] ipiv_expected = new int[n];
+        int[] ipiv_actual = new int[n];
+        double[] work_expected = new double[n * 64];
+        double[] work_actual = new double[n * 64];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsytrf("L", n, a_expected, n, ipiv_expected, work_expected, work_expected.length, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsytrf("L", n, a_actual, n, ipiv_actual, work_actual, work_actual.length, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(a_expected, a_actual, depsilon);
     }
 }

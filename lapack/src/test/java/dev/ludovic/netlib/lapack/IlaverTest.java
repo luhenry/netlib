@@ -29,12 +29,26 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class IlaverTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // ilaver returns LAPACK library version.
+        // Different implementations have different versions (f2j=3.1.x, native=3.12.x).
+        // Just verify that each implementation returns a valid version number.
+        intW major = new intW(0);
+        intW minor = new intW(0);
+        intW patch = new intW(0);
+        lapack.ilaver(major, minor, patch);
+
+        // Version should be at least 3.0.0
+        assertTrue(major.val >= 3, "Major version should be at least 3, got " + major.val);
+        assertTrue(minor.val >= 0, "Minor version should be non-negative, got " + minor.val);
+        assertTrue(patch.val >= 0, "Patch version should be non-negative, got " + patch.val);
     }
 }

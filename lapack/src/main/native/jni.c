@@ -41,7 +41,7 @@ static jfieldID floatW_val_fieldID;
 static jfieldID doubleW_val_fieldID;
 static jfieldID StringW_val_fieldID;
 
-static void (*dbdsdc_)(const char *uplo, const char *compq, int *n, double *d, double *e, double *u, int *ldu, double *vt, int *ldvt, double *q, int *iq, double *work, int *iwork, int *info);
+static void (*dbdsdc_)(const char *uplo, const char *compq, int *n, double *d, double *e, double *u, int *ldu, double *vt, int *ldvt, double *q, int *iq, double *work, int *iwork, int *info, int len_uplo, int len_compq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dbdsdcK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring compq, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray u, jint offsetu, jint ldu, jdoubleArray vt, jint offsetvt, jint ldvt, jdoubleArray q, jint offsetq, jintArray iq, jint offsetiq, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dbdsdc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -74,7 +74,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dbdsdcK(JNIEnv *env, UNUSED jobjec
   if (iq) { if (!(__niq = (*env)->GetPrimitiveArrayCritical(env, iq, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dbdsdc_(__nuplo, __ncompq, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nq ? __nq + offsetq : NULL, __niq ? __niq + offsetiq : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dbdsdc_(__nuplo, __ncompq, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nq ? __nq + offsetq : NULL, __niq ? __niq + offsetiq : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, compq));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -90,7 +90,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dbdsqr_)(const char *uplo, int *n, int *ncvt, int *nru, int *ncc, double *d, double *e, double *vt, int *ldvt, double *u, int *ldu, double *c, int *Ldc, double *work, int *info);
+static void (*dbdsqr_)(const char *uplo, int *n, int *ncvt, int *nru, int *ncc, double *d, double *e, double *vt, int *ldvt, double *u, int *ldu, double *c, int *Ldc, double *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dbdsqrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint ncvt, jint nru, jint ncc, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray vt, jint offsetvt, jint ldvt, jdoubleArray u, jint offsetu, jint ldu, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dbdsqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -125,7 +125,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dbdsqrK(JNIEnv *env, UNUSED jobjec
   if (u) { if (!(__nu = (*env)->GetPrimitiveArrayCritical(env, u, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dbdsqr_(__nuplo, &__nn, &__nncvt, &__nnru, &__nncc, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nu ? __nu + offsetu : NULL, &__nldu, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dbdsqr_(__nuplo, &__nn, &__nncvt, &__nnru, &__nncc, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nu ? __nu + offsetu : NULL, &__nldu, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -138,7 +138,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ddisna_)(const char *job, int *m, int *n, double *d, double *sep, int *info);
+static void (*ddisna_)(const char *job, int *m, int *n, double *d, double *sep, int *info, int len_job);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ddisnaK(JNIEnv *env, UNUSED jobject obj, jstring job, jint m, jint n, jdoubleArray d, jint offsetd, jdoubleArray sep, jint offsetsep, jobject info) {
   if (!ddisna_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -155,7 +155,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ddisnaK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (sep) { if (!(__nsep = (*env)->GetPrimitiveArrayCritical(env, sep, NULL))) { __failed = TRUE; goto done; } }
-  ddisna_(__njob, &__nm, &__nn, __nd ? __nd + offsetd : NULL, __nsep ? __nsep + offsetsep : NULL, &__ninfo);
+  ddisna_(__njob, &__nm, &__nn, __nd ? __nd + offsetd : NULL, __nsep ? __nsep + offsetsep : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job));
 done:
   if (__nsep) (*env)->ReleasePrimitiveArrayCritical(env, sep, __nsep, __failed ? JNI_ABORT : 0);
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
@@ -164,7 +164,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgbbrd_)(const char *vect, int *m, int *n, int *ncc, int *kl, int *ku, double *ab, int *ldab, double *d, double *e, double *q, int *ldq, double *pt, int *ldpt, double *c, int *Ldc, double *work, int *info);
+static void (*dgbbrd_)(const char *vect, int *m, int *n, int *ncc, int *kl, int *ku, double *ab, int *ldab, double *d, double *e, double *q, int *ldq, double *pt, int *ldpt, double *c, int *Ldc, double *work, int *info, int len_vect);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbbrdK(JNIEnv *env, UNUSED jobject obj, jstring vect, jint m, jint n, jint ncc, jint kl, jint ku, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray q, jint offsetq, jint ldq, jdoubleArray pt, jint offsetpt, jint ldpt, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dgbbrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -205,7 +205,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbbrdK(JNIEnv *env, UNUSED jobjec
   if (pt) { if (!(__npt = (*env)->GetPrimitiveArrayCritical(env, pt, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dgbbrd_(__nvect, &__nm, &__nn, &__nncc, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __npt ? __npt + offsetpt : NULL, &__nldpt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dgbbrd_(__nvect, &__nm, &__nn, &__nncc, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __npt ? __npt + offsetpt : NULL, &__nldpt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, vect));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -219,7 +219,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgbcon_)(const char *norm, int *n, int *kl, int *ku, double *ab, int *ldab, int *ipiv, double *anorm, double *rcond, double *work, int *iwork, int *info);
+static void (*dgbcon_)(const char *norm, int *n, int *kl, int *ku, double *ab, int *ldab, int *ipiv, double *anorm, double *rcond, double *work, int *iwork, int *info, int len_norm);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jint kl, jint ku, jdoubleArray ab, jint offsetab, jint ldab, jintArray ipiv, jint offsetipiv, jdouble anorm, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgbcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -248,7 +248,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbconK(JNIEnv *env, UNUSED jobjec
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgbcon_(__nnorm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgbcon_(__nnorm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -301,7 +301,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgbrfs_)(const char *trans, int *n, int *kl, int *ku, int *nrhs, double *ab, int *ldab, double *afb, int *ldafb, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dgbrfs_)(const char *trans, int *n, int *kl, int *ku, int *nrhs, double *ab, int *ldab, double *afb, int *ldafb, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbrfsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint kl, jint ku, jint nrhs, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray afb, jint offsetafb, jint ldafb, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgbrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -344,7 +344,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgbrfs_(__ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgbrfs_(__ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -394,7 +394,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgbsvx_)(const char *fact, const char *trans, int *n, int *kl, int *ku, int *nrhs, double *ab, int *ldab, double *afb, int *ldafb, int *ipiv, char *equed, double *r, double *c, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dgbsvx_)(const char *fact, const char *trans, int *n, int *kl, int *ku, int *nrhs, double *ab, int *ldab, double *afb, int *ldafb, int *ipiv, char *equed, double *r, double *c, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info, int len_fact, int len_trans, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring trans, jint n, jint kl, jint ku, jint nrhs, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray afb, jint offsetafb, jint ldafb, jintArray ipiv, jint offsetipiv, jobject equed, jdoubleArray r, jint offsetr, jdoubleArray c, jint offsetc, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jobject rcond, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgbsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -431,7 +431,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbsvxK(JNIEnv *env, UNUSED jobjec
   __nnrhs = nrhs;
   __nldab = ldab;
   __nldafb = ldafb;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetDoubleField(env, rcond, doubleW_val_fieldID);
@@ -447,7 +447,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgbsvx_(__nfact, __ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nipiv ? __nipiv + offsetipiv : NULL, __nequed, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgbsvx_(__nfact, __ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nipiv ? __nipiv + offsetipiv : NULL, __nequed, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -526,7 +526,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgbtrs_)(const char *trans, int *n, int *kl, int *ku, int *nrhs, double *ab, int *ldab, int *ipiv, double *b, int *ldb, int *info);
+static void (*dgbtrs_)(const char *trans, int *n, int *kl, int *ku, int *nrhs, double *ab, int *ldab, int *ipiv, double *b, int *ldb, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbtrsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint kl, jint ku, jint nrhs, jdoubleArray ab, jint offsetab, jint ldab, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dgbtrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -553,7 +553,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgbtrsK(JNIEnv *env, UNUSED jobjec
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dgbtrs_(__ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dgbtrs_(__ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -563,7 +563,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgebak_)(const char *job, const char *side, int *n, int *ilo, int *ihi, double *scale, int *m, double *v, int *ldv, int *info);
+static void (*dgebak_)(const char *job, const char *side, int *n, int *ilo, int *ihi, double *scale, int *m, double *v, int *ldv, int *info, int len_job, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgebakK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring side, jint n, jint ilo, jint ihi, jdoubleArray scale, jint offsetscale, jint m, jdoubleArray v, jint offsetv, jint ldv, jobject info) {
   if (!dgebak_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -588,7 +588,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgebakK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (scale) { if (!(__nscale = (*env)->GetPrimitiveArrayCritical(env, scale, NULL))) { __failed = TRUE; goto done; } }
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
-  dgebak_(__njob, __nside, &__nn, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__nm, __nv ? __nv + offsetv : NULL, &__nldv, &__ninfo);
+  dgebak_(__njob, __nside, &__nn, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__nm, __nv ? __nv + offsetv : NULL, &__nldv, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, side));
 done:
   if (__nv) (*env)->ReleasePrimitiveArrayCritical(env, v, __nv, __failed ? JNI_ABORT : 0);
   if (__nscale) (*env)->ReleasePrimitiveArrayCritical(env, scale, __nscale, __failed ? JNI_ABORT : 0);
@@ -598,7 +598,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgebal_)(const char *job, int *n, double *a, int *lda, int *ilo, int *ihi, double *scale, int *info);
+static void (*dgebal_)(const char *job, int *n, double *a, int *lda, int *ilo, int *ihi, double *scale, int *info, int len_job);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgebalK(JNIEnv *env, UNUSED jobject obj, jstring job, jint n, jdoubleArray a, jint offseta, jint lda, jobject ilo, jobject ihi, jdoubleArray scale, jint offsetscale, jobject info) {
   if (!dgebal_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -619,7 +619,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgebalK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (scale) { if (!(__nscale = (*env)->GetPrimitiveArrayCritical(env, scale, NULL))) { __failed = TRUE; goto done; } }
-  dgebal_(__njob, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__ninfo);
+  dgebal_(__njob, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job));
 done:
   if (__nscale) (*env)->ReleasePrimitiveArrayCritical(env, scale, __nscale, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -706,7 +706,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgecon_)(const char *norm, int *n, double *a, int *lda, double *anorm, double *rcond, double *work, int *iwork, int *info);
+static void (*dgecon_)(const char *norm, int *n, double *a, int *lda, double *anorm, double *rcond, double *work, int *iwork, int *info, int len_norm);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgeconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jdoubleArray a, jint offseta, jint lda, jdouble anorm, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgecon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -729,7 +729,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgeconK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgecon_(__nnorm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgecon_(__nnorm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -789,7 +789,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgeesxK(JNIEnv *env, UNUSED jobjec
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
 }
 
-static void (*dgeev_)(const char *jobvl, const char *jobvr, int *n, double *a, int *lda, double *wr, double *wi, double *vl, int *ldvl, double *vr, int *ldvr, double *work, int *lwork, int *info);
+static void (*dgeev_)(const char *jobvl, const char *jobvr, int *n, double *a, int *lda, double *wr, double *wi, double *vl, int *ldvl, double *vr, int *ldvr, double *work, int *lwork, int *info, int len_jobvl, int len_jobvr);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgeevK(JNIEnv *env, UNUSED jobject obj, jstring jobvl, jstring jobvr, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray wr, jint offsetwr, jdoubleArray wi, jint offsetwi, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dgeev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -822,7 +822,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgeevK(JNIEnv *env, UNUSED jobject
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dgeev_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dgeev_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -836,7 +836,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgeevx_)(const char *balanc, const char *jobvl, const char *jobvr, const char *sense, int *n, double *a, int *lda, double *wr, double *wi, double *vl, int *ldvl, double *vr, int *ldvr, int *ilo, int *ihi, double *scale, double *abnrm, double *rconde, double *rcondv, double *work, int *lwork, int *iwork, int *info);
+static void (*dgeevx_)(const char *balanc, const char *jobvl, const char *jobvr, const char *sense, int *n, double *a, int *lda, double *wr, double *wi, double *vl, int *ldvl, double *vr, int *ldvr, int *ilo, int *ihi, double *scale, double *abnrm, double *rconde, double *rcondv, double *work, int *lwork, int *iwork, int *info, int len_balanc, int len_jobvl, int len_jobvr, int len_sense);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgeevxK(JNIEnv *env, UNUSED jobject obj, jstring balanc, jstring jobvl, jstring jobvr, jstring sense, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray wr, jint offsetwr, jdoubleArray wi, jint offsetwi, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jobject ilo, jobject ihi, jdoubleArray scale, jint offsetscale, jobject abnrm, jdoubleArray rconde, jint offsetrconde, jdoubleArray rcondv, jint offsetrcondv, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgeevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -887,7 +887,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgeevxK(JNIEnv *env, UNUSED jobjec
   if (rcondv) { if (!(__nrcondv = (*env)->GetPrimitiveArrayCritical(env, rcondv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgeevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__nabnrm, __nrconde ? __nrconde + offsetrconde : NULL, __nrcondv ? __nrcondv + offsetrcondv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgeevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__nabnrm, __nrconde ? __nrconde + offsetrconde : NULL, __nrcondv ? __nrcondv + offsetrcondv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, balanc), (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr), (*env)->GetStringUTFLength(env, sense));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -910,7 +910,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgegs_)(const char *jobvsl, const char *jobvsr, int *n, double *a, int *lda, double *b, int *ldb, double *alphar, double *alphai, double *beta, double *vsl, int *ldvsl, double *vsr, int *ldvsr, double *work, int *lwork, int *info);
+static void (*dgegs_)(const char *jobvsl, const char *jobvsr, int *n, double *a, int *lda, double *b, int *ldb, double *alphar, double *alphai, double *beta, double *vsl, int *ldvsl, double *vsr, int *ldvsr, double *work, int *lwork, int *info, int len_jobvsl, int len_jobvsr);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgegsK(JNIEnv *env, UNUSED jobject obj, jstring jobvsl, jstring jobvsr, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray alphar, jint offsetalphar, jdoubleArray alphai, jint offsetalphai, jdoubleArray beta, jint offsetbeta, jdoubleArray vsl, jint offsetvsl, jint ldvsl, jdoubleArray vsr, jint offsetvsr, jint ldvsr, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dgegs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -949,7 +949,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgegsK(JNIEnv *env, UNUSED jobject
   if (vsl) { if (!(__nvsl = (*env)->GetPrimitiveArrayCritical(env, vsl, NULL))) { __failed = TRUE; goto done; } }
   if (vsr) { if (!(__nvsr = (*env)->GetPrimitiveArrayCritical(env, vsr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dgegs_(__njobvsl, __njobvsr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvsl ? __nvsl + offsetvsl : NULL, &__nldvsl, __nvsr ? __nvsr + offsetvsr : NULL, &__nldvsr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dgegs_(__njobvsl, __njobvsr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvsl ? __nvsl + offsetvsl : NULL, &__nldvsl, __nvsr ? __nvsr + offsetvsr : NULL, &__nldvsr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobvsl), (*env)->GetStringUTFLength(env, jobvsr));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvsr) (*env)->ReleasePrimitiveArrayCritical(env, vsr, __nvsr, __failed ? JNI_ABORT : 0);
@@ -965,7 +965,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgegv_)(const char *jobvl, const char *jobvr, int *n, double *a, int *lda, double *b, int *ldb, double *alphar, double *alphai, double *beta, double *vl, int *ldvl, double *vr, int *ldvr, double *work, int *lwork, int *info);
+static void (*dgegv_)(const char *jobvl, const char *jobvr, int *n, double *a, int *lda, double *b, int *ldb, double *alphar, double *alphai, double *beta, double *vl, int *ldvl, double *vr, int *ldvr, double *work, int *lwork, int *info, int len_jobvl, int len_jobvr);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgegvK(JNIEnv *env, UNUSED jobject obj, jstring jobvl, jstring jobvr, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray alphar, jint offsetalphar, jdoubleArray alphai, jint offsetalphai, jdoubleArray beta, jint offsetbeta, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dgegv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -1004,7 +1004,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgegvK(JNIEnv *env, UNUSED jobject
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dgegv_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dgegv_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -1140,7 +1140,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgels_)(const char *trans, int *m, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, double *work, int *lwork, int *info);
+static void (*dgels_)(const char *trans, int *m, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, double *work, int *lwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgelsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dgels_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -1167,7 +1167,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgelsK(JNIEnv *env, UNUSED jobject
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dgels_(__ntrans, &__nm, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dgels_(__ntrans, &__nm, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
@@ -1526,7 +1526,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgerfs_)(const char *trans, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dgerfs_)(const char *trans, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgerfsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray af, jint offsetaf, jint ldaf, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgerfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -1565,7 +1565,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgerfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgerfs_(__ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgerfs_(__ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -1668,7 +1668,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgesdd_)(const char *jobz, int *m, int *n, double *a, int *lda, double *s, double *u, int *ldu, double *vt, int *ldvt, double *work, int *lwork, int *iwork, int *info);
+static void (*dgesdd_)(const char *jobz, int *m, int *n, double *a, int *lda, double *s, double *u, int *ldu, double *vt, int *ldvt, double *work, int *lwork, int *iwork, int *info, int len_jobz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgesddK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray s, jint offsets, jdoubleArray u, jint offsetu, jint ldu, jdoubleArray vt, jint offsetvt, jint ldvt, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgesdd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -1701,7 +1701,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgesddK(JNIEnv *env, UNUSED jobjec
   if (vt) { if (!(__nvt = (*env)->GetPrimitiveArrayCritical(env, vt, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgesdd_(__njobz, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgesdd_(__njobz, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -1744,7 +1744,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgesvd_)(const char *jobu, const char *jobvt, int *m, int *n, double *a, int *lda, double *s, double *u, int *ldu, double *vt, int *ldvt, double *work, int *lwork, int *info);
+static void (*dgesvd_)(const char *jobu, const char *jobvt, int *m, int *n, double *a, int *lda, double *s, double *u, int *ldu, double *vt, int *ldvt, double *work, int *lwork, int *info, int len_jobu, int len_jobvt);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgesvdK(JNIEnv *env, UNUSED jobject obj, jstring jobu, jstring jobvt, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray s, jint offsets, jdoubleArray u, jint offsetu, jint ldu, jdoubleArray vt, jint offsetvt, jint ldvt, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dgesvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -1777,7 +1777,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgesvdK(JNIEnv *env, UNUSED jobjec
   if (u) { if (!(__nu = (*env)->GetPrimitiveArrayCritical(env, u, NULL))) { __failed = TRUE; goto done; } }
   if (vt) { if (!(__nvt = (*env)->GetPrimitiveArrayCritical(env, vt, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dgesvd_(__njobu, __njobvt, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dgesvd_(__njobu, __njobvt, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobu), (*env)->GetStringUTFLength(env, jobvt));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvt) (*env)->ReleasePrimitiveArrayCritical(env, vt, __nvt, __failed ? JNI_ABORT : 0);
@@ -1790,7 +1790,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgesvx_)(const char *fact, const char *trans, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, int *ipiv, char *equed, double *r, double *c, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dgesvx_)(const char *fact, const char *trans, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, int *ipiv, char *equed, double *r, double *c, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info, int len_fact, int len_trans, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgesvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring trans, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray af, jint offsetaf, jint ldaf, jintArray ipiv, jint offsetipiv, jobject equed, jdoubleArray r, jint offsetr, jdoubleArray c, jint offsetc, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jobject rcond, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgesvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -1823,7 +1823,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgesvxK(JNIEnv *env, UNUSED jobjec
   __nnrhs = nrhs;
   __nlda = lda;
   __nldaf = ldaf;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetDoubleField(env, rcond, doubleW_val_fieldID);
@@ -1839,7 +1839,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgesvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgesvx_(__nfact, __ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nequed, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgesvx_(__nfact, __ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nequed, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -1964,7 +1964,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgetrs_)(const char *trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
+static void (*dgetrs_)(const char *trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgetrsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dgetrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -1987,7 +1987,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgetrsK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dgetrs_(__ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dgetrs_(__ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -1997,7 +1997,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dggbak_)(const char *job, const char *side, int *n, int *ilo, int *ihi, double *lscale, double *rscale, int *m, double *v, int *ldv, int *info);
+static void (*dggbak_)(const char *job, const char *side, int *n, int *ilo, int *ihi, double *lscale, double *rscale, int *m, double *v, int *ldv, int *info, int len_job, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggbakK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring side, jint n, jint ilo, jint ihi, jdoubleArray lscale, jint offsetlscale, jdoubleArray rscale, jint offsetrscale, jint m, jdoubleArray v, jint offsetv, jint ldv, jobject info) {
   if (!dggbak_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2024,7 +2024,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggbakK(JNIEnv *env, UNUSED jobjec
   if (lscale) { if (!(__nlscale = (*env)->GetPrimitiveArrayCritical(env, lscale, NULL))) { __failed = TRUE; goto done; } }
   if (rscale) { if (!(__nrscale = (*env)->GetPrimitiveArrayCritical(env, rscale, NULL))) { __failed = TRUE; goto done; } }
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
-  dggbak_(__njob, __nside, &__nn, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, &__nm, __nv ? __nv + offsetv : NULL, &__nldv, &__ninfo);
+  dggbak_(__njob, __nside, &__nn, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, &__nm, __nv ? __nv + offsetv : NULL, &__nldv, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, side));
 done:
   if (__nv) (*env)->ReleasePrimitiveArrayCritical(env, v, __nv, __failed ? JNI_ABORT : 0);
   if (__nrscale) (*env)->ReleasePrimitiveArrayCritical(env, rscale, __nrscale, __failed ? JNI_ABORT : 0);
@@ -2035,7 +2035,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dggbal_)(const char *job, int *n, double *a, int *lda, double *b, int *ldb, int *ilo, int *ihi, double *lscale, double *rscale, double *work, int *info);
+static void (*dggbal_)(const char *job, int *n, double *a, int *lda, double *b, int *ldb, int *ilo, int *ihi, double *lscale, double *rscale, double *work, int *info, int len_job);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggbalK(JNIEnv *env, UNUSED jobject obj, jstring job, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jobject ilo, jobject ihi, jdoubleArray lscale, jint offsetlscale, jdoubleArray rscale, jint offsetrscale, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dggbal_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2064,7 +2064,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggbalK(JNIEnv *env, UNUSED jobjec
   if (lscale) { if (!(__nlscale = (*env)->GetPrimitiveArrayCritical(env, lscale, NULL))) { __failed = TRUE; goto done; } }
   if (rscale) { if (!(__nrscale = (*env)->GetPrimitiveArrayCritical(env, rscale, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dggbal_(__njob, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dggbal_(__njob, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nrscale) (*env)->ReleasePrimitiveArrayCritical(env, rscale, __nrscale, __failed ? JNI_ABORT : 0);
@@ -2090,7 +2090,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggesxK(JNIEnv *env, UNUSED jobjec
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
 }
 
-static void (*dggev_)(const char *jobvl, const char *jobvr, int *n, double *a, int *lda, double *b, int *ldb, double *alphar, double *alphai, double *beta, double *vl, int *ldvl, double *vr, int *ldvr, double *work, int *lwork, int *info);
+static void (*dggev_)(const char *jobvl, const char *jobvr, int *n, double *a, int *lda, double *b, int *ldb, double *alphar, double *alphai, double *beta, double *vl, int *ldvl, double *vr, int *ldvr, double *work, int *lwork, int *info, int len_jobvl, int len_jobvr);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggevK(JNIEnv *env, UNUSED jobject obj, jstring jobvl, jstring jobvr, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray alphar, jint offsetalphar, jdoubleArray alphai, jint offsetalphai, jdoubleArray beta, jint offsetbeta, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dggev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2129,7 +2129,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggevK(JNIEnv *env, UNUSED jobject
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dggev_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dggev_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -2145,7 +2145,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dggevx_)(const char *balanc, const char *jobvl, const char *jobvr, const char *sense, int *n, double *a, int *lda, double *b, int *ldb, double *alphar, double *alphai, double *beta, double *vl, int *ldvl, double *vr, int *ldvr, int *ilo, int *ihi, double *lscale, double *rscale, double *abnrm, double *bbnrm, double *rconde, double *rcondv, double *work, int *lwork, int *iwork, int *bwork, int *info);
+static void (*dggevx_)(const char *balanc, const char *jobvl, const char *jobvr, const char *sense, int *n, double *a, int *lda, double *b, int *ldb, double *alphar, double *alphai, double *beta, double *vl, int *ldvl, double *vr, int *ldvr, int *ilo, int *ihi, double *lscale, double *rscale, double *abnrm, double *bbnrm, double *rconde, double *rcondv, double *work, int *lwork, int *iwork, int *bwork, int *info, int len_balanc, int len_jobvl, int len_jobvr, int len_sense);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggevxK(JNIEnv *env, UNUSED jobject obj, jstring balanc, jstring jobvl, jstring jobvr, jstring sense, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray alphar, jint offsetalphar, jdoubleArray alphai, jint offsetalphai, jdoubleArray beta, jint offsetbeta, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jobject ilo, jobject ihi, jdoubleArray lscale, jint offsetlscale, jdoubleArray rscale, jint offsetrscale, jobject abnrm, jobject bbnrm, jdoubleArray rconde, jint offsetrconde, jdoubleArray rcondv, jint offsetrcondv, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jbooleanArray bwork, jint offsetbwork, jobject info) {
   if (!dggevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2214,7 +2214,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggevxK(JNIEnv *env, UNUSED jobjec
     if (!(__nbwork = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
     for (int i = 0; i < __length; i++) { __nbwork[i] = __jbwork[i]; }
   } while(0); }
-  dggevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, &__nabnrm, &__nbbnrm, __nrconde ? __nrconde + offsetrconde : NULL, __nrcondv ? __nrcondv + offsetrcondv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nbwork ? __nbwork + offsetbwork : NULL, &__ninfo);
+  dggevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, &__nabnrm, &__nbbnrm, __nrconde ? __nrconde + offsetrconde : NULL, __nrcondv ? __nrcondv + offsetrcondv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nbwork ? __nbwork + offsetbwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, balanc), (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr), (*env)->GetStringUTFLength(env, sense));
 done:
   if (__nbwork) { free(__nbwork); } if (__jbwork) (*env)->ReleasePrimitiveArrayCritical(env, bwork, __nbwork, JNI_ABORT);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -2285,7 +2285,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgghrd_)(const char *compq, const char *compz, int *n, int *ilo, int *ihi, double *a, int *lda, double *b, int *ldb, double *q, int *ldq, double *z, int *ldz, int *info);
+static void (*dgghrd_)(const char *compq, const char *compz, int *n, int *ilo, int *ihi, double *a, int *lda, double *b, int *ldb, double *q, int *ldq, double *z, int *ldz, int *info, int len_compq, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgghrdK(JNIEnv *env, UNUSED jobject obj, jstring compq, jstring compz, jint n, jint ilo, jint ihi, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray q, jint offsetq, jint ldq, jdoubleArray z, jint offsetz, jint ldz, jobject info) {
   if (!dgghrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2318,7 +2318,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgghrdK(JNIEnv *env, UNUSED jobjec
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
-  dgghrd_(__ncompq, __ncompz, &__nn, &__nilo, &__nihi, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nq ? __nq + offsetq : NULL, &__nldq, __nz ? __nz + offsetz : NULL, &__nldz, &__ninfo);
+  dgghrd_(__ncompq, __ncompz, &__nn, &__nilo, &__nihi, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nq ? __nq + offsetq : NULL, &__nldq, __nz ? __nz + offsetz : NULL, &__nldz, &__ninfo, (*env)->GetStringUTFLength(env, compq), (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -2453,7 +2453,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dggsvd_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *n, int *p, int *k, int *l, double *a, int *lda, double *b, int *ldb, double *alpha, double *beta, double *u, int *ldu, double *v, int *ldv, double *q, int *ldq, double *work, int *iwork, int *info);
+static void (*dggsvd_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *n, int *p, int *k, int *l, double *a, int *lda, double *b, int *ldb, double *alpha, double *beta, double *u, int *ldu, double *v, int *ldv, double *q, int *ldq, double *work, int *iwork, int *info, int len_jobu, int len_jobv, int len_jobq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggsvdK(JNIEnv *env, UNUSED jobject obj, jstring jobu, jstring jobv, jstring jobq, jint m, jint n, jint p, jobject k, jobject l, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray alpha, jint offsetalpha, jdoubleArray beta, jint offsetbeta, jdoubleArray u, jint offsetu, jint ldu, jdoubleArray v, jint offsetv, jint ldv, jdoubleArray q, jint offsetq, jint ldq, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dggsvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2504,7 +2504,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggsvdK(JNIEnv *env, UNUSED jobjec
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dggsvd_(__njobu, __njobv, __njobq, &__nm, &__nn, &__np, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalpha ? __nalpha + offsetalpha : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dggsvd_(__njobu, __njobv, __njobq, &__nm, &__nn, &__np, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalpha ? __nalpha + offsetalpha : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobu), (*env)->GetStringUTFLength(env, jobv), (*env)->GetStringUTFLength(env, jobq));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -2524,7 +2524,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dggsvp_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *p, int *n, double *a, int *lda, double *b, int *ldb, double *tola, double *tolb, int *k, int *l, double *u, int *ldu, double *v, int *ldv, double *q, int *ldq, int *iwork, double *tau, double *work, int *info);
+static void (*dggsvp_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *p, int *n, double *a, int *lda, double *b, int *ldb, double *tola, double *tolb, int *k, int *l, double *u, int *ldu, double *v, int *ldv, double *q, int *ldq, int *iwork, double *tau, double *work, int *info, int len_jobu, int len_jobv, int len_jobq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggsvpK(JNIEnv *env, UNUSED jobject obj, jstring jobu, jstring jobv, jstring jobq, jint m, jint p, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble tola, jdouble tolb, jobject k, jobject l, jdoubleArray u, jint offsetu, jint ldu, jdoubleArray v, jint offsetv, jint ldv, jdoubleArray q, jint offsetq, jint ldq, jintArray iwork, jint offsetiwork, jdoubleArray tau, jint offsettau, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dggsvp_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2577,7 +2577,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dggsvpK(JNIEnv *env, UNUSED jobjec
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dggsvp_(__njobu, __njobv, __njobq, &__nm, &__np, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ntola, &__ntolb, &__nk, &__nl, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __niwork ? __niwork + offsetiwork : NULL, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dggsvp_(__njobu, __njobv, __njobq, &__nm, &__np, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ntola, &__ntolb, &__nk, &__nl, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __niwork ? __niwork + offsetiwork : NULL, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobu), (*env)->GetStringUTFLength(env, jobv), (*env)->GetStringUTFLength(env, jobq));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -2596,7 +2596,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgtcon_)(const char *norm, int *n, double *dl, double *d, double *du, double *du2, int *ipiv, double *anorm, double *rcond, double *work, int *iwork, int *info);
+static void (*dgtcon_)(const char *norm, int *n, double *dl, double *d, double *du, double *du2, int *ipiv, double *anorm, double *rcond, double *work, int *iwork, int *info, int len_norm);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgtconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jdoubleArray dl, jint offsetdl, jdoubleArray d, jint offsetd, jdoubleArray du, jint offsetdu, jdoubleArray du2, jint offsetdu2, jintArray ipiv, jint offsetipiv, jdouble anorm, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgtcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2625,7 +2625,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgtconK(JNIEnv *env, UNUSED jobjec
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgtcon_(__nnorm, &__nn, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgtcon_(__nnorm, &__nn, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -2640,7 +2640,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgtrfs_)(const char *trans, int *n, int *nrhs, double *dl, double *d, double *du, double *dlf, double *df, double *duf, double *du2, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dgtrfs_)(const char *trans, int *n, int *nrhs, double *dl, double *d, double *du, double *dlf, double *df, double *duf, double *du2, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgtrfsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jdoubleArray dl, jint offsetdl, jdoubleArray d, jint offsetd, jdoubleArray du, jint offsetdu, jdoubleArray dlf, jint offsetdlf, jdoubleArray df, jint offsetdf, jdoubleArray duf, jint offsetduf, jdoubleArray du2, jint offsetdu2, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgtrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2685,7 +2685,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgtrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgtrfs_(__ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndlf ? __ndlf + offsetdlf : NULL, __ndf ? __ndf + offsetdf : NULL, __nduf ? __nduf + offsetduf : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgtrfs_(__ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndlf ? __ndlf + offsetdlf : NULL, __ndf ? __ndf + offsetdf : NULL, __nduf ? __nduf + offsetduf : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -2737,7 +2737,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgtsvx_)(const char *fact, const char *trans, int *n, int *nrhs, double *dl, double *d, double *du, double *dlf, double *df, double *duf, double *du2, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dgtsvx_)(const char *fact, const char *trans, int *n, int *nrhs, double *dl, double *d, double *du, double *dlf, double *df, double *duf, double *du2, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info, int len_fact, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgtsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring trans, jint n, jint nrhs, jdoubleArray dl, jint offsetdl, jdoubleArray d, jint offsetd, jdoubleArray du, jint offsetdu, jdoubleArray dlf, jint offsetdlf, jdoubleArray df, jint offsetdf, jdoubleArray duf, jint offsetduf, jdoubleArray du2, jint offsetdu2, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jobject rcond, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dgtsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2786,7 +2786,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgtsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dgtsvx_(__nfact, __ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndlf ? __ndlf + offsetdlf : NULL, __ndf ? __ndf + offsetdf : NULL, __nduf ? __nduf + offsetduf : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dgtsvx_(__nfact, __ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndlf ? __ndlf + offsetdlf : NULL, __ndf ? __ndf + offsetdf : NULL, __nduf ? __nduf + offsetduf : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -2839,7 +2839,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dgttrs_)(const char *trans, int *n, int *nrhs, double *dl, double *d, double *du, double *du2, int *ipiv, double *b, int *ldb, int *info);
+static void (*dgttrs_)(const char *trans, int *n, int *nrhs, double *dl, double *d, double *du, double *du2, int *ipiv, double *b, int *ldb, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgttrsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jdoubleArray dl, jint offsetdl, jdoubleArray d, jint offsetd, jdoubleArray du, jint offsetdu, jdoubleArray du2, jint offsetdu2, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dgttrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2866,7 +2866,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dgttrsK(JNIEnv *env, UNUSED jobjec
   if (du2) { if (!(__ndu2 = (*env)->GetPrimitiveArrayCritical(env, du2, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dgttrs_(__ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dgttrs_(__ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -2915,7 +2915,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dhgeqz_)(const char *job, const char *compq, const char *compz, int *n, int *ilo, int *ihi, double *h, int *ldh, double *t, int *ldt, double *alphar, double *alphai, double *beta, double *q, int *ldq, double *z, int *ldz, double *work, int *lwork, int *info);
+static void (*dhgeqz_)(const char *job, const char *compq, const char *compz, int *n, int *ilo, int *ihi, double *h, int *ldh, double *t, int *ldt, double *alphar, double *alphai, double *beta, double *q, int *ldq, double *z, int *ldz, double *work, int *lwork, int *info, int len_job, int len_compq, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dhgeqzK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring compq, jstring compz, jint n, jint ilo, jint ihi, jdoubleArray h, jint offseth, jint ldh, jdoubleArray t, jint offsett, jint ldt, jdoubleArray alphar, jint offsetalphar, jdoubleArray alphai, jint offsetalphai, jdoubleArray beta, jint offsetbeta, jdoubleArray q, jint offsetq, jint ldq, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dhgeqz_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -2960,7 +2960,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dhgeqzK(JNIEnv *env, UNUSED jobjec
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dhgeqz_(__njob, __ncompq, __ncompz, &__nn, &__nilo, &__nihi, __nh ? __nh + offseth : NULL, &__nldh, __nt ? __nt + offsett : NULL, &__nldt, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dhgeqz_(__njob, __ncompq, __ncompz, &__nn, &__nilo, &__nihi, __nh ? __nh + offseth : NULL, &__nldh, __nt ? __nt + offsett : NULL, &__nldt, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, compq), (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -2977,7 +2977,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dhsein_)(const char *side, const char *eigsrc, const char *initv, int *select, int *n, double *h, int *ldh, double *wr, double *wi, double *vl, int *ldvl, double *vr, int *ldvr, int *mm, int *m, double *work, int *ifaill, int *ifailr, int *info);
+static void (*dhsein_)(const char *side, const char *eigsrc, const char *initv, int *select, int *n, double *h, int *ldh, double *wr, double *wi, double *vl, int *ldvl, double *vr, int *ldvr, int *mm, int *m, double *work, int *ifaill, int *ifailr, int *info, int len_side, int len_eigsrc, int len_initv);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dhseinK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring eigsrc, jstring initv, jbooleanArray select, jint offsetselect, jint n, jdoubleArray h, jint offseth, jint ldh, jdoubleArray wr, jint offsetwr, jdoubleArray wi, jint offsetwi, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jint mm, jobject m, jdoubleArray work, jint offsetwork, jintArray ifaill, jint offsetifaill, jintArray ifailr, jint offsetifailr, jobject info) {
   if (!dhsein_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -3026,7 +3026,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dhseinK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (ifaill) { if (!(__nifaill = (*env)->GetPrimitiveArrayCritical(env, ifaill, NULL))) { __failed = TRUE; goto done; } }
   if (ifailr) { if (!(__nifailr = (*env)->GetPrimitiveArrayCritical(env, ifailr, NULL))) { __failed = TRUE; goto done; } }
-  dhsein_(__nside, __neigsrc, __ninitv, __nselect ? __nselect + offsetselect : NULL, &__nn, __nh ? __nh + offseth : NULL, &__nldh, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, __nifaill ? __nifaill + offsetifaill : NULL, __nifailr ? __nifailr + offsetifailr : NULL, &__ninfo);
+  dhsein_(__nside, __neigsrc, __ninitv, __nselect ? __nselect + offsetselect : NULL, &__nn, __nh ? __nh + offseth : NULL, &__nldh, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, __nifaill ? __nifaill + offsetifaill : NULL, __nifailr ? __nifailr + offsetifailr : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, eigsrc), (*env)->GetStringUTFLength(env, initv));
 done:
   if (__nifailr) (*env)->ReleasePrimitiveArrayCritical(env, ifailr, __nifailr, __failed ? JNI_ABORT : 0);
   if (__nifaill) (*env)->ReleasePrimitiveArrayCritical(env, ifaill, __nifaill, __failed ? JNI_ABORT : 0);
@@ -3045,7 +3045,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dhseqr_)(const char *job, const char *compz, int *n, int *ilo, int *ihi, double *h, int *ldh, double *wr, double *wi, double *z, int *ldz, double *work, int *lwork, int *info);
+static void (*dhseqr_)(const char *job, const char *compz, int *n, int *ilo, int *ihi, double *h, int *ldh, double *wr, double *wi, double *z, int *ldz, double *work, int *lwork, int *info, int len_job, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dhseqrK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring compz, jint n, jint ilo, jint ihi, jdoubleArray h, jint offseth, jint ldh, jdoubleArray wr, jint offsetwr, jdoubleArray wi, jint offsetwi, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dhseqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -3078,7 +3078,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dhseqrK(JNIEnv *env, UNUSED jobjec
   if (wi) { if (!(__nwi = (*env)->GetPrimitiveArrayCritical(env, wi, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dhseqr_(__njob, __ncompz, &__nn, &__nilo, &__nihi, __nh ? __nh + offseth : NULL, &__nldh, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dhseqr_(__njob, __ncompz, &__nn, &__nilo, &__nihi, __nh ? __nh + offseth : NULL, &__nldh, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -3221,7 +3221,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlacpy_)(const char *uplo, int *m, int *n, double *a, int *lda, double *b, int *ldb);
+static void (*dlacpy_)(const char *uplo, int *m, int *n, double *a, int *lda, double *b, int *ldb, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlacpyK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb) {
   if (!dlacpy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -3240,7 +3240,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlacpyK(JNIEnv *env, UNUSED jobjec
   __nldb = ldb;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dlacpy_(__nuplo, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb);
+  dlacpy_(__nuplo, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -4105,7 +4105,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlagtm_)(const char *trans, int *n, int *nrhs, double *alpha, double *dl, double *d, double *du, double *x, int *ldx, double *beta, double *b, int *ldb);
+static void (*dlagtm_)(const char *trans, int *n, int *nrhs, double *alpha, double *dl, double *d, double *du, double *x, int *ldx, double *beta, double *b, int *ldb, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlagtmK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jdouble alpha, jdoubleArray dl, jint offsetdl, jdoubleArray d, jint offsetd, jdoubleArray du, jint offsetdu, jdoubleArray x, jint offsetx, jint ldx, jdouble beta, jdoubleArray b, jint offsetb, jint ldb) {
   if (!dlagtm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4134,7 +4134,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlagtmK(JNIEnv *env, UNUSED jobjec
   if (du) { if (!(__ndu = (*env)->GetPrimitiveArrayCritical(env, du, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dlagtm_(__ntrans, &__nn, &__nnrhs, &__nalpha, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __nx ? __nx + offsetx : NULL, &__nldx, &__nbeta, __nb ? __nb + offsetb : NULL, &__nldb);
+  dlagtm_(__ntrans, &__nn, &__nnrhs, &__nalpha, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __nx ? __nx + offsetx : NULL, &__nldx, &__nbeta, __nb ? __nb + offsetb : NULL, &__nldb, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -4585,7 +4585,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlalsd_)(const char *uplo, int *smlsiz, int *n, int *nrhs, double *d, double *e, double *b, int *ldb, double *rcond, int *rank, double *work, int *iwork, int *info);
+static void (*dlalsd_)(const char *uplo, int *smlsiz, int *n, int *nrhs, double *d, double *e, double *b, int *ldb, double *rcond, int *rank, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlalsdK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint smlsiz, jint n, jint nrhs, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray b, jint offsetb, jint ldb, jdouble rcond, jobject rank, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dlalsd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4616,7 +4616,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlalsdK(JNIEnv *env, UNUSED jobjec
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dlalsd_(__nuplo, &__nsmlsiz, &__nn, &__nnrhs, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__nrcond, &__nrank, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dlalsd_(__nuplo, &__nsmlsiz, &__nn, &__nnrhs, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__nrcond, &__nrank, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -4679,7 +4679,7 @@ done:
   return __ret;
 }
 
-static double (*dlangb_)(const char *norm, int *n, int *kl, int *ku, double *ab, int *ldab, double *work);
+static double (*dlangb_)(const char *norm, int *n, int *kl, int *ku, double *ab, int *ldab, double *work, int len_norm);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlangbK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jint kl, jint ku, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray work, jint offsetwork) {
   if (!dlangb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4699,7 +4699,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlangbK(JNIEnv *env, UNUSED job
   __nldab = ldab;
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlangb_(__nnorm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL);
+  __ret = dlangb_(__nnorm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -4708,7 +4708,7 @@ done:
   return __ret;
 }
 
-static double (*dlange_)(const char *norm, int *m, int *n, double *a, int *lda, double *work);
+static double (*dlange_)(const char *norm, int *m, int *n, double *a, int *lda, double *work, int len_norm);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlangeK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray work, jint offsetwork) {
   if (!dlange_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4726,7 +4726,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlangeK(JNIEnv *env, UNUSED job
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlange_(__nnorm, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL);
+  __ret = dlange_(__nnorm, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -4735,7 +4735,7 @@ done:
   return __ret;
 }
 
-static double (*dlangt_)(const char *norm, int *n, double *dl, double *d, double *du);
+static double (*dlangt_)(const char *norm, int *n, double *dl, double *d, double *du, int len_norm);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlangtK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jdoubleArray dl, jint offsetdl, jdoubleArray d, jint offsetd, jdoubleArray du, jint offsetdu) {
   if (!dlangt_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4751,7 +4751,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlangtK(JNIEnv *env, UNUSED job
   if (dl) { if (!(__ndl = (*env)->GetPrimitiveArrayCritical(env, dl, NULL))) { __failed = TRUE; goto done; } }
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (du) { if (!(__ndu = (*env)->GetPrimitiveArrayCritical(env, du, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlangt_(__nnorm, &__nn, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL);
+  __ret = dlangt_(__nnorm, &__nn, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__ndu) (*env)->ReleasePrimitiveArrayCritical(env, du, __ndu, __failed ? JNI_ABORT : 0);
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
@@ -4761,7 +4761,7 @@ done:
   return __ret;
 }
 
-static double (*dlanhs_)(const char *norm, int *n, double *a, int *lda, double *work);
+static double (*dlanhs_)(const char *norm, int *n, double *a, int *lda, double *work, int len_norm);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanhsK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray work, jint offsetwork) {
   if (!dlanhs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4777,7 +4777,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanhsK(JNIEnv *env, UNUSED job
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlanhs_(__nnorm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL);
+  __ret = dlanhs_(__nnorm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -4786,7 +4786,7 @@ done:
   return __ret;
 }
 
-static double (*dlansb_)(const char *norm, const char *uplo, int *n, int *k, double *ab, int *ldab, double *work);
+static double (*dlansb_)(const char *norm, const char *uplo, int *n, int *k, double *ab, int *ldab, double *work, int len_norm, int len_uplo);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlansbK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jint n, jint k, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray work, jint offsetwork) {
   if (!dlansb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4806,7 +4806,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlansbK(JNIEnv *env, UNUSED job
   __nldab = ldab;
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlansb_(__nnorm, __nuplo, &__nn, &__nk, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL);
+  __ret = dlansb_(__nnorm, __nuplo, &__nn, &__nk, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -4816,7 +4816,7 @@ done:
   return __ret;
 }
 
-static double (*dlansp_)(const char *norm, const char *uplo, int *n, double *ap, double *work);
+static double (*dlansp_)(const char *norm, const char *uplo, int *n, double *ap, double *work, int len_norm, int len_uplo);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanspK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray work, jint offsetwork) {
   if (!dlansp_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4832,7 +4832,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanspK(JNIEnv *env, UNUSED job
   __nn = n;
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlansp_(__nnorm, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nwork ? __nwork + offsetwork : NULL);
+  __ret = dlansp_(__nnorm, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -4842,7 +4842,7 @@ done:
   return __ret;
 }
 
-static double (*dlanst_)(const char *norm, int *n, double *d, double *e);
+static double (*dlanst_)(const char *norm, int *n, double *d, double *e, int len_norm);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanstK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete) {
   if (!dlanst_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4856,7 +4856,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlanstK(JNIEnv *env, UNUSED job
   __nn = n;
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlanst_(__nnorm, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL);
+  __ret = dlanst_(__nnorm, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__ne) (*env)->ReleasePrimitiveArrayCritical(env, e, __ne, __failed ? JNI_ABORT : 0);
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
@@ -4865,7 +4865,7 @@ done:
   return __ret;
 }
 
-static double (*dlansy_)(const char *norm, const char *uplo, int *n, double *a, int *lda, double *work);
+static double (*dlansy_)(const char *norm, const char *uplo, int *n, double *a, int *lda, double *work, int len_norm, int len_uplo);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlansyK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray work, jint offsetwork) {
   if (!dlansy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4883,7 +4883,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlansyK(JNIEnv *env, UNUSED job
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlansy_(__nnorm, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL);
+  __ret = dlansy_(__nnorm, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -4893,7 +4893,7 @@ done:
   return __ret;
 }
 
-static double (*dlantb_)(const char *norm, const char *uplo, const char *diag, int *n, int *k, double *ab, int *ldab, double *work);
+static double (*dlantb_)(const char *norm, const char *uplo, const char *diag, int *n, int *k, double *ab, int *ldab, double *work, int len_norm, int len_uplo, int len_diag);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlantbK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jint k, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray work, jint offsetwork) {
   if (!dlantb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4915,7 +4915,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlantbK(JNIEnv *env, UNUSED job
   __nldab = ldab;
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlantb_(__nnorm, __nuplo, __ndiag, &__nn, &__nk, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL);
+  __ret = dlantb_(__nnorm, __nuplo, __ndiag, &__nn, &__nk, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -4926,7 +4926,7 @@ done:
   return __ret;
 }
 
-static double (*dlantp_)(const char *norm, const char *uplo, const char *diag, int *n, double *ap, double *work);
+static double (*dlantp_)(const char *norm, const char *uplo, const char *diag, int *n, double *ap, double *work, int len_norm, int len_uplo, int len_diag);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlantpK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jdoubleArray ap, jint offsetap, jdoubleArray work, jint offsetwork) {
   if (!dlantp_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4944,7 +4944,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlantpK(JNIEnv *env, UNUSED job
   __nn = n;
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlantp_(__nnorm, __nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, __nwork ? __nwork + offsetwork : NULL);
+  __ret = dlantp_(__nnorm, __nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -4955,7 +4955,7 @@ done:
   return __ret;
 }
 
-static double (*dlantr_)(const char *norm, const char *uplo, const char *diag, int *m, int *n, double *a, int *lda, double *work);
+static double (*dlantr_)(const char *norm, const char *uplo, const char *diag, int *m, int *n, double *a, int *lda, double *work, int len_norm, int len_uplo, int len_diag);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlantrK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray work, jint offsetwork) {
   if (!dlantr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -4977,7 +4977,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlantrK(JNIEnv *env, UNUSED job
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = dlantr_(__nnorm, __nuplo, __ndiag, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL);
+  __ret = dlantr_(__nnorm, __nuplo, __ndiag, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -5111,7 +5111,7 @@ done:
   return __ret;
 }
 
-static void (*dlaqgb_)(int *m, int *n, int *kl, int *ku, double *ab, int *ldab, double *r, double *c, double *rowcnd, double *colcnd, double *amax, char *equed);
+static void (*dlaqgb_)(int *m, int *n, int *kl, int *ku, double *ab, int *ldab, double *r, double *c, double *rowcnd, double *colcnd, double *amax, char *equed, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqgbK(JNIEnv *env, UNUSED jobject obj, jint m, jint n, jint kl, jint ku, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray r, jint offsetr, jdoubleArray c, jint offsetc, jdouble rowcnd, jdouble colcnd, jdouble amax, jobject equed) {
   if (!dlaqgb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -5136,11 +5136,11 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqgbK(JNIEnv *env, UNUSED jobjec
   __nrowcnd = rowcnd;
   __ncolcnd = colcnd;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (r) { if (!(__nr = (*env)->GetPrimitiveArrayCritical(env, r, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
-  dlaqgb_(&__nm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, &__nrowcnd, &__ncolcnd, &__namax, __nequed);
+  dlaqgb_(&__nm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, &__nrowcnd, &__ncolcnd, &__namax, __nequed, (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
   if (__nr) (*env)->ReleasePrimitiveArrayCritical(env, r, __nr, __failed ? JNI_ABORT : 0);
@@ -5149,7 +5149,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlaqge_)(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, char *equed);
+static void (*dlaqge_)(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, char *equed, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqgeK(JNIEnv *env, UNUSED jobject obj, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray r, jint offsetr, jdoubleArray c, jint offsetc, jdouble rowcnd, jdouble colcnd, jdouble amax, jobject equed) {
   if (!dlaqge_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -5170,11 +5170,11 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqgeK(JNIEnv *env, UNUSED jobjec
   __nrowcnd = rowcnd;
   __ncolcnd = colcnd;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (r) { if (!(__nr = (*env)->GetPrimitiveArrayCritical(env, r, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
-  dlaqge_(&__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, &__nrowcnd, &__ncolcnd, &__namax, __nequed);
+  dlaqge_(&__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, &__nrowcnd, &__ncolcnd, &__namax, __nequed, (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
   if (__nr) (*env)->ReleasePrimitiveArrayCritical(env, r, __nr, __failed ? JNI_ABORT : 0);
@@ -5601,7 +5601,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlaqsb_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, double *s, double *scond, double *amax, char *equed);
+static void (*dlaqsb_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, double *s, double *scond, double *amax, char *equed, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqsbK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray s, jint offsets, jdouble scond, jdouble amax, jobject equed) {
   if (!dlaqsb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -5621,10 +5621,10 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqsbK(JNIEnv *env, UNUSED jobjec
   __nldab = ldab;
   __nscond = scond;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  dlaqsb_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed);
+  dlaqsb_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -5633,7 +5633,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlaqsp_)(const char *uplo, int *n, double *ap, double *s, double *scond, double *amax, char *equed);
+static void (*dlaqsp_)(const char *uplo, int *n, double *ap, double *s, double *scond, double *amax, char *equed, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqspK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray s, jint offsets, jdouble scond, jdouble amax, jobject equed) {
   if (!dlaqsp_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -5649,10 +5649,10 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqspK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __nscond = scond;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  dlaqsp_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed);
+  dlaqsp_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -5661,7 +5661,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlaqsy_)(const char *uplo, int *n, double *a, int *lda, double *s, double *scond, double *amax, char *equed);
+static void (*dlaqsy_)(const char *uplo, int *n, double *a, int *lda, double *s, double *scond, double *amax, char *equed, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqsyK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray s, jint offsets, jdouble scond, jdouble amax, jobject equed) {
   if (!dlaqsy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -5679,10 +5679,10 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlaqsyK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __nscond = scond;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  dlaqsy_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed);
+  dlaqsy_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -5826,7 +5826,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarf_)(const char *side, int *m, int *n, double *v, int *incv, double *tau, double *c, int *Ldc, double *work);
+static void (*dlarf_)(const char *side, int *m, int *n, double *v, int *incv, double *tau, double *c, int *Ldc, double *work, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarfK(JNIEnv *env, UNUSED jobject obj, jstring side, jint m, jint n, jdoubleArray v, jint offsetv, jint incv, jdouble tau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork) {
   if (!dlarf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -5849,7 +5849,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarfK(JNIEnv *env, UNUSED jobject
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dlarf_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL);
+  dlarf_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, side));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -5858,7 +5858,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarfb_)(const char *side, const char *trans, const char *direct, const char *storev, int *m, int *n, int *k, double *v, int *ldv, double *t, int *ldt, double *c, int *Ldc, double *work, int *ldwork);
+static void (*dlarfb_)(const char *side, const char *trans, const char *direct, const char *storev, int *m, int *n, int *k, double *v, int *ldv, double *t, int *ldt, double *c, int *Ldc, double *work, int *ldwork, int len_side, int len_trans, int len_direct, int len_storev);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarfbK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jstring direct, jstring storev, jint m, jint n, jint k, jdoubleArray v, jint offsetv, jint ldv, jdoubleArray t, jint offsett, jint ldt, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint ldwork) {
   if (!dlarfb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -5893,7 +5893,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarfbK(JNIEnv *env, UNUSED jobjec
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dlarfb_(__nside, __ntrans, __ndirect, __nstorev, &__nm, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __nt ? __nt + offsett : NULL, &__nldt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nldwork);
+  dlarfb_(__nside, __ntrans, __ndirect, __nstorev, &__nm, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __nt ? __nt + offsett : NULL, &__nldt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nldwork, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, direct), (*env)->GetStringUTFLength(env, storev));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -5929,7 +5929,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarft_)(const char *direct, const char *storev, int *n, int *k, double *v, int *ldv, double *tau, double *t, int *ldt);
+static void (*dlarft_)(const char *direct, const char *storev, int *n, int *k, double *v, int *ldv, double *tau, double *t, int *ldt, int len_direct, int len_storev);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarftK(JNIEnv *env, UNUSED jobject obj, jstring direct, jstring storev, jint n, jint k, jdoubleArray v, jint offsetv, jint ldv, jdoubleArray tau, jint offsettau, jdoubleArray t, jint offsett, jint ldt) {
   if (!dlarft_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -5952,7 +5952,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarftK(JNIEnv *env, UNUSED jobjec
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
-  dlarft_(__ndirect, __nstorev, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __ntau ? __ntau + offsettau : NULL, __nt ? __nt + offsett : NULL, &__nldt);
+  dlarft_(__ndirect, __nstorev, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __ntau ? __ntau + offsettau : NULL, __nt ? __nt + offsett : NULL, &__nldt, (*env)->GetStringUTFLength(env, direct), (*env)->GetStringUTFLength(env, storev));
 done:
   if (__nt) (*env)->ReleasePrimitiveArrayCritical(env, t, __nt, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -5962,7 +5962,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarfx_)(const char *side, int *m, int *n, double *v, double *tau, double *c, int *Ldc, double *work);
+static void (*dlarfx_)(const char *side, int *m, int *n, double *v, double *tau, double *c, int *Ldc, double *work, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarfxK(JNIEnv *env, UNUSED jobject obj, jstring side, jint m, jint n, jdoubleArray v, jint offsetv, jdouble tau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork) {
   if (!dlarfx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -5983,7 +5983,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarfxK(JNIEnv *env, UNUSED jobjec
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dlarfx_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL);
+  dlarfx_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, side));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -6125,7 +6125,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarrc_)(const char *jobt, int *n, double *vl, double *vu, double *d, double *e, double *pivmin, int *eigcnt, int *lcnt, int *rcnt, int *info);
+static void (*dlarrc_)(const char *jobt, int *n, double *vl, double *vu, double *d, double *e, double *pivmin, int *eigcnt, int *lcnt, int *rcnt, int *info, int len_jobt);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarrcK(JNIEnv *env, UNUSED jobject obj, jstring jobt, jint n, jdouble vl, jdouble vu, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdouble pivmin, jobject eigcnt, jobject lcnt, jobject rcnt, jobject info) {
   if (!dlarrc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -6152,7 +6152,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarrcK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
-  dlarrc_(__njobt, &__nn, &__nvl, &__nvu, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__npivmin, &__neigcnt, &__nlcnt, &__nrcnt, &__ninfo);
+  dlarrc_(__njobt, &__nn, &__nvl, &__nvu, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__npivmin, &__neigcnt, &__nlcnt, &__nrcnt, &__ninfo, (*env)->GetStringUTFLength(env, jobt));
 done:
   if (__ne) (*env)->ReleasePrimitiveArrayCritical(env, e, __ne, __failed ? JNI_ABORT : 0);
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
@@ -6164,7 +6164,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarrd_)(const char *range, const char *order, int *n, double *vl, double *vu, int *il, int *iu, double *gers, double *reltol, double *d, double *e, double *e2, double *pivmin, int *nsplit, int *isplit, int *m, double *w, double *werr, double *wl, double *wu, int *iblock, int *indexw, double *work, int *iwork, int *info);
+static void (*dlarrd_)(const char *range, const char *order, int *n, double *vl, double *vu, int *il, int *iu, double *gers, double *reltol, double *d, double *e, double *e2, double *pivmin, int *nsplit, int *isplit, int *m, double *w, double *werr, double *wl, double *wu, int *iblock, int *indexw, double *work, int *iwork, int *info, int len_range, int len_order);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarrdK(JNIEnv *env, UNUSED jobject obj, jstring range, jstring order, jint n, jdouble vl, jdouble vu, jint il, jint iu, jdoubleArray gers, jint offsetgers, jdouble reltol, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray e2, jint offsete2, jdouble pivmin, jint nsplit, jintArray isplit, jint offsetisplit, jobject m, jdoubleArray w, jint offsetw, jdoubleArray werr, jint offsetwerr, jobject wl, jobject wu, jintArray iblock, jint offsetiblock, jintArray indexw, jint offsetindexw, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dlarrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -6219,7 +6219,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarrdK(JNIEnv *env, UNUSED jobjec
   if (indexw) { if (!(__nindexw = (*env)->GetPrimitiveArrayCritical(env, indexw, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dlarrd_(__nrange, __norder, &__nn, &__nvl, &__nvu, &__nil, &__niu, __ngers ? __ngers + offsetgers : NULL, &__nreltol, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ne2 ? __ne2 + offsete2 : NULL, &__npivmin, &__nnsplit, __nisplit ? __nisplit + offsetisplit : NULL, &__nm, __nw ? __nw + offsetw : NULL, __nwerr ? __nwerr + offsetwerr : NULL, &__nwl, &__nwu, __niblock ? __niblock + offsetiblock : NULL, __nindexw ? __nindexw + offsetindexw : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dlarrd_(__nrange, __norder, &__nn, &__nvl, &__nvu, &__nil, &__niu, __ngers ? __ngers + offsetgers : NULL, &__nreltol, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ne2 ? __ne2 + offsete2 : NULL, &__npivmin, &__nnsplit, __nisplit ? __nisplit + offsetisplit : NULL, &__nm, __nw ? __nw + offsetw : NULL, __nwerr ? __nwerr + offsetwerr : NULL, &__nwl, &__nwu, __niblock ? __niblock + offsetiblock : NULL, __nindexw ? __nindexw + offsetindexw : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, order));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -6241,7 +6241,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarre_)(const char *range, int *n, double *vl, double *vu, int *il, int *iu, double *d, double *e, double *e2, double *rtol1, double *rtol2, double *spltol, int *nsplit, int *isplit, int *m, double *w, double *werr, double *wgap, int *iblock, int *indexw, double *gers, double *pivmin, double *work, int *iwork, int *info);
+static void (*dlarre_)(const char *range, int *n, double *vl, double *vu, int *il, int *iu, double *d, double *e, double *e2, double *rtol1, double *rtol2, double *spltol, int *nsplit, int *isplit, int *m, double *w, double *werr, double *wgap, int *iblock, int *indexw, double *gers, double *pivmin, double *work, int *iwork, int *info, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarreK(JNIEnv *env, UNUSED jobject obj, jstring range, jint n, jobject vl, jobject vu, jint il, jint iu, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray e2, jint offsete2, jdouble rtol1, jdouble rtol2, jdouble spltol, jobject nsplit, jintArray isplit, jint offsetisplit, jobject m, jdoubleArray w, jint offsetw, jdoubleArray werr, jint offsetwerr, jdoubleArray wgap, jint offsetwgap, jintArray iblock, jint offsetiblock, jintArray indexw, jint offsetindexw, jdoubleArray gers, jint offsetgers, jobject pivmin, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dlarre_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -6296,7 +6296,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarreK(JNIEnv *env, UNUSED jobjec
   if (gers) { if (!(__ngers = (*env)->GetPrimitiveArrayCritical(env, gers, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dlarre_(__nrange, &__nn, &__nvl, &__nvu, &__nil, &__niu, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ne2 ? __ne2 + offsete2 : NULL, &__nrtol1, &__nrtol2, &__nspltol, &__nnsplit, __nisplit ? __nisplit + offsetisplit : NULL, &__nm, __nw ? __nw + offsetw : NULL, __nwerr ? __nwerr + offsetwerr : NULL, __nwgap ? __nwgap + offsetwgap : NULL, __niblock ? __niblock + offsetiblock : NULL, __nindexw ? __nindexw + offsetindexw : NULL, __ngers ? __ngers + offsetgers : NULL, &__npivmin, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dlarre_(__nrange, &__nn, &__nvl, &__nvu, &__nil, &__niu, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ne2 ? __ne2 + offsete2 : NULL, &__nrtol1, &__nrtol2, &__nspltol, &__nnsplit, __nisplit ? __nisplit + offsetisplit : NULL, &__nm, __nw ? __nw + offsetw : NULL, __nwerr ? __nwerr + offsetwerr : NULL, __nwgap ? __nwgap + offsetwgap : NULL, __niblock ? __niblock + offsetiblock : NULL, __nindexw ? __nindexw + offsetindexw : NULL, __ngers ? __ngers + offsetgers : NULL, &__npivmin, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, range));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -6627,7 +6627,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarz_)(const char *side, int *m, int *n, int *l, double *v, int *incv, double *tau, double *c, int *Ldc, double *work);
+static void (*dlarz_)(const char *side, int *m, int *n, int *l, double *v, int *incv, double *tau, double *c, int *Ldc, double *work, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarzK(JNIEnv *env, UNUSED jobject obj, jstring side, jint m, jint n, jint l, jdoubleArray v, jint offsetv, jint incv, jdouble tau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork) {
   if (!dlarz_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -6652,7 +6652,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarzK(JNIEnv *env, UNUSED jobject
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dlarz_(__nside, &__nm, &__nn, &__nl, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL);
+  dlarz_(__nside, &__nm, &__nn, &__nl, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, side));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -6661,7 +6661,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarzb_)(const char *side, const char *trans, const char *direct, const char *storev, int *m, int *n, int *k, int *l, double *v, int *ldv, double *t, int *ldt, double *c, int *Ldc, double *work, int *ldwork);
+static void (*dlarzb_)(const char *side, const char *trans, const char *direct, const char *storev, int *m, int *n, int *k, int *l, double *v, int *ldv, double *t, int *ldt, double *c, int *Ldc, double *work, int *ldwork, int len_side, int len_trans, int len_direct, int len_storev);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarzbK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jstring direct, jstring storev, jint m, jint n, jint k, jint l, jdoubleArray v, jint offsetv, jint ldv, jdoubleArray t, jint offsett, jint ldt, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint ldwork) {
   if (!dlarzb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -6698,7 +6698,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarzbK(JNIEnv *env, UNUSED jobjec
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dlarzb_(__nside, __ntrans, __ndirect, __nstorev, &__nm, &__nn, &__nk, &__nl, __nv ? __nv + offsetv : NULL, &__nldv, __nt ? __nt + offsett : NULL, &__nldt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nldwork);
+  dlarzb_(__nside, __ntrans, __ndirect, __nstorev, &__nm, &__nn, &__nk, &__nl, __nv ? __nv + offsetv : NULL, &__nldv, __nt ? __nt + offsett : NULL, &__nldt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nldwork, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, direct), (*env)->GetStringUTFLength(env, storev));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -6711,7 +6711,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlarzt_)(const char *direct, const char *storev, int *n, int *k, double *v, int *ldv, double *tau, double *t, int *ldt);
+static void (*dlarzt_)(const char *direct, const char *storev, int *n, int *k, double *v, int *ldv, double *tau, double *t, int *ldt, int len_direct, int len_storev);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarztK(JNIEnv *env, UNUSED jobject obj, jstring direct, jstring storev, jint n, jint k, jdoubleArray v, jint offsetv, jint ldv, jdoubleArray tau, jint offsettau, jdoubleArray t, jint offsett, jint ldt) {
   if (!dlarzt_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -6734,7 +6734,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlarztK(JNIEnv *env, UNUSED jobjec
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
-  dlarzt_(__ndirect, __nstorev, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __ntau ? __ntau + offsettau : NULL, __nt ? __nt + offsett : NULL, &__nldt);
+  dlarzt_(__ndirect, __nstorev, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __ntau ? __ntau + offsettau : NULL, __nt ? __nt + offsett : NULL, &__nldt, (*env)->GetStringUTFLength(env, direct), (*env)->GetStringUTFLength(env, storev));
 done:
   if (__nt) (*env)->ReleasePrimitiveArrayCritical(env, t, __nt, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -6766,7 +6766,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlascl_)(const char *type, int *kl, int *ku, double *cfrom, double *cto, int *m, int *n, double *a, int *lda, int *info);
+static void (*dlascl_)(const char *type, int *kl, int *ku, double *cfrom, double *cto, int *m, int *n, double *a, int *lda, int *info, int len_type);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasclK(JNIEnv *env, UNUSED jobject obj, jstring type, jint kl, jint ku, jdouble cfrom, jdouble cto, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jobject info) {
   if (!dlascl_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -6791,7 +6791,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasclK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dlascl_(__ntype, &__nkl, &__nku, &__ncfrom, &__ncto, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  dlascl_(__ntype, &__nkl, &__nku, &__ncfrom, &__ncto, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, type));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -7365,7 +7365,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlasdq_)(const char *uplo, int *sqre, int *n, int *ncvt, int *nru, int *ncc, double *d, double *e, double *vt, int *ldvt, double *u, int *ldu, double *c, int *Ldc, double *work, int *info);
+static void (*dlasdq_)(const char *uplo, int *sqre, int *n, int *ncvt, int *nru, int *ncc, double *d, double *e, double *vt, int *ldvt, double *u, int *ldu, double *c, int *Ldc, double *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasdqK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint sqre, jint n, jint ncvt, jint nru, jint ncc, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray vt, jint offsetvt, jint ldvt, jdoubleArray u, jint offsetu, jint ldu, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dlasdq_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -7402,7 +7402,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasdqK(JNIEnv *env, UNUSED jobjec
   if (u) { if (!(__nu = (*env)->GetPrimitiveArrayCritical(env, u, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dlasdq_(__nuplo, &__nsqre, &__nn, &__nncvt, &__nnru, &__nncc, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nu ? __nu + offsetu : NULL, &__nldu, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dlasdq_(__nuplo, &__nsqre, &__nn, &__nncvt, &__nnru, &__nncc, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nu ? __nu + offsetu : NULL, &__nldu, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -7444,7 +7444,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlaset_)(const char *uplo, int *m, int *n, double *alpha, double *beta, double *a, int *lda);
+static void (*dlaset_)(const char *uplo, int *m, int *n, double *alpha, double *beta, double *a, int *lda, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasetK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint m, jint n, jdouble alpha, jdouble beta, jdoubleArray a, jint offseta, jint lda) {
   if (!dlaset_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -7463,7 +7463,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasetK(JNIEnv *env, UNUSED jobjec
   __nbeta = beta;
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dlaset_(__nuplo, &__nm, &__nn, &__nalpha, &__nbeta, __na ? __na + offseta : NULL, &__nlda);
+  dlaset_(__nuplo, &__nm, &__nn, &__nalpha, &__nbeta, __na ? __na + offseta : NULL, &__nlda, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
@@ -7512,9 +7512,9 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlasq3_)(int *i0, int *n0, double *z, int *pp, double *dmin, double *sigma, double *desig, double *qmax, int *nfail, int *iter, int *ndiv, int *ieee);
+static void (*dlasq3_)(int *i0, int *n0, double *z, int *pp, double *dmin, double *sigma, double *desig, double *qmax, int *nfail, int *iter, int *ndiv, int *ieee, int *ttype, double *dmin1, double *dmin2, double *dn, double *dn1, double *dn2, double *g, double *tau);
 
-void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq3K(JNIEnv *env, UNUSED jobject obj, jint i0, jobject n0, jdoubleArray z, jint offsetz, jint pp, jobject dmin, jobject sigma, jobject desig, jobject qmax, jobject nfail, jobject iter, jobject ndiv, jboolean ieee) {
+void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq3K(JNIEnv *env, UNUSED jobject obj, jint i0, jobject n0, jdoubleArray z, jint offsetz, jint pp, jobject dmin, jobject sigma, jobject desig, jobject qmax, jobject nfail, jobject iter, jobject ndiv, jboolean ieee, jobject ttype, jobject dmin1, jobject dmin2, jobject dn, jobject dn1, jobject dn2, jobject g, jobject tau) {
   if (!dlasq3_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __ni0 __attribute__((aligned(8)));
@@ -7528,6 +7528,14 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq3K(JNIEnv *env, UNUSED jobjec
   int __niter = 0;
   int __nndiv = 0;
   int __nieee __attribute__((aligned(8)));
+  int __nttype = 0;
+  double __ndmin1 = 0;
+  double __ndmin2 = 0;
+  double __ndn = 0;
+  double __ndn1 = 0;
+  double __ndn2 = 0;
+  double __ng = 0;
+  double __ntau = 0;
   double *__nz = NULL;
   __ni0 = i0;
   __nn0 = (*env)->GetIntField(env, n0, intW_val_fieldID);
@@ -7540,10 +7548,26 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq3K(JNIEnv *env, UNUSED jobjec
   __niter = (*env)->GetIntField(env, iter, intW_val_fieldID);
   __nndiv = (*env)->GetIntField(env, ndiv, intW_val_fieldID);
   __nieee = ieee;
+  __nttype = (*env)->GetIntField(env, ttype, intW_val_fieldID);
+  __ndmin1 = (*env)->GetDoubleField(env, dmin1, doubleW_val_fieldID);
+  __ndmin2 = (*env)->GetDoubleField(env, dmin2, doubleW_val_fieldID);
+  __ndn = (*env)->GetDoubleField(env, dn, doubleW_val_fieldID);
+  __ndn1 = (*env)->GetDoubleField(env, dn1, doubleW_val_fieldID);
+  __ndn2 = (*env)->GetDoubleField(env, dn2, doubleW_val_fieldID);
+  __ng = (*env)->GetDoubleField(env, g, doubleW_val_fieldID);
+  __ntau = (*env)->GetDoubleField(env, tau, doubleW_val_fieldID);
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
-  dlasq3_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__ndmin, &__nsigma, &__ndesig, &__nqmax, &__nnfail, &__niter, &__nndiv, &__nieee);
+  dlasq3_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__ndmin, &__nsigma, &__ndesig, &__nqmax, &__nnfail, &__niter, &__nndiv, &__nieee, &__nttype, &__ndmin1, &__ndmin2, &__ndn, &__ndn1, &__ndn2, &__ng, &__ntau);
 done:
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
+  if (!__failed) (*env)->SetDoubleField(env, tau, doubleW_val_fieldID, __ntau);
+  if (!__failed) (*env)->SetDoubleField(env, g, doubleW_val_fieldID, __ng);
+  if (!__failed) (*env)->SetDoubleField(env, dn2, doubleW_val_fieldID, __ndn2);
+  if (!__failed) (*env)->SetDoubleField(env, dn1, doubleW_val_fieldID, __ndn1);
+  if (!__failed) (*env)->SetDoubleField(env, dn, doubleW_val_fieldID, __ndn);
+  if (!__failed) (*env)->SetDoubleField(env, dmin2, doubleW_val_fieldID, __ndmin2);
+  if (!__failed) (*env)->SetDoubleField(env, dmin1, doubleW_val_fieldID, __ndmin1);
+  if (!__failed) (*env)->SetIntField(env, ttype, intW_val_fieldID, __nttype);
   if (!__failed) (*env)->SetIntField(env, ndiv, intW_val_fieldID, __nndiv);
   if (!__failed) (*env)->SetIntField(env, iter, intW_val_fieldID, __niter);
   if (!__failed) (*env)->SetIntField(env, nfail, intW_val_fieldID, __nnfail);
@@ -7555,9 +7579,9 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlasq4_)(int *i0, int *n0, double *z, int *pp, int *n0in, double *dmin, double *dmin1, double *dmin2, double *dn, double *dn1, double *dn2, double *tau, int *ttype);
+static void (*dlasq4_)(int *i0, int *n0, double *z, int *pp, int *n0in, double *dmin, double *dmin1, double *dmin2, double *dn, double *dn1, double *dn2, double *tau, int *ttype, double *g);
 
-void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq4K(JNIEnv *env, UNUSED jobject obj, jint i0, jint n0, jdoubleArray z, jint offsetz, jint pp, jint n0in, jdouble dmin, jdouble dmin1, jdouble dmin2, jdouble dn, jdouble dn1, jdouble dn2, jobject tau, jobject ttype) {
+void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq4K(JNIEnv *env, UNUSED jobject obj, jint i0, jint n0, jdoubleArray z, jint offsetz, jint pp, jint n0in, jdouble dmin, jdouble dmin1, jdouble dmin2, jdouble dn, jdouble dn1, jdouble dn2, jobject tau, jobject ttype, jobject g) {
   if (!dlasq4_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __ni0 __attribute__((aligned(8)));
@@ -7572,6 +7596,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq4K(JNIEnv *env, UNUSED jobjec
   double __ndn2 __attribute__((aligned(8)));
   double __ntau = 0;
   int __nttype = 0;
+  double __ng = 0;
   double *__nz = NULL;
   __ni0 = i0;
   __nn0 = n0;
@@ -7585,24 +7610,27 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq4K(JNIEnv *env, UNUSED jobjec
   __ndn2 = dn2;
   __ntau = (*env)->GetDoubleField(env, tau, doubleW_val_fieldID);
   __nttype = (*env)->GetIntField(env, ttype, intW_val_fieldID);
+  __ng = (*env)->GetDoubleField(env, g, doubleW_val_fieldID);
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
-  dlasq4_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__nn0in, &__ndmin, &__ndmin1, &__ndmin2, &__ndn, &__ndn1, &__ndn2, &__ntau, &__nttype);
+  dlasq4_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__nn0in, &__ndmin, &__ndmin1, &__ndmin2, &__ndn, &__ndn1, &__ndn2, &__ntau, &__nttype, &__ng);
 done:
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
+  if (!__failed) (*env)->SetDoubleField(env, g, doubleW_val_fieldID, __ng);
   if (!__failed) (*env)->SetIntField(env, ttype, intW_val_fieldID, __nttype);
   if (!__failed) (*env)->SetDoubleField(env, tau, doubleW_val_fieldID, __ntau);
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlasq5_)(int *i0, int *n0, double *z, int *pp, double *tau, double *dmin, double *dmin1, double *dmin2, double *dn, double *dnm1, double *dnm2, int *ieee);
+static void (*dlasq5_)(int *i0, int *n0, double *z, int *pp, double *tau, double *sigma, double *dmin, double *dmin1, double *dmin2, double *dn, double *dnm1, double *dnm2, int *ieee, double *eps);
 
-void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq5K(JNIEnv *env, UNUSED jobject obj, jint i0, jint n0, jdoubleArray z, jint offsetz, jint pp, jdouble tau, jobject dmin, jobject dmin1, jobject dmin2, jobject dn, jobject dnm1, jobject dnm2, jboolean ieee) {
+void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq5K(JNIEnv *env, UNUSED jobject obj, jint i0, jint n0, jdoubleArray z, jint offsetz, jint pp, jdouble tau, jdouble sigma, jobject dmin, jobject dmin1, jobject dmin2, jobject dn, jobject dnm1, jobject dnm2, jboolean ieee, jdouble eps) {
   if (!dlasq5_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __ni0 __attribute__((aligned(8)));
   int __nn0 __attribute__((aligned(8)));
   int __npp __attribute__((aligned(8)));
   double __ntau __attribute__((aligned(8)));
+  double __nsigma __attribute__((aligned(8)));
   double __ndmin = 0;
   double __ndmin1 = 0;
   double __ndmin2 = 0;
@@ -7610,11 +7638,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq5K(JNIEnv *env, UNUSED jobjec
   double __ndnm1 = 0;
   double __ndnm2 = 0;
   int __nieee __attribute__((aligned(8)));
+  double __neps __attribute__((aligned(8)));
   double *__nz = NULL;
   __ni0 = i0;
   __nn0 = n0;
   __npp = pp;
   __ntau = tau;
+  __nsigma = sigma;
   __ndmin = (*env)->GetDoubleField(env, dmin, doubleW_val_fieldID);
   __ndmin1 = (*env)->GetDoubleField(env, dmin1, doubleW_val_fieldID);
   __ndmin2 = (*env)->GetDoubleField(env, dmin2, doubleW_val_fieldID);
@@ -7622,8 +7652,9 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasq5K(JNIEnv *env, UNUSED jobjec
   __ndnm1 = (*env)->GetDoubleField(env, dnm1, doubleW_val_fieldID);
   __ndnm2 = (*env)->GetDoubleField(env, dnm2, doubleW_val_fieldID);
   __nieee = ieee;
+  __neps = eps;
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
-  dlasq5_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__ntau, &__ndmin, &__ndmin1, &__ndmin2, &__ndn, &__ndnm1, &__ndnm2, &__nieee);
+  dlasq5_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__ntau, &__nsigma, &__ndmin, &__ndmin1, &__ndmin2, &__ndn, &__ndnm1, &__ndnm2, &__nieee, &__neps);
 done:
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetDoubleField(env, dnm2, doubleW_val_fieldID, __ndnm2);
@@ -7672,7 +7703,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlasr_)(const char *side, const char *pivot, const char *direct, int *m, int *n, double *c, double *s, double *a, int *lda);
+static void (*dlasr_)(const char *side, const char *pivot, const char *direct, int *m, int *n, double *c, double *s, double *a, int *lda, int len_side, int len_pivot, int len_direct);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring pivot, jstring direct, jint m, jint n, jdoubleArray c, jint offsetc, jdoubleArray s, jint offsets, jdoubleArray a, jint offseta, jint lda) {
   if (!dlasr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -7695,7 +7726,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasrK(JNIEnv *env, UNUSED jobject
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dlasr_(__nside, __npivot, __ndirect, &__nm, &__nn, __nc ? __nc + offsetc : NULL, __ns ? __ns + offsets : NULL, __na ? __na + offseta : NULL, &__nlda);
+  dlasr_(__nside, __npivot, __ndirect, &__nm, &__nn, __nc ? __nc + offsetc : NULL, __ns ? __ns + offsets : NULL, __na ? __na + offseta : NULL, &__nlda, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, pivot), (*env)->GetStringUTFLength(env, direct));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
@@ -7706,7 +7737,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlasrt_)(const char *id, int *n, double *d, int *info);
+static void (*dlasrt_)(const char *id, int *n, double *d, int *info, int len_id);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasrtK(JNIEnv *env, UNUSED jobject obj, jstring id, jint n, jdoubleArray d, jint offsetd, jobject info) {
   if (!dlasrt_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -7719,7 +7750,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasrtK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
-  dlasrt_(__nid, &__nn, __nd ? __nd + offsetd : NULL, &__ninfo);
+  dlasrt_(__nid, &__nn, __nd ? __nd + offsetd : NULL, &__ninfo, (*env)->GetStringUTFLength(env, id));
 done:
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -7859,7 +7890,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlasyf_)(const char *uplo, int *n, int *nb, int *kb, double *a, int *lda, int *ipiv, double *w, int *ldw, int *info);
+static void (*dlasyf_)(const char *uplo, int *n, int *nb, int *kb, double *a, int *lda, int *ipiv, double *w, int *ldw, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasyfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nb, jobject kb, jdoubleArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jdoubleArray w, jint offsetw, jint ldw, jobject info) {
   if (!dlasyf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -7884,7 +7915,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlasyfK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
-  dlasyf_(__nuplo, &__nn, &__nnb, &__nkb, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nw ? __nw + offsetw : NULL, &__nldw, &__ninfo);
+  dlasyf_(__nuplo, &__nn, &__nnb, &__nkb, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nw ? __nw + offsetw : NULL, &__nldw, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nw) (*env)->ReleasePrimitiveArrayCritical(env, w, __nw, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -7895,7 +7926,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlatbs_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, int *kd, double *ab, int *ldab, double *x, double *scale, double *cnorm, int *info);
+static void (*dlatbs_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, int *kd, double *ab, int *ldab, double *x, double *scale, double *cnorm, int *info, int len_uplo, int len_trans, int len_diag, int len_normin);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatbsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jstring normin, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray x, jint offsetx, jobject scale, jdoubleArray cnorm, jint offsetcnorm, jobject info) {
   if (!dlatbs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -7924,7 +7955,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatbsK(JNIEnv *env, UNUSED jobjec
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (cnorm) { if (!(__ncnorm = (*env)->GetPrimitiveArrayCritical(env, cnorm, NULL))) { __failed = TRUE; goto done; } }
-  dlatbs_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo);
+  dlatbs_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag), (*env)->GetStringUTFLength(env, normin));
 done:
   if (__ncnorm) (*env)->ReleasePrimitiveArrayCritical(env, cnorm, __ncnorm, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -7972,7 +8003,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlatps_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, double *ap, double *x, double *scale, double *cnorm, int *info);
+static void (*dlatps_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, double *ap, double *x, double *scale, double *cnorm, int *info, int len_uplo, int len_trans, int len_diag, int len_normin);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatpsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jstring normin, jint n, jdoubleArray ap, jint offsetap, jdoubleArray x, jint offsetx, jobject scale, jdoubleArray cnorm, jint offsetcnorm, jobject info) {
   if (!dlatps_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -7997,7 +8028,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatpsK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (cnorm) { if (!(__ncnorm = (*env)->GetPrimitiveArrayCritical(env, cnorm, NULL))) { __failed = TRUE; goto done; } }
-  dlatps_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, __nap ? __nap + offsetap : NULL, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo);
+  dlatps_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, __nap ? __nap + offsetap : NULL, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag), (*env)->GetStringUTFLength(env, normin));
 done:
   if (__ncnorm) (*env)->ReleasePrimitiveArrayCritical(env, cnorm, __ncnorm, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -8011,7 +8042,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlatrd_)(const char *uplo, int *n, int *nb, double *a, int *lda, double *e, double *tau, double *w, int *ldw);
+static void (*dlatrd_)(const char *uplo, int *n, int *nb, double *a, int *lda, double *e, double *tau, double *w, int *ldw, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatrdK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nb, jdoubleArray a, jint offseta, jint lda, jdoubleArray e, jint offsete, jdoubleArray tau, jint offsettau, jdoubleArray w, jint offsetw, jint ldw) {
   if (!dlatrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8034,7 +8065,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatrdK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
-  dlatrd_(__nuplo, &__nn, &__nnb, __na ? __na + offseta : NULL, &__nlda, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, __nw ? __nw + offsetw : NULL, &__nldw);
+  dlatrd_(__nuplo, &__nn, &__nnb, __na ? __na + offseta : NULL, &__nlda, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, __nw ? __nw + offsetw : NULL, &__nldw, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nw) (*env)->ReleasePrimitiveArrayCritical(env, w, __nw, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -8044,7 +8075,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlatrs_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, double *a, int *lda, double *x, double *scale, double *cnorm, int *info);
+static void (*dlatrs_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, double *a, int *lda, double *x, double *scale, double *cnorm, int *info, int len_uplo, int len_trans, int len_diag, int len_normin);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jstring normin, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray x, jint offsetx, jobject scale, jdoubleArray cnorm, jint offsetcnorm, jobject info) {
   if (!dlatrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8071,7 +8102,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatrsK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (cnorm) { if (!(__ncnorm = (*env)->GetPrimitiveArrayCritical(env, cnorm, NULL))) { __failed = TRUE; goto done; } }
-  dlatrs_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, __na ? __na + offseta : NULL, &__nlda, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo);
+  dlatrs_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, __na ? __na + offseta : NULL, &__nlda, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag), (*env)->GetStringUTFLength(env, normin));
 done:
   if (__ncnorm) (*env)->ReleasePrimitiveArrayCritical(env, cnorm, __ncnorm, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -8112,7 +8143,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlatzm_)(const char *side, int *m, int *n, double *v, int *incv, double *tau, double *c1, double *c2, int *Ldc, double *work);
+static void (*dlatzm_)(const char *side, int *m, int *n, double *v, int *incv, double *tau, double *c1, double *c2, int *Ldc, double *work, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatzmK(JNIEnv *env, UNUSED jobject obj, jstring side, jint m, jint n, jdoubleArray v, jint offsetv, jint incv, jdouble tau, jdoubleArray c1, jint offsetc1, jdoubleArray c2, jint offsetc2, jint Ldc, jdoubleArray work, jint offsetwork) {
   if (!dlatzm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8137,7 +8168,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlatzmK(JNIEnv *env, UNUSED jobjec
   if (c1) { if (!(__nc1 = (*env)->GetPrimitiveArrayCritical(env, c1, NULL))) { __failed = TRUE; goto done; } }
   if (c2) { if (!(__nc2 = (*env)->GetPrimitiveArrayCritical(env, c2, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dlatzm_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc1 ? __nc1 + offsetc1 : NULL, __nc2 ? __nc2 + offsetc2 : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL);
+  dlatzm_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc1 ? __nc1 + offsetc1 : NULL, __nc2 ? __nc2 + offsetc2 : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, side));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc2) (*env)->ReleasePrimitiveArrayCritical(env, c2, __nc2, __failed ? JNI_ABORT : 0);
@@ -8147,7 +8178,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlauu2_)(const char *uplo, int *n, double *a, int *lda, int *info);
+static void (*dlauu2_)(const char *uplo, int *n, double *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlauu2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jobject info) {
   if (!dlauu2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8162,7 +8193,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlauu2K(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dlauu2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  dlauu2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -8170,7 +8201,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dlauum_)(const char *uplo, int *n, double *a, int *lda, int *info);
+static void (*dlauum_)(const char *uplo, int *n, double *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlauumK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jobject info) {
   if (!dlauum_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8185,7 +8216,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlauumK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dlauum_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  dlauum_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -8205,7 +8236,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dlazq4K(JNIEnv *env, UNUSED jobjec
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
 }
 
-static void (*dopgtr_)(const char *uplo, int *n, double *ap, double *tau, double *q, int *ldq, double *work, int *info);
+static void (*dopgtr_)(const char *uplo, int *n, double *ap, double *tau, double *q, int *ldq, double *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dopgtrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray tau, jint offsettau, jdoubleArray q, jint offsetq, jint ldq, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dopgtr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8226,7 +8257,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dopgtrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dopgtr_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ntau ? __ntau + offsettau : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dopgtr_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ntau ? __ntau + offsettau : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -8237,7 +8268,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dopmtr_)(const char *side, const char *uplo, const char *trans, int *m, int *n, double *ap, double *tau, double *c, int *Ldc, double *work, int *info);
+static void (*dopmtr_)(const char *side, const char *uplo, const char *trans, int *m, int *n, double *ap, double *tau, double *c, int *Ldc, double *work, int *info, int len_side, int len_uplo, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dopmtrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring trans, jint m, jint n, jdoubleArray ap, jint offsetap, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dopmtr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8264,7 +8295,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dopmtrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dopmtr_(__nside, __nuplo, __ntrans, &__nm, &__nn, __nap ? __nap + offsetap : NULL, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dopmtr_(__nside, __nuplo, __ntrans, &__nm, &__nn, __nap ? __nap + offsetap : NULL, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -8337,7 +8368,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dorgbr_)(const char *vect, int *m, int *n, int *k, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
+static void (*dorgbr_)(const char *vect, int *m, int *n, int *k, double *a, int *lda, double *tau, double *work, int *lwork, int *info, int len_vect);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorgbrK(JNIEnv *env, UNUSED jobject obj, jstring vect, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dorgbr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8362,7 +8393,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorgbrK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dorgbr_(__nvect, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dorgbr_(__nvect, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, vect));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -8592,7 +8623,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dorgtr_)(const char *uplo, int *n, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
+static void (*dorgtr_)(const char *uplo, int *n, double *a, int *lda, double *tau, double *work, int *lwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorgtrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dorgtr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8613,7 +8644,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorgtrK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dorgtr_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dorgtr_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -8623,7 +8654,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dorm2l_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info);
+static void (*dorm2l_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorm2lK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dorm2l_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8652,7 +8683,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorm2lK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dorm2l_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dorm2l_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -8664,7 +8695,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dorm2r_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info);
+static void (*dorm2r_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorm2rK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dorm2r_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8693,7 +8724,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorm2rK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dorm2r_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dorm2r_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -8705,7 +8736,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormbr_)(const char *vect, const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info);
+static void (*dormbr_)(const char *vect, const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info, int len_vect, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormbrK(JNIEnv *env, UNUSED jobject obj, jstring vect, jstring side, jstring trans, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dormbr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8738,7 +8769,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormbrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormbr_(__nvect, __nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dormbr_(__nvect, __nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, vect), (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -8751,7 +8782,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormhr_)(const char *side, const char *trans, int *m, int *n, int *ilo, int *ihi, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info);
+static void (*dormhr_)(const char *side, const char *trans, int *m, int *n, int *ilo, int *ihi, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormhrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint ilo, jint ihi, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dormhr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8784,7 +8815,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormhrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormhr_(__nside, __ntrans, &__nm, &__nn, &__nilo, &__nihi, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dormhr_(__nside, __ntrans, &__nm, &__nn, &__nilo, &__nihi, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -8796,7 +8827,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dorml2_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info);
+static void (*dorml2_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorml2K(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dorml2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8825,7 +8856,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dorml2K(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dorml2_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dorml2_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -8837,7 +8868,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormlq_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info);
+static void (*dormlq_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormlqK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dormlq_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8868,7 +8899,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormlqK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormlq_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dormlq_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -8880,7 +8911,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormql_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info);
+static void (*dormql_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormqlK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dormql_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8911,7 +8942,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormqlK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormql_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dormql_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -8923,7 +8954,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormqr_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info);
+static void (*dormqr_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormqrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dormqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8954,7 +8985,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormqrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormqr_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dormqr_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -8966,7 +8997,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormr2_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info);
+static void (*dormr2_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormr2K(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dormr2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -8995,7 +9026,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormr2K(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormr2_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dormr2_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -9007,7 +9038,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormr3_)(const char *side, const char *trans, int *m, int *n, int *k, int *l, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info);
+static void (*dormr3_)(const char *side, const char *trans, int *m, int *n, int *k, int *l, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormr3K(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jint l, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dormr3_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9038,7 +9069,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormr3K(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormr3_(__nside, __ntrans, &__nm, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dormr3_(__nside, __ntrans, &__nm, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -9050,7 +9081,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormrq_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info);
+static void (*dormrq_)(const char *side, const char *trans, int *m, int *n, int *k, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormrqK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dormrq_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9081,7 +9112,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormrqK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormrq_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dormrq_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -9093,7 +9124,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormrz_)(const char *side, const char *trans, int *m, int *n, int *k, int *l, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info);
+static void (*dormrz_)(const char *side, const char *trans, int *m, int *n, int *k, int *l, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormrzK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jint l, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dormrz_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9126,7 +9157,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormrzK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormrz_(__nside, __ntrans, &__nm, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dormrz_(__nside, __ntrans, &__nm, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -9138,7 +9169,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dormtr_)(const char *side, const char *uplo, const char *trans, int *m, int *n, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info);
+static void (*dormtr_)(const char *side, const char *uplo, const char *trans, int *m, int *n, double *a, int *lda, double *tau, double *c, int *Ldc, double *work, int *lwork, int *info, int len_side, int len_uplo, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormtrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring trans, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray tau, jint offsettau, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dormtr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9169,7 +9200,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dormtrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dormtr_(__nside, __nuplo, __ntrans, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dormtr_(__nside, __nuplo, __ntrans, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -9182,7 +9213,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpbcon_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, double *anorm, double *rcond, double *work, int *iwork, int *info);
+static void (*dpbcon_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, double *anorm, double *rcond, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jdouble anorm, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dpbcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9207,7 +9238,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbconK(JNIEnv *env, UNUSED jobjec
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dpbcon_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dpbcon_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -9218,7 +9249,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpbequ_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, double *s, double *scond, double *amax, int *info);
+static void (*dpbequ_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, double *s, double *scond, double *amax, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbequK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray s, jint offsets, jobject scond, jobject amax, jobject info) {
   if (!dpbequ_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9241,7 +9272,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbequK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  dpbequ_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __ns ? __ns + offsets : NULL, &__nscond, &__namax, &__ninfo);
+  dpbequ_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __ns ? __ns + offsets : NULL, &__nscond, &__namax, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -9252,7 +9283,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpbrfs_)(const char *uplo, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *afb, int *ldafb, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dpbrfs_)(const char *uplo, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *afb, int *ldafb, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbrfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jint nrhs, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray afb, jint offsetafb, jint ldafb, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dpbrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9291,7 +9322,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dpbrfs_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dpbrfs_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -9306,7 +9337,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpbstf_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, int *info);
+static void (*dpbstf_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbstfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jobject info) {
   if (!dpbstf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9323,7 +9354,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbstfK(JNIEnv *env, UNUSED jobjec
   __nldab = ldab;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
-  dpbstf_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo);
+  dpbstf_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -9331,7 +9362,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpbsv_)(const char *uplo, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *b, int *ldb, int *info);
+static void (*dpbsv_)(const char *uplo, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jint nrhs, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dpbsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9354,7 +9385,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbsvK(JNIEnv *env, UNUSED jobject
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dpbsv_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dpbsv_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -9363,7 +9394,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpbsvx_)(const char *fact, const char *uplo, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *afb, int *ldafb, char *equed, double *s, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dpbsvx_)(const char *fact, const char *uplo, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *afb, int *ldafb, char *equed, double *s, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info, int len_fact, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint kd, jint nrhs, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray afb, jint offsetafb, jint ldafb, jobject equed, jdoubleArray s, jint offsets, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jobject rcond, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dpbsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9396,7 +9427,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbsvxK(JNIEnv *env, UNUSED jobjec
   __nnrhs = nrhs;
   __nldab = ldab;
   __nldafb = ldafb;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetDoubleField(env, rcond, doubleW_val_fieldID);
@@ -9410,7 +9441,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dpbsvx_(__nfact, __nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dpbsvx_(__nfact, __nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -9429,7 +9460,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpbtf2_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, int *info);
+static void (*dpbtf2_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbtf2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jobject info) {
   if (!dpbtf2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9446,7 +9477,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbtf2K(JNIEnv *env, UNUSED jobjec
   __nldab = ldab;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
-  dpbtf2_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo);
+  dpbtf2_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -9454,7 +9485,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpbtrf_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, int *info);
+static void (*dpbtrf_)(const char *uplo, int *n, int *kd, double *ab, int *ldab, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbtrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jobject info) {
   if (!dpbtrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9471,7 +9502,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbtrfK(JNIEnv *env, UNUSED jobjec
   __nldab = ldab;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
-  dpbtrf_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo);
+  dpbtrf_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -9479,7 +9510,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpbtrs_)(const char *uplo, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *b, int *ldb, int *info);
+static void (*dpbtrs_)(const char *uplo, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbtrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jint nrhs, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dpbtrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9502,7 +9533,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpbtrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dpbtrs_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dpbtrs_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -9511,7 +9542,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpocon_)(const char *uplo, int *n, double *a, int *lda, double *anorm, double *rcond, double *work, int *iwork, int *info);
+static void (*dpocon_)(const char *uplo, int *n, double *a, int *lda, double *anorm, double *rcond, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpoconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdouble anorm, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dpocon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9534,7 +9565,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpoconK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dpocon_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dpocon_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -9574,7 +9605,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dporfs_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dporfs_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dporfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray af, jint offsetaf, jint ldaf, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dporfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9611,7 +9642,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dporfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dporfs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dporfs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -9626,7 +9657,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dposv_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, int *info);
+static void (*dposv_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dposvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dposv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9647,7 +9678,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dposvK(JNIEnv *env, UNUSED jobject
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dposv_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dposv_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -9656,7 +9687,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dposvx_)(const char *fact, const char *uplo, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, char *equed, double *s, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dposvx_)(const char *fact, const char *uplo, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, char *equed, double *s, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info, int len_fact, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dposvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray af, jint offsetaf, jint ldaf, jobject equed, jdoubleArray s, jint offsets, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jobject rcond, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dposvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9687,7 +9718,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dposvxK(JNIEnv *env, UNUSED jobjec
   __nnrhs = nrhs;
   __nlda = lda;
   __nldaf = ldaf;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetDoubleField(env, rcond, doubleW_val_fieldID);
@@ -9701,7 +9732,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dposvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dposvx_(__nfact, __nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dposvx_(__nfact, __nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -9720,7 +9751,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpotf2_)(const char *uplo, int *n, double *a, int *lda, int *info);
+static void (*dpotf2_)(const char *uplo, int *n, double *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpotf2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jobject info) {
   if (!dpotf2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9735,7 +9766,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpotf2K(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dpotf2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  dpotf2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -9743,7 +9774,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpotrf_)(const char *uplo, int *n, double *a, int *lda, int *info);
+static void (*dpotrf_)(const char *uplo, int *n, double *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpotrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jobject info) {
   if (!dpotrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9758,7 +9789,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpotrfK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dpotrf_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  dpotrf_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -9766,7 +9797,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpotri_)(const char *uplo, int *n, double *a, int *lda, int *info);
+static void (*dpotri_)(const char *uplo, int *n, double *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpotriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jobject info) {
   if (!dpotri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9781,7 +9812,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpotriK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dpotri_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  dpotri_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -9789,7 +9820,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpotrs_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, int *info);
+static void (*dpotrs_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpotrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dpotrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9810,7 +9841,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpotrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dpotrs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dpotrs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -9819,7 +9850,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dppcon_)(const char *uplo, int *n, double *ap, double *anorm, double *rcond, double *work, int *iwork, int *info);
+static void (*dppcon_)(const char *uplo, int *n, double *ap, double *anorm, double *rcond, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dppconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdouble anorm, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dppcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9840,7 +9871,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dppconK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dppcon_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dppcon_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -9851,7 +9882,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dppequ_)(const char *uplo, int *n, double *ap, double *s, double *scond, double *amax, int *info);
+static void (*dppequ_)(const char *uplo, int *n, double *ap, double *s, double *scond, double *amax, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dppequK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray s, jint offsets, jobject scond, jobject amax, jobject info) {
   if (!dppequ_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9870,7 +9901,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dppequK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  dppequ_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ns ? __ns + offsets : NULL, &__nscond, &__namax, &__ninfo);
+  dppequ_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ns ? __ns + offsets : NULL, &__nscond, &__namax, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -9881,7 +9912,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpprfs_)(const char *uplo, int *n, int *nrhs, double *ap, double *afp, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dpprfs_)(const char *uplo, int *n, int *nrhs, double *ap, double *afp, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpprfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jdoubleArray afp, jint offsetafp, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dpprfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9914,7 +9945,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpprfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dpprfs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dpprfs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -9929,7 +9960,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dppsv_)(const char *uplo, int *n, int *nrhs, double *ap, double *b, int *ldb, int *info);
+static void (*dppsv_)(const char *uplo, int *n, int *nrhs, double *ap, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dppsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dppsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9948,7 +9979,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dppsvK(JNIEnv *env, UNUSED jobject
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dppsv_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dppsv_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -9957,7 +9988,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dppsvx_)(const char *fact, const char *uplo, int *n, int *nrhs, double *ap, double *afp, char *equed, double *s, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dppsvx_)(const char *fact, const char *uplo, int *n, int *nrhs, double *ap, double *afp, char *equed, double *s, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info, int len_fact, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dppsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jdoubleArray afp, jint offsetafp, jobject equed, jdoubleArray s, jint offsets, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jobject rcond, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dppsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -9984,7 +10015,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dppsvxK(JNIEnv *env, UNUSED jobjec
   if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) { __failed = TRUE; goto done; }
   __nn = n;
   __nnrhs = nrhs;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetDoubleField(env, rcond, doubleW_val_fieldID);
@@ -9998,7 +10029,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dppsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dppsvx_(__nfact, __nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dppsvx_(__nfact, __nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -10017,7 +10048,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpptrf_)(const char *uplo, int *n, double *ap, int *info);
+static void (*dpptrf_)(const char *uplo, int *n, double *ap, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpptrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jobject info) {
   if (!dpptrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10030,7 +10061,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpptrfK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
-  dpptrf_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo);
+  dpptrf_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -10038,7 +10069,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpptri_)(const char *uplo, int *n, double *ap, int *info);
+static void (*dpptri_)(const char *uplo, int *n, double *ap, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpptriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jobject info) {
   if (!dpptri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10051,7 +10082,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpptriK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
-  dpptri_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo);
+  dpptri_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -10059,7 +10090,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpptrs_)(const char *uplo, int *n, int *nrhs, double *ap, double *b, int *ldb, int *info);
+static void (*dpptrs_)(const char *uplo, int *n, int *nrhs, double *ap, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpptrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dpptrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10078,7 +10109,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpptrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dpptrs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dpptrs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -10116,7 +10147,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dpteqr_)(const char *compz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *info);
+static void (*dpteqr_)(const char *compz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *info, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpteqrK(JNIEnv *env, UNUSED jobject obj, jstring compz, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dpteqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10137,7 +10168,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dpteqrK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dpteqr_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dpteqr_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -10224,7 +10255,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dptsvx_)(const char *fact, int *n, int *nrhs, double *d, double *e, double *df, double *ef, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *info);
+static void (*dptsvx_)(const char *fact, int *n, int *nrhs, double *d, double *e, double *df, double *ef, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *info, int len_fact);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dptsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jint n, jint nrhs, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray df, jint offsetdf, jdoubleArray ef, jint offsetef, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jobject rcond, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dptsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10261,7 +10292,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dptsvxK(JNIEnv *env, UNUSED jobjec
   if (ferr) { if (!(__nferr = (*env)->GetPrimitiveArrayCritical(env, ferr, NULL))) { __failed = TRUE; goto done; } }
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dptsvx_(__nfact, &__nn, &__nnrhs, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ndf ? __ndf + offsetdf : NULL, __nef ? __nef + offsetef : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dptsvx_(__nfact, &__nn, &__nnrhs, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ndf ? __ndf + offsetdf : NULL, __nef ? __nef + offsetef : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nberr) (*env)->ReleasePrimitiveArrayCritical(env, berr, __nberr, __failed ? JNI_ABORT : 0);
@@ -10371,7 +10402,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsbev_)(const char *jobz, const char *uplo, int *n, int *kd, double *ab, int *ldab, double *w, double *z, int *ldz, double *work, int *info);
+static void (*dsbev_)(const char *jobz, const char *uplo, int *n, int *kd, double *ab, int *ldab, double *w, double *z, int *ldz, double *work, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbevK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dsbev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10398,7 +10429,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbevK(JNIEnv *env, UNUSED jobject
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsbev_(__njobz, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dsbev_(__njobz, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -10410,7 +10441,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsbevd_)(const char *jobz, const char *uplo, int *n, int *kd, double *ab, int *ldab, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dsbevd_)(const char *jobz, const char *uplo, int *n, int *kd, double *ab, int *ldab, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbevdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dsbevd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10443,7 +10474,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbevdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dsbevd_(__njobz, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dsbevd_(__njobz, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -10456,7 +10487,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsbevx_)(const char *jobz, const char *range, const char *uplo, int *n, int *kd, double *ab, int *ldab, double *q, int *ldq, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info);
+static void (*dsbevx_)(const char *jobz, const char *range, const char *uplo, int *n, int *kd, double *ab, int *ldab, double *q, int *ldq, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbevxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray q, jint offsetq, jint ldq, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!dsbevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10505,7 +10536,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbevxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  dsbevx_(__njobz, __nrange, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nq ? __nq + offsetq : NULL, &__nldq, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  dsbevx_(__njobz, __nrange, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nq ? __nq + offsetq : NULL, &__nldq, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -10522,7 +10553,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsbgst_)(const char *vect, const char *uplo, int *n, int *ka, int *kb, double *ab, int *ldab, double *bb, int *ldbb, double *x, int *ldx, double *work, int *info);
+static void (*dsbgst_)(const char *vect, const char *uplo, int *n, int *ka, int *kb, double *ab, int *ldab, double *bb, int *ldbb, double *x, int *ldx, double *work, int *info, int len_vect, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbgstK(JNIEnv *env, UNUSED jobject obj, jstring vect, jstring uplo, jint n, jint ka, jint kb, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray bb, jint offsetbb, jint ldbb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dsbgst_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10553,7 +10584,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbgstK(JNIEnv *env, UNUSED jobjec
   if (bb) { if (!(__nbb = (*env)->GetPrimitiveArrayCritical(env, bb, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsbgst_(__nvect, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nx ? __nx + offsetx : NULL, &__nldx, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dsbgst_(__nvect, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nx ? __nx + offsetx : NULL, &__nldx, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, vect), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -10565,7 +10596,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsbgv_)(const char *jobz, const char *uplo, int *n, int *ka, int *kb, double *ab, int *ldab, double *bb, int *ldbb, double *w, double *z, int *ldz, double *work, int *info);
+static void (*dsbgv_)(const char *jobz, const char *uplo, int *n, int *ka, int *kb, double *ab, int *ldab, double *bb, int *ldbb, double *w, double *z, int *ldz, double *work, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbgvK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jint ka, jint kb, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray bb, jint offsetbb, jint ldbb, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dsbgv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10598,7 +10629,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbgvK(JNIEnv *env, UNUSED jobject
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsbgv_(__njobz, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dsbgv_(__njobz, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -10611,7 +10642,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsbgvd_)(const char *jobz, const char *uplo, int *n, int *ka, int *kb, double *ab, int *ldab, double *bb, int *ldbb, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dsbgvd_)(const char *jobz, const char *uplo, int *n, int *ka, int *kb, double *ab, int *ldab, double *bb, int *ldbb, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbgvdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jint ka, jint kb, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray bb, jint offsetbb, jint ldbb, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dsbgvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10650,7 +10681,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbgvdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dsbgvd_(__njobz, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dsbgvd_(__njobz, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -10664,7 +10695,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsbgvx_)(const char *jobz, const char *range, const char *uplo, int *n, int *ka, int *kb, double *ab, int *ldab, double *bb, int *ldbb, double *q, int *ldq, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info);
+static void (*dsbgvx_)(const char *jobz, const char *range, const char *uplo, int *n, int *ka, int *kb, double *ab, int *ldab, double *bb, int *ldbb, double *q, int *ldq, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbgvxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jint ka, jint kb, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray bb, jint offsetbb, jint ldbb, jdoubleArray q, jint offsetq, jint ldq, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!dsbgvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10719,7 +10750,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbgvxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  dsbgvx_(__njobz, __nrange, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nq ? __nq + offsetq : NULL, &__nldq, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  dsbgvx_(__njobz, __nrange, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nq ? __nq + offsetq : NULL, &__nldq, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -10737,7 +10768,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsbtrd_)(const char *vect, const char *uplo, int *n, int *kd, double *ab, int *ldab, double *d, double *e, double *q, int *ldq, double *work, int *info);
+static void (*dsbtrd_)(const char *vect, const char *uplo, int *n, int *kd, double *ab, int *ldab, double *d, double *e, double *q, int *ldq, double *work, int *info, int len_vect, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbtrdK(JNIEnv *env, UNUSED jobject obj, jstring vect, jstring uplo, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray q, jint offsetq, jint ldq, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dsbtrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10766,7 +10797,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsbtrdK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsbtrd_(__nvect, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dsbtrd_(__nvect, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, vect), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -10823,7 +10854,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspcon_)(const char *uplo, int *n, double *ap, int *ipiv, double *anorm, double *rcond, double *work, int *iwork, int *info);
+static void (*dspcon_)(const char *uplo, int *n, double *ap, int *ipiv, double *anorm, double *rcond, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jdouble anorm, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dspcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10846,7 +10877,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspconK(JNIEnv *env, UNUSED jobjec
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dspcon_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dspcon_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -10858,7 +10889,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspev_)(const char *jobz, const char *uplo, int *n, double *ap, double *w, double *z, int *ldz, double *work, int *info);
+static void (*dspev_)(const char *jobz, const char *uplo, int *n, double *ap, double *w, double *z, int *ldz, double *work, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspevK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dspev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10881,7 +10912,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspevK(JNIEnv *env, UNUSED jobject
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dspev_(__njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dspev_(__njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -10893,7 +10924,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspevd_)(const char *jobz, const char *uplo, int *n, double *ap, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dspevd_)(const char *jobz, const char *uplo, int *n, double *ap, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspevdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dspevd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10922,7 +10953,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspevdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dspevd_(__njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dspevd_(__njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -10935,7 +10966,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspevx_)(const char *jobz, const char *range, const char *uplo, int *n, double *ap, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info);
+static void (*dspevx_)(const char *jobz, const char *range, const char *uplo, int *n, double *ap, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspevxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!dspevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -10976,7 +11007,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspevxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  dspevx_(__njobz, __nrange, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  dspevx_(__njobz, __nrange, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -10992,7 +11023,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspgst_)(int *itype, const char *uplo, int *n, double *ap, double *bp, int *info);
+static void (*dspgst_)(int *itype, const char *uplo, int *n, double *ap, double *bp, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspgstK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray bp, jint offsetbp, jobject info) {
   if (!dspgst_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11009,7 +11040,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspgstK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (bp) { if (!(__nbp = (*env)->GetPrimitiveArrayCritical(env, bp, NULL))) { __failed = TRUE; goto done; } }
-  dspgst_(&__nitype, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, &__ninfo);
+  dspgst_(&__nitype, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nbp) (*env)->ReleasePrimitiveArrayCritical(env, bp, __nbp, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -11018,7 +11049,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspgv_)(int *itype, const char *jobz, const char *uplo, int *n, double *ap, double *bp, double *w, double *z, int *ldz, double *work, int *info);
+static void (*dspgv_)(int *itype, const char *jobz, const char *uplo, int *n, double *ap, double *bp, double *w, double *z, int *ldz, double *work, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspgvK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray bp, jint offsetbp, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dspgv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11045,7 +11076,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspgvK(JNIEnv *env, UNUSED jobject
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dspgv_(&__nitype, __njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dspgv_(&__nitype, __njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -11058,7 +11089,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspgvd_)(int *itype, const char *jobz, const char *uplo, int *n, double *ap, double *bp, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dspgvd_)(int *itype, const char *jobz, const char *uplo, int *n, double *ap, double *bp, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspgvdK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray bp, jint offsetbp, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dspgvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11091,7 +11122,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspgvdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dspgvd_(&__nitype, __njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dspgvd_(&__nitype, __njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11105,7 +11136,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspgvx_)(int *itype, const char *jobz, const char *range, const char *uplo, int *n, double *ap, double *bp, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info);
+static void (*dspgvx_)(int *itype, const char *jobz, const char *range, const char *uplo, int *n, double *ap, double *bp, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspgvxK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring range, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray bp, jint offsetbp, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!dspgvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11150,7 +11181,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspgvxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  dspgvx_(&__nitype, __njobz, __nrange, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  dspgvx_(&__nitype, __njobz, __nrange, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -11167,7 +11198,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsprfs_)(const char *uplo, int *n, int *nrhs, double *ap, double *afp, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dsprfs_)(const char *uplo, int *n, int *nrhs, double *ap, double *afp, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsprfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jdoubleArray afp, jint offsetafp, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dsprfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11202,7 +11233,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsprfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dsprfs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dsprfs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11218,7 +11249,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspsv_)(const char *uplo, int *n, int *nrhs, double *ap, int *ipiv, double *b, int *ldb, int *info);
+static void (*dspsv_)(const char *uplo, int *n, int *nrhs, double *ap, int *ipiv, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dspsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11239,7 +11270,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspsvK(JNIEnv *env, UNUSED jobject
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dspsv_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dspsv_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -11249,7 +11280,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dspsvx_)(const char *fact, const char *uplo, int *n, int *nrhs, double *ap, double *afp, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dspsvx_)(const char *fact, const char *uplo, int *n, int *nrhs, double *ap, double *afp, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *iwork, int *info, int len_fact, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jdoubleArray afp, jint offsetafp, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jobject rcond, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dspsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11288,7 +11319,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dspsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dspsvx_(__nfact, __nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dspsvx_(__nfact, __nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11306,7 +11337,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsptrd_)(const char *uplo, int *n, double *ap, double *d, double *e, double *tau, int *info);
+static void (*dsptrd_)(const char *uplo, int *n, double *ap, double *d, double *e, double *tau, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsptrdK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray tau, jint offsettau, jobject info) {
   if (!dsptrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11325,7 +11356,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsptrdK(JNIEnv *env, UNUSED jobjec
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
-  dsptrd_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, &__ninfo);
+  dsptrd_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
   if (__ne) (*env)->ReleasePrimitiveArrayCritical(env, e, __ne, __failed ? JNI_ABORT : 0);
@@ -11336,7 +11367,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsptrf_)(const char *uplo, int *n, double *ap, int *ipiv, int *info);
+static void (*dsptrf_)(const char *uplo, int *n, double *ap, int *ipiv, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsptrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jobject info) {
   if (!dsptrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11351,7 +11382,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsptrfK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
-  dsptrf_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__ninfo);
+  dsptrf_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -11360,7 +11391,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsptri_)(const char *uplo, int *n, double *ap, int *ipiv, double *work, int *info);
+static void (*dsptri_)(const char *uplo, int *n, double *ap, int *ipiv, double *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsptriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dsptri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11377,7 +11408,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsptriK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsptri_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dsptri_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -11387,7 +11418,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsptrs_)(const char *uplo, int *n, int *nrhs, double *ap, int *ipiv, double *b, int *ldb, int *info);
+static void (*dsptrs_)(const char *uplo, int *n, int *nrhs, double *ap, int *ipiv, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsptrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dsptrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11408,7 +11439,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsptrsK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dsptrs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dsptrs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -11418,7 +11449,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dstebz_)(const char *range, const char *order, int *n, double *vl, double *vu, int *il, int *iu, double *abstol, double *d, double *e, int *m, int *nsplit, double *w, int *iblock, int *isplit, double *work, int *iwork, int *info);
+static void (*dstebz_)(const char *range, const char *order, int *n, double *vl, double *vu, int *il, int *iu, double *abstol, double *d, double *e, int *m, int *nsplit, double *w, int *iblock, int *isplit, double *work, int *iwork, int *info, int len_range, int len_order);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstebzK(JNIEnv *env, UNUSED jobject obj, jstring range, jstring order, jint n, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jobject m, jobject nsplit, jdoubleArray w, jint offsetw, jintArray iblock, jint offsetiblock, jintArray isplit, jint offsetisplit, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dstebz_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11459,7 +11490,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstebzK(JNIEnv *env, UNUSED jobjec
   if (isplit) { if (!(__nisplit = (*env)->GetPrimitiveArrayCritical(env, isplit, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dstebz_(__nrange, __norder, &__nn, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nm, &__nnsplit, __nw ? __nw + offsetw : NULL, __niblock ? __niblock + offsetiblock : NULL, __nisplit ? __nisplit + offsetisplit : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dstebz_(__nrange, __norder, &__nn, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nm, &__nnsplit, __nw ? __nw + offsetw : NULL, __niblock ? __niblock + offsetiblock : NULL, __nisplit ? __nisplit + offsetisplit : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, order));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11476,7 +11507,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dstedc_)(const char *compz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dstedc_)(const char *compz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstedcK(JNIEnv *env, UNUSED jobject obj, jstring compz, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dstedc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11503,7 +11534,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstedcK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dstedc_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dstedc_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, compz));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11515,7 +11546,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dstegr_)(const char *jobz, const char *range, int *n, double *d, double *e, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, int *isuppz, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dstegr_)(const char *jobz, const char *range, int *n, double *d, double *e, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, int *isuppz, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstegrK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jintArray isuppz, jint offsetisuppz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dstegr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11560,7 +11591,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstegrK(JNIEnv *env, UNUSED jobjec
   if (isuppz) { if (!(__nisuppz = (*env)->GetPrimitiveArrayCritical(env, isuppz, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dstegr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dstegr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11622,7 +11653,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dstemr_)(const char *jobz, const char *range, int *n, double *d, double *e, double *vl, double *vu, int *il, int *iu, int *m, double *w, double *z, int *ldz, int *nzc, int *isuppz, int *tryrac, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dstemr_)(const char *jobz, const char *range, int *n, double *d, double *e, double *vl, double *vu, int *il, int *iu, int *m, double *w, double *z, int *ldz, int *nzc, int *isuppz, int *tryrac, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstemrK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdouble vl, jdouble vu, jint il, jint iu, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jint nzc, jintArray isuppz, jint offsetisuppz, jobject tryrac, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dstemr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11669,7 +11700,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstemrK(JNIEnv *env, UNUSED jobjec
   if (isuppz) { if (!(__nisuppz = (*env)->GetPrimitiveArrayCritical(env, isuppz, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dstemr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, &__nnzc, __nisuppz ? __nisuppz + offsetisuppz : NULL, &__ntryrac, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dstemr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, &__nnzc, __nisuppz ? __nisuppz + offsetisuppz : NULL, &__ntryrac, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11686,7 +11717,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsteqr_)(const char *compz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *info);
+static void (*dsteqr_)(const char *compz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *info, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsteqrK(JNIEnv *env, UNUSED jobject obj, jstring compz, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dsteqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11707,7 +11738,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsteqrK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsteqr_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dsteqr_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -11739,7 +11770,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dstev_)(const char *jobz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *info);
+static void (*dstev_)(const char *jobz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *info, int len_jobz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstevK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dstev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11760,7 +11791,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstevK(JNIEnv *env, UNUSED jobject
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dstev_(__njobz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dstev_(__njobz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -11771,7 +11802,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dstevd_)(const char *jobz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dstevd_)(const char *jobz, int *n, double *d, double *e, double *z, int *ldz, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstevdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dstevd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11798,7 +11829,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstevdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dstevd_(__njobz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dstevd_(__njobz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11810,7 +11841,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dstevr_)(const char *jobz, const char *range, int *n, double *d, double *e, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, int *isuppz, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dstevr_)(const char *jobz, const char *range, int *n, double *d, double *e, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, int *isuppz, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstevrK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jintArray isuppz, jint offsetisuppz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dstevr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11855,7 +11886,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstevrK(JNIEnv *env, UNUSED jobjec
   if (isuppz) { if (!(__nisuppz = (*env)->GetPrimitiveArrayCritical(env, isuppz, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dstevr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dstevr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11871,7 +11902,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dstevx_)(const char *jobz, const char *range, int *n, double *d, double *e, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info);
+static void (*dstevx_)(const char *jobz, const char *range, int *n, double *d, double *e, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstevxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jint n, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!dstevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11912,7 +11943,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dstevxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  dstevx_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  dstevx_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -11928,7 +11959,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsycon_)(const char *uplo, int *n, double *a, int *lda, int *ipiv, double *anorm, double *rcond, double *work, int *iwork, int *info);
+static void (*dsycon_)(const char *uplo, int *n, double *a, int *lda, int *ipiv, double *anorm, double *rcond, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jdouble anorm, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dsycon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11953,7 +11984,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyconK(JNIEnv *env, UNUSED jobjec
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dsycon_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dsycon_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -11965,7 +11996,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsyev_)(const char *jobz, const char *uplo, int *n, double *a, int *lda, double *w, double *work, int *lwork, int *info);
+static void (*dsyev_)(const char *jobz, const char *uplo, int *n, double *a, int *lda, double *w, double *work, int *lwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyevK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray w, jint offsetw, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dsyev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -11988,7 +12019,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyevK(JNIEnv *env, UNUSED jobject
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsyev_(__njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dsyev_(__njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nw) (*env)->ReleasePrimitiveArrayCritical(env, w, __nw, __failed ? JNI_ABORT : 0);
@@ -11999,7 +12030,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsyevd_)(const char *jobz, const char *uplo, int *n, double *a, int *lda, double *w, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dsyevd_)(const char *jobz, const char *uplo, int *n, double *a, int *lda, double *w, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyevdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray w, jint offsetw, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dsyevd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12026,7 +12057,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyevdK(JNIEnv *env, UNUSED jobjec
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dsyevd_(__njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dsyevd_(__njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -12038,7 +12069,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsyevr_)(const char *jobz, const char *range, const char *uplo, int *n, double *a, int *lda, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, int *isuppz, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dsyevr_)(const char *jobz, const char *range, const char *uplo, int *n, double *a, int *lda, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, int *isuppz, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyevrK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jintArray isuppz, jint offsetisuppz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dsyevr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12085,7 +12116,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyevrK(JNIEnv *env, UNUSED jobjec
   if (isuppz) { if (!(__nisuppz = (*env)->GetPrimitiveArrayCritical(env, isuppz, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dsyevr_(__njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dsyevr_(__njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -12101,7 +12132,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsyevx_)(const char *jobz, const char *range, const char *uplo, int *n, double *a, int *lda, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *ifail, int *info);
+static void (*dsyevx_)(const char *jobz, const char *range, const char *uplo, int *n, double *a, int *lda, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyevxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!dsyevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12146,7 +12177,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyevxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  dsyevx_(__njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  dsyevx_(__njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -12162,7 +12193,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsygs2_)(int *itype, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, int *info);
+static void (*dsygs2_)(int *itype, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygs2K(JNIEnv *env, UNUSED jobject obj, jint itype, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dsygs2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12183,7 +12214,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygs2K(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dsygs2_(&__nitype, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dsygs2_(&__nitype, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -12192,7 +12223,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsygst_)(int *itype, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, int *info);
+static void (*dsygst_)(int *itype, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygstK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dsygst_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12213,7 +12244,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygstK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dsygst_(&__nitype, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dsygst_(&__nitype, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -12222,7 +12253,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsygv_)(int *itype, const char *jobz, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, double *w, double *work, int *lwork, int *info);
+static void (*dsygv_)(int *itype, const char *jobz, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, double *w, double *work, int *lwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygvK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray w, jint offsetw, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dsygv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12251,7 +12282,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygvK(JNIEnv *env, UNUSED jobject
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsygv_(&__nitype, __njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dsygv_(&__nitype, __njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nw) (*env)->ReleasePrimitiveArrayCritical(env, w, __nw, __failed ? JNI_ABORT : 0);
@@ -12263,7 +12294,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsygvd_)(int *itype, const char *jobz, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, double *w, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dsygvd_)(int *itype, const char *jobz, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, double *w, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygvdK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray w, jint offsetw, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dsygvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12296,7 +12327,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygvdK(JNIEnv *env, UNUSED jobjec
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dsygvd_(&__nitype, __njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dsygvd_(&__nitype, __njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -12309,7 +12340,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsygvx_)(int *itype, const char *jobz, const char *range, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *ifail, int *info);
+static void (*dsygvx_)(int *itype, const char *jobz, const char *range, const char *uplo, int *n, double *a, int *lda, double *b, int *ldb, double *vl, double *vu, int *il, int *iu, double *abstol, int *m, double *w, double *z, int *ldz, double *work, int *lwork, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygvxK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring range, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble vl, jdouble vu, jint il, jint iu, jdouble abstol, jobject m, jdoubleArray w, jint offsetw, jdoubleArray z, jint offsetz, jint ldz, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!dsygvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12360,7 +12391,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsygvxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  dsygvx_(&__nitype, __njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  dsygvx_(&__nitype, __njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -12377,7 +12408,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsyrfs_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dsyrfs_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyrfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray af, jint offsetaf, jint ldaf, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dsyrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12416,7 +12447,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsyrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dsyrfs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dsyrfs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -12432,7 +12463,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsysv_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, double *work, int *lwork, int *info);
+static void (*dsysv_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, double *work, int *lwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsysvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dsysv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12459,7 +12490,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsysvK(JNIEnv *env, UNUSED jobject
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsysv_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dsysv_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
@@ -12470,7 +12501,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsysvx_)(const char *fact, const char *uplo, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *lwork, int *iwork, int *info);
+static void (*dsysvx_)(const char *fact, const char *uplo, int *n, int *nrhs, double *a, int *lda, double *af, int *ldaf, int *ipiv, double *b, int *ldb, double *x, int *ldx, double *rcond, double *ferr, double *berr, double *work, int *lwork, int *iwork, int *info, int len_fact, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsysvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray af, jint offsetaf, jint ldaf, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jobject rcond, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dsysvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12515,7 +12546,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsysvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dsysvx_(__nfact, __nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dsysvx_(__nfact, __nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -12533,7 +12564,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsytd2_)(const char *uplo, int *n, double *a, int *lda, double *d, double *e, double *tau, int *info);
+static void (*dsytd2_)(const char *uplo, int *n, double *a, int *lda, double *d, double *e, double *tau, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytd2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray tau, jint offsettau, jobject info) {
   if (!dsytd2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12554,7 +12585,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytd2K(JNIEnv *env, UNUSED jobjec
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
-  dsytd2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, &__ninfo);
+  dsytd2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
   if (__ne) (*env)->ReleasePrimitiveArrayCritical(env, e, __ne, __failed ? JNI_ABORT : 0);
@@ -12565,7 +12596,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsytf2_)(const char *uplo, int *n, double *a, int *lda, int *ipiv, int *info);
+static void (*dsytf2_)(const char *uplo, int *n, double *a, int *lda, int *ipiv, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytf2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jobject info) {
   if (!dsytf2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12582,7 +12613,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytf2K(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
-  dsytf2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, &__ninfo);
+  dsytf2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -12591,7 +12622,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsytrd_)(const char *uplo, int *n, double *a, int *lda, double *d, double *e, double *tau, double *work, int *lwork, int *info);
+static void (*dsytrd_)(const char *uplo, int *n, double *a, int *lda, double *d, double *e, double *tau, double *work, int *lwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytrdK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray d, jint offsetd, jdoubleArray e, jint offsete, jdoubleArray tau, jint offsettau, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dsytrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12616,7 +12647,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytrdK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsytrd_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dsytrd_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -12628,7 +12659,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsytrf_)(const char *uplo, int *n, double *a, int *lda, int *ipiv, double *work, int *lwork, int *info);
+static void (*dsytrf_)(const char *uplo, int *n, double *a, int *lda, int *ipiv, double *work, int *lwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jdoubleArray work, jint offsetwork, jint lwork, jobject info) {
   if (!dsytrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12649,7 +12680,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytrfK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsytrf_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  dsytrf_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -12659,7 +12690,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsytri_)(const char *uplo, int *n, double *a, int *lda, int *ipiv, double *work, int *info);
+static void (*dsytri_)(const char *uplo, int *n, double *a, int *lda, int *ipiv, double *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jdoubleArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dsytri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12678,7 +12709,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytriK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dsytri_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dsytri_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -12688,7 +12719,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dsytrs_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
+static void (*dsytrs_)(const char *uplo, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dsytrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12711,7 +12742,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dsytrsK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dsytrs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dsytrs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -12721,7 +12752,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtbcon_)(const char *norm, const char *uplo, const char *diag, int *n, int *kd, double *ab, int *ldab, double *rcond, double *work, int *iwork, int *info);
+static void (*dtbcon_)(const char *norm, const char *uplo, const char *diag, int *n, int *kd, double *ab, int *ldab, double *rcond, double *work, int *iwork, int *info, int len_norm, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtbconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jint kd, jdoubleArray ab, jint offsetab, jint ldab, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dtbcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12748,7 +12779,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtbconK(JNIEnv *env, UNUSED jobjec
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtbcon_(__nnorm, __nuplo, __ndiag, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dtbcon_(__nnorm, __nuplo, __ndiag, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -12761,7 +12792,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtbrfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dtbrfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtbrfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint kd, jint nrhs, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dtbrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12800,7 +12831,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtbrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtbrfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dtbrfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -12816,7 +12847,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtbtrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *b, int *ldb, int *info);
+static void (*dtbtrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *kd, int *nrhs, double *ab, int *ldab, double *b, int *ldb, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtbtrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint kd, jint nrhs, jdoubleArray ab, jint offsetab, jint ldab, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dtbtrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12843,7 +12874,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtbtrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dtbtrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dtbtrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -12854,7 +12885,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtgevc_)(const char *side, const char *howmny, int *select, int *n, double *s, int *lds, double *p, int *ldp, double *vl, int *ldvl, double *vr, int *ldvr, int *mm, int *m, double *work, int *info);
+static void (*dtgevc_)(const char *side, const char *howmny, int *select, int *n, double *s, int *lds, double *p, int *ldp, double *vl, int *ldvl, double *vr, int *ldvr, int *mm, int *m, double *work, int *info, int len_side, int len_howmny);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgevcK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring howmny, jbooleanArray select, jint offsetselect, jint n, jdoubleArray s, jint offsets, jint lds, jdoubleArray p, jint offsetp, jint ldp, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jint mm, jobject m, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dtgevc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -12897,7 +12928,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgevcK(JNIEnv *env, UNUSED jobjec
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dtgevc_(__nside, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __ns ? __ns + offsets : NULL, &__nlds, __np ? __np + offsetp : NULL, &__nldp, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dtgevc_(__nside, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __ns ? __ns + offsets : NULL, &__nlds, __np ? __np + offsetp : NULL, &__nldp, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, howmny));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -13093,7 +13124,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtgsja_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *p, int *n, int *k, int *l, double *a, int *lda, double *b, int *ldb, double *tola, double *tolb, double *alpha, double *beta, double *u, int *ldu, double *v, int *ldv, double *q, int *ldq, double *work, int *ncycle, int *info);
+static void (*dtgsja_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *p, int *n, int *k, int *l, double *a, int *lda, double *b, int *ldb, double *tola, double *tolb, double *alpha, double *beta, double *u, int *ldu, double *v, int *ldv, double *q, int *ldq, double *work, int *ncycle, int *info, int len_jobu, int len_jobv, int len_jobq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsjaK(JNIEnv *env, UNUSED jobject obj, jstring jobu, jstring jobv, jstring jobq, jint m, jint p, jint n, jint k, jint l, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdouble tola, jdouble tolb, jdoubleArray alpha, jint offsetalpha, jdoubleArray beta, jint offsetbeta, jdoubleArray u, jint offsetu, jint ldu, jdoubleArray v, jint offsetv, jint ldv, jdoubleArray q, jint offsetq, jint ldq, jdoubleArray work, jint offsetwork, jobject ncycle, jobject info) {
   if (!dtgsja_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13148,7 +13179,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsjaK(JNIEnv *env, UNUSED jobjec
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dtgsja_(__njobu, __njobv, __njobq, &__nm, &__np, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ntola, &__ntolb, __nalpha ? __nalpha + offsetalpha : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__nncycle, &__ninfo);
+  dtgsja_(__njobu, __njobv, __njobq, &__nm, &__np, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ntola, &__ntolb, __nalpha ? __nalpha + offsetalpha : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__nncycle, &__ninfo, (*env)->GetStringUTFLength(env, jobu), (*env)->GetStringUTFLength(env, jobv), (*env)->GetStringUTFLength(env, jobq));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -13166,7 +13197,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtgsna_)(const char *job, const char *howmny, int *select, int *n, double *a, int *lda, double *b, int *ldb, double *vl, int *ldvl, double *vr, int *ldvr, double *s, double *dif, int *mm, int *m, double *work, int *lwork, int *iwork, int *info);
+static void (*dtgsna_)(const char *job, const char *howmny, int *select, int *n, double *a, int *lda, double *b, int *ldb, double *vl, int *ldvl, double *vr, int *ldvr, double *s, double *dif, int *mm, int *m, double *work, int *lwork, int *iwork, int *info, int len_job, int len_howmny);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsnaK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring howmny, jbooleanArray select, jint offsetselect, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jdoubleArray s, jint offsets, jdoubleArray dif, jint offsetdif, jint mm, jobject m, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dtgsna_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13217,7 +13248,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsnaK(JNIEnv *env, UNUSED jobjec
   if (dif) { if (!(__ndif = (*env)->GetPrimitiveArrayCritical(env, dif, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtgsna_(__njob, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __ns ? __ns + offsets : NULL, __ndif ? __ndif + offsetdif : NULL, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dtgsna_(__njob, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __ns ? __ns + offsets : NULL, __ndif ? __ndif + offsetdif : NULL, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, howmny));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -13235,7 +13266,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtgsy2_)(const char *trans, int *ijob, int *m, int *n, double *a, int *lda, double *b, int *ldb, double *c, int *Ldc, double *d, int *ldd, double *e, int *lde, double *f, int *ldf, double *scale, double *rdsum, double *rdscal, int *iwork, int *pq, int *info);
+static void (*dtgsy2_)(const char *trans, int *ijob, int *m, int *n, double *a, int *lda, double *b, int *ldb, double *c, int *Ldc, double *d, int *ldd, double *e, int *lde, double *f, int *ldf, double *scale, double *rdsum, double *rdscal, int *iwork, int *pq, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsy2K(JNIEnv *env, UNUSED jobject obj, jstring trans, jint ijob, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray d, jint offsetd, jint ldd, jdoubleArray e, jint offsete, jint lde, jdoubleArray f, jint offsetf, jint ldf, jobject scale, jobject rdsum, jobject rdscal, jintArray iwork, jint offsetiwork, jobject pq, jobject info) {
   if (!dtgsy2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13284,7 +13315,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsy2K(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (f) { if (!(__nf = (*env)->GetPrimitiveArrayCritical(env, f, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtgsy2_(__ntrans, &__nijob, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, __nd ? __nd + offsetd : NULL, &__nldd, __ne ? __ne + offsete : NULL, &__nlde, __nf ? __nf + offsetf : NULL, &__nldf, &__nscale, &__nrdsum, &__nrdscal, __niwork ? __niwork + offsetiwork : NULL, &__npq, &__ninfo);
+  dtgsy2_(__ntrans, &__nijob, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, __nd ? __nd + offsetd : NULL, &__nldd, __ne ? __ne + offsete : NULL, &__nlde, __nf ? __nf + offsetf : NULL, &__nldf, &__nscale, &__nrdsum, &__nrdscal, __niwork ? __niwork + offsetiwork : NULL, &__npq, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nf) (*env)->ReleasePrimitiveArrayCritical(env, f, __nf, __failed ? JNI_ABORT : 0);
@@ -13302,7 +13333,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtgsyl_)(const char *trans, int *ijob, int *m, int *n, double *a, int *lda, double *b, int *ldb, double *c, int *Ldc, double *d, int *ldd, double *e, int *lde, double *f, int *ldf, double *scale, double *dif, double *work, int *lwork, int *iwork, int *info);
+static void (*dtgsyl_)(const char *trans, int *ijob, int *m, int *n, double *a, int *lda, double *b, int *ldb, double *c, int *Ldc, double *d, int *ldd, double *e, int *lde, double *f, int *ldf, double *scale, double *dif, double *work, int *lwork, int *iwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsylK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint ijob, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray c, jint offsetc, jint Ldc, jdoubleArray d, jint offsetd, jint ldd, jdoubleArray e, jint offsete, jint lde, jdoubleArray f, jint offsetf, jint ldf, jobject scale, jobject dif, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dtgsyl_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13351,7 +13382,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtgsylK(JNIEnv *env, UNUSED jobjec
   if (f) { if (!(__nf = (*env)->GetPrimitiveArrayCritical(env, f, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtgsyl_(__ntrans, &__nijob, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, __nd ? __nd + offsetd : NULL, &__nldd, __ne ? __ne + offsete : NULL, &__nlde, __nf ? __nf + offsetf : NULL, &__nldf, &__nscale, &__ndif, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dtgsyl_(__ntrans, &__nijob, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, __nd ? __nd + offsetd : NULL, &__nldd, __ne ? __ne + offsete : NULL, &__nlde, __nf ? __nf + offsetf : NULL, &__nldf, &__nscale, &__ndif, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -13368,7 +13399,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtpcon_)(const char *norm, const char *uplo, const char *diag, int *n, double *ap, double *rcond, double *work, int *iwork, int *info);
+static void (*dtpcon_)(const char *norm, const char *uplo, const char *diag, int *n, double *ap, double *rcond, double *work, int *iwork, int *info, int len_norm, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtpconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jdoubleArray ap, jint offsetap, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dtpcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13391,7 +13422,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtpconK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtpcon_(__nnorm, __nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dtpcon_(__nnorm, __nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -13404,7 +13435,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtprfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, double *ap, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dtprfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, double *ap, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtprfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dtprfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13439,7 +13470,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtprfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtprfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dtprfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -13455,7 +13486,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtptri_)(const char *uplo, const char *diag, int *n, double *ap, int *info);
+static void (*dtptri_)(const char *uplo, const char *diag, int *n, double *ap, int *info, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtptriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring diag, jint n, jdoubleArray ap, jint offsetap, jobject info) {
   if (!dtptri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13470,7 +13501,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtptriK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
-  dtptri_(__nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo);
+  dtptri_(__nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -13479,7 +13510,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtptrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, double *ap, double *b, int *ldb, int *info);
+static void (*dtptrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, double *ap, double *b, int *ldb, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtptrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint nrhs, jdoubleArray ap, jint offsetap, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dtptrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13502,7 +13533,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtptrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dtptrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dtptrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -13513,7 +13544,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrcon_)(const char *norm, const char *uplo, const char *diag, int *n, double *a, int *lda, double *rcond, double *work, int *iwork, int *info);
+static void (*dtrcon_)(const char *norm, const char *uplo, const char *diag, int *n, double *a, int *lda, double *rcond, double *work, int *iwork, int *info, int len_norm, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jdoubleArray a, jint offseta, jint lda, jobject rcond, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dtrcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13538,7 +13569,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrconK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtrcon_(__nnorm, __nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dtrcon_(__nnorm, __nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -13551,7 +13582,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrevc_)(const char *side, const char *howmny, int *select, int *n, double *t, int *ldt, double *vl, int *ldvl, double *vr, int *ldvr, int *mm, int *m, double *work, int *info);
+static void (*dtrevc_)(const char *side, const char *howmny, int *select, int *n, double *t, int *ldt, double *vl, int *ldvl, double *vr, int *ldvr, int *mm, int *m, double *work, int *info, int len_side, int len_howmny);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrevcK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring howmny, jbooleanArray select, jint offsetselect, jint n, jdoubleArray t, jint offsett, jint ldt, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jint mm, jobject m, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dtrevc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13590,7 +13621,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrevcK(JNIEnv *env, UNUSED jobjec
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dtrevc_(__nside, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dtrevc_(__nside, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, howmny));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -13604,7 +13635,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrexc_)(const char *compq, int *n, double *t, int *ldt, double *q, int *ldq, int *ifst, int *ilst, double *work, int *info);
+static void (*dtrexc_)(const char *compq, int *n, double *t, int *ldt, double *q, int *ldq, int *ifst, int *ilst, double *work, int *info, int len_compq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrexcK(JNIEnv *env, UNUSED jobject obj, jstring compq, jint n, jdoubleArray t, jint offsett, jint ldt, jdoubleArray q, jint offsetq, jint ldq, jobject ifst, jobject ilst, jdoubleArray work, jint offsetwork, jobject info) {
   if (!dtrexc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13629,7 +13660,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrexcK(JNIEnv *env, UNUSED jobjec
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  dtrexc_(__ncompq, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nq ? __nq + offsetq : NULL, &__nldq, &__nifst, &__nilst, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  dtrexc_(__ncompq, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nq ? __nq + offsetq : NULL, &__nldq, &__nifst, &__nilst, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, compq));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -13641,7 +13672,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrrfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info);
+static void (*dtrrfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, double *x, int *ldx, double *ferr, double *berr, double *work, int *iwork, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrrfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray x, jint offsetx, jint ldx, jdoubleArray ferr, jint offsetferr, jdoubleArray berr, jint offsetberr, jdoubleArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dtrrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13678,7 +13709,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtrrfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dtrrfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -13694,7 +13725,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrsen_)(const char *job, const char *compq, int *select, int *n, double *t, int *ldt, double *q, int *ldq, double *wr, double *wi, int *m, double *s, double *sep, double *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*dtrsen_)(const char *job, const char *compq, int *select, int *n, double *t, int *ldt, double *q, int *ldq, double *wr, double *wi, int *m, double *s, double *sep, double *work, int *lwork, int *iwork, int *liwork, int *info, int len_job, int len_compq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrsenK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring compq, jbooleanArray select, jint offsetselect, jint n, jdoubleArray t, jint offsett, jint ldt, jdoubleArray q, jint offsetq, jint ldq, jdoubleArray wr, jint offsetwr, jdoubleArray wi, jint offsetwi, jobject m, jobject s, jobject sep, jdoubleArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!dtrsen_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13741,7 +13772,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrsenK(JNIEnv *env, UNUSED jobjec
   if (wi) { if (!(__nwi = (*env)->GetPrimitiveArrayCritical(env, wi, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtrsen_(__njob, __ncompq, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nq ? __nq + offsetq : NULL, &__nldq, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, &__nm, &__ns, &__nsep, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  dtrsen_(__njob, __ncompq, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nq ? __nq + offsetq : NULL, &__nldq, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, &__nm, &__ns, &__nsep, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, compq));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -13759,7 +13790,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrsna_)(const char *job, const char *howmny, int *select, int *n, double *t, int *ldt, double *vl, int *ldvl, double *vr, int *ldvr, double *s, double *sep, int *mm, int *m, double *work, int *ldwork, int *iwork, int *info);
+static void (*dtrsna_)(const char *job, const char *howmny, int *select, int *n, double *t, int *ldt, double *vl, int *ldvl, double *vr, int *ldvr, double *s, double *sep, int *mm, int *m, double *work, int *ldwork, int *iwork, int *info, int len_job, int len_howmny);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrsnaK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring howmny, jbooleanArray select, jint offsetselect, jint n, jdoubleArray t, jint offsett, jint ldt, jdoubleArray vl, jint offsetvl, jint ldvl, jdoubleArray vr, jint offsetvr, jint ldvr, jdoubleArray s, jint offsets, jdoubleArray sep, jint offsetsep, jint mm, jobject m, jdoubleArray work, jint offsetwork, jint ldwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!dtrsna_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13806,7 +13837,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrsnaK(JNIEnv *env, UNUSED jobjec
   if (sep) { if (!(__nsep = (*env)->GetPrimitiveArrayCritical(env, sep, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  dtrsna_(__njob, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __ns ? __ns + offsets : NULL, __nsep ? __nsep + offsetsep : NULL, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__nldwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  dtrsna_(__njob, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __ns ? __ns + offsets : NULL, __nsep ? __nsep + offsetsep : NULL, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__nldwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, howmny));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -13823,7 +13854,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrsyl_)(const char *trana, const char *tranb, int *isgn, int *m, int *n, double *a, int *lda, double *b, int *ldb, double *c, int *Ldc, double *scale, int *info);
+static void (*dtrsyl_)(const char *trana, const char *tranb, int *isgn, int *m, int *n, double *a, int *lda, double *b, int *ldb, double *c, int *Ldc, double *scale, int *info, int len_trana, int len_tranb);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrsylK(JNIEnv *env, UNUSED jobject obj, jstring trana, jstring tranb, jint isgn, jint m, jint n, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jdoubleArray c, jint offsetc, jint Ldc, jobject scale, jobject info) {
   if (!dtrsyl_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13854,7 +13885,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrsylK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
-  dtrsyl_(__ntrana, __ntranb, &__nisgn, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, &__nscale, &__ninfo);
+  dtrsyl_(__ntrana, __ntranb, &__nisgn, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, &__nscale, &__ninfo, (*env)->GetStringUTFLength(env, trana), (*env)->GetStringUTFLength(env, tranb));
 done:
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
@@ -13866,7 +13897,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrti2_)(const char *uplo, const char *diag, int *n, double *a, int *lda, int *info);
+static void (*dtrti2_)(const char *uplo, const char *diag, int *n, double *a, int *lda, int *info, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrti2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring diag, jint n, jdoubleArray a, jint offseta, jint lda, jobject info) {
   if (!dtrti2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13883,7 +13914,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrti2K(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dtrti2_(__nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  dtrti2_(__nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -13892,7 +13923,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrtri_)(const char *uplo, const char *diag, int *n, double *a, int *lda, int *info);
+static void (*dtrtri_)(const char *uplo, const char *diag, int *n, double *a, int *lda, int *info, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrtriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring diag, jint n, jdoubleArray a, jint offseta, jint lda, jobject info) {
   if (!dtrtri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13909,7 +13940,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrtriK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  dtrtri_(__nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  dtrtri_(__nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -13918,7 +13949,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*dtrtrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, int *info);
+static void (*dtrtrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, double *a, int *lda, double *b, int *ldb, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrtrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint nrhs, jdoubleArray a, jint offseta, jint lda, jdoubleArray b, jint offsetb, jint ldb, jobject info) {
   if (!dtrtrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -13943,7 +13974,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_dtrtrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  dtrtrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  dtrtrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -14027,7 +14058,7 @@ done:
   return __ret;
 }
 
-static int (*ilaenv_)(int *ispec, const char *name, const char *opts, int *n1, int *n2, int *n3, int *n4);
+static int (*ilaenv_)(int *ispec, const char *name, const char *opts, int *n1, int *n2, int *n3, int *n4, int len_name, int len_opts);
 
 jint Java_dev_ludovic_netlib_lapack_JNILAPACK_ilaenvK(JNIEnv *env, UNUSED jobject obj, jint ispec, jstring name, jstring opts, jint n1, jint n2, jint n3, jint n4) {
   if (!ilaenv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14047,7 +14078,7 @@ jint Java_dev_ludovic_netlib_lapack_JNILAPACK_ilaenvK(JNIEnv *env, UNUSED jobjec
   __nn2 = n2;
   __nn3 = n3;
   __nn4 = n4;
-  __ret = ilaenv_(&__nispec, __nname, __nopts, &__nn1, &__nn2, &__nn3, &__nn4);
+  __ret = ilaenv_(&__nispec, __nname, __nopts, &__nn1, &__nn2, &__nn3, &__nn4, (*env)->GetStringUTFLength(env, name), (*env)->GetStringUTFLength(env, opts));
 done:
   if (__nopts) (*env)->ReleaseStringUTFChars(env, opts, __nopts);
   if (__nname) (*env)->ReleaseStringUTFChars(env, name, __nname);
@@ -14074,7 +14105,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static int (*iparmq_)(int *ispec, const char *name, const char *opts, int *n, int *ilo, int *ihi, int *lwork);
+static int (*iparmq_)(int *ispec, const char *name, const char *opts, int *n, int *ilo, int *ihi, int *lwork, int len_name, int len_opts);
 
 jint Java_dev_ludovic_netlib_lapack_JNILAPACK_iparmqK(JNIEnv *env, UNUSED jobject obj, jint ispec, jstring name, jstring opts, jint n, jint ilo, jint ihi, jint lwork) {
   if (!iparmq_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14094,7 +14125,7 @@ jint Java_dev_ludovic_netlib_lapack_JNILAPACK_iparmqK(JNIEnv *env, UNUSED jobjec
   __nilo = ilo;
   __nihi = ihi;
   __nlwork = lwork;
-  __ret = iparmq_(&__nispec, __nname, __nopts, &__nn, &__nilo, &__nihi, &__nlwork);
+  __ret = iparmq_(&__nispec, __nname, __nopts, &__nn, &__nilo, &__nihi, &__nlwork, (*env)->GetStringUTFLength(env, name), (*env)->GetStringUTFLength(env, opts));
 done:
   if (__nopts) (*env)->ReleaseStringUTFChars(env, opts, __nopts);
   if (__nname) (*env)->ReleaseStringUTFChars(env, name, __nname);
@@ -14102,7 +14133,7 @@ done:
   return __ret;
 }
 
-static int (*lsamen_)(int *n, const char *ca, const char *cb);
+static int (*lsamen_)(int *n, const char *ca, const char *cb, int len_ca, int len_cb);
 
 jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_lsamenK(JNIEnv *env, UNUSED jobject obj, jint n, jstring ca, jstring cb) {
   if (!lsamen_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14114,7 +14145,7 @@ jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_lsamenK(JNIEnv *env, UNUSED jo
   __nn = n;
   if (!(__nca = (*env)->GetStringUTFChars(env, ca, NULL))) { __failed = TRUE; goto done; }
   if (!(__ncb = (*env)->GetStringUTFChars(env, cb, NULL))) { __failed = TRUE; goto done; }
-  __ret = lsamen_(&__nn, __nca, __ncb);
+  __ret = lsamen_(&__nn, __nca, __ncb, (*env)->GetStringUTFLength(env, ca), (*env)->GetStringUTFLength(env, cb));
 done:
   if (__ncb) (*env)->ReleaseStringUTFChars(env, cb, __ncb);
   if (__nca) (*env)->ReleaseStringUTFChars(env, ca, __nca);
@@ -14122,7 +14153,7 @@ done:
   return __ret;
 }
 
-static void (*sbdsdc_)(const char *uplo, const char *compq, int *n, float *d, float *e, float *u, int *ldu, float *vt, int *ldvt, float *q, int *iq, float *work, int *iwork, int *info);
+static void (*sbdsdc_)(const char *uplo, const char *compq, int *n, float *d, float *e, float *u, int *ldu, float *vt, int *ldvt, float *q, int *iq, float *work, int *iwork, int *info, int len_uplo, int len_compq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sbdsdcK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring compq, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray u, jint offsetu, jint ldu, jfloatArray vt, jint offsetvt, jint ldvt, jfloatArray q, jint offsetq, jintArray iq, jint offsetiq, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sbdsdc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14155,7 +14186,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sbdsdcK(JNIEnv *env, UNUSED jobjec
   if (iq) { if (!(__niq = (*env)->GetPrimitiveArrayCritical(env, iq, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sbdsdc_(__nuplo, __ncompq, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nq ? __nq + offsetq : NULL, __niq ? __niq + offsetiq : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sbdsdc_(__nuplo, __ncompq, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nq ? __nq + offsetq : NULL, __niq ? __niq + offsetiq : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, compq));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -14171,7 +14202,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sbdsqr_)(const char *uplo, int *n, int *ncvt, int *nru, int *ncc, float *d, float *e, float *vt, int *ldvt, float *u, int *ldu, float *c, int *Ldc, float *work, int *info);
+static void (*sbdsqr_)(const char *uplo, int *n, int *ncvt, int *nru, int *ncc, float *d, float *e, float *vt, int *ldvt, float *u, int *ldu, float *c, int *Ldc, float *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sbdsqrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint ncvt, jint nru, jint ncc, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray vt, jint offsetvt, jint ldvt, jfloatArray u, jint offsetu, jint ldu, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jobject info) {
   if (!sbdsqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14206,7 +14237,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sbdsqrK(JNIEnv *env, UNUSED jobjec
   if (u) { if (!(__nu = (*env)->GetPrimitiveArrayCritical(env, u, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sbdsqr_(__nuplo, &__nn, &__nncvt, &__nnru, &__nncc, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nu ? __nu + offsetu : NULL, &__nldu, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sbdsqr_(__nuplo, &__nn, &__nncvt, &__nnru, &__nncc, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nu ? __nu + offsetu : NULL, &__nldu, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -14219,7 +14250,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sdisna_)(const char *job, int *m, int *n, float *d, float *sep, int *info);
+static void (*sdisna_)(const char *job, int *m, int *n, float *d, float *sep, int *info, int len_job);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sdisnaK(JNIEnv *env, UNUSED jobject obj, jstring job, jint m, jint n, jfloatArray d, jint offsetd, jfloatArray sep, jint offsetsep, jobject info) {
   if (!sdisna_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14236,7 +14267,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sdisnaK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (sep) { if (!(__nsep = (*env)->GetPrimitiveArrayCritical(env, sep, NULL))) { __failed = TRUE; goto done; } }
-  sdisna_(__njob, &__nm, &__nn, __nd ? __nd + offsetd : NULL, __nsep ? __nsep + offsetsep : NULL, &__ninfo);
+  sdisna_(__njob, &__nm, &__nn, __nd ? __nd + offsetd : NULL, __nsep ? __nsep + offsetsep : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job));
 done:
   if (__nsep) (*env)->ReleasePrimitiveArrayCritical(env, sep, __nsep, __failed ? JNI_ABORT : 0);
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
@@ -14245,7 +14276,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgbbrd_)(const char *vect, int *m, int *n, int *ncc, int *kl, int *ku, float *ab, int *ldab, float *d, float *e, float *q, int *ldq, float *pt, int *ldpt, float *c, int *Ldc, float *work, int *info);
+static void (*sgbbrd_)(const char *vect, int *m, int *n, int *ncc, int *kl, int *ku, float *ab, int *ldab, float *d, float *e, float *q, int *ldq, float *pt, int *ldpt, float *c, int *Ldc, float *work, int *info, int len_vect);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbbrdK(JNIEnv *env, UNUSED jobject obj, jstring vect, jint m, jint n, jint ncc, jint kl, jint ku, jfloatArray ab, jint offsetab, jint ldab, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray q, jint offsetq, jint ldq, jfloatArray pt, jint offsetpt, jint ldpt, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jobject info) {
   if (!sgbbrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14286,7 +14317,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbbrdK(JNIEnv *env, UNUSED jobjec
   if (pt) { if (!(__npt = (*env)->GetPrimitiveArrayCritical(env, pt, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sgbbrd_(__nvect, &__nm, &__nn, &__nncc, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __npt ? __npt + offsetpt : NULL, &__nldpt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sgbbrd_(__nvect, &__nm, &__nn, &__nncc, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __npt ? __npt + offsetpt : NULL, &__nldpt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, vect));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -14300,7 +14331,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgbcon_)(const char *norm, int *n, int *kl, int *ku, float *ab, int *ldab, int *ipiv, float *anorm, float *rcond, float *work, int *iwork, int *info);
+static void (*sgbcon_)(const char *norm, int *n, int *kl, int *ku, float *ab, int *ldab, int *ipiv, float *anorm, float *rcond, float *work, int *iwork, int *info, int len_norm);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jint kl, jint ku, jfloatArray ab, jint offsetab, jint ldab, jintArray ipiv, jint offsetipiv, jfloat anorm, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgbcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14329,7 +14360,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbconK(JNIEnv *env, UNUSED jobjec
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgbcon_(__nnorm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgbcon_(__nnorm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -14382,7 +14413,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgbrfs_)(const char *trans, int *n, int *kl, int *ku, int *nrhs, float *ab, int *ldab, float *afb, int *ldafb, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sgbrfs_)(const char *trans, int *n, int *kl, int *ku, int *nrhs, float *ab, int *ldab, float *afb, int *ldafb, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbrfsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint kl, jint ku, jint nrhs, jfloatArray ab, jint offsetab, jint ldab, jfloatArray afb, jint offsetafb, jint ldafb, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgbrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14425,7 +14456,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgbrfs_(__ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgbrfs_(__ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -14475,7 +14506,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgbsvx_)(const char *fact, const char *trans, int *n, int *kl, int *ku, int *nrhs, float *ab, int *ldab, float *afb, int *ldafb, int *ipiv, char *equed, float *r, float *c, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sgbsvx_)(const char *fact, const char *trans, int *n, int *kl, int *ku, int *nrhs, float *ab, int *ldab, float *afb, int *ldafb, int *ipiv, char *equed, float *r, float *c, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info, int len_fact, int len_trans, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring trans, jint n, jint kl, jint ku, jint nrhs, jfloatArray ab, jint offsetab, jint ldab, jfloatArray afb, jint offsetafb, jint ldafb, jintArray ipiv, jint offsetipiv, jobject equed, jfloatArray r, jint offsetr, jfloatArray c, jint offsetc, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jobject rcond, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgbsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14512,7 +14543,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbsvxK(JNIEnv *env, UNUSED jobjec
   __nnrhs = nrhs;
   __nldab = ldab;
   __nldafb = ldafb;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetFloatField(env, rcond, floatW_val_fieldID);
@@ -14528,7 +14559,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgbsvx_(__nfact, __ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nipiv ? __nipiv + offsetipiv : NULL, __nequed, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgbsvx_(__nfact, __ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nipiv ? __nipiv + offsetipiv : NULL, __nequed, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -14607,7 +14638,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgbtrs_)(const char *trans, int *n, int *kl, int *ku, int *nrhs, float *ab, int *ldab, int *ipiv, float *b, int *ldb, int *info);
+static void (*sgbtrs_)(const char *trans, int *n, int *kl, int *ku, int *nrhs, float *ab, int *ldab, int *ipiv, float *b, int *ldb, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbtrsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint kl, jint ku, jint nrhs, jfloatArray ab, jint offsetab, jint ldab, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!sgbtrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14634,7 +14665,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgbtrsK(JNIEnv *env, UNUSED jobjec
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  sgbtrs_(__ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  sgbtrs_(__ntrans, &__nn, &__nkl, &__nku, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -14644,7 +14675,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgebak_)(const char *job, const char *side, int *n, int *ilo, int *ihi, float *scale, int *m, float *v, int *ldv, int *info);
+static void (*sgebak_)(const char *job, const char *side, int *n, int *ilo, int *ihi, float *scale, int *m, float *v, int *ldv, int *info, int len_job, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgebakK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring side, jint n, jint ilo, jint ihi, jfloatArray scale, jint offsetscale, jint m, jfloatArray v, jint offsetv, jint ldv, jobject info) {
   if (!sgebak_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14669,7 +14700,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgebakK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (scale) { if (!(__nscale = (*env)->GetPrimitiveArrayCritical(env, scale, NULL))) { __failed = TRUE; goto done; } }
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
-  sgebak_(__njob, __nside, &__nn, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__nm, __nv ? __nv + offsetv : NULL, &__nldv, &__ninfo);
+  sgebak_(__njob, __nside, &__nn, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__nm, __nv ? __nv + offsetv : NULL, &__nldv, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, side));
 done:
   if (__nv) (*env)->ReleasePrimitiveArrayCritical(env, v, __nv, __failed ? JNI_ABORT : 0);
   if (__nscale) (*env)->ReleasePrimitiveArrayCritical(env, scale, __nscale, __failed ? JNI_ABORT : 0);
@@ -14679,7 +14710,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgebal_)(const char *job, int *n, float *a, int *lda, int *ilo, int *ihi, float *scale, int *info);
+static void (*sgebal_)(const char *job, int *n, float *a, int *lda, int *ilo, int *ihi, float *scale, int *info, int len_job);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgebalK(JNIEnv *env, UNUSED jobject obj, jstring job, jint n, jfloatArray a, jint offseta, jint lda, jobject ilo, jobject ihi, jfloatArray scale, jint offsetscale, jobject info) {
   if (!sgebal_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14700,7 +14731,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgebalK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (scale) { if (!(__nscale = (*env)->GetPrimitiveArrayCritical(env, scale, NULL))) { __failed = TRUE; goto done; } }
-  sgebal_(__njob, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__ninfo);
+  sgebal_(__njob, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job));
 done:
   if (__nscale) (*env)->ReleasePrimitiveArrayCritical(env, scale, __nscale, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -14787,7 +14818,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgecon_)(const char *norm, int *n, float *a, int *lda, float *anorm, float *rcond, float *work, int *iwork, int *info);
+static void (*sgecon_)(const char *norm, int *n, float *a, int *lda, float *anorm, float *rcond, float *work, int *iwork, int *info, int len_norm);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgeconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jfloatArray a, jint offseta, jint lda, jfloat anorm, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgecon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14810,7 +14841,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgeconK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgecon_(__nnorm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgecon_(__nnorm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -14870,7 +14901,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgeesxK(JNIEnv *env, UNUSED jobjec
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
 }
 
-static void (*sgeev_)(const char *jobvl, const char *jobvr, int *n, float *a, int *lda, float *wr, float *wi, float *vl, int *ldvl, float *vr, int *ldvr, float *work, int *lwork, int *info);
+static void (*sgeev_)(const char *jobvl, const char *jobvr, int *n, float *a, int *lda, float *wr, float *wi, float *vl, int *ldvl, float *vr, int *ldvr, float *work, int *lwork, int *info, int len_jobvl, int len_jobvr);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgeevK(JNIEnv *env, UNUSED jobject obj, jstring jobvl, jstring jobvr, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray wr, jint offsetwr, jfloatArray wi, jint offsetwi, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sgeev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14903,7 +14934,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgeevK(JNIEnv *env, UNUSED jobject
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sgeev_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sgeev_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -14917,7 +14948,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgeevx_)(const char *balanc, const char *jobvl, const char *jobvr, const char *sense, int *n, float *a, int *lda, float *wr, float *wi, float *vl, int *ldvl, float *vr, int *ldvr, int *ilo, int *ihi, float *scale, float *abnrm, float *rconde, float *rcondv, float *work, int *lwork, int *iwork, int *info);
+static void (*sgeevx_)(const char *balanc, const char *jobvl, const char *jobvr, const char *sense, int *n, float *a, int *lda, float *wr, float *wi, float *vl, int *ldvl, float *vr, int *ldvr, int *ilo, int *ihi, float *scale, float *abnrm, float *rconde, float *rcondv, float *work, int *lwork, int *iwork, int *info, int len_balanc, int len_jobvl, int len_jobvr, int len_sense);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgeevxK(JNIEnv *env, UNUSED jobject obj, jstring balanc, jstring jobvl, jstring jobvr, jstring sense, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray wr, jint offsetwr, jfloatArray wi, jint offsetwi, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jobject ilo, jobject ihi, jfloatArray scale, jint offsetscale, jobject abnrm, jfloatArray rconde, jint offsetrconde, jfloatArray rcondv, jint offsetrcondv, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgeevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -14968,7 +14999,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgeevxK(JNIEnv *env, UNUSED jobjec
   if (rcondv) { if (!(__nrcondv = (*env)->GetPrimitiveArrayCritical(env, rcondv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgeevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__nabnrm, __nrconde ? __nrconde + offsetrconde : NULL, __nrcondv ? __nrcondv + offsetrcondv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgeevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nilo, &__nihi, __nscale ? __nscale + offsetscale : NULL, &__nabnrm, __nrconde ? __nrconde + offsetrconde : NULL, __nrcondv ? __nrcondv + offsetrcondv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, balanc), (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr), (*env)->GetStringUTFLength(env, sense));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -14991,7 +15022,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgegs_)(const char *jobvsl, const char *jobvsr, int *n, float *a, int *lda, float *b, int *ldb, float *alphar, float *alphai, float *beta, float *vsl, int *ldvsl, float *vsr, int *ldvsr, float *work, int *lwork, int *info);
+static void (*sgegs_)(const char *jobvsl, const char *jobvsr, int *n, float *a, int *lda, float *b, int *ldb, float *alphar, float *alphai, float *beta, float *vsl, int *ldvsl, float *vsr, int *ldvsr, float *work, int *lwork, int *info, int len_jobvsl, int len_jobvsr);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgegsK(JNIEnv *env, UNUSED jobject obj, jstring jobvsl, jstring jobvsr, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray alphar, jint offsetalphar, jfloatArray alphai, jint offsetalphai, jfloatArray beta, jint offsetbeta, jfloatArray vsl, jint offsetvsl, jint ldvsl, jfloatArray vsr, jint offsetvsr, jint ldvsr, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sgegs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -15030,7 +15061,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgegsK(JNIEnv *env, UNUSED jobject
   if (vsl) { if (!(__nvsl = (*env)->GetPrimitiveArrayCritical(env, vsl, NULL))) { __failed = TRUE; goto done; } }
   if (vsr) { if (!(__nvsr = (*env)->GetPrimitiveArrayCritical(env, vsr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sgegs_(__njobvsl, __njobvsr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvsl ? __nvsl + offsetvsl : NULL, &__nldvsl, __nvsr ? __nvsr + offsetvsr : NULL, &__nldvsr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sgegs_(__njobvsl, __njobvsr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvsl ? __nvsl + offsetvsl : NULL, &__nldvsl, __nvsr ? __nvsr + offsetvsr : NULL, &__nldvsr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobvsl), (*env)->GetStringUTFLength(env, jobvsr));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvsr) (*env)->ReleasePrimitiveArrayCritical(env, vsr, __nvsr, __failed ? JNI_ABORT : 0);
@@ -15046,7 +15077,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgegv_)(const char *jobvl, const char *jobvr, int *n, float *a, int *lda, float *b, int *ldb, float *alphar, float *alphai, float *beta, float *vl, int *ldvl, float *vr, int *ldvr, float *work, int *lwork, int *info);
+static void (*sgegv_)(const char *jobvl, const char *jobvr, int *n, float *a, int *lda, float *b, int *ldb, float *alphar, float *alphai, float *beta, float *vl, int *ldvl, float *vr, int *ldvr, float *work, int *lwork, int *info, int len_jobvl, int len_jobvr);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgegvK(JNIEnv *env, UNUSED jobject obj, jstring jobvl, jstring jobvr, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray alphar, jint offsetalphar, jfloatArray alphai, jint offsetalphai, jfloatArray beta, jint offsetbeta, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sgegv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -15085,7 +15116,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgegvK(JNIEnv *env, UNUSED jobject
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sgegv_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sgegv_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -15221,7 +15252,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgels_)(const char *trans, int *m, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, float *work, int *lwork, int *info);
+static void (*sgels_)(const char *trans, int *m, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, float *work, int *lwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgelsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint m, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sgels_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -15248,7 +15279,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgelsK(JNIEnv *env, UNUSED jobject
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sgels_(__ntrans, &__nm, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sgels_(__ntrans, &__nm, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
@@ -15607,7 +15638,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgerfs_)(const char *trans, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sgerfs_)(const char *trans, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgerfsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray af, jint offsetaf, jint ldaf, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgerfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -15646,7 +15677,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgerfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgerfs_(__ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgerfs_(__ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -15749,7 +15780,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgesdd_)(const char *jobz, int *m, int *n, float *a, int *lda, float *s, float *u, int *ldu, float *vt, int *ldvt, float *work, int *lwork, int *iwork, int *info);
+static void (*sgesdd_)(const char *jobz, int *m, int *n, float *a, int *lda, float *s, float *u, int *ldu, float *vt, int *ldvt, float *work, int *lwork, int *iwork, int *info, int len_jobz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgesddK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray s, jint offsets, jfloatArray u, jint offsetu, jint ldu, jfloatArray vt, jint offsetvt, jint ldvt, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgesdd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -15782,7 +15813,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgesddK(JNIEnv *env, UNUSED jobjec
   if (vt) { if (!(__nvt = (*env)->GetPrimitiveArrayCritical(env, vt, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgesdd_(__njobz, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgesdd_(__njobz, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -15825,7 +15856,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgesvd_)(const char *jobu, const char *jobvt, int *m, int *n, float *a, int *lda, float *s, float *u, int *ldu, float *vt, int *ldvt, float *work, int *lwork, int *info);
+static void (*sgesvd_)(const char *jobu, const char *jobvt, int *m, int *n, float *a, int *lda, float *s, float *u, int *ldu, float *vt, int *ldvt, float *work, int *lwork, int *info, int len_jobu, int len_jobvt);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgesvdK(JNIEnv *env, UNUSED jobject obj, jstring jobu, jstring jobvt, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray s, jint offsets, jfloatArray u, jint offsetu, jint ldu, jfloatArray vt, jint offsetvt, jint ldvt, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sgesvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -15858,7 +15889,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgesvdK(JNIEnv *env, UNUSED jobjec
   if (u) { if (!(__nu = (*env)->GetPrimitiveArrayCritical(env, u, NULL))) { __failed = TRUE; goto done; } }
   if (vt) { if (!(__nvt = (*env)->GetPrimitiveArrayCritical(env, vt, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sgesvd_(__njobu, __njobvt, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sgesvd_(__njobu, __njobvt, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobu), (*env)->GetStringUTFLength(env, jobvt));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvt) (*env)->ReleasePrimitiveArrayCritical(env, vt, __nvt, __failed ? JNI_ABORT : 0);
@@ -15871,7 +15902,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgesvx_)(const char *fact, const char *trans, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, int *ipiv, char *equed, float *r, float *c, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sgesvx_)(const char *fact, const char *trans, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, int *ipiv, char *equed, float *r, float *c, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info, int len_fact, int len_trans, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgesvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring trans, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray af, jint offsetaf, jint ldaf, jintArray ipiv, jint offsetipiv, jobject equed, jfloatArray r, jint offsetr, jfloatArray c, jint offsetc, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jobject rcond, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgesvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -15904,7 +15935,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgesvxK(JNIEnv *env, UNUSED jobjec
   __nnrhs = nrhs;
   __nlda = lda;
   __nldaf = ldaf;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetFloatField(env, rcond, floatW_val_fieldID);
@@ -15920,7 +15951,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgesvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgesvx_(__nfact, __ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nequed, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgesvx_(__nfact, __ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nequed, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -16045,7 +16076,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgetrs_)(const char *trans, int *n, int *nrhs, float *a, int *lda, int *ipiv, float *b, int *ldb, int *info);
+static void (*sgetrs_)(const char *trans, int *n, int *nrhs, float *a, int *lda, int *ipiv, float *b, int *ldb, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgetrsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!sgetrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16068,7 +16099,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgetrsK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  sgetrs_(__ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  sgetrs_(__ntrans, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -16078,7 +16109,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sggbak_)(const char *job, const char *side, int *n, int *ilo, int *ihi, float *lscale, float *rscale, int *m, float *v, int *ldv, int *info);
+static void (*sggbak_)(const char *job, const char *side, int *n, int *ilo, int *ihi, float *lscale, float *rscale, int *m, float *v, int *ldv, int *info, int len_job, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggbakK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring side, jint n, jint ilo, jint ihi, jfloatArray lscale, jint offsetlscale, jfloatArray rscale, jint offsetrscale, jint m, jfloatArray v, jint offsetv, jint ldv, jobject info) {
   if (!sggbak_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16105,7 +16136,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggbakK(JNIEnv *env, UNUSED jobjec
   if (lscale) { if (!(__nlscale = (*env)->GetPrimitiveArrayCritical(env, lscale, NULL))) { __failed = TRUE; goto done; } }
   if (rscale) { if (!(__nrscale = (*env)->GetPrimitiveArrayCritical(env, rscale, NULL))) { __failed = TRUE; goto done; } }
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
-  sggbak_(__njob, __nside, &__nn, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, &__nm, __nv ? __nv + offsetv : NULL, &__nldv, &__ninfo);
+  sggbak_(__njob, __nside, &__nn, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, &__nm, __nv ? __nv + offsetv : NULL, &__nldv, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, side));
 done:
   if (__nv) (*env)->ReleasePrimitiveArrayCritical(env, v, __nv, __failed ? JNI_ABORT : 0);
   if (__nrscale) (*env)->ReleasePrimitiveArrayCritical(env, rscale, __nrscale, __failed ? JNI_ABORT : 0);
@@ -16116,7 +16147,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sggbal_)(const char *job, int *n, float *a, int *lda, float *b, int *ldb, int *ilo, int *ihi, float *lscale, float *rscale, float *work, int *info);
+static void (*sggbal_)(const char *job, int *n, float *a, int *lda, float *b, int *ldb, int *ilo, int *ihi, float *lscale, float *rscale, float *work, int *info, int len_job);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggbalK(JNIEnv *env, UNUSED jobject obj, jstring job, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jobject ilo, jobject ihi, jfloatArray lscale, jint offsetlscale, jfloatArray rscale, jint offsetrscale, jfloatArray work, jint offsetwork, jobject info) {
   if (!sggbal_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16145,7 +16176,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggbalK(JNIEnv *env, UNUSED jobjec
   if (lscale) { if (!(__nlscale = (*env)->GetPrimitiveArrayCritical(env, lscale, NULL))) { __failed = TRUE; goto done; } }
   if (rscale) { if (!(__nrscale = (*env)->GetPrimitiveArrayCritical(env, rscale, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sggbal_(__njob, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sggbal_(__njob, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nrscale) (*env)->ReleasePrimitiveArrayCritical(env, rscale, __nrscale, __failed ? JNI_ABORT : 0);
@@ -16171,7 +16202,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggesxK(JNIEnv *env, UNUSED jobjec
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
 }
 
-static void (*sggev_)(const char *jobvl, const char *jobvr, int *n, float *a, int *lda, float *b, int *ldb, float *alphar, float *alphai, float *beta, float *vl, int *ldvl, float *vr, int *ldvr, float *work, int *lwork, int *info);
+static void (*sggev_)(const char *jobvl, const char *jobvr, int *n, float *a, int *lda, float *b, int *ldb, float *alphar, float *alphai, float *beta, float *vl, int *ldvl, float *vr, int *ldvr, float *work, int *lwork, int *info, int len_jobvl, int len_jobvr);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggevK(JNIEnv *env, UNUSED jobject obj, jstring jobvl, jstring jobvr, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray alphar, jint offsetalphar, jfloatArray alphai, jint offsetalphai, jfloatArray beta, jint offsetbeta, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sggev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16210,7 +16241,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggevK(JNIEnv *env, UNUSED jobject
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sggev_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sggev_(__njobvl, __njobvr, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -16226,7 +16257,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sggevx_)(const char *balanc, const char *jobvl, const char *jobvr, const char *sense, int *n, float *a, int *lda, float *b, int *ldb, float *alphar, float *alphai, float *beta, float *vl, int *ldvl, float *vr, int *ldvr, int *ilo, int *ihi, float *lscale, float *rscale, float *abnrm, float *bbnrm, float *rconde, float *rcondv, float *work, int *lwork, int *iwork, int *bwork, int *info);
+static void (*sggevx_)(const char *balanc, const char *jobvl, const char *jobvr, const char *sense, int *n, float *a, int *lda, float *b, int *ldb, float *alphar, float *alphai, float *beta, float *vl, int *ldvl, float *vr, int *ldvr, int *ilo, int *ihi, float *lscale, float *rscale, float *abnrm, float *bbnrm, float *rconde, float *rcondv, float *work, int *lwork, int *iwork, int *bwork, int *info, int len_balanc, int len_jobvl, int len_jobvr, int len_sense);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggevxK(JNIEnv *env, UNUSED jobject obj, jstring balanc, jstring jobvl, jstring jobvr, jstring sense, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray alphar, jint offsetalphar, jfloatArray alphai, jint offsetalphai, jfloatArray beta, jint offsetbeta, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jobject ilo, jobject ihi, jfloatArray lscale, jint offsetlscale, jfloatArray rscale, jint offsetrscale, jobject abnrm, jobject bbnrm, jfloatArray rconde, jint offsetrconde, jfloatArray rcondv, jint offsetrcondv, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jbooleanArray bwork, jint offsetbwork, jobject info) {
   if (!sggevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16295,7 +16326,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggevxK(JNIEnv *env, UNUSED jobjec
     if (!(__nbwork = malloc(sizeof(int) * __length))) { __failed = TRUE; goto done; }
     for (int i = 0; i < __length; i++) { __nbwork[i] = __jbwork[i]; }
   } while(0); }
-  sggevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, &__nabnrm, &__nbbnrm, __nrconde ? __nrconde + offsetrconde : NULL, __nrcondv ? __nrcondv + offsetrcondv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nbwork ? __nbwork + offsetbwork : NULL, &__ninfo);
+  sggevx_(__nbalanc, __njobvl, __njobvr, __nsense, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nilo, &__nihi, __nlscale ? __nlscale + offsetlscale : NULL, __nrscale ? __nrscale + offsetrscale : NULL, &__nabnrm, &__nbbnrm, __nrconde ? __nrconde + offsetrconde : NULL, __nrcondv ? __nrcondv + offsetrcondv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nbwork ? __nbwork + offsetbwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, balanc), (*env)->GetStringUTFLength(env, jobvl), (*env)->GetStringUTFLength(env, jobvr), (*env)->GetStringUTFLength(env, sense));
 done:
   if (__nbwork) { free(__nbwork); } if (__jbwork) (*env)->ReleasePrimitiveArrayCritical(env, bwork, __nbwork, JNI_ABORT);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -16366,7 +16397,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgghrd_)(const char *compq, const char *compz, int *n, int *ilo, int *ihi, float *a, int *lda, float *b, int *ldb, float *q, int *ldq, float *z, int *ldz, int *info);
+static void (*sgghrd_)(const char *compq, const char *compz, int *n, int *ilo, int *ihi, float *a, int *lda, float *b, int *ldb, float *q, int *ldq, float *z, int *ldz, int *info, int len_compq, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgghrdK(JNIEnv *env, UNUSED jobject obj, jstring compq, jstring compz, jint n, jint ilo, jint ihi, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray q, jint offsetq, jint ldq, jfloatArray z, jint offsetz, jint ldz, jobject info) {
   if (!sgghrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16399,7 +16430,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgghrdK(JNIEnv *env, UNUSED jobjec
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
-  sgghrd_(__ncompq, __ncompz, &__nn, &__nilo, &__nihi, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nq ? __nq + offsetq : NULL, &__nldq, __nz ? __nz + offsetz : NULL, &__nldz, &__ninfo);
+  sgghrd_(__ncompq, __ncompz, &__nn, &__nilo, &__nihi, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nq ? __nq + offsetq : NULL, &__nldq, __nz ? __nz + offsetz : NULL, &__nldz, &__ninfo, (*env)->GetStringUTFLength(env, compq), (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -16534,7 +16565,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sggsvd_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *n, int *p, int *k, int *l, float *a, int *lda, float *b, int *ldb, float *alpha, float *beta, float *u, int *ldu, float *v, int *ldv, float *q, int *ldq, float *work, int *iwork, int *info);
+static void (*sggsvd_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *n, int *p, int *k, int *l, float *a, int *lda, float *b, int *ldb, float *alpha, float *beta, float *u, int *ldu, float *v, int *ldv, float *q, int *ldq, float *work, int *iwork, int *info, int len_jobu, int len_jobv, int len_jobq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggsvdK(JNIEnv *env, UNUSED jobject obj, jstring jobu, jstring jobv, jstring jobq, jint m, jint n, jint p, jobject k, jobject l, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray alpha, jint offsetalpha, jfloatArray beta, jint offsetbeta, jfloatArray u, jint offsetu, jint ldu, jfloatArray v, jint offsetv, jint ldv, jfloatArray q, jint offsetq, jint ldq, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sggsvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16585,7 +16616,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggsvdK(JNIEnv *env, UNUSED jobjec
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sggsvd_(__njobu, __njobv, __njobq, &__nm, &__nn, &__np, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalpha ? __nalpha + offsetalpha : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sggsvd_(__njobu, __njobv, __njobq, &__nm, &__nn, &__np, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nalpha ? __nalpha + offsetalpha : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobu), (*env)->GetStringUTFLength(env, jobv), (*env)->GetStringUTFLength(env, jobq));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -16605,7 +16636,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sggsvp_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *p, int *n, float *a, int *lda, float *b, int *ldb, float *tola, float *tolb, int *k, int *l, float *u, int *ldu, float *v, int *ldv, float *q, int *ldq, int *iwork, float *tau, float *work, int *info);
+static void (*sggsvp_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *p, int *n, float *a, int *lda, float *b, int *ldb, float *tola, float *tolb, int *k, int *l, float *u, int *ldu, float *v, int *ldv, float *q, int *ldq, int *iwork, float *tau, float *work, int *info, int len_jobu, int len_jobv, int len_jobq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggsvpK(JNIEnv *env, UNUSED jobject obj, jstring jobu, jstring jobv, jstring jobq, jint m, jint p, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat tola, jfloat tolb, jobject k, jobject l, jfloatArray u, jint offsetu, jint ldu, jfloatArray v, jint offsetv, jint ldv, jfloatArray q, jint offsetq, jint ldq, jintArray iwork, jint offsetiwork, jfloatArray tau, jint offsettau, jfloatArray work, jint offsetwork, jobject info) {
   if (!sggsvp_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16658,7 +16689,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sggsvpK(JNIEnv *env, UNUSED jobjec
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sggsvp_(__njobu, __njobv, __njobq, &__nm, &__np, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ntola, &__ntolb, &__nk, &__nl, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __niwork ? __niwork + offsetiwork : NULL, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sggsvp_(__njobu, __njobv, __njobq, &__nm, &__np, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ntola, &__ntolb, &__nk, &__nl, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __niwork ? __niwork + offsetiwork : NULL, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobu), (*env)->GetStringUTFLength(env, jobv), (*env)->GetStringUTFLength(env, jobq));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -16677,7 +16708,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgtcon_)(const char *norm, int *n, float *dl, float *d, float *du, float *du2, int *ipiv, float *anorm, float *rcond, float *work, int *iwork, int *info);
+static void (*sgtcon_)(const char *norm, int *n, float *dl, float *d, float *du, float *du2, int *ipiv, float *anorm, float *rcond, float *work, int *iwork, int *info, int len_norm);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgtconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jfloatArray dl, jint offsetdl, jfloatArray d, jint offsetd, jfloatArray du, jint offsetdu, jfloatArray du2, jint offsetdu2, jintArray ipiv, jint offsetipiv, jfloat anorm, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgtcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16706,7 +16737,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgtconK(JNIEnv *env, UNUSED jobjec
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgtcon_(__nnorm, &__nn, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgtcon_(__nnorm, &__nn, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -16721,7 +16752,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgtrfs_)(const char *trans, int *n, int *nrhs, float *dl, float *d, float *du, float *dlf, float *df, float *duf, float *du2, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sgtrfs_)(const char *trans, int *n, int *nrhs, float *dl, float *d, float *du, float *dlf, float *df, float *duf, float *du2, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgtrfsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jfloatArray dl, jint offsetdl, jfloatArray d, jint offsetd, jfloatArray du, jint offsetdu, jfloatArray dlf, jint offsetdlf, jfloatArray df, jint offsetdf, jfloatArray duf, jint offsetduf, jfloatArray du2, jint offsetdu2, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgtrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16766,7 +16797,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgtrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgtrfs_(__ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndlf ? __ndlf + offsetdlf : NULL, __ndf ? __ndf + offsetdf : NULL, __nduf ? __nduf + offsetduf : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgtrfs_(__ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndlf ? __ndlf + offsetdlf : NULL, __ndf ? __ndf + offsetdf : NULL, __nduf ? __nduf + offsetduf : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -16818,7 +16849,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgtsvx_)(const char *fact, const char *trans, int *n, int *nrhs, float *dl, float *d, float *du, float *dlf, float *df, float *duf, float *du2, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sgtsvx_)(const char *fact, const char *trans, int *n, int *nrhs, float *dl, float *d, float *du, float *dlf, float *df, float *duf, float *du2, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info, int len_fact, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgtsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring trans, jint n, jint nrhs, jfloatArray dl, jint offsetdl, jfloatArray d, jint offsetd, jfloatArray du, jint offsetdu, jfloatArray dlf, jint offsetdlf, jfloatArray df, jint offsetdf, jfloatArray duf, jint offsetduf, jfloatArray du2, jint offsetdu2, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jobject rcond, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sgtsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16867,7 +16898,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgtsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sgtsvx_(__nfact, __ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndlf ? __ndlf + offsetdlf : NULL, __ndf ? __ndf + offsetdf : NULL, __nduf ? __nduf + offsetduf : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sgtsvx_(__nfact, __ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndlf ? __ndlf + offsetdlf : NULL, __ndf ? __ndf + offsetdf : NULL, __nduf ? __nduf + offsetduf : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -16920,7 +16951,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sgttrs_)(const char *trans, int *n, int *nrhs, float *dl, float *d, float *du, float *du2, int *ipiv, float *b, int *ldb, int *info);
+static void (*sgttrs_)(const char *trans, int *n, int *nrhs, float *dl, float *d, float *du, float *du2, int *ipiv, float *b, int *ldb, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgttrsK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jfloatArray dl, jint offsetdl, jfloatArray d, jint offsetd, jfloatArray du, jint offsetdu, jfloatArray du2, jint offsetdu2, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!sgttrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -16947,7 +16978,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sgttrsK(JNIEnv *env, UNUSED jobjec
   if (du2) { if (!(__ndu2 = (*env)->GetPrimitiveArrayCritical(env, du2, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  sgttrs_(__ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  sgttrs_(__ntrans, &__nn, &__nnrhs, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __ndu2 ? __ndu2 + offsetdu2 : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -16996,7 +17027,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*shgeqz_)(const char *job, const char *compq, const char *compz, int *n, int *ilo, int *ihi, float *h, int *ldh, float *t, int *ldt, float *alphar, float *alphai, float *beta, float *q, int *ldq, float *z, int *ldz, float *work, int *lwork, int *info);
+static void (*shgeqz_)(const char *job, const char *compq, const char *compz, int *n, int *ilo, int *ihi, float *h, int *ldh, float *t, int *ldt, float *alphar, float *alphai, float *beta, float *q, int *ldq, float *z, int *ldz, float *work, int *lwork, int *info, int len_job, int len_compq, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_shgeqzK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring compq, jstring compz, jint n, jint ilo, jint ihi, jfloatArray h, jint offseth, jint ldh, jfloatArray t, jint offsett, jint ldt, jfloatArray alphar, jint offsetalphar, jfloatArray alphai, jint offsetalphai, jfloatArray beta, jint offsetbeta, jfloatArray q, jint offsetq, jint ldq, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!shgeqz_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -17041,7 +17072,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_shgeqzK(JNIEnv *env, UNUSED jobjec
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  shgeqz_(__njob, __ncompq, __ncompz, &__nn, &__nilo, &__nihi, __nh ? __nh + offseth : NULL, &__nldh, __nt ? __nt + offsett : NULL, &__nldt, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  shgeqz_(__njob, __ncompq, __ncompz, &__nn, &__nilo, &__nihi, __nh ? __nh + offseth : NULL, &__nldh, __nt ? __nt + offsett : NULL, &__nldt, __nalphar ? __nalphar + offsetalphar : NULL, __nalphai ? __nalphai + offsetalphai : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, compq), (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -17058,7 +17089,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*shsein_)(const char *side, const char *eigsrc, const char *initv, int *select, int *n, float *h, int *ldh, float *wr, float *wi, float *vl, int *ldvl, float *vr, int *ldvr, int *mm, int *m, float *work, int *ifaill, int *ifailr, int *info);
+static void (*shsein_)(const char *side, const char *eigsrc, const char *initv, int *select, int *n, float *h, int *ldh, float *wr, float *wi, float *vl, int *ldvl, float *vr, int *ldvr, int *mm, int *m, float *work, int *ifaill, int *ifailr, int *info, int len_side, int len_eigsrc, int len_initv);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_shseinK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring eigsrc, jstring initv, jbooleanArray select, jint offsetselect, jint n, jfloatArray h, jint offseth, jint ldh, jfloatArray wr, jint offsetwr, jfloatArray wi, jint offsetwi, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jint mm, jobject m, jfloatArray work, jint offsetwork, jintArray ifaill, jint offsetifaill, jintArray ifailr, jint offsetifailr, jobject info) {
   if (!shsein_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -17107,7 +17138,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_shseinK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (ifaill) { if (!(__nifaill = (*env)->GetPrimitiveArrayCritical(env, ifaill, NULL))) { __failed = TRUE; goto done; } }
   if (ifailr) { if (!(__nifailr = (*env)->GetPrimitiveArrayCritical(env, ifailr, NULL))) { __failed = TRUE; goto done; } }
-  shsein_(__nside, __neigsrc, __ninitv, __nselect ? __nselect + offsetselect : NULL, &__nn, __nh ? __nh + offseth : NULL, &__nldh, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, __nifaill ? __nifaill + offsetifaill : NULL, __nifailr ? __nifailr + offsetifailr : NULL, &__ninfo);
+  shsein_(__nside, __neigsrc, __ninitv, __nselect ? __nselect + offsetselect : NULL, &__nn, __nh ? __nh + offseth : NULL, &__nldh, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, __nifaill ? __nifaill + offsetifaill : NULL, __nifailr ? __nifailr + offsetifailr : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, eigsrc), (*env)->GetStringUTFLength(env, initv));
 done:
   if (__nifailr) (*env)->ReleasePrimitiveArrayCritical(env, ifailr, __nifailr, __failed ? JNI_ABORT : 0);
   if (__nifaill) (*env)->ReleasePrimitiveArrayCritical(env, ifaill, __nifaill, __failed ? JNI_ABORT : 0);
@@ -17126,7 +17157,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*shseqr_)(const char *job, const char *compz, int *n, int *ilo, int *ihi, float *h, int *ldh, float *wr, float *wi, float *z, int *ldz, float *work, int *lwork, int *info);
+static void (*shseqr_)(const char *job, const char *compz, int *n, int *ilo, int *ihi, float *h, int *ldh, float *wr, float *wi, float *z, int *ldz, float *work, int *lwork, int *info, int len_job, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_shseqrK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring compz, jint n, jint ilo, jint ihi, jfloatArray h, jint offseth, jint ldh, jfloatArray wr, jint offsetwr, jfloatArray wi, jint offsetwi, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!shseqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -17159,7 +17190,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_shseqrK(JNIEnv *env, UNUSED jobjec
   if (wi) { if (!(__nwi = (*env)->GetPrimitiveArrayCritical(env, wi, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  shseqr_(__njob, __ncompz, &__nn, &__nilo, &__nihi, __nh ? __nh + offseth : NULL, &__nldh, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  shseqr_(__njob, __ncompz, &__nn, &__nilo, &__nihi, __nh ? __nh + offseth : NULL, &__nldh, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -17302,7 +17333,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slacpy_)(const char *uplo, int *m, int *n, float *a, int *lda, float *b, int *ldb);
+static void (*slacpy_)(const char *uplo, int *m, int *n, float *a, int *lda, float *b, int *ldb, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slacpyK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb) {
   if (!slacpy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -17321,7 +17352,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slacpyK(JNIEnv *env, UNUSED jobjec
   __nldb = ldb;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  slacpy_(__nuplo, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb);
+  slacpy_(__nuplo, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -18186,7 +18217,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slagtm_)(const char *trans, int *n, int *nrhs, float *alpha, float *dl, float *d, float *du, float *x, int *ldx, float *beta, float *b, int *ldb);
+static void (*slagtm_)(const char *trans, int *n, int *nrhs, float *alpha, float *dl, float *d, float *du, float *x, int *ldx, float *beta, float *b, int *ldb, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slagtmK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint n, jint nrhs, jfloat alpha, jfloatArray dl, jint offsetdl, jfloatArray d, jint offsetd, jfloatArray du, jint offsetdu, jfloatArray x, jint offsetx, jint ldx, jfloat beta, jfloatArray b, jint offsetb, jint ldb) {
   if (!slagtm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18215,7 +18246,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slagtmK(JNIEnv *env, UNUSED jobjec
   if (du) { if (!(__ndu = (*env)->GetPrimitiveArrayCritical(env, du, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  slagtm_(__ntrans, &__nn, &__nnrhs, &__nalpha, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __nx ? __nx + offsetx : NULL, &__nldx, &__nbeta, __nb ? __nb + offsetb : NULL, &__nldb);
+  slagtm_(__ntrans, &__nn, &__nnrhs, &__nalpha, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, __nx ? __nx + offsetx : NULL, &__nldx, &__nbeta, __nb ? __nb + offsetb : NULL, &__nldb, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -18666,7 +18697,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slalsd_)(const char *uplo, int *smlsiz, int *n, int *nrhs, float *d, float *e, float *b, int *ldb, float *rcond, int *rank, float *work, int *iwork, int *info);
+static void (*slalsd_)(const char *uplo, int *smlsiz, int *n, int *nrhs, float *d, float *e, float *b, int *ldb, float *rcond, int *rank, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slalsdK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint smlsiz, jint n, jint nrhs, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray b, jint offsetb, jint ldb, jfloat rcond, jobject rank, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!slalsd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18697,7 +18728,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slalsdK(JNIEnv *env, UNUSED jobjec
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  slalsd_(__nuplo, &__nsmlsiz, &__nn, &__nnrhs, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__nrcond, &__nrank, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  slalsd_(__nuplo, &__nsmlsiz, &__nn, &__nnrhs, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__nrcond, &__nrank, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -18760,7 +18791,11 @@ done:
   return __ret;
 }
 
-static float (*slangb_)(const char *norm, int *n, int *kl, int *ku, float *ab, int *ldab, float *work);
+#ifdef __APPLE__
+static double (*slangb_)(const char *norm, int *n, int *kl, int *ku, float *ab, int *ldab, float *work, int len_norm);
+#else
+static float (*slangb_)(const char *norm, int *n, int *kl, int *ku, float *ab, int *ldab, float *work, int len_norm);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slangbK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jint kl, jint ku, jfloatArray ab, jint offsetab, jint ldab, jfloatArray work, jint offsetwork) {
   if (!slangb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18780,7 +18815,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slangbK(JNIEnv *env, UNUSED jobj
   __nldab = ldab;
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slangb_(__nnorm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL);
+  __ret = slangb_(__nnorm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -18789,7 +18824,11 @@ done:
   return __ret;
 }
 
-static float (*slange_)(const char *norm, int *m, int *n, float *a, int *lda, float *work);
+#ifdef __APPLE__
+static double (*slange_)(const char *norm, int *m, int *n, float *a, int *lda, float *work, int len_norm);
+#else
+static float (*slange_)(const char *norm, int *m, int *n, float *a, int *lda, float *work, int len_norm);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slangeK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray work, jint offsetwork) {
   if (!slange_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18807,7 +18846,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slangeK(JNIEnv *env, UNUSED jobj
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slange_(__nnorm, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL);
+  __ret = slange_(__nnorm, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -18816,7 +18855,11 @@ done:
   return __ret;
 }
 
-static float (*slangt_)(const char *norm, int *n, float *dl, float *d, float *du);
+#ifdef __APPLE__
+static double (*slangt_)(const char *norm, int *n, float *dl, float *d, float *du, int len_norm);
+#else
+static float (*slangt_)(const char *norm, int *n, float *dl, float *d, float *du, int len_norm);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slangtK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jfloatArray dl, jint offsetdl, jfloatArray d, jint offsetd, jfloatArray du, jint offsetdu) {
   if (!slangt_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18832,7 +18875,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slangtK(JNIEnv *env, UNUSED jobj
   if (dl) { if (!(__ndl = (*env)->GetPrimitiveArrayCritical(env, dl, NULL))) { __failed = TRUE; goto done; } }
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (du) { if (!(__ndu = (*env)->GetPrimitiveArrayCritical(env, du, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slangt_(__nnorm, &__nn, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL);
+  __ret = slangt_(__nnorm, &__nn, __ndl ? __ndl + offsetdl : NULL, __nd ? __nd + offsetd : NULL, __ndu ? __ndu + offsetdu : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__ndu) (*env)->ReleasePrimitiveArrayCritical(env, du, __ndu, __failed ? JNI_ABORT : 0);
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
@@ -18842,7 +18885,11 @@ done:
   return __ret;
 }
 
-static float (*slanhs_)(const char *norm, int *n, float *a, int *lda, float *work);
+#ifdef __APPLE__
+static double (*slanhs_)(const char *norm, int *n, float *a, int *lda, float *work, int len_norm);
+#else
+static float (*slanhs_)(const char *norm, int *n, float *a, int *lda, float *work, int len_norm);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slanhsK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray work, jint offsetwork) {
   if (!slanhs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18858,7 +18905,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slanhsK(JNIEnv *env, UNUSED jobj
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slanhs_(__nnorm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL);
+  __ret = slanhs_(__nnorm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -18867,7 +18914,11 @@ done:
   return __ret;
 }
 
-static float (*slansb_)(const char *norm, const char *uplo, int *n, int *k, float *ab, int *ldab, float *work);
+#ifdef __APPLE__
+static double (*slansb_)(const char *norm, const char *uplo, int *n, int *k, float *ab, int *ldab, float *work, int len_norm, int len_uplo);
+#else
+static float (*slansb_)(const char *norm, const char *uplo, int *n, int *k, float *ab, int *ldab, float *work, int len_norm, int len_uplo);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slansbK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jint n, jint k, jfloatArray ab, jint offsetab, jint ldab, jfloatArray work, jint offsetwork) {
   if (!slansb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18887,7 +18938,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slansbK(JNIEnv *env, UNUSED jobj
   __nldab = ldab;
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slansb_(__nnorm, __nuplo, &__nn, &__nk, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL);
+  __ret = slansb_(__nnorm, __nuplo, &__nn, &__nk, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -18897,7 +18948,11 @@ done:
   return __ret;
 }
 
-static float (*slansp_)(const char *norm, const char *uplo, int *n, float *ap, float *work);
+#ifdef __APPLE__
+static double (*slansp_)(const char *norm, const char *uplo, int *n, float *ap, float *work, int len_norm, int len_uplo);
+#else
+static float (*slansp_)(const char *norm, const char *uplo, int *n, float *ap, float *work, int len_norm, int len_uplo);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slanspK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray work, jint offsetwork) {
   if (!slansp_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18913,7 +18968,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slanspK(JNIEnv *env, UNUSED jobj
   __nn = n;
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slansp_(__nnorm, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nwork ? __nwork + offsetwork : NULL);
+  __ret = slansp_(__nnorm, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -18923,7 +18978,11 @@ done:
   return __ret;
 }
 
-static float (*slanst_)(const char *norm, int *n, float *d, float *e);
+#ifdef __APPLE__
+static double (*slanst_)(const char *norm, int *n, float *d, float *e, int len_norm);
+#else
+static float (*slanst_)(const char *norm, int *n, float *d, float *e, int len_norm);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slanstK(JNIEnv *env, UNUSED jobject obj, jstring norm, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete) {
   if (!slanst_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18937,7 +18996,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slanstK(JNIEnv *env, UNUSED jobj
   __nn = n;
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slanst_(__nnorm, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL);
+  __ret = slanst_(__nnorm, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, (*env)->GetStringUTFLength(env, norm));
 done:
   if (__ne) (*env)->ReleasePrimitiveArrayCritical(env, e, __ne, __failed ? JNI_ABORT : 0);
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
@@ -18946,7 +19005,11 @@ done:
   return __ret;
 }
 
-static float (*slansy_)(const char *norm, const char *uplo, int *n, float *a, int *lda, float *work);
+#ifdef __APPLE__
+static double (*slansy_)(const char *norm, const char *uplo, int *n, float *a, int *lda, float *work, int len_norm, int len_uplo);
+#else
+static float (*slansy_)(const char *norm, const char *uplo, int *n, float *a, int *lda, float *work, int len_norm, int len_uplo);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slansyK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray work, jint offsetwork) {
   if (!slansy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18964,7 +19027,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slansyK(JNIEnv *env, UNUSED jobj
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slansy_(__nnorm, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL);
+  __ret = slansy_(__nnorm, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -18974,7 +19037,11 @@ done:
   return __ret;
 }
 
-static float (*slantb_)(const char *norm, const char *uplo, const char *diag, int *n, int *k, float *ab, int *ldab, float *work);
+#ifdef __APPLE__
+static double (*slantb_)(const char *norm, const char *uplo, const char *diag, int *n, int *k, float *ab, int *ldab, float *work, int len_norm, int len_uplo, int len_diag);
+#else
+static float (*slantb_)(const char *norm, const char *uplo, const char *diag, int *n, int *k, float *ab, int *ldab, float *work, int len_norm, int len_uplo, int len_diag);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slantbK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jint k, jfloatArray ab, jint offsetab, jint ldab, jfloatArray work, jint offsetwork) {
   if (!slantb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -18996,7 +19063,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slantbK(JNIEnv *env, UNUSED jobj
   __nldab = ldab;
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slantb_(__nnorm, __nuplo, __ndiag, &__nn, &__nk, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL);
+  __ret = slantb_(__nnorm, __nuplo, __ndiag, &__nn, &__nk, __nab ? __nab + offsetab : NULL, &__nldab, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -19007,7 +19074,11 @@ done:
   return __ret;
 }
 
-static float (*slantp_)(const char *norm, const char *uplo, const char *diag, int *n, float *ap, float *work);
+#ifdef __APPLE__
+static double (*slantp_)(const char *norm, const char *uplo, const char *diag, int *n, float *ap, float *work, int len_norm, int len_uplo, int len_diag);
+#else
+static float (*slantp_)(const char *norm, const char *uplo, const char *diag, int *n, float *ap, float *work, int len_norm, int len_uplo, int len_diag);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slantpK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jfloatArray ap, jint offsetap, jfloatArray work, jint offsetwork) {
   if (!slantp_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19025,7 +19096,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slantpK(JNIEnv *env, UNUSED jobj
   __nn = n;
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slantp_(__nnorm, __nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, __nwork ? __nwork + offsetwork : NULL);
+  __ret = slantp_(__nnorm, __nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -19036,7 +19107,11 @@ done:
   return __ret;
 }
 
-static float (*slantr_)(const char *norm, const char *uplo, const char *diag, int *m, int *n, float *a, int *lda, float *work);
+#ifdef __APPLE__
+static double (*slantr_)(const char *norm, const char *uplo, const char *diag, int *m, int *n, float *a, int *lda, float *work, int len_norm, int len_uplo, int len_diag);
+#else
+static float (*slantr_)(const char *norm, const char *uplo, const char *diag, int *m, int *n, float *a, int *lda, float *work, int len_norm, int len_uplo, int len_diag);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slantrK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray work, jint offsetwork) {
   if (!slantr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19058,7 +19133,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slantrK(JNIEnv *env, UNUSED jobj
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  __ret = slantr_(__nnorm, __nuplo, __ndiag, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL);
+  __ret = slantr_(__nnorm, __nuplo, __ndiag, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -19158,7 +19233,11 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
+#ifdef __APPLE__
+static double (*slapy2_)(float *x, float *y);
+#else
 static float (*slapy2_)(float *x, float *y);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slapy2K(JNIEnv *env, UNUSED jobject obj, jfloat x, jfloat y) {
   if (!slapy2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19174,7 +19253,11 @@ done:
   return __ret;
 }
 
+#ifdef __APPLE__
+static double (*slapy3_)(float *x, float *y, float *z);
+#else
 static float (*slapy3_)(float *x, float *y, float *z);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slapy3K(JNIEnv *env, UNUSED jobject obj, jfloat x, jfloat y, jfloat z) {
   if (!slapy3_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19192,7 +19275,7 @@ done:
   return __ret;
 }
 
-static void (*slaqgb_)(int *m, int *n, int *kl, int *ku, float *ab, int *ldab, float *r, float *c, float *rowcnd, float *colcnd, float *amax, char *equed);
+static void (*slaqgb_)(int *m, int *n, int *kl, int *ku, float *ab, int *ldab, float *r, float *c, float *rowcnd, float *colcnd, float *amax, char *equed, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqgbK(JNIEnv *env, UNUSED jobject obj, jint m, jint n, jint kl, jint ku, jfloatArray ab, jint offsetab, jint ldab, jfloatArray r, jint offsetr, jfloatArray c, jint offsetc, jfloat rowcnd, jfloat colcnd, jfloat amax, jobject equed) {
   if (!slaqgb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19217,11 +19300,11 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqgbK(JNIEnv *env, UNUSED jobjec
   __nrowcnd = rowcnd;
   __ncolcnd = colcnd;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (r) { if (!(__nr = (*env)->GetPrimitiveArrayCritical(env, r, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
-  slaqgb_(&__nm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, &__nrowcnd, &__ncolcnd, &__namax, __nequed);
+  slaqgb_(&__nm, &__nn, &__nkl, &__nku, __nab ? __nab + offsetab : NULL, &__nldab, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, &__nrowcnd, &__ncolcnd, &__namax, __nequed, (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
   if (__nr) (*env)->ReleasePrimitiveArrayCritical(env, r, __nr, __failed ? JNI_ABORT : 0);
@@ -19230,7 +19313,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slaqge_)(int *m, int *n, float *a, int *lda, float *r, float *c, float *rowcnd, float *colcnd, float *amax, char *equed);
+static void (*slaqge_)(int *m, int *n, float *a, int *lda, float *r, float *c, float *rowcnd, float *colcnd, float *amax, char *equed, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqgeK(JNIEnv *env, UNUSED jobject obj, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray r, jint offsetr, jfloatArray c, jint offsetc, jfloat rowcnd, jfloat colcnd, jfloat amax, jobject equed) {
   if (!slaqge_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19251,11 +19334,11 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqgeK(JNIEnv *env, UNUSED jobjec
   __nrowcnd = rowcnd;
   __ncolcnd = colcnd;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (r) { if (!(__nr = (*env)->GetPrimitiveArrayCritical(env, r, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
-  slaqge_(&__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, &__nrowcnd, &__ncolcnd, &__namax, __nequed);
+  slaqge_(&__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nr ? __nr + offsetr : NULL, __nc ? __nc + offsetc : NULL, &__nrowcnd, &__ncolcnd, &__namax, __nequed, (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
   if (__nr) (*env)->ReleasePrimitiveArrayCritical(env, r, __nr, __failed ? JNI_ABORT : 0);
@@ -19682,7 +19765,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slaqsb_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, float *s, float *scond, float *amax, char *equed);
+static void (*slaqsb_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, float *s, float *scond, float *amax, char *equed, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqsbK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jfloatArray s, jint offsets, jfloat scond, jfloat amax, jobject equed) {
   if (!slaqsb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19702,10 +19785,10 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqsbK(JNIEnv *env, UNUSED jobjec
   __nldab = ldab;
   __nscond = scond;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  slaqsb_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed);
+  slaqsb_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -19714,7 +19797,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slaqsp_)(const char *uplo, int *n, float *ap, float *s, float *scond, float *amax, char *equed);
+static void (*slaqsp_)(const char *uplo, int *n, float *ap, float *s, float *scond, float *amax, char *equed, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqspK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray s, jint offsets, jfloat scond, jfloat amax, jobject equed) {
   if (!slaqsp_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19730,10 +19813,10 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqspK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __nscond = scond;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  slaqsp_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed);
+  slaqsp_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -19742,7 +19825,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slaqsy_)(const char *uplo, int *n, float *a, int *lda, float *s, float *scond, float *amax, char *equed);
+static void (*slaqsy_)(const char *uplo, int *n, float *a, int *lda, float *s, float *scond, float *amax, char *equed, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqsyK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray s, jint offsets, jfloat scond, jfloat amax, jobject equed) {
   if (!slaqsy_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19760,10 +19843,10 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slaqsyK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __nscond = scond;
   __namax = amax;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  slaqsy_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed);
+  slaqsy_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __ns ? __ns + offsets : NULL, &__nscond, &__namax, __nequed, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -19907,7 +19990,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarf_)(const char *side, int *m, int *n, float *v, int *incv, float *tau, float *c, int *Ldc, float *work);
+static void (*slarf_)(const char *side, int *m, int *n, float *v, int *incv, float *tau, float *c, int *Ldc, float *work, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarfK(JNIEnv *env, UNUSED jobject obj, jstring side, jint m, jint n, jfloatArray v, jint offsetv, jint incv, jfloat tau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork) {
   if (!slarf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19930,7 +20013,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarfK(JNIEnv *env, UNUSED jobject
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  slarf_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL);
+  slarf_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, side));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -19939,7 +20022,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarfb_)(const char *side, const char *trans, const char *direct, const char *storev, int *m, int *n, int *k, float *v, int *ldv, float *t, int *ldt, float *c, int *Ldc, float *work, int *ldwork);
+static void (*slarfb_)(const char *side, const char *trans, const char *direct, const char *storev, int *m, int *n, int *k, float *v, int *ldv, float *t, int *ldt, float *c, int *Ldc, float *work, int *ldwork, int len_side, int len_trans, int len_direct, int len_storev);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarfbK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jstring direct, jstring storev, jint m, jint n, jint k, jfloatArray v, jint offsetv, jint ldv, jfloatArray t, jint offsett, jint ldt, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint ldwork) {
   if (!slarfb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -19974,7 +20057,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarfbK(JNIEnv *env, UNUSED jobjec
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  slarfb_(__nside, __ntrans, __ndirect, __nstorev, &__nm, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __nt ? __nt + offsett : NULL, &__nldt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nldwork);
+  slarfb_(__nside, __ntrans, __ndirect, __nstorev, &__nm, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __nt ? __nt + offsett : NULL, &__nldt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nldwork, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, direct), (*env)->GetStringUTFLength(env, storev));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -20010,7 +20093,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarft_)(const char *direct, const char *storev, int *n, int *k, float *v, int *ldv, float *tau, float *t, int *ldt);
+static void (*slarft_)(const char *direct, const char *storev, int *n, int *k, float *v, int *ldv, float *tau, float *t, int *ldt, int len_direct, int len_storev);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarftK(JNIEnv *env, UNUSED jobject obj, jstring direct, jstring storev, jint n, jint k, jfloatArray v, jint offsetv, jint ldv, jfloatArray tau, jint offsettau, jfloatArray t, jint offsett, jint ldt) {
   if (!slarft_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -20033,7 +20116,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarftK(JNIEnv *env, UNUSED jobjec
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
-  slarft_(__ndirect, __nstorev, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __ntau ? __ntau + offsettau : NULL, __nt ? __nt + offsett : NULL, &__nldt);
+  slarft_(__ndirect, __nstorev, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __ntau ? __ntau + offsettau : NULL, __nt ? __nt + offsett : NULL, &__nldt, (*env)->GetStringUTFLength(env, direct), (*env)->GetStringUTFLength(env, storev));
 done:
   if (__nt) (*env)->ReleasePrimitiveArrayCritical(env, t, __nt, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -20043,7 +20126,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarfx_)(const char *side, int *m, int *n, float *v, float *tau, float *c, int *Ldc, float *work);
+static void (*slarfx_)(const char *side, int *m, int *n, float *v, float *tau, float *c, int *Ldc, float *work, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarfxK(JNIEnv *env, UNUSED jobject obj, jstring side, jint m, jint n, jfloatArray v, jint offsetv, jfloat tau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork) {
   if (!slarfx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -20064,7 +20147,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarfxK(JNIEnv *env, UNUSED jobjec
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  slarfx_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL);
+  slarfx_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, side));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -20206,7 +20289,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarrc_)(const char *jobt, int *n, float *vl, float *vu, float *d, float *e, float *pivmin, int *eigcnt, int *lcnt, int *rcnt, int *info);
+static void (*slarrc_)(const char *jobt, int *n, float *vl, float *vu, float *d, float *e, float *pivmin, int *eigcnt, int *lcnt, int *rcnt, int *info, int len_jobt);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarrcK(JNIEnv *env, UNUSED jobject obj, jstring jobt, jint n, jfloat vl, jfloat vu, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloat pivmin, jobject eigcnt, jobject lcnt, jobject rcnt, jobject info) {
   if (!slarrc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -20233,7 +20316,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarrcK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
-  slarrc_(__njobt, &__nn, &__nvl, &__nvu, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__npivmin, &__neigcnt, &__nlcnt, &__nrcnt, &__ninfo);
+  slarrc_(__njobt, &__nn, &__nvl, &__nvu, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__npivmin, &__neigcnt, &__nlcnt, &__nrcnt, &__ninfo, (*env)->GetStringUTFLength(env, jobt));
 done:
   if (__ne) (*env)->ReleasePrimitiveArrayCritical(env, e, __ne, __failed ? JNI_ABORT : 0);
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
@@ -20245,7 +20328,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarrd_)(const char *range, const char *order, int *n, float *vl, float *vu, int *il, int *iu, float *gers, float *reltol, float *d, float *e, float *e2, float *pivmin, int *nsplit, int *isplit, int *m, float *w, float *werr, float *wl, float *wu, int *iblock, int *indexw, float *work, int *iwork, int *info);
+static void (*slarrd_)(const char *range, const char *order, int *n, float *vl, float *vu, int *il, int *iu, float *gers, float *reltol, float *d, float *e, float *e2, float *pivmin, int *nsplit, int *isplit, int *m, float *w, float *werr, float *wl, float *wu, int *iblock, int *indexw, float *work, int *iwork, int *info, int len_range, int len_order);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarrdK(JNIEnv *env, UNUSED jobject obj, jstring range, jstring order, jint n, jfloat vl, jfloat vu, jint il, jint iu, jfloatArray gers, jint offsetgers, jfloat reltol, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray e2, jint offsete2, jfloat pivmin, jint nsplit, jintArray isplit, jint offsetisplit, jobject m, jfloatArray w, jint offsetw, jfloatArray werr, jint offsetwerr, jobject wl, jobject wu, jintArray iblock, jint offsetiblock, jintArray indexw, jint offsetindexw, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!slarrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -20300,7 +20383,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarrdK(JNIEnv *env, UNUSED jobjec
   if (indexw) { if (!(__nindexw = (*env)->GetPrimitiveArrayCritical(env, indexw, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  slarrd_(__nrange, __norder, &__nn, &__nvl, &__nvu, &__nil, &__niu, __ngers ? __ngers + offsetgers : NULL, &__nreltol, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ne2 ? __ne2 + offsete2 : NULL, &__npivmin, &__nnsplit, __nisplit ? __nisplit + offsetisplit : NULL, &__nm, __nw ? __nw + offsetw : NULL, __nwerr ? __nwerr + offsetwerr : NULL, &__nwl, &__nwu, __niblock ? __niblock + offsetiblock : NULL, __nindexw ? __nindexw + offsetindexw : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  slarrd_(__nrange, __norder, &__nn, &__nvl, &__nvu, &__nil, &__niu, __ngers ? __ngers + offsetgers : NULL, &__nreltol, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ne2 ? __ne2 + offsete2 : NULL, &__npivmin, &__nnsplit, __nisplit ? __nisplit + offsetisplit : NULL, &__nm, __nw ? __nw + offsetw : NULL, __nwerr ? __nwerr + offsetwerr : NULL, &__nwl, &__nwu, __niblock ? __niblock + offsetiblock : NULL, __nindexw ? __nindexw + offsetindexw : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, order));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -20322,7 +20405,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarre_)(const char *range, int *n, float *vl, float *vu, int *il, int *iu, float *d, float *e, float *e2, float *rtol1, float *rtol2, float *spltol, int *nsplit, int *isplit, int *m, float *w, float *werr, float *wgap, int *iblock, int *indexw, float *gers, float *pivmin, float *work, int *iwork, int *info);
+static void (*slarre_)(const char *range, int *n, float *vl, float *vu, int *il, int *iu, float *d, float *e, float *e2, float *rtol1, float *rtol2, float *spltol, int *nsplit, int *isplit, int *m, float *w, float *werr, float *wgap, int *iblock, int *indexw, float *gers, float *pivmin, float *work, int *iwork, int *info, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarreK(JNIEnv *env, UNUSED jobject obj, jstring range, jint n, jobject vl, jobject vu, jint il, jint iu, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray e2, jint offsete2, jfloat rtol1, jfloat rtol2, jfloat spltol, jobject nsplit, jintArray isplit, jint offsetisplit, jobject m, jfloatArray w, jint offsetw, jfloatArray werr, jint offsetwerr, jfloatArray wgap, jint offsetwgap, jintArray iblock, jint offsetiblock, jintArray indexw, jint offsetindexw, jfloatArray gers, jint offsetgers, jobject pivmin, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!slarre_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -20377,7 +20460,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarreK(JNIEnv *env, UNUSED jobjec
   if (gers) { if (!(__ngers = (*env)->GetPrimitiveArrayCritical(env, gers, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  slarre_(__nrange, &__nn, &__nvl, &__nvu, &__nil, &__niu, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ne2 ? __ne2 + offsete2 : NULL, &__nrtol1, &__nrtol2, &__nspltol, &__nnsplit, __nisplit ? __nisplit + offsetisplit : NULL, &__nm, __nw ? __nw + offsetw : NULL, __nwerr ? __nwerr + offsetwerr : NULL, __nwgap ? __nwgap + offsetwgap : NULL, __niblock ? __niblock + offsetiblock : NULL, __nindexw ? __nindexw + offsetindexw : NULL, __ngers ? __ngers + offsetgers : NULL, &__npivmin, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  slarre_(__nrange, &__nn, &__nvl, &__nvu, &__nil, &__niu, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ne2 ? __ne2 + offsete2 : NULL, &__nrtol1, &__nrtol2, &__nspltol, &__nnsplit, __nisplit ? __nisplit + offsetisplit : NULL, &__nm, __nw ? __nw + offsetw : NULL, __nwerr ? __nwerr + offsetwerr : NULL, __nwgap ? __nwgap + offsetwgap : NULL, __niblock ? __niblock + offsetiblock : NULL, __nindexw ? __nindexw + offsetindexw : NULL, __ngers ? __ngers + offsetgers : NULL, &__npivmin, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, range));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -20708,7 +20791,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarz_)(const char *side, int *m, int *n, int *l, float *v, int *incv, float *tau, float *c, int *Ldc, float *work);
+static void (*slarz_)(const char *side, int *m, int *n, int *l, float *v, int *incv, float *tau, float *c, int *Ldc, float *work, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarzK(JNIEnv *env, UNUSED jobject obj, jstring side, jint m, jint n, jint l, jfloatArray v, jint offsetv, jint incv, jfloat tau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork) {
   if (!slarz_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -20733,7 +20816,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarzK(JNIEnv *env, UNUSED jobject
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  slarz_(__nside, &__nm, &__nn, &__nl, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL);
+  slarz_(__nside, &__nm, &__nn, &__nl, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, side));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -20742,7 +20825,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarzb_)(const char *side, const char *trans, const char *direct, const char *storev, int *m, int *n, int *k, int *l, float *v, int *ldv, float *t, int *ldt, float *c, int *Ldc, float *work, int *ldwork);
+static void (*slarzb_)(const char *side, const char *trans, const char *direct, const char *storev, int *m, int *n, int *k, int *l, float *v, int *ldv, float *t, int *ldt, float *c, int *Ldc, float *work, int *ldwork, int len_side, int len_trans, int len_direct, int len_storev);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarzbK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jstring direct, jstring storev, jint m, jint n, jint k, jint l, jfloatArray v, jint offsetv, jint ldv, jfloatArray t, jint offsett, jint ldt, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint ldwork) {
   if (!slarzb_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -20779,7 +20862,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarzbK(JNIEnv *env, UNUSED jobjec
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  slarzb_(__nside, __ntrans, __ndirect, __nstorev, &__nm, &__nn, &__nk, &__nl, __nv ? __nv + offsetv : NULL, &__nldv, __nt ? __nt + offsett : NULL, &__nldt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nldwork);
+  slarzb_(__nside, __ntrans, __ndirect, __nstorev, &__nm, &__nn, &__nk, &__nl, __nv ? __nv + offsetv : NULL, &__nldv, __nt ? __nt + offsett : NULL, &__nldt, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nldwork, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, direct), (*env)->GetStringUTFLength(env, storev));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -20792,7 +20875,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slarzt_)(const char *direct, const char *storev, int *n, int *k, float *v, int *ldv, float *tau, float *t, int *ldt);
+static void (*slarzt_)(const char *direct, const char *storev, int *n, int *k, float *v, int *ldv, float *tau, float *t, int *ldt, int len_direct, int len_storev);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarztK(JNIEnv *env, UNUSED jobject obj, jstring direct, jstring storev, jint n, jint k, jfloatArray v, jint offsetv, jint ldv, jfloatArray tau, jint offsettau, jfloatArray t, jint offsett, jint ldt) {
   if (!slarzt_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -20815,7 +20898,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slarztK(JNIEnv *env, UNUSED jobjec
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
-  slarzt_(__ndirect, __nstorev, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __ntau ? __ntau + offsettau : NULL, __nt ? __nt + offsett : NULL, &__nldt);
+  slarzt_(__ndirect, __nstorev, &__nn, &__nk, __nv ? __nv + offsetv : NULL, &__nldv, __ntau ? __ntau + offsettau : NULL, __nt ? __nt + offsett : NULL, &__nldt, (*env)->GetStringUTFLength(env, direct), (*env)->GetStringUTFLength(env, storev));
 done:
   if (__nt) (*env)->ReleasePrimitiveArrayCritical(env, t, __nt, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -20847,7 +20930,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slascl_)(const char *type, int *kl, int *ku, float *cfrom, float *cto, int *m, int *n, float *a, int *lda, int *info);
+static void (*slascl_)(const char *type, int *kl, int *ku, float *cfrom, float *cto, int *m, int *n, float *a, int *lda, int *info, int len_type);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasclK(JNIEnv *env, UNUSED jobject obj, jstring type, jint kl, jint ku, jfloat cfrom, jfloat cto, jint m, jint n, jfloatArray a, jint offseta, jint lda, jobject info) {
   if (!slascl_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -20872,7 +20955,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasclK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  slascl_(__ntype, &__nkl, &__nku, &__ncfrom, &__ncto, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  slascl_(__ntype, &__nkl, &__nku, &__ncfrom, &__ncto, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, type));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -21446,7 +21529,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slasdq_)(const char *uplo, int *sqre, int *n, int *ncvt, int *nru, int *ncc, float *d, float *e, float *vt, int *ldvt, float *u, int *ldu, float *c, int *Ldc, float *work, int *info);
+static void (*slasdq_)(const char *uplo, int *sqre, int *n, int *ncvt, int *nru, int *ncc, float *d, float *e, float *vt, int *ldvt, float *u, int *ldu, float *c, int *Ldc, float *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasdqK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint sqre, jint n, jint ncvt, jint nru, jint ncc, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray vt, jint offsetvt, jint ldvt, jfloatArray u, jint offsetu, jint ldu, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jobject info) {
   if (!slasdq_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -21483,7 +21566,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasdqK(JNIEnv *env, UNUSED jobjec
   if (u) { if (!(__nu = (*env)->GetPrimitiveArrayCritical(env, u, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  slasdq_(__nuplo, &__nsqre, &__nn, &__nncvt, &__nnru, &__nncc, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nu ? __nu + offsetu : NULL, &__nldu, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  slasdq_(__nuplo, &__nsqre, &__nn, &__nncvt, &__nnru, &__nncc, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nvt ? __nvt + offsetvt : NULL, &__nldvt, __nu ? __nu + offsetu : NULL, &__nldu, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -21525,7 +21608,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slaset_)(const char *uplo, int *m, int *n, float *alpha, float *beta, float *a, int *lda);
+static void (*slaset_)(const char *uplo, int *m, int *n, float *alpha, float *beta, float *a, int *lda, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasetK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint m, jint n, jfloat alpha, jfloat beta, jfloatArray a, jint offseta, jint lda) {
   if (!slaset_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -21544,7 +21627,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasetK(JNIEnv *env, UNUSED jobjec
   __nbeta = beta;
   __nlda = lda;
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  slaset_(__nuplo, &__nm, &__nn, &__nalpha, &__nbeta, __na ? __na + offseta : NULL, &__nlda);
+  slaset_(__nuplo, &__nm, &__nn, &__nalpha, &__nbeta, __na ? __na + offseta : NULL, &__nlda, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (__nuplo) (*env)->ReleaseStringUTFChars(env, uplo, __nuplo);
@@ -21593,9 +21676,9 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slasq3_)(int *i0, int *n0, float *z, int *pp, float *dmin, float *sigma, float *desig, float *qmax, int *nfail, int *iter, int *ndiv, int *ieee);
+static void (*slasq3_)(int *i0, int *n0, float *z, int *pp, float *dmin, float *sigma, float *desig, float *qmax, int *nfail, int *iter, int *ndiv, int *ieee, int *ttype, float *dmin1, float *dmin2, float *dn, float *dn1, float *dn2, float *g, float *tau);
 
-void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq3K(JNIEnv *env, UNUSED jobject obj, jint i0, jobject n0, jfloatArray z, jint offsetz, jint pp, jobject dmin, jobject sigma, jobject desig, jobject qmax, jobject nfail, jobject iter, jobject ndiv, jboolean ieee) {
+void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq3K(JNIEnv *env, UNUSED jobject obj, jint i0, jobject n0, jfloatArray z, jint offsetz, jint pp, jobject dmin, jobject sigma, jobject desig, jobject qmax, jobject nfail, jobject iter, jobject ndiv, jboolean ieee, jobject ttype, jobject dmin1, jobject dmin2, jobject dn, jobject dn1, jobject dn2, jobject g, jobject tau) {
   if (!slasq3_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __ni0 __attribute__((aligned(8)));
@@ -21609,6 +21692,14 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq3K(JNIEnv *env, UNUSED jobjec
   int __niter = 0;
   int __nndiv = 0;
   int __nieee __attribute__((aligned(8)));
+  int __nttype = 0;
+  float __ndmin1 = 0;
+  float __ndmin2 = 0;
+  float __ndn = 0;
+  float __ndn1 = 0;
+  float __ndn2 = 0;
+  float __ng = 0;
+  float __ntau = 0;
   float *__nz = NULL;
   __ni0 = i0;
   __nn0 = (*env)->GetIntField(env, n0, intW_val_fieldID);
@@ -21621,10 +21712,26 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq3K(JNIEnv *env, UNUSED jobjec
   __niter = (*env)->GetIntField(env, iter, intW_val_fieldID);
   __nndiv = (*env)->GetIntField(env, ndiv, intW_val_fieldID);
   __nieee = ieee;
+  __nttype = (*env)->GetIntField(env, ttype, intW_val_fieldID);
+  __ndmin1 = (*env)->GetFloatField(env, dmin1, floatW_val_fieldID);
+  __ndmin2 = (*env)->GetFloatField(env, dmin2, floatW_val_fieldID);
+  __ndn = (*env)->GetFloatField(env, dn, floatW_val_fieldID);
+  __ndn1 = (*env)->GetFloatField(env, dn1, floatW_val_fieldID);
+  __ndn2 = (*env)->GetFloatField(env, dn2, floatW_val_fieldID);
+  __ng = (*env)->GetFloatField(env, g, floatW_val_fieldID);
+  __ntau = (*env)->GetFloatField(env, tau, floatW_val_fieldID);
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
-  slasq3_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__ndmin, &__nsigma, &__ndesig, &__nqmax, &__nnfail, &__niter, &__nndiv, &__nieee);
+  slasq3_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__ndmin, &__nsigma, &__ndesig, &__nqmax, &__nnfail, &__niter, &__nndiv, &__nieee, &__nttype, &__ndmin1, &__ndmin2, &__ndn, &__ndn1, &__ndn2, &__ng, &__ntau);
 done:
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
+  if (!__failed) (*env)->SetFloatField(env, tau, floatW_val_fieldID, __ntau);
+  if (!__failed) (*env)->SetFloatField(env, g, floatW_val_fieldID, __ng);
+  if (!__failed) (*env)->SetFloatField(env, dn2, floatW_val_fieldID, __ndn2);
+  if (!__failed) (*env)->SetFloatField(env, dn1, floatW_val_fieldID, __ndn1);
+  if (!__failed) (*env)->SetFloatField(env, dn, floatW_val_fieldID, __ndn);
+  if (!__failed) (*env)->SetFloatField(env, dmin2, floatW_val_fieldID, __ndmin2);
+  if (!__failed) (*env)->SetFloatField(env, dmin1, floatW_val_fieldID, __ndmin1);
+  if (!__failed) (*env)->SetIntField(env, ttype, intW_val_fieldID, __nttype);
   if (!__failed) (*env)->SetIntField(env, ndiv, intW_val_fieldID, __nndiv);
   if (!__failed) (*env)->SetIntField(env, iter, intW_val_fieldID, __niter);
   if (!__failed) (*env)->SetIntField(env, nfail, intW_val_fieldID, __nnfail);
@@ -21636,9 +21743,9 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slasq4_)(int *i0, int *n0, float *z, int *pp, int *n0in, float *dmin, float *dmin1, float *dmin2, float *dn, float *dn1, float *dn2, float *tau, int *ttype);
+static void (*slasq4_)(int *i0, int *n0, float *z, int *pp, int *n0in, float *dmin, float *dmin1, float *dmin2, float *dn, float *dn1, float *dn2, float *tau, int *ttype, float *g);
 
-void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq4K(JNIEnv *env, UNUSED jobject obj, jint i0, jint n0, jfloatArray z, jint offsetz, jint pp, jint n0in, jfloat dmin, jfloat dmin1, jfloat dmin2, jfloat dn, jfloat dn1, jfloat dn2, jobject tau, jobject ttype) {
+void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq4K(JNIEnv *env, UNUSED jobject obj, jint i0, jint n0, jfloatArray z, jint offsetz, jint pp, jint n0in, jfloat dmin, jfloat dmin1, jfloat dmin2, jfloat dn, jfloat dn1, jfloat dn2, jobject tau, jobject ttype, jobject g) {
   if (!slasq4_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __ni0 __attribute__((aligned(8)));
@@ -21653,6 +21760,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq4K(JNIEnv *env, UNUSED jobjec
   float __ndn2 __attribute__((aligned(8)));
   float __ntau = 0;
   int __nttype = 0;
+  float __ng = 0;
   float *__nz = NULL;
   __ni0 = i0;
   __nn0 = n0;
@@ -21666,24 +21774,27 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq4K(JNIEnv *env, UNUSED jobjec
   __ndn2 = dn2;
   __ntau = (*env)->GetFloatField(env, tau, floatW_val_fieldID);
   __nttype = (*env)->GetIntField(env, ttype, intW_val_fieldID);
+  __ng = (*env)->GetFloatField(env, g, floatW_val_fieldID);
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
-  slasq4_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__nn0in, &__ndmin, &__ndmin1, &__ndmin2, &__ndn, &__ndn1, &__ndn2, &__ntau, &__nttype);
+  slasq4_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__nn0in, &__ndmin, &__ndmin1, &__ndmin2, &__ndn, &__ndn1, &__ndn2, &__ntau, &__nttype, &__ng);
 done:
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
+  if (!__failed) (*env)->SetFloatField(env, g, floatW_val_fieldID, __ng);
   if (!__failed) (*env)->SetIntField(env, ttype, intW_val_fieldID, __nttype);
   if (!__failed) (*env)->SetFloatField(env, tau, floatW_val_fieldID, __ntau);
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slasq5_)(int *i0, int *n0, float *z, int *pp, float *tau, float *dmin, float *dmin1, float *dmin2, float *dn, float *dnm1, float *dnm2, int *ieee);
+static void (*slasq5_)(int *i0, int *n0, float *z, int *pp, float *tau, float *sigma, float *dmin, float *dmin1, float *dmin2, float *dn, float *dnm1, float *dnm2, int *ieee, float *eps);
 
-void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq5K(JNIEnv *env, UNUSED jobject obj, jint i0, jint n0, jfloatArray z, jint offsetz, jint pp, jfloat tau, jobject dmin, jobject dmin1, jobject dmin2, jobject dn, jobject dnm1, jobject dnm2, jboolean ieee) {
+void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq5K(JNIEnv *env, UNUSED jobject obj, jint i0, jint n0, jfloatArray z, jint offsetz, jint pp, jfloat tau, jfloat sigma, jobject dmin, jobject dmin1, jobject dmin2, jobject dn, jobject dnm1, jobject dnm2, jboolean ieee, jfloat eps) {
   if (!slasq5_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
   jboolean __failed = FALSE;
   int __ni0 __attribute__((aligned(8)));
   int __nn0 __attribute__((aligned(8)));
   int __npp __attribute__((aligned(8)));
   float __ntau __attribute__((aligned(8)));
+  float __nsigma __attribute__((aligned(8)));
   float __ndmin = 0;
   float __ndmin1 = 0;
   float __ndmin2 = 0;
@@ -21691,11 +21802,13 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq5K(JNIEnv *env, UNUSED jobjec
   float __ndnm1 = 0;
   float __ndnm2 = 0;
   int __nieee __attribute__((aligned(8)));
+  float __neps __attribute__((aligned(8)));
   float *__nz = NULL;
   __ni0 = i0;
   __nn0 = n0;
   __npp = pp;
   __ntau = tau;
+  __nsigma = sigma;
   __ndmin = (*env)->GetFloatField(env, dmin, floatW_val_fieldID);
   __ndmin1 = (*env)->GetFloatField(env, dmin1, floatW_val_fieldID);
   __ndmin2 = (*env)->GetFloatField(env, dmin2, floatW_val_fieldID);
@@ -21703,8 +21816,9 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasq5K(JNIEnv *env, UNUSED jobjec
   __ndnm1 = (*env)->GetFloatField(env, dnm1, floatW_val_fieldID);
   __ndnm2 = (*env)->GetFloatField(env, dnm2, floatW_val_fieldID);
   __nieee = ieee;
+  __neps = eps;
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
-  slasq5_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__ntau, &__ndmin, &__ndmin1, &__ndmin2, &__ndn, &__ndnm1, &__ndnm2, &__nieee);
+  slasq5_(&__ni0, &__nn0, __nz ? __nz + offsetz : NULL, &__npp, &__ntau, &__nsigma, &__ndmin, &__ndmin1, &__ndmin2, &__ndn, &__ndnm1, &__ndnm2, &__nieee, &__neps);
 done:
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetFloatField(env, dnm2, floatW_val_fieldID, __ndnm2);
@@ -21753,7 +21867,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slasr_)(const char *side, const char *pivot, const char *direct, int *m, int *n, float *c, float *s, float *a, int *lda);
+static void (*slasr_)(const char *side, const char *pivot, const char *direct, int *m, int *n, float *c, float *s, float *a, int *lda, int len_side, int len_pivot, int len_direct);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring pivot, jstring direct, jint m, jint n, jfloatArray c, jint offsetc, jfloatArray s, jint offsets, jfloatArray a, jint offseta, jint lda) {
   if (!slasr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -21776,7 +21890,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasrK(JNIEnv *env, UNUSED jobject
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  slasr_(__nside, __npivot, __ndirect, &__nm, &__nn, __nc ? __nc + offsetc : NULL, __ns ? __ns + offsets : NULL, __na ? __na + offseta : NULL, &__nlda);
+  slasr_(__nside, __npivot, __ndirect, &__nm, &__nn, __nc ? __nc + offsetc : NULL, __ns ? __ns + offsets : NULL, __na ? __na + offseta : NULL, &__nlda, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, pivot), (*env)->GetStringUTFLength(env, direct));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
@@ -21787,7 +21901,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slasrt_)(const char *id, int *n, float *d, int *info);
+static void (*slasrt_)(const char *id, int *n, float *d, int *info, int len_id);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasrtK(JNIEnv *env, UNUSED jobject obj, jstring id, jint n, jfloatArray d, jint offsetd, jobject info) {
   if (!slasrt_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -21800,7 +21914,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasrtK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
-  slasrt_(__nid, &__nn, __nd ? __nd + offsetd : NULL, &__ninfo);
+  slasrt_(__nid, &__nn, __nd ? __nd + offsetd : NULL, &__ninfo, (*env)->GetStringUTFLength(env, id));
 done:
   if (__nd) (*env)->ReleasePrimitiveArrayCritical(env, d, __nd, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -21940,7 +22054,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slasyf_)(const char *uplo, int *n, int *nb, int *kb, float *a, int *lda, int *ipiv, float *w, int *ldw, int *info);
+static void (*slasyf_)(const char *uplo, int *n, int *nb, int *kb, float *a, int *lda, int *ipiv, float *w, int *ldw, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasyfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nb, jobject kb, jfloatArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jfloatArray w, jint offsetw, jint ldw, jobject info) {
   if (!slasyf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -21965,7 +22079,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slasyfK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
-  slasyf_(__nuplo, &__nn, &__nnb, &__nkb, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nw ? __nw + offsetw : NULL, &__nldw, &__ninfo);
+  slasyf_(__nuplo, &__nn, &__nnb, &__nkb, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nw ? __nw + offsetw : NULL, &__nldw, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nw) (*env)->ReleasePrimitiveArrayCritical(env, w, __nw, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -21976,7 +22090,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slatbs_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, int *kd, float *ab, int *ldab, float *x, float *scale, float *cnorm, int *info);
+static void (*slatbs_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, int *kd, float *ab, int *ldab, float *x, float *scale, float *cnorm, int *info, int len_uplo, int len_trans, int len_diag, int len_normin);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatbsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jstring normin, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jfloatArray x, jint offsetx, jobject scale, jfloatArray cnorm, jint offsetcnorm, jobject info) {
   if (!slatbs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22005,7 +22119,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatbsK(JNIEnv *env, UNUSED jobjec
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (cnorm) { if (!(__ncnorm = (*env)->GetPrimitiveArrayCritical(env, cnorm, NULL))) { __failed = TRUE; goto done; } }
-  slatbs_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo);
+  slatbs_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag), (*env)->GetStringUTFLength(env, normin));
 done:
   if (__ncnorm) (*env)->ReleasePrimitiveArrayCritical(env, cnorm, __ncnorm, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -22053,7 +22167,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slatps_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, float *ap, float *x, float *scale, float *cnorm, int *info);
+static void (*slatps_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, float *ap, float *x, float *scale, float *cnorm, int *info, int len_uplo, int len_trans, int len_diag, int len_normin);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatpsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jstring normin, jint n, jfloatArray ap, jint offsetap, jfloatArray x, jint offsetx, jobject scale, jfloatArray cnorm, jint offsetcnorm, jobject info) {
   if (!slatps_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22078,7 +22192,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatpsK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (cnorm) { if (!(__ncnorm = (*env)->GetPrimitiveArrayCritical(env, cnorm, NULL))) { __failed = TRUE; goto done; } }
-  slatps_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, __nap ? __nap + offsetap : NULL, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo);
+  slatps_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, __nap ? __nap + offsetap : NULL, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag), (*env)->GetStringUTFLength(env, normin));
 done:
   if (__ncnorm) (*env)->ReleasePrimitiveArrayCritical(env, cnorm, __ncnorm, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -22092,7 +22206,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slatrd_)(const char *uplo, int *n, int *nb, float *a, int *lda, float *e, float *tau, float *w, int *ldw);
+static void (*slatrd_)(const char *uplo, int *n, int *nb, float *a, int *lda, float *e, float *tau, float *w, int *ldw, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatrdK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nb, jfloatArray a, jint offseta, jint lda, jfloatArray e, jint offsete, jfloatArray tau, jint offsettau, jfloatArray w, jint offsetw, jint ldw) {
   if (!slatrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22115,7 +22229,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatrdK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
-  slatrd_(__nuplo, &__nn, &__nnb, __na ? __na + offseta : NULL, &__nlda, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, __nw ? __nw + offsetw : NULL, &__nldw);
+  slatrd_(__nuplo, &__nn, &__nnb, __na ? __na + offseta : NULL, &__nlda, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, __nw ? __nw + offsetw : NULL, &__nldw, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nw) (*env)->ReleasePrimitiveArrayCritical(env, w, __nw, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -22125,7 +22239,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slatrs_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, float *a, int *lda, float *x, float *scale, float *cnorm, int *info);
+static void (*slatrs_)(const char *uplo, const char *trans, const char *diag, const char *normin, int *n, float *a, int *lda, float *x, float *scale, float *cnorm, int *info, int len_uplo, int len_trans, int len_diag, int len_normin);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jstring normin, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray x, jint offsetx, jobject scale, jfloatArray cnorm, jint offsetcnorm, jobject info) {
   if (!slatrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22152,7 +22266,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatrsK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (cnorm) { if (!(__ncnorm = (*env)->GetPrimitiveArrayCritical(env, cnorm, NULL))) { __failed = TRUE; goto done; } }
-  slatrs_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, __na ? __na + offseta : NULL, &__nlda, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo);
+  slatrs_(__nuplo, __ntrans, __ndiag, __nnormin, &__nn, __na ? __na + offseta : NULL, &__nlda, __nx ? __nx + offsetx : NULL, &__nscale, __ncnorm ? __ncnorm + offsetcnorm : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag), (*env)->GetStringUTFLength(env, normin));
 done:
   if (__ncnorm) (*env)->ReleasePrimitiveArrayCritical(env, cnorm, __ncnorm, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -22193,7 +22307,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slatzm_)(const char *side, int *m, int *n, float *v, int *incv, float *tau, float *c1, float *c2, int *Ldc, float *work);
+static void (*slatzm_)(const char *side, int *m, int *n, float *v, int *incv, float *tau, float *c1, float *c2, int *Ldc, float *work, int len_side);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatzmK(JNIEnv *env, UNUSED jobject obj, jstring side, jint m, jint n, jfloatArray v, jint offsetv, jint incv, jfloat tau, jfloatArray c1, jint offsetc1, jfloatArray c2, jint offsetc2, jint Ldc, jfloatArray work, jint offsetwork) {
   if (!slatzm_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22218,7 +22332,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slatzmK(JNIEnv *env, UNUSED jobjec
   if (c1) { if (!(__nc1 = (*env)->GetPrimitiveArrayCritical(env, c1, NULL))) { __failed = TRUE; goto done; } }
   if (c2) { if (!(__nc2 = (*env)->GetPrimitiveArrayCritical(env, c2, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  slatzm_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc1 ? __nc1 + offsetc1 : NULL, __nc2 ? __nc2 + offsetc2 : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL);
+  slatzm_(__nside, &__nm, &__nn, __nv ? __nv + offsetv : NULL, &__nincv, &__ntau, __nc1 ? __nc1 + offsetc1 : NULL, __nc2 ? __nc2 + offsetc2 : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, (*env)->GetStringUTFLength(env, side));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc2) (*env)->ReleasePrimitiveArrayCritical(env, c2, __nc2, __failed ? JNI_ABORT : 0);
@@ -22228,7 +22342,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slauu2_)(const char *uplo, int *n, float *a, int *lda, int *info);
+static void (*slauu2_)(const char *uplo, int *n, float *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slauu2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jobject info) {
   if (!slauu2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22243,7 +22357,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slauu2K(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  slauu2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  slauu2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -22251,7 +22365,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*slauum_)(const char *uplo, int *n, float *a, int *lda, int *info);
+static void (*slauum_)(const char *uplo, int *n, float *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_slauumK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jobject info) {
   if (!slauum_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22266,7 +22380,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slauumK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  slauum_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  slauum_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -22286,7 +22400,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slazq4K(JNIEnv *env, UNUSED jobjec
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
 }
 
-static void (*sopgtr_)(const char *uplo, int *n, float *ap, float *tau, float *q, int *ldq, float *work, int *info);
+static void (*sopgtr_)(const char *uplo, int *n, float *ap, float *tau, float *q, int *ldq, float *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sopgtrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray tau, jint offsettau, jfloatArray q, jint offsetq, jint ldq, jfloatArray work, jint offsetwork, jobject info) {
   if (!sopgtr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22307,7 +22421,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sopgtrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sopgtr_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ntau ? __ntau + offsettau : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sopgtr_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ntau ? __ntau + offsettau : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -22318,7 +22432,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sopmtr_)(const char *side, const char *uplo, const char *trans, int *m, int *n, float *ap, float *tau, float *c, int *Ldc, float *work, int *info);
+static void (*sopmtr_)(const char *side, const char *uplo, const char *trans, int *m, int *n, float *ap, float *tau, float *c, int *Ldc, float *work, int *info, int len_side, int len_uplo, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sopmtrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring trans, jint m, jint n, jfloatArray ap, jint offsetap, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jobject info) {
   if (!sopmtr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22345,7 +22459,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sopmtrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sopmtr_(__nside, __nuplo, __ntrans, &__nm, &__nn, __nap ? __nap + offsetap : NULL, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sopmtr_(__nside, __nuplo, __ntrans, &__nm, &__nn, __nap ? __nap + offsetap : NULL, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -22418,7 +22532,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sorgbr_)(const char *vect, int *m, int *n, int *k, float *a, int *lda, float *tau, float *work, int *lwork, int *info);
+static void (*sorgbr_)(const char *vect, int *m, int *n, int *k, float *a, int *lda, float *tau, float *work, int *lwork, int *info, int len_vect);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorgbrK(JNIEnv *env, UNUSED jobject obj, jstring vect, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sorgbr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22443,7 +22557,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorgbrK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sorgbr_(__nvect, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sorgbr_(__nvect, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, vect));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -22673,7 +22787,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sorgtr_)(const char *uplo, int *n, float *a, int *lda, float *tau, float *work, int *lwork, int *info);
+static void (*sorgtr_)(const char *uplo, int *n, float *a, int *lda, float *tau, float *work, int *lwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorgtrK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sorgtr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22694,7 +22808,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorgtrK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sorgtr_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sorgtr_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -22704,7 +22818,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sorm2l_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info);
+static void (*sorm2l_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorm2lK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jobject info) {
   if (!sorm2l_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22733,7 +22847,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorm2lK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sorm2l_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sorm2l_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -22745,7 +22859,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sorm2r_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info);
+static void (*sorm2r_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorm2rK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jobject info) {
   if (!sorm2r_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22774,7 +22888,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorm2rK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sorm2r_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sorm2r_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -22786,7 +22900,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormbr_)(const char *vect, const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info);
+static void (*sormbr_)(const char *vect, const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info, int len_vect, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormbrK(JNIEnv *env, UNUSED jobject obj, jstring vect, jstring side, jstring trans, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sormbr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22819,7 +22933,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormbrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormbr_(__nvect, __nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sormbr_(__nvect, __nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, vect), (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -22832,7 +22946,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormhr_)(const char *side, const char *trans, int *m, int *n, int *ilo, int *ihi, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info);
+static void (*sormhr_)(const char *side, const char *trans, int *m, int *n, int *ilo, int *ihi, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormhrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint ilo, jint ihi, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sormhr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22865,7 +22979,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormhrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormhr_(__nside, __ntrans, &__nm, &__nn, &__nilo, &__nihi, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sormhr_(__nside, __ntrans, &__nm, &__nn, &__nilo, &__nihi, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -22877,7 +22991,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sorml2_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info);
+static void (*sorml2_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorml2K(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jobject info) {
   if (!sorml2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22906,7 +23020,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sorml2K(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sorml2_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sorml2_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -22918,7 +23032,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormlq_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info);
+static void (*sormlq_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormlqK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sormlq_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22949,7 +23063,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormlqK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormlq_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sormlq_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -22961,7 +23075,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormql_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info);
+static void (*sormql_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormqlK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sormql_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -22992,7 +23106,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormqlK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormql_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sormql_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -23004,7 +23118,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormqr_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info);
+static void (*sormqr_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormqrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sormqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23035,7 +23149,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormqrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormqr_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sormqr_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -23047,7 +23161,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormr2_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info);
+static void (*sormr2_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormr2K(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jobject info) {
   if (!sormr2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23076,7 +23190,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormr2K(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormr2_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sormr2_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -23088,7 +23202,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormr3_)(const char *side, const char *trans, int *m, int *n, int *k, int *l, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info);
+static void (*sormr3_)(const char *side, const char *trans, int *m, int *n, int *k, int *l, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormr3K(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jint l, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jobject info) {
   if (!sormr3_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23119,7 +23233,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormr3K(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormr3_(__nside, __ntrans, &__nm, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sormr3_(__nside, __ntrans, &__nm, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -23131,7 +23245,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormrq_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info);
+static void (*sormrq_)(const char *side, const char *trans, int *m, int *n, int *k, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormrqK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sormrq_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23162,7 +23276,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormrqK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormrq_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sormrq_(__nside, __ntrans, &__nm, &__nn, &__nk, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -23174,7 +23288,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormrz_)(const char *side, const char *trans, int *m, int *n, int *k, int *l, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info);
+static void (*sormrz_)(const char *side, const char *trans, int *m, int *n, int *k, int *l, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info, int len_side, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormrzK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring trans, jint m, jint n, jint k, jint l, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sormrz_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23207,7 +23321,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormrzK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormrz_(__nside, __ntrans, &__nm, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sormrz_(__nside, __ntrans, &__nm, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -23219,7 +23333,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sormtr_)(const char *side, const char *uplo, const char *trans, int *m, int *n, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info);
+static void (*sormtr_)(const char *side, const char *uplo, const char *trans, int *m, int *n, float *a, int *lda, float *tau, float *c, int *Ldc, float *work, int *lwork, int *info, int len_side, int len_uplo, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormtrK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring uplo, jstring trans, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray tau, jint offsettau, jfloatArray c, jint offsetc, jint Ldc, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!sormtr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23250,7 +23364,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sormtrK(JNIEnv *env, UNUSED jobjec
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sormtr_(__nside, __nuplo, __ntrans, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  sormtr_(__nside, __nuplo, __ntrans, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __ntau ? __ntau + offsettau : NULL, __nc ? __nc + offsetc : NULL, &__nLdc, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
@@ -23263,7 +23377,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spbcon_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, float *anorm, float *rcond, float *work, int *iwork, int *info);
+static void (*spbcon_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, float *anorm, float *rcond, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jfloat anorm, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!spbcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23288,7 +23402,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbconK(JNIEnv *env, UNUSED jobjec
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  spbcon_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  spbcon_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -23299,7 +23413,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spbequ_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, float *s, float *scond, float *amax, int *info);
+static void (*spbequ_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, float *s, float *scond, float *amax, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbequK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jfloatArray s, jint offsets, jobject scond, jobject amax, jobject info) {
   if (!spbequ_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23322,7 +23436,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbequK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  spbequ_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __ns ? __ns + offsets : NULL, &__nscond, &__namax, &__ninfo);
+  spbequ_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __ns ? __ns + offsets : NULL, &__nscond, &__namax, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -23333,7 +23447,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spbrfs_)(const char *uplo, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *afb, int *ldafb, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*spbrfs_)(const char *uplo, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *afb, int *ldafb, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbrfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jint nrhs, jfloatArray ab, jint offsetab, jint ldab, jfloatArray afb, jint offsetafb, jint ldafb, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!spbrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23372,7 +23486,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  spbrfs_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  spbrfs_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -23387,7 +23501,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spbstf_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, int *info);
+static void (*spbstf_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbstfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jobject info) {
   if (!spbstf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23404,7 +23518,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbstfK(JNIEnv *env, UNUSED jobjec
   __nldab = ldab;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
-  spbstf_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo);
+  spbstf_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -23412,7 +23526,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spbsv_)(const char *uplo, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *b, int *ldb, int *info);
+static void (*spbsv_)(const char *uplo, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jint nrhs, jfloatArray ab, jint offsetab, jint ldab, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!spbsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23435,7 +23549,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbsvK(JNIEnv *env, UNUSED jobject
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  spbsv_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  spbsv_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -23444,7 +23558,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spbsvx_)(const char *fact, const char *uplo, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *afb, int *ldafb, char *equed, float *s, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*spbsvx_)(const char *fact, const char *uplo, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *afb, int *ldafb, char *equed, float *s, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info, int len_fact, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint kd, jint nrhs, jfloatArray ab, jint offsetab, jint ldab, jfloatArray afb, jint offsetafb, jint ldafb, jobject equed, jfloatArray s, jint offsets, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jobject rcond, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!spbsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23477,7 +23591,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbsvxK(JNIEnv *env, UNUSED jobjec
   __nnrhs = nrhs;
   __nldab = ldab;
   __nldafb = ldafb;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetFloatField(env, rcond, floatW_val_fieldID);
@@ -23491,7 +23605,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  spbsvx_(__nfact, __nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  spbsvx_(__nfact, __nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nafb ? __nafb + offsetafb : NULL, &__nldafb, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -23510,7 +23624,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spbtf2_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, int *info);
+static void (*spbtf2_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbtf2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jobject info) {
   if (!spbtf2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23527,7 +23641,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbtf2K(JNIEnv *env, UNUSED jobjec
   __nldab = ldab;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
-  spbtf2_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo);
+  spbtf2_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -23535,7 +23649,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spbtrf_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, int *info);
+static void (*spbtrf_)(const char *uplo, int *n, int *kd, float *ab, int *ldab, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbtrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jobject info) {
   if (!spbtrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23552,7 +23666,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbtrfK(JNIEnv *env, UNUSED jobjec
   __nldab = ldab;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
-  spbtrf_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo);
+  spbtrf_(__nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -23560,7 +23674,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spbtrs_)(const char *uplo, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *b, int *ldb, int *info);
+static void (*spbtrs_)(const char *uplo, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbtrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint kd, jint nrhs, jfloatArray ab, jint offsetab, jint ldab, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!spbtrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23583,7 +23697,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spbtrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  spbtrs_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  spbtrs_(__nuplo, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -23592,7 +23706,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spocon_)(const char *uplo, int *n, float *a, int *lda, float *anorm, float *rcond, float *work, int *iwork, int *info);
+static void (*spocon_)(const char *uplo, int *n, float *a, int *lda, float *anorm, float *rcond, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spoconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloat anorm, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!spocon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23615,7 +23729,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spoconK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  spocon_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  spocon_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -23655,7 +23769,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sporfs_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sporfs_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sporfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray af, jint offsetaf, jint ldaf, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sporfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23692,7 +23806,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sporfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sporfs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sporfs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -23707,7 +23821,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sposv_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, int *info);
+static void (*sposv_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sposvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!sposv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23728,7 +23842,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sposvK(JNIEnv *env, UNUSED jobject
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  sposv_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  sposv_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -23737,7 +23851,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sposvx_)(const char *fact, const char *uplo, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, char *equed, float *s, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sposvx_)(const char *fact, const char *uplo, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, char *equed, float *s, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info, int len_fact, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sposvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray af, jint offsetaf, jint ldaf, jobject equed, jfloatArray s, jint offsets, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jobject rcond, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sposvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23768,7 +23882,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sposvxK(JNIEnv *env, UNUSED jobjec
   __nnrhs = nrhs;
   __nlda = lda;
   __nldaf = ldaf;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetFloatField(env, rcond, floatW_val_fieldID);
@@ -23782,7 +23896,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sposvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sposvx_(__nfact, __nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sposvx_(__nfact, __nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -23801,7 +23915,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spotf2_)(const char *uplo, int *n, float *a, int *lda, int *info);
+static void (*spotf2_)(const char *uplo, int *n, float *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spotf2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jobject info) {
   if (!spotf2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23816,7 +23930,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spotf2K(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  spotf2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  spotf2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -23824,7 +23938,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spotrf_)(const char *uplo, int *n, float *a, int *lda, int *info);
+static void (*spotrf_)(const char *uplo, int *n, float *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spotrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jobject info) {
   if (!spotrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23839,7 +23953,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spotrfK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  spotrf_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  spotrf_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -23847,7 +23961,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spotri_)(const char *uplo, int *n, float *a, int *lda, int *info);
+static void (*spotri_)(const char *uplo, int *n, float *a, int *lda, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spotriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jobject info) {
   if (!spotri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23862,7 +23976,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spotriK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  spotri_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  spotri_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -23870,7 +23984,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spotrs_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, int *info);
+static void (*spotrs_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spotrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!spotrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23891,7 +24005,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spotrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  spotrs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  spotrs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -23900,7 +24014,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sppcon_)(const char *uplo, int *n, float *ap, float *anorm, float *rcond, float *work, int *iwork, int *info);
+static void (*sppcon_)(const char *uplo, int *n, float *ap, float *anorm, float *rcond, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sppconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloat anorm, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sppcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23921,7 +24035,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sppconK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sppcon_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sppcon_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -23932,7 +24046,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sppequ_)(const char *uplo, int *n, float *ap, float *s, float *scond, float *amax, int *info);
+static void (*sppequ_)(const char *uplo, int *n, float *ap, float *s, float *scond, float *amax, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sppequK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray s, jint offsets, jobject scond, jobject amax, jobject info) {
   if (!sppequ_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23951,7 +24065,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sppequK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (s) { if (!(__ns = (*env)->GetPrimitiveArrayCritical(env, s, NULL))) { __failed = TRUE; goto done; } }
-  sppequ_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ns ? __ns + offsets : NULL, &__nscond, &__namax, &__ninfo);
+  sppequ_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __ns ? __ns + offsets : NULL, &__nscond, &__namax, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__ns) (*env)->ReleasePrimitiveArrayCritical(env, s, __ns, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -23962,7 +24076,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spprfs_)(const char *uplo, int *n, int *nrhs, float *ap, float *afp, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*spprfs_)(const char *uplo, int *n, int *nrhs, float *ap, float *afp, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spprfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray ap, jint offsetap, jfloatArray afp, jint offsetafp, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!spprfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -23995,7 +24109,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spprfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  spprfs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  spprfs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -24010,7 +24124,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sppsv_)(const char *uplo, int *n, int *nrhs, float *ap, float *b, int *ldb, int *info);
+static void (*sppsv_)(const char *uplo, int *n, int *nrhs, float *ap, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sppsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray ap, jint offsetap, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!sppsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24029,7 +24143,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sppsvK(JNIEnv *env, UNUSED jobject
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  sppsv_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  sppsv_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -24038,7 +24152,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sppsvx_)(const char *fact, const char *uplo, int *n, int *nrhs, float *ap, float *afp, char *equed, float *s, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sppsvx_)(const char *fact, const char *uplo, int *n, int *nrhs, float *ap, float *afp, char *equed, float *s, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info, int len_fact, int len_uplo, int len_equed);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sppsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint nrhs, jfloatArray ap, jint offsetap, jfloatArray afp, jint offsetafp, jobject equed, jfloatArray s, jint offsets, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jobject rcond, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sppsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24065,7 +24179,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sppsvxK(JNIEnv *env, UNUSED jobjec
   if (!(__nuplo = (*env)->GetStringUTFChars(env, uplo, NULL))) { __failed = TRUE; goto done; }
   __nn = n;
   __nnrhs = nrhs;
-  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, equed, NULL))) { __failed = TRUE; goto done; }
+  __jequed = (jstring)(*env)->GetObjectField(env, equed, StringW_val_fieldID); if (!(__nequed = (char*)(*env)->GetStringUTFChars(env, __jequed, NULL))) { __failed = TRUE; goto done; }
   __nldb = ldb;
   __nldx = ldx;
   __nrcond = (*env)->GetFloatField(env, rcond, floatW_val_fieldID);
@@ -24079,7 +24193,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sppsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sppsvx_(__nfact, __nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sppsvx_(__nfact, __nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nequed, __ns ? __ns + offsets : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, __jequed));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -24098,7 +24212,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spptrf_)(const char *uplo, int *n, float *ap, int *info);
+static void (*spptrf_)(const char *uplo, int *n, float *ap, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spptrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jobject info) {
   if (!spptrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24111,7 +24225,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spptrfK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
-  spptrf_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo);
+  spptrf_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -24119,7 +24233,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spptri_)(const char *uplo, int *n, float *ap, int *info);
+static void (*spptri_)(const char *uplo, int *n, float *ap, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spptriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jobject info) {
   if (!spptri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24132,7 +24246,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spptriK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
-  spptri_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo);
+  spptri_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -24140,7 +24254,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spptrs_)(const char *uplo, int *n, int *nrhs, float *ap, float *b, int *ldb, int *info);
+static void (*spptrs_)(const char *uplo, int *n, int *nrhs, float *ap, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spptrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray ap, jint offsetap, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!spptrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24159,7 +24273,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spptrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  spptrs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  spptrs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -24197,7 +24311,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*spteqr_)(const char *compz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *info);
+static void (*spteqr_)(const char *compz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *info, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_spteqrK(JNIEnv *env, UNUSED jobject obj, jstring compz, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jobject info) {
   if (!spteqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24218,7 +24332,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_spteqrK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  spteqr_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  spteqr_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -24305,7 +24419,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sptsvx_)(const char *fact, int *n, int *nrhs, float *d, float *e, float *df, float *ef, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *info);
+static void (*sptsvx_)(const char *fact, int *n, int *nrhs, float *d, float *e, float *df, float *ef, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *info, int len_fact);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sptsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jint n, jint nrhs, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray df, jint offsetdf, jfloatArray ef, jint offsetef, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jobject rcond, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jobject info) {
   if (!sptsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24342,7 +24456,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sptsvxK(JNIEnv *env, UNUSED jobjec
   if (ferr) { if (!(__nferr = (*env)->GetPrimitiveArrayCritical(env, ferr, NULL))) { __failed = TRUE; goto done; } }
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sptsvx_(__nfact, &__nn, &__nnrhs, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ndf ? __ndf + offsetdf : NULL, __nef ? __nef + offsetef : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sptsvx_(__nfact, &__nn, &__nnrhs, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ndf ? __ndf + offsetdf : NULL, __nef ? __nef + offsetef : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nberr) (*env)->ReleasePrimitiveArrayCritical(env, berr, __nberr, __failed ? JNI_ABORT : 0);
@@ -24452,7 +24566,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssbev_)(const char *jobz, const char *uplo, int *n, int *kd, float *ab, int *ldab, float *w, float *z, int *ldz, float *work, int *info);
+static void (*ssbev_)(const char *jobz, const char *uplo, int *n, int *kd, float *ab, int *ldab, float *w, float *z, int *ldz, float *work, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbevK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jobject info) {
   if (!ssbev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24479,7 +24593,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbevK(JNIEnv *env, UNUSED jobject
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssbev_(__njobz, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  ssbev_(__njobz, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -24491,7 +24605,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssbevd_)(const char *jobz, const char *uplo, int *n, int *kd, float *ab, int *ldab, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*ssbevd_)(const char *jobz, const char *uplo, int *n, int *kd, float *ab, int *ldab, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbevdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!ssbevd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24524,7 +24638,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbevdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  ssbevd_(__njobz, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  ssbevd_(__njobz, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -24537,7 +24651,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssbevx_)(const char *jobz, const char *range, const char *uplo, int *n, int *kd, float *ab, int *ldab, float *q, int *ldq, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info);
+static void (*ssbevx_)(const char *jobz, const char *range, const char *uplo, int *n, int *kd, float *ab, int *ldab, float *q, int *ldq, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbevxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jfloatArray q, jint offsetq, jint ldq, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!ssbevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24586,7 +24700,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbevxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  ssbevx_(__njobz, __nrange, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nq ? __nq + offsetq : NULL, &__nldq, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  ssbevx_(__njobz, __nrange, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nq ? __nq + offsetq : NULL, &__nldq, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -24603,7 +24717,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssbgst_)(const char *vect, const char *uplo, int *n, int *ka, int *kb, float *ab, int *ldab, float *bb, int *ldbb, float *x, int *ldx, float *work, int *info);
+static void (*ssbgst_)(const char *vect, const char *uplo, int *n, int *ka, int *kb, float *ab, int *ldab, float *bb, int *ldbb, float *x, int *ldx, float *work, int *info, int len_vect, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbgstK(JNIEnv *env, UNUSED jobject obj, jstring vect, jstring uplo, jint n, jint ka, jint kb, jfloatArray ab, jint offsetab, jint ldab, jfloatArray bb, jint offsetbb, jint ldbb, jfloatArray x, jint offsetx, jint ldx, jfloatArray work, jint offsetwork, jobject info) {
   if (!ssbgst_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24634,7 +24748,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbgstK(JNIEnv *env, UNUSED jobjec
   if (bb) { if (!(__nbb = (*env)->GetPrimitiveArrayCritical(env, bb, NULL))) { __failed = TRUE; goto done; } }
   if (x) { if (!(__nx = (*env)->GetPrimitiveArrayCritical(env, x, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssbgst_(__nvect, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nx ? __nx + offsetx : NULL, &__nldx, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  ssbgst_(__nvect, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nx ? __nx + offsetx : NULL, &__nldx, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, vect), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nx) (*env)->ReleasePrimitiveArrayCritical(env, x, __nx, __failed ? JNI_ABORT : 0);
@@ -24646,7 +24760,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssbgv_)(const char *jobz, const char *uplo, int *n, int *ka, int *kb, float *ab, int *ldab, float *bb, int *ldbb, float *w, float *z, int *ldz, float *work, int *info);
+static void (*ssbgv_)(const char *jobz, const char *uplo, int *n, int *ka, int *kb, float *ab, int *ldab, float *bb, int *ldbb, float *w, float *z, int *ldz, float *work, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbgvK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jint ka, jint kb, jfloatArray ab, jint offsetab, jint ldab, jfloatArray bb, jint offsetbb, jint ldbb, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jobject info) {
   if (!ssbgv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24679,7 +24793,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbgvK(JNIEnv *env, UNUSED jobject
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssbgv_(__njobz, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  ssbgv_(__njobz, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -24692,7 +24806,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssbgvd_)(const char *jobz, const char *uplo, int *n, int *ka, int *kb, float *ab, int *ldab, float *bb, int *ldbb, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*ssbgvd_)(const char *jobz, const char *uplo, int *n, int *ka, int *kb, float *ab, int *ldab, float *bb, int *ldbb, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbgvdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jint ka, jint kb, jfloatArray ab, jint offsetab, jint ldab, jfloatArray bb, jint offsetbb, jint ldbb, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!ssbgvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24731,7 +24845,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbgvdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  ssbgvd_(__njobz, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  ssbgvd_(__njobz, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -24745,7 +24859,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssbgvx_)(const char *jobz, const char *range, const char *uplo, int *n, int *ka, int *kb, float *ab, int *ldab, float *bb, int *ldbb, float *q, int *ldq, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info);
+static void (*ssbgvx_)(const char *jobz, const char *range, const char *uplo, int *n, int *ka, int *kb, float *ab, int *ldab, float *bb, int *ldbb, float *q, int *ldq, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbgvxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jint ka, jint kb, jfloatArray ab, jint offsetab, jint ldab, jfloatArray bb, jint offsetbb, jint ldbb, jfloatArray q, jint offsetq, jint ldq, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!ssbgvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24800,7 +24914,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbgvxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  ssbgvx_(__njobz, __nrange, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nq ? __nq + offsetq : NULL, &__nldq, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  ssbgvx_(__njobz, __nrange, __nuplo, &__nn, &__nka, &__nkb, __nab ? __nab + offsetab : NULL, &__nldab, __nbb ? __nbb + offsetbb : NULL, &__nldbb, __nq ? __nq + offsetq : NULL, &__nldq, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -24818,7 +24932,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssbtrd_)(const char *vect, const char *uplo, int *n, int *kd, float *ab, int *ldab, float *d, float *e, float *q, int *ldq, float *work, int *info);
+static void (*ssbtrd_)(const char *vect, const char *uplo, int *n, int *kd, float *ab, int *ldab, float *d, float *e, float *q, int *ldq, float *work, int *info, int len_vect, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbtrdK(JNIEnv *env, UNUSED jobject obj, jstring vect, jstring uplo, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray q, jint offsetq, jint ldq, jfloatArray work, jint offsetwork, jobject info) {
   if (!ssbtrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24847,7 +24961,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssbtrdK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssbtrd_(__nvect, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  ssbtrd_(__nvect, __nuplo, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, vect), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -24860,7 +24974,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspcon_)(const char *uplo, int *n, float *ap, int *ipiv, float *anorm, float *rcond, float *work, int *iwork, int *info);
+static void (*sspcon_)(const char *uplo, int *n, float *ap, int *ipiv, float *anorm, float *rcond, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jfloat anorm, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sspcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24883,7 +24997,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspconK(JNIEnv *env, UNUSED jobjec
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sspcon_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sspcon_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -24895,7 +25009,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspev_)(const char *jobz, const char *uplo, int *n, float *ap, float *w, float *z, int *ldz, float *work, int *info);
+static void (*sspev_)(const char *jobz, const char *uplo, int *n, float *ap, float *w, float *z, int *ldz, float *work, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspevK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jobject info) {
   if (!sspev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24918,7 +25032,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspevK(JNIEnv *env, UNUSED jobject
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sspev_(__njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sspev_(__njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -24930,7 +25044,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspevd_)(const char *jobz, const char *uplo, int *n, float *ap, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*sspevd_)(const char *jobz, const char *uplo, int *n, float *ap, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspevdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!sspevd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -24959,7 +25073,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspevdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sspevd_(__njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  sspevd_(__njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -24972,7 +25086,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspevx_)(const char *jobz, const char *range, const char *uplo, int *n, float *ap, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info);
+static void (*sspevx_)(const char *jobz, const char *range, const char *uplo, int *n, float *ap, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspevxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!sspevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25013,7 +25127,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspevxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  sspevx_(__njobz, __nrange, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  sspevx_(__njobz, __nrange, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -25029,7 +25143,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspgst_)(int *itype, const char *uplo, int *n, float *ap, float *bp, int *info);
+static void (*sspgst_)(int *itype, const char *uplo, int *n, float *ap, float *bp, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspgstK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray bp, jint offsetbp, jobject info) {
   if (!sspgst_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25046,7 +25160,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspgstK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (bp) { if (!(__nbp = (*env)->GetPrimitiveArrayCritical(env, bp, NULL))) { __failed = TRUE; goto done; } }
-  sspgst_(&__nitype, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, &__ninfo);
+  sspgst_(&__nitype, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nbp) (*env)->ReleasePrimitiveArrayCritical(env, bp, __nbp, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -25055,7 +25169,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspgv_)(int *itype, const char *jobz, const char *uplo, int *n, float *ap, float *bp, float *w, float *z, int *ldz, float *work, int *info);
+static void (*sspgv_)(int *itype, const char *jobz, const char *uplo, int *n, float *ap, float *bp, float *w, float *z, int *ldz, float *work, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspgvK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray bp, jint offsetbp, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jobject info) {
   if (!sspgv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25082,7 +25196,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspgvK(JNIEnv *env, UNUSED jobject
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sspgv_(&__nitype, __njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sspgv_(&__nitype, __njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -25095,7 +25209,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspgvd_)(int *itype, const char *jobz, const char *uplo, int *n, float *ap, float *bp, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*sspgvd_)(int *itype, const char *jobz, const char *uplo, int *n, float *ap, float *bp, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspgvdK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray bp, jint offsetbp, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!sspgvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25128,7 +25242,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspgvdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sspgvd_(&__nitype, __njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  sspgvd_(&__nitype, __njobz, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -25142,7 +25256,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspgvx_)(int *itype, const char *jobz, const char *range, const char *uplo, int *n, float *ap, float *bp, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info);
+static void (*sspgvx_)(int *itype, const char *jobz, const char *range, const char *uplo, int *n, float *ap, float *bp, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspgvxK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring range, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray bp, jint offsetbp, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!sspgvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25187,7 +25301,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspgvxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  sspgvx_(&__nitype, __njobz, __nrange, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  sspgvx_(&__nitype, __njobz, __nrange, __nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nbp ? __nbp + offsetbp : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -25204,7 +25318,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssprfs_)(const char *uplo, int *n, int *nrhs, float *ap, float *afp, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*ssprfs_)(const char *uplo, int *n, int *nrhs, float *ap, float *afp, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssprfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray ap, jint offsetap, jfloatArray afp, jint offsetafp, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!ssprfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25239,7 +25353,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssprfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  ssprfs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  ssprfs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -25255,7 +25369,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspsv_)(const char *uplo, int *n, int *nrhs, float *ap, int *ipiv, float *b, int *ldb, int *info);
+static void (*sspsv_)(const char *uplo, int *n, int *nrhs, float *ap, int *ipiv, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspsvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!sspsv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25276,7 +25390,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspsvK(JNIEnv *env, UNUSED jobject
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  sspsv_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  sspsv_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -25286,7 +25400,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sspsvx_)(const char *fact, const char *uplo, int *n, int *nrhs, float *ap, float *afp, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*sspsvx_)(const char *fact, const char *uplo, int *n, int *nrhs, float *ap, float *afp, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *iwork, int *info, int len_fact, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspsvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint nrhs, jfloatArray ap, jint offsetap, jfloatArray afp, jint offsetafp, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jobject rcond, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sspsvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25325,7 +25439,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sspsvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sspsvx_(__nfact, __nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sspsvx_(__nfact, __nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nafp ? __nafp + offsetafp : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -25343,7 +25457,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssptrd_)(const char *uplo, int *n, float *ap, float *d, float *e, float *tau, int *info);
+static void (*ssptrd_)(const char *uplo, int *n, float *ap, float *d, float *e, float *tau, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssptrdK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray tau, jint offsettau, jobject info) {
   if (!ssptrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25362,7 +25476,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssptrdK(JNIEnv *env, UNUSED jobjec
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
-  ssptrd_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, &__ninfo);
+  ssptrd_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
   if (__ne) (*env)->ReleasePrimitiveArrayCritical(env, e, __ne, __failed ? JNI_ABORT : 0);
@@ -25373,7 +25487,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssptrf_)(const char *uplo, int *n, float *ap, int *ipiv, int *info);
+static void (*ssptrf_)(const char *uplo, int *n, float *ap, int *ipiv, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssptrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jobject info) {
   if (!ssptrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25388,7 +25502,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssptrfK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
-  ssptrf_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__ninfo);
+  ssptrf_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -25397,7 +25511,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssptri_)(const char *uplo, int *n, float *ap, int *ipiv, float *work, int *info);
+static void (*ssptri_)(const char *uplo, int *n, float *ap, int *ipiv, float *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssptriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jfloatArray work, jint offsetwork, jobject info) {
   if (!ssptri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25414,7 +25528,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssptriK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssptri_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  ssptri_(__nuplo, &__nn, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -25424,7 +25538,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssptrs_)(const char *uplo, int *n, int *nrhs, float *ap, int *ipiv, float *b, int *ldb, int *info);
+static void (*ssptrs_)(const char *uplo, int *n, int *nrhs, float *ap, int *ipiv, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssptrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray ap, jint offsetap, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!ssptrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25445,7 +25559,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssptrsK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  ssptrs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  ssptrs_(__nuplo, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -25455,7 +25569,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sstebz_)(const char *range, const char *order, int *n, float *vl, float *vu, int *il, int *iu, float *abstol, float *d, float *e, int *m, int *nsplit, float *w, int *iblock, int *isplit, float *work, int *iwork, int *info);
+static void (*sstebz_)(const char *range, const char *order, int *n, float *vl, float *vu, int *il, int *iu, float *abstol, float *d, float *e, int *m, int *nsplit, float *w, int *iblock, int *isplit, float *work, int *iwork, int *info, int len_range, int len_order);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstebzK(JNIEnv *env, UNUSED jobject obj, jstring range, jstring order, jint n, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jobject m, jobject nsplit, jfloatArray w, jint offsetw, jintArray iblock, jint offsetiblock, jintArray isplit, jint offsetisplit, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!sstebz_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25496,7 +25610,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstebzK(JNIEnv *env, UNUSED jobjec
   if (isplit) { if (!(__nisplit = (*env)->GetPrimitiveArrayCritical(env, isplit, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sstebz_(__nrange, __norder, &__nn, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nm, &__nnsplit, __nw ? __nw + offsetw : NULL, __niblock ? __niblock + offsetiblock : NULL, __nisplit ? __nisplit + offsetisplit : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  sstebz_(__nrange, __norder, &__nn, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nm, &__nnsplit, __nw ? __nw + offsetw : NULL, __niblock ? __niblock + offsetiblock : NULL, __nisplit ? __nisplit + offsetisplit : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, order));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -25513,7 +25627,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sstedc_)(const char *compz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*sstedc_)(const char *compz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstedcK(JNIEnv *env, UNUSED jobject obj, jstring compz, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!sstedc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25540,7 +25654,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstedcK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sstedc_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  sstedc_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, compz));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -25552,7 +25666,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sstegr_)(const char *jobz, const char *range, int *n, float *d, float *e, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, int *isuppz, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*sstegr_)(const char *jobz, const char *range, int *n, float *d, float *e, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, int *isuppz, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstegrK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jintArray isuppz, jint offsetisuppz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!sstegr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25597,7 +25711,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstegrK(JNIEnv *env, UNUSED jobjec
   if (isuppz) { if (!(__nisuppz = (*env)->GetPrimitiveArrayCritical(env, isuppz, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sstegr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  sstegr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -25659,7 +25773,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sstemr_)(const char *jobz, const char *range, int *n, float *d, float *e, float *vl, float *vu, int *il, int *iu, int *m, float *w, float *z, int *ldz, int *nzc, int *isuppz, int *tryrac, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*sstemr_)(const char *jobz, const char *range, int *n, float *d, float *e, float *vl, float *vu, int *il, int *iu, int *m, float *w, float *z, int *ldz, int *nzc, int *isuppz, int *tryrac, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstemrK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloat vl, jfloat vu, jint il, jint iu, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jint nzc, jintArray isuppz, jint offsetisuppz, jobject tryrac, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!sstemr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25706,7 +25820,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstemrK(JNIEnv *env, UNUSED jobjec
   if (isuppz) { if (!(__nisuppz = (*env)->GetPrimitiveArrayCritical(env, isuppz, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sstemr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, &__nnzc, __nisuppz ? __nisuppz + offsetisuppz : NULL, &__ntryrac, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  sstemr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, &__nnzc, __nisuppz ? __nisuppz + offsetisuppz : NULL, &__ntryrac, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -25723,7 +25837,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssteqr_)(const char *compz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *info);
+static void (*ssteqr_)(const char *compz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *info, int len_compz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssteqrK(JNIEnv *env, UNUSED jobject obj, jstring compz, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jobject info) {
   if (!ssteqr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25744,7 +25858,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssteqrK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssteqr_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  ssteqr_(__ncompz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, compz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -25776,7 +25890,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sstev_)(const char *jobz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *info);
+static void (*sstev_)(const char *jobz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *info, int len_jobz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstevK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jobject info) {
   if (!sstev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25797,7 +25911,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstevK(JNIEnv *env, UNUSED jobject
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  sstev_(__njobz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  sstev_(__njobz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nz) (*env)->ReleasePrimitiveArrayCritical(env, z, __nz, __failed ? JNI_ABORT : 0);
@@ -25808,7 +25922,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sstevd_)(const char *jobz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*sstevd_)(const char *jobz, int *n, float *d, float *e, float *z, int *ldz, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstevdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!sstevd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25835,7 +25949,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstevdK(JNIEnv *env, UNUSED jobjec
   if (z) { if (!(__nz = (*env)->GetPrimitiveArrayCritical(env, z, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sstevd_(__njobz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  sstevd_(__njobz, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -25847,7 +25961,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sstevr_)(const char *jobz, const char *range, int *n, float *d, float *e, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, int *isuppz, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*sstevr_)(const char *jobz, const char *range, int *n, float *d, float *e, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, int *isuppz, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstevrK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jintArray isuppz, jint offsetisuppz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!sstevr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25892,7 +26006,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstevrK(JNIEnv *env, UNUSED jobjec
   if (isuppz) { if (!(__nisuppz = (*env)->GetPrimitiveArrayCritical(env, isuppz, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  sstevr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  sstevr_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -25908,7 +26022,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*sstevx_)(const char *jobz, const char *range, int *n, float *d, float *e, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info);
+static void (*sstevx_)(const char *jobz, const char *range, int *n, float *d, float *e, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *iwork, int *ifail, int *info, int len_jobz, int len_range);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstevxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jint n, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!sstevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25949,7 +26063,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_sstevxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  sstevx_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  sstevx_(__njobz, __nrange, &__nn, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -25965,7 +26079,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssycon_)(const char *uplo, int *n, float *a, int *lda, int *ipiv, float *anorm, float *rcond, float *work, int *iwork, int *info);
+static void (*ssycon_)(const char *uplo, int *n, float *a, int *lda, int *ipiv, float *anorm, float *rcond, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyconK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jfloat anorm, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!ssycon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -25990,7 +26104,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyconK(JNIEnv *env, UNUSED jobjec
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  ssycon_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  ssycon_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, &__nanorm, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -26002,7 +26116,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssyev_)(const char *jobz, const char *uplo, int *n, float *a, int *lda, float *w, float *work, int *lwork, int *info);
+static void (*ssyev_)(const char *jobz, const char *uplo, int *n, float *a, int *lda, float *w, float *work, int *lwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyevK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray w, jint offsetw, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!ssyev_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26025,7 +26139,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyevK(JNIEnv *env, UNUSED jobject
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssyev_(__njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  ssyev_(__njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nw) (*env)->ReleasePrimitiveArrayCritical(env, w, __nw, __failed ? JNI_ABORT : 0);
@@ -26036,7 +26150,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssyevd_)(const char *jobz, const char *uplo, int *n, float *a, int *lda, float *w, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*ssyevd_)(const char *jobz, const char *uplo, int *n, float *a, int *lda, float *w, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyevdK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray w, jint offsetw, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!ssyevd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26063,7 +26177,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyevdK(JNIEnv *env, UNUSED jobjec
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  ssyevd_(__njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  ssyevd_(__njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -26075,7 +26189,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssyevr_)(const char *jobz, const char *range, const char *uplo, int *n, float *a, int *lda, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, int *isuppz, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*ssyevr_)(const char *jobz, const char *range, const char *uplo, int *n, float *a, int *lda, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, int *isuppz, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyevrK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jintArray isuppz, jint offsetisuppz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!ssyevr_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26122,7 +26236,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyevrK(JNIEnv *env, UNUSED jobjec
   if (isuppz) { if (!(__nisuppz = (*env)->GetPrimitiveArrayCritical(env, isuppz, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  ssyevr_(__njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  ssyevr_(__njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nisuppz ? __nisuppz + offsetisuppz : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -26138,7 +26252,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssyevx_)(const char *jobz, const char *range, const char *uplo, int *n, float *a, int *lda, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *ifail, int *info);
+static void (*ssyevx_)(const char *jobz, const char *range, const char *uplo, int *n, float *a, int *lda, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyevxK(JNIEnv *env, UNUSED jobject obj, jstring jobz, jstring range, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!ssyevx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26183,7 +26297,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyevxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  ssyevx_(__njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  ssyevx_(__njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -26199,7 +26313,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssygs2_)(int *itype, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, int *info);
+static void (*ssygs2_)(int *itype, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygs2K(JNIEnv *env, UNUSED jobject obj, jint itype, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!ssygs2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26220,7 +26334,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygs2K(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  ssygs2_(&__nitype, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  ssygs2_(&__nitype, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -26229,7 +26343,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssygst_)(int *itype, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, int *info);
+static void (*ssygst_)(int *itype, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygstK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!ssygst_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26250,7 +26364,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygstK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  ssygst_(&__nitype, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  ssygst_(&__nitype, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -26259,7 +26373,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssygv_)(int *itype, const char *jobz, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, float *w, float *work, int *lwork, int *info);
+static void (*ssygv_)(int *itype, const char *jobz, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, float *w, float *work, int *lwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygvK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray w, jint offsetw, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!ssygv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26288,7 +26402,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygvK(JNIEnv *env, UNUSED jobject
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssygv_(&__nitype, __njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  ssygv_(&__nitype, __njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nw) (*env)->ReleasePrimitiveArrayCritical(env, w, __nw, __failed ? JNI_ABORT : 0);
@@ -26300,7 +26414,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssygvd_)(int *itype, const char *jobz, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, float *w, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*ssygvd_)(int *itype, const char *jobz, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, float *w, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_jobz, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygvdK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray w, jint offsetw, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!ssygvd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26333,7 +26447,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygvdK(JNIEnv *env, UNUSED jobjec
   if (w) { if (!(__nw = (*env)->GetPrimitiveArrayCritical(env, w, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  ssygvd_(&__nitype, __njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  ssygvd_(&__nitype, __njobz, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nw ? __nw + offsetw : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -26346,7 +26460,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssygvx_)(int *itype, const char *jobz, const char *range, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *ifail, int *info);
+static void (*ssygvx_)(int *itype, const char *jobz, const char *range, const char *uplo, int *n, float *a, int *lda, float *b, int *ldb, float *vl, float *vu, int *il, int *iu, float *abstol, int *m, float *w, float *z, int *ldz, float *work, int *lwork, int *iwork, int *ifail, int *info, int len_jobz, int len_range, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygvxK(JNIEnv *env, UNUSED jobject obj, jint itype, jstring jobz, jstring range, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat vl, jfloat vu, jint il, jint iu, jfloat abstol, jobject m, jfloatArray w, jint offsetw, jfloatArray z, jint offsetz, jint ldz, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jintArray ifail, jint offsetifail, jobject info) {
   if (!ssygvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26397,7 +26511,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssygvxK(JNIEnv *env, UNUSED jobjec
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
   if (ifail) { if (!(__nifail = (*env)->GetPrimitiveArrayCritical(env, ifail, NULL))) { __failed = TRUE; goto done; } }
-  ssygvx_(&__nitype, __njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo);
+  ssygvx_(&__nitype, __njobz, __nrange, __nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__nvl, &__nvu, &__nil, &__niu, &__nabstol, &__nm, __nw ? __nw + offsetw : NULL, __nz ? __nz + offsetz : NULL, &__nldz, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, __nifail ? __nifail + offsetifail : NULL, &__ninfo, (*env)->GetStringUTFLength(env, jobz), (*env)->GetStringUTFLength(env, range), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nifail) (*env)->ReleasePrimitiveArrayCritical(env, ifail, __nifail, __failed ? JNI_ABORT : 0);
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
@@ -26414,7 +26528,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssyrfs_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*ssyrfs_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyrfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray af, jint offsetaf, jint ldaf, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!ssyrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26453,7 +26567,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssyrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  ssyrfs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  ssyrfs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -26469,7 +26583,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssysv_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, int *ipiv, float *b, int *ldb, float *work, int *lwork, int *info);
+static void (*ssysv_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, int *ipiv, float *b, int *ldb, float *work, int *lwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssysvK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!ssysv_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26496,7 +26610,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssysvK(JNIEnv *env, UNUSED jobject
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssysv_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  ssysv_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
@@ -26507,7 +26621,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssysvx_)(const char *fact, const char *uplo, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *lwork, int *iwork, int *info);
+static void (*ssysvx_)(const char *fact, const char *uplo, int *n, int *nrhs, float *a, int *lda, float *af, int *ldaf, int *ipiv, float *b, int *ldb, float *x, int *ldx, float *rcond, float *ferr, float *berr, float *work, int *lwork, int *iwork, int *info, int len_fact, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssysvxK(JNIEnv *env, UNUSED jobject obj, jstring fact, jstring uplo, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray af, jint offsetaf, jint ldaf, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jobject rcond, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!ssysvx_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26552,7 +26666,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssysvxK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  ssysvx_(__nfact, __nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  ssysvx_(__nfact, __nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __naf ? __naf + offsetaf : NULL, &__nldaf, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, &__nrcond, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, fact), (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -26570,7 +26684,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssytd2_)(const char *uplo, int *n, float *a, int *lda, float *d, float *e, float *tau, int *info);
+static void (*ssytd2_)(const char *uplo, int *n, float *a, int *lda, float *d, float *e, float *tau, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytd2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray tau, jint offsettau, jobject info) {
   if (!ssytd2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26591,7 +26705,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytd2K(JNIEnv *env, UNUSED jobjec
   if (d) { if (!(__nd = (*env)->GetPrimitiveArrayCritical(env, d, NULL))) { __failed = TRUE; goto done; } }
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
-  ssytd2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, &__ninfo);
+  ssytd2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
   if (__ne) (*env)->ReleasePrimitiveArrayCritical(env, e, __ne, __failed ? JNI_ABORT : 0);
@@ -26602,7 +26716,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssytf2_)(const char *uplo, int *n, float *a, int *lda, int *ipiv, int *info);
+static void (*ssytf2_)(const char *uplo, int *n, float *a, int *lda, int *ipiv, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytf2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jobject info) {
   if (!ssytf2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26619,7 +26733,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytf2K(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
-  ssytf2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, &__ninfo);
+  ssytf2_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -26628,7 +26742,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssytrd_)(const char *uplo, int *n, float *a, int *lda, float *d, float *e, float *tau, float *work, int *lwork, int *info);
+static void (*ssytrd_)(const char *uplo, int *n, float *a, int *lda, float *d, float *e, float *tau, float *work, int *lwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytrdK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray d, jint offsetd, jfloatArray e, jint offsete, jfloatArray tau, jint offsettau, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!ssytrd_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26653,7 +26767,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytrdK(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (tau) { if (!(__ntau = (*env)->GetPrimitiveArrayCritical(env, tau, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssytrd_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  ssytrd_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nd ? __nd + offsetd : NULL, __ne ? __ne + offsete : NULL, __ntau ? __ntau + offsettau : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__ntau) (*env)->ReleasePrimitiveArrayCritical(env, tau, __ntau, __failed ? JNI_ABORT : 0);
@@ -26665,7 +26779,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssytrf_)(const char *uplo, int *n, float *a, int *lda, int *ipiv, float *work, int *lwork, int *info);
+static void (*ssytrf_)(const char *uplo, int *n, float *a, int *lda, int *ipiv, float *work, int *lwork, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytrfK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jfloatArray work, jint offsetwork, jint lwork, jobject info) {
   if (!ssytrf_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26686,7 +26800,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytrfK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssytrf_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo);
+  ssytrf_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__nlwork, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -26696,7 +26810,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssytri_)(const char *uplo, int *n, float *a, int *lda, int *ipiv, float *work, int *info);
+static void (*ssytri_)(const char *uplo, int *n, float *a, int *lda, int *ipiv, float *work, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jfloatArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jfloatArray work, jint offsetwork, jobject info) {
   if (!ssytri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26715,7 +26829,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytriK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  ssytri_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  ssytri_(__nuplo, &__nn, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -26725,7 +26839,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*ssytrs_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, int *ipiv, float *b, int *ldb, int *info);
+static void (*ssytrs_)(const char *uplo, int *n, int *nrhs, float *a, int *lda, int *ipiv, float *b, int *ldb, int *info, int len_uplo);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jintArray ipiv, jint offsetipiv, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!ssytrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26748,7 +26862,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_ssytrsK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (ipiv) { if (!(__nipiv = (*env)->GetPrimitiveArrayCritical(env, ipiv, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  ssytrs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  ssytrs_(__nuplo, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nipiv ? __nipiv + offsetipiv : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nipiv) (*env)->ReleasePrimitiveArrayCritical(env, ipiv, __nipiv, __failed ? JNI_ABORT : 0);
@@ -26758,7 +26872,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stbcon_)(const char *norm, const char *uplo, const char *diag, int *n, int *kd, float *ab, int *ldab, float *rcond, float *work, int *iwork, int *info);
+static void (*stbcon_)(const char *norm, const char *uplo, const char *diag, int *n, int *kd, float *ab, int *ldab, float *rcond, float *work, int *iwork, int *info, int len_norm, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stbconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jint kd, jfloatArray ab, jint offsetab, jint ldab, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!stbcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26785,7 +26899,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stbconK(JNIEnv *env, UNUSED jobjec
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  stbcon_(__nnorm, __nuplo, __ndiag, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  stbcon_(__nnorm, __nuplo, __ndiag, &__nn, &__nkd, __nab ? __nab + offsetab : NULL, &__nldab, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -26798,7 +26912,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stbrfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*stbrfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stbrfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint kd, jint nrhs, jfloatArray ab, jint offsetab, jint ldab, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!stbrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26837,7 +26951,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stbrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  stbrfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  stbrfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -26853,7 +26967,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stbtrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *b, int *ldb, int *info);
+static void (*stbtrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *kd, int *nrhs, float *ab, int *ldab, float *b, int *ldb, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stbtrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint kd, jint nrhs, jfloatArray ab, jint offsetab, jint ldab, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!stbtrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26880,7 +26994,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stbtrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ab) { if (!(__nab = (*env)->GetPrimitiveArrayCritical(env, ab, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  stbtrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  stbtrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nkd, &__nnrhs, __nab ? __nab + offsetab : NULL, &__nldab, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nab) (*env)->ReleasePrimitiveArrayCritical(env, ab, __nab, __failed ? JNI_ABORT : 0);
@@ -26891,7 +27005,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stgevc_)(const char *side, const char *howmny, int *select, int *n, float *s, int *lds, float *p, int *ldp, float *vl, int *ldvl, float *vr, int *ldvr, int *mm, int *m, float *work, int *info);
+static void (*stgevc_)(const char *side, const char *howmny, int *select, int *n, float *s, int *lds, float *p, int *ldp, float *vl, int *ldvl, float *vr, int *ldvr, int *mm, int *m, float *work, int *info, int len_side, int len_howmny);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgevcK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring howmny, jbooleanArray select, jint offsetselect, jint n, jfloatArray s, jint offsets, jint lds, jfloatArray p, jint offsetp, jint ldp, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jint mm, jobject m, jfloatArray work, jint offsetwork, jobject info) {
   if (!stgevc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -26934,7 +27048,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgevcK(JNIEnv *env, UNUSED jobjec
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  stgevc_(__nside, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __ns ? __ns + offsets : NULL, &__nlds, __np ? __np + offsetp : NULL, &__nldp, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  stgevc_(__nside, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __ns ? __ns + offsets : NULL, &__nlds, __np ? __np + offsetp : NULL, &__nldp, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, howmny));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -27130,7 +27244,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stgsja_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *p, int *n, int *k, int *l, float *a, int *lda, float *b, int *ldb, float *tola, float *tolb, float *alpha, float *beta, float *u, int *ldu, float *v, int *ldv, float *q, int *ldq, float *work, int *ncycle, int *info);
+static void (*stgsja_)(const char *jobu, const char *jobv, const char *jobq, int *m, int *p, int *n, int *k, int *l, float *a, int *lda, float *b, int *ldb, float *tola, float *tolb, float *alpha, float *beta, float *u, int *ldu, float *v, int *ldv, float *q, int *ldq, float *work, int *ncycle, int *info, int len_jobu, int len_jobv, int len_jobq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsjaK(JNIEnv *env, UNUSED jobject obj, jstring jobu, jstring jobv, jstring jobq, jint m, jint p, jint n, jint k, jint l, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloat tola, jfloat tolb, jfloatArray alpha, jint offsetalpha, jfloatArray beta, jint offsetbeta, jfloatArray u, jint offsetu, jint ldu, jfloatArray v, jint offsetv, jint ldv, jfloatArray q, jint offsetq, jint ldq, jfloatArray work, jint offsetwork, jobject ncycle, jobject info) {
   if (!stgsja_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27185,7 +27299,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsjaK(JNIEnv *env, UNUSED jobjec
   if (v) { if (!(__nv = (*env)->GetPrimitiveArrayCritical(env, v, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  stgsja_(__njobu, __njobv, __njobq, &__nm, &__np, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ntola, &__ntolb, __nalpha ? __nalpha + offsetalpha : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__nncycle, &__ninfo);
+  stgsja_(__njobu, __njobv, __njobq, &__nm, &__np, &__nn, &__nk, &__nl, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ntola, &__ntolb, __nalpha ? __nalpha + offsetalpha : NULL, __nbeta ? __nbeta + offsetbeta : NULL, __nu ? __nu + offsetu : NULL, &__nldu, __nv ? __nv + offsetv : NULL, &__nldv, __nq ? __nq + offsetq : NULL, &__nldq, __nwork ? __nwork + offsetwork : NULL, &__nncycle, &__ninfo, (*env)->GetStringUTFLength(env, jobu), (*env)->GetStringUTFLength(env, jobv), (*env)->GetStringUTFLength(env, jobq));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -27203,7 +27317,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stgsna_)(const char *job, const char *howmny, int *select, int *n, float *a, int *lda, float *b, int *ldb, float *vl, int *ldvl, float *vr, int *ldvr, float *s, float *dif, int *mm, int *m, float *work, int *lwork, int *iwork, int *info);
+static void (*stgsna_)(const char *job, const char *howmny, int *select, int *n, float *a, int *lda, float *b, int *ldb, float *vl, int *ldvl, float *vr, int *ldvr, float *s, float *dif, int *mm, int *m, float *work, int *lwork, int *iwork, int *info, int len_job, int len_howmny);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsnaK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring howmny, jbooleanArray select, jint offsetselect, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jfloatArray s, jint offsets, jfloatArray dif, jint offsetdif, jint mm, jobject m, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!stgsna_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27254,7 +27368,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsnaK(JNIEnv *env, UNUSED jobjec
   if (dif) { if (!(__ndif = (*env)->GetPrimitiveArrayCritical(env, dif, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  stgsna_(__njob, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __ns ? __ns + offsets : NULL, __ndif ? __ndif + offsetdif : NULL, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  stgsna_(__njob, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __ns ? __ns + offsets : NULL, __ndif ? __ndif + offsetdif : NULL, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, howmny));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -27272,7 +27386,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stgsy2_)(const char *trans, int *ijob, int *m, int *n, float *a, int *lda, float *b, int *ldb, float *c, int *Ldc, float *d, int *ldd, float *e, int *lde, float *f, int *ldf, float *scale, float *rdsum, float *rdscal, int *iwork, int *pq, int *info);
+static void (*stgsy2_)(const char *trans, int *ijob, int *m, int *n, float *a, int *lda, float *b, int *ldb, float *c, int *Ldc, float *d, int *ldd, float *e, int *lde, float *f, int *ldf, float *scale, float *rdsum, float *rdscal, int *iwork, int *pq, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsy2K(JNIEnv *env, UNUSED jobject obj, jstring trans, jint ijob, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray c, jint offsetc, jint Ldc, jfloatArray d, jint offsetd, jint ldd, jfloatArray e, jint offsete, jint lde, jfloatArray f, jint offsetf, jint ldf, jobject scale, jobject rdsum, jobject rdscal, jintArray iwork, jint offsetiwork, jobject pq, jobject info) {
   if (!stgsy2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27321,7 +27435,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsy2K(JNIEnv *env, UNUSED jobjec
   if (e) { if (!(__ne = (*env)->GetPrimitiveArrayCritical(env, e, NULL))) { __failed = TRUE; goto done; } }
   if (f) { if (!(__nf = (*env)->GetPrimitiveArrayCritical(env, f, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  stgsy2_(__ntrans, &__nijob, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, __nd ? __nd + offsetd : NULL, &__nldd, __ne ? __ne + offsete : NULL, &__nlde, __nf ? __nf + offsetf : NULL, &__nldf, &__nscale, &__nrdsum, &__nrdscal, __niwork ? __niwork + offsetiwork : NULL, &__npq, &__ninfo);
+  stgsy2_(__ntrans, &__nijob, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, __nd ? __nd + offsetd : NULL, &__nldd, __ne ? __ne + offsete : NULL, &__nlde, __nf ? __nf + offsetf : NULL, &__nldf, &__nscale, &__nrdsum, &__nrdscal, __niwork ? __niwork + offsetiwork : NULL, &__npq, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nf) (*env)->ReleasePrimitiveArrayCritical(env, f, __nf, __failed ? JNI_ABORT : 0);
@@ -27339,7 +27453,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stgsyl_)(const char *trans, int *ijob, int *m, int *n, float *a, int *lda, float *b, int *ldb, float *c, int *Ldc, float *d, int *ldd, float *e, int *lde, float *f, int *ldf, float *scale, float *dif, float *work, int *lwork, int *iwork, int *info);
+static void (*stgsyl_)(const char *trans, int *ijob, int *m, int *n, float *a, int *lda, float *b, int *ldb, float *c, int *Ldc, float *d, int *ldd, float *e, int *lde, float *f, int *ldf, float *scale, float *dif, float *work, int *lwork, int *iwork, int *info, int len_trans);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsylK(JNIEnv *env, UNUSED jobject obj, jstring trans, jint ijob, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray c, jint offsetc, jint Ldc, jfloatArray d, jint offsetd, jint ldd, jfloatArray e, jint offsete, jint lde, jfloatArray f, jint offsetf, jint ldf, jobject scale, jobject dif, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!stgsyl_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27388,7 +27502,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stgsylK(JNIEnv *env, UNUSED jobjec
   if (f) { if (!(__nf = (*env)->GetPrimitiveArrayCritical(env, f, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  stgsyl_(__ntrans, &__nijob, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, __nd ? __nd + offsetd : NULL, &__nldd, __ne ? __ne + offsete : NULL, &__nlde, __nf ? __nf + offsetf : NULL, &__nldf, &__nscale, &__ndif, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  stgsyl_(__ntrans, &__nijob, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, __nd ? __nd + offsetd : NULL, &__nldd, __ne ? __ne + offsete : NULL, &__nlde, __nf ? __nf + offsetf : NULL, &__nldf, &__nscale, &__ndif, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, trans));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -27405,7 +27519,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stpcon_)(const char *norm, const char *uplo, const char *diag, int *n, float *ap, float *rcond, float *work, int *iwork, int *info);
+static void (*stpcon_)(const char *norm, const char *uplo, const char *diag, int *n, float *ap, float *rcond, float *work, int *iwork, int *info, int len_norm, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stpconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jfloatArray ap, jint offsetap, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!stpcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27428,7 +27542,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stpconK(JNIEnv *env, UNUSED jobjec
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  stpcon_(__nnorm, __nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  stpcon_(__nnorm, __nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -27441,7 +27555,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stprfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, float *ap, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*stprfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, float *ap, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stprfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint nrhs, jfloatArray ap, jint offsetap, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!stprfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27476,7 +27590,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stprfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  stprfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  stprfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -27492,7 +27606,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stptri_)(const char *uplo, const char *diag, int *n, float *ap, int *info);
+static void (*stptri_)(const char *uplo, const char *diag, int *n, float *ap, int *info, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stptriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring diag, jint n, jfloatArray ap, jint offsetap, jobject info) {
   if (!stptri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27507,7 +27621,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stptriK(JNIEnv *env, UNUSED jobjec
   __nn = n;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
-  stptri_(__nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo);
+  stptri_(__nuplo, __ndiag, &__nn, __nap ? __nap + offsetap : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -27516,7 +27630,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*stptrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, float *ap, float *b, int *ldb, int *info);
+static void (*stptrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, float *ap, float *b, int *ldb, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_stptrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint nrhs, jfloatArray ap, jint offsetap, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!stptrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27539,7 +27653,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_stptrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (ap) { if (!(__nap = (*env)->GetPrimitiveArrayCritical(env, ap, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  stptrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  stptrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __nap ? __nap + offsetap : NULL, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__nap) (*env)->ReleasePrimitiveArrayCritical(env, ap, __nap, __failed ? JNI_ABORT : 0);
@@ -27550,7 +27664,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strcon_)(const char *norm, const char *uplo, const char *diag, int *n, float *a, int *lda, float *rcond, float *work, int *iwork, int *info);
+static void (*strcon_)(const char *norm, const char *uplo, const char *diag, int *n, float *a, int *lda, float *rcond, float *work, int *iwork, int *info, int len_norm, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strconK(JNIEnv *env, UNUSED jobject obj, jstring norm, jstring uplo, jstring diag, jint n, jfloatArray a, jint offseta, jint lda, jobject rcond, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!strcon_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27575,7 +27689,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strconK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  strcon_(__nnorm, __nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  strcon_(__nnorm, __nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__nrcond, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, norm), (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -27588,7 +27702,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strevc_)(const char *side, const char *howmny, int *select, int *n, float *t, int *ldt, float *vl, int *ldvl, float *vr, int *ldvr, int *mm, int *m, float *work, int *info);
+static void (*strevc_)(const char *side, const char *howmny, int *select, int *n, float *t, int *ldt, float *vl, int *ldvl, float *vr, int *ldvr, int *mm, int *m, float *work, int *info, int len_side, int len_howmny);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strevcK(JNIEnv *env, UNUSED jobject obj, jstring side, jstring howmny, jbooleanArray select, jint offsetselect, jint n, jfloatArray t, jint offsett, jint ldt, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jint mm, jobject m, jfloatArray work, jint offsetwork, jobject info) {
   if (!strevc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27627,7 +27741,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strevcK(JNIEnv *env, UNUSED jobjec
   if (vl) { if (!(__nvl = (*env)->GetPrimitiveArrayCritical(env, vl, NULL))) { __failed = TRUE; goto done; } }
   if (vr) { if (!(__nvr = (*env)->GetPrimitiveArrayCritical(env, vr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  strevc_(__nside, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  strevc_(__nside, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, side), (*env)->GetStringUTFLength(env, howmny));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nvr) (*env)->ReleasePrimitiveArrayCritical(env, vr, __nvr, __failed ? JNI_ABORT : 0);
@@ -27641,7 +27755,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strexc_)(const char *compq, int *n, float *t, int *ldt, float *q, int *ldq, int *ifst, int *ilst, float *work, int *info);
+static void (*strexc_)(const char *compq, int *n, float *t, int *ldt, float *q, int *ldq, int *ifst, int *ilst, float *work, int *info, int len_compq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strexcK(JNIEnv *env, UNUSED jobject obj, jstring compq, jint n, jfloatArray t, jint offsett, jint ldt, jfloatArray q, jint offsetq, jint ldq, jobject ifst, jobject ilst, jfloatArray work, jint offsetwork, jobject info) {
   if (!strexc_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27666,7 +27780,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strexcK(JNIEnv *env, UNUSED jobjec
   if (t) { if (!(__nt = (*env)->GetPrimitiveArrayCritical(env, t, NULL))) { __failed = TRUE; goto done; } }
   if (q) { if (!(__nq = (*env)->GetPrimitiveArrayCritical(env, q, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
-  strexc_(__ncompq, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nq ? __nq + offsetq : NULL, &__nldq, &__nifst, &__nilst, __nwork ? __nwork + offsetwork : NULL, &__ninfo);
+  strexc_(__ncompq, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nq ? __nq + offsetq : NULL, &__nldq, &__nifst, &__nilst, __nwork ? __nwork + offsetwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, compq));
 done:
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
   if (__nq) (*env)->ReleasePrimitiveArrayCritical(env, q, __nq, __failed ? JNI_ABORT : 0);
@@ -27678,7 +27792,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strrfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info);
+static void (*strrfs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, float *x, int *ldx, float *ferr, float *berr, float *work, int *iwork, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strrfsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray x, jint offsetx, jint ldx, jfloatArray ferr, jint offsetferr, jfloatArray berr, jint offsetberr, jfloatArray work, jint offsetwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!strrfs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27715,7 +27829,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strrfsK(JNIEnv *env, UNUSED jobjec
   if (berr) { if (!(__nberr = (*env)->GetPrimitiveArrayCritical(env, berr, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  strrfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  strrfs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nx ? __nx + offsetx : NULL, &__nldx, __nferr ? __nferr + offsetferr : NULL, __nberr ? __nberr + offsetberr : NULL, __nwork ? __nwork + offsetwork : NULL, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -27731,7 +27845,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strsen_)(const char *job, const char *compq, int *select, int *n, float *t, int *ldt, float *q, int *ldq, float *wr, float *wi, int *m, float *s, float *sep, float *work, int *lwork, int *iwork, int *liwork, int *info);
+static void (*strsen_)(const char *job, const char *compq, int *select, int *n, float *t, int *ldt, float *q, int *ldq, float *wr, float *wi, int *m, float *s, float *sep, float *work, int *lwork, int *iwork, int *liwork, int *info, int len_job, int len_compq);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strsenK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring compq, jbooleanArray select, jint offsetselect, jint n, jfloatArray t, jint offsett, jint ldt, jfloatArray q, jint offsetq, jint ldq, jfloatArray wr, jint offsetwr, jfloatArray wi, jint offsetwi, jobject m, jobject s, jobject sep, jfloatArray work, jint offsetwork, jint lwork, jintArray iwork, jint offsetiwork, jint liwork, jobject info) {
   if (!strsen_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27778,7 +27892,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strsenK(JNIEnv *env, UNUSED jobjec
   if (wi) { if (!(__nwi = (*env)->GetPrimitiveArrayCritical(env, wi, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  strsen_(__njob, __ncompq, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nq ? __nq + offsetq : NULL, &__nldq, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, &__nm, &__ns, &__nsep, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo);
+  strsen_(__njob, __ncompq, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nq ? __nq + offsetq : NULL, &__nldq, __nwr ? __nwr + offsetwr : NULL, __nwi ? __nwi + offsetwi : NULL, &__nm, &__ns, &__nsep, __nwork ? __nwork + offsetwork : NULL, &__nlwork, __niwork ? __niwork + offsetiwork : NULL, &__nliwork, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, compq));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -27796,7 +27910,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strsna_)(const char *job, const char *howmny, int *select, int *n, float *t, int *ldt, float *vl, int *ldvl, float *vr, int *ldvr, float *s, float *sep, int *mm, int *m, float *work, int *ldwork, int *iwork, int *info);
+static void (*strsna_)(const char *job, const char *howmny, int *select, int *n, float *t, int *ldt, float *vl, int *ldvl, float *vr, int *ldvr, float *s, float *sep, int *mm, int *m, float *work, int *ldwork, int *iwork, int *info, int len_job, int len_howmny);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strsnaK(JNIEnv *env, UNUSED jobject obj, jstring job, jstring howmny, jbooleanArray select, jint offsetselect, jint n, jfloatArray t, jint offsett, jint ldt, jfloatArray vl, jint offsetvl, jint ldvl, jfloatArray vr, jint offsetvr, jint ldvr, jfloatArray s, jint offsets, jfloatArray sep, jint offsetsep, jint mm, jobject m, jfloatArray work, jint offsetwork, jint ldwork, jintArray iwork, jint offsetiwork, jobject info) {
   if (!strsna_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27843,7 +27957,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strsnaK(JNIEnv *env, UNUSED jobjec
   if (sep) { if (!(__nsep = (*env)->GetPrimitiveArrayCritical(env, sep, NULL))) { __failed = TRUE; goto done; } }
   if (work) { if (!(__nwork = (*env)->GetPrimitiveArrayCritical(env, work, NULL))) { __failed = TRUE; goto done; } }
   if (iwork) { if (!(__niwork = (*env)->GetPrimitiveArrayCritical(env, iwork, NULL))) { __failed = TRUE; goto done; } }
-  strsna_(__njob, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __ns ? __ns + offsets : NULL, __nsep ? __nsep + offsetsep : NULL, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__nldwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo);
+  strsna_(__njob, __nhowmny, __nselect ? __nselect + offsetselect : NULL, &__nn, __nt ? __nt + offsett : NULL, &__nldt, __nvl ? __nvl + offsetvl : NULL, &__nldvl, __nvr ? __nvr + offsetvr : NULL, &__nldvr, __ns ? __ns + offsets : NULL, __nsep ? __nsep + offsetsep : NULL, &__nmm, &__nm, __nwork ? __nwork + offsetwork : NULL, &__nldwork, __niwork ? __niwork + offsetiwork : NULL, &__ninfo, (*env)->GetStringUTFLength(env, job), (*env)->GetStringUTFLength(env, howmny));
 done:
   if (__niwork) (*env)->ReleasePrimitiveArrayCritical(env, iwork, __niwork, __failed ? JNI_ABORT : 0);
   if (__nwork) (*env)->ReleasePrimitiveArrayCritical(env, work, __nwork, __failed ? JNI_ABORT : 0);
@@ -27860,7 +27974,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strsyl_)(const char *trana, const char *tranb, int *isgn, int *m, int *n, float *a, int *lda, float *b, int *ldb, float *c, int *Ldc, float *scale, int *info);
+static void (*strsyl_)(const char *trana, const char *tranb, int *isgn, int *m, int *n, float *a, int *lda, float *b, int *ldb, float *c, int *Ldc, float *scale, int *info, int len_trana, int len_tranb);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strsylK(JNIEnv *env, UNUSED jobject obj, jstring trana, jstring tranb, jint isgn, jint m, jint n, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jfloatArray c, jint offsetc, jint Ldc, jobject scale, jobject info) {
   if (!strsyl_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27891,7 +28005,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strsylK(JNIEnv *env, UNUSED jobjec
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
   if (c) { if (!(__nc = (*env)->GetPrimitiveArrayCritical(env, c, NULL))) { __failed = TRUE; goto done; } }
-  strsyl_(__ntrana, __ntranb, &__nisgn, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, &__nscale, &__ninfo);
+  strsyl_(__ntrana, __ntranb, &__nisgn, &__nm, &__nn, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, __nc ? __nc + offsetc : NULL, &__nLdc, &__nscale, &__ninfo, (*env)->GetStringUTFLength(env, trana), (*env)->GetStringUTFLength(env, tranb));
 done:
   if (__nc) (*env)->ReleasePrimitiveArrayCritical(env, c, __nc, __failed ? JNI_ABORT : 0);
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
@@ -27903,7 +28017,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strti2_)(const char *uplo, const char *diag, int *n, float *a, int *lda, int *info);
+static void (*strti2_)(const char *uplo, const char *diag, int *n, float *a, int *lda, int *info, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strti2K(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring diag, jint n, jfloatArray a, jint offseta, jint lda, jobject info) {
   if (!strti2_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27920,7 +28034,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strti2K(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  strti2_(__nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  strti2_(__nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -27929,7 +28043,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strtri_)(const char *uplo, const char *diag, int *n, float *a, int *lda, int *info);
+static void (*strtri_)(const char *uplo, const char *diag, int *n, float *a, int *lda, int *info, int len_uplo, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strtriK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring diag, jint n, jfloatArray a, jint offseta, jint lda, jobject info) {
   if (!strtri_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27946,7 +28060,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strtriK(JNIEnv *env, UNUSED jobjec
   __nlda = lda;
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
-  strtri_(__nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo);
+  strtri_(__nuplo, __ndiag, &__nn, __na ? __na + offseta : NULL, &__nlda, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
   if (!__failed) (*env)->SetIntField(env, info, intW_val_fieldID, __ninfo);
@@ -27955,7 +28069,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static void (*strtrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, int *info);
+static void (*strtrs_)(const char *uplo, const char *trans, const char *diag, int *n, int *nrhs, float *a, int *lda, float *b, int *ldb, int *info, int len_uplo, int len_trans, int len_diag);
 
 void Java_dev_ludovic_netlib_lapack_JNILAPACK_strtrsK(JNIEnv *env, UNUSED jobject obj, jstring uplo, jstring trans, jstring diag, jint n, jint nrhs, jfloatArray a, jint offseta, jint lda, jfloatArray b, jint offsetb, jint ldb, jobject info) {
   if (!strtrs_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -27980,7 +28094,7 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_strtrsK(JNIEnv *env, UNUSED jobjec
   __ninfo = (*env)->GetIntField(env, info, intW_val_fieldID);
   if (a) { if (!(__na = (*env)->GetPrimitiveArrayCritical(env, a, NULL))) { __failed = TRUE; goto done; } }
   if (b) { if (!(__nb = (*env)->GetPrimitiveArrayCritical(env, b, NULL))) { __failed = TRUE; goto done; } }
-  strtrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo);
+  strtrs_(__nuplo, __ntrans, __ndiag, &__nn, &__nnrhs, __na ? __na + offseta : NULL, &__nlda, __nb ? __nb + offsetb : NULL, &__nldb, &__ninfo, (*env)->GetStringUTFLength(env, uplo), (*env)->GetStringUTFLength(env, trans), (*env)->GetStringUTFLength(env, diag));
 done:
   if (__nb) (*env)->ReleasePrimitiveArrayCritical(env, b, __nb, __failed ? JNI_ABORT : 0);
   if (__na) (*env)->ReleasePrimitiveArrayCritical(env, a, __na, __failed ? JNI_ABORT : 0);
@@ -28046,7 +28160,7 @@ done:
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
 }
 
-static double (*dlamch_)(const char *cmach);
+static double (*dlamch_)(const char *cmach, int len_cmach);
 
 jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlamchK(JNIEnv *env, UNUSED jobject obj, jstring cmach) {
   if (!dlamch_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -28054,7 +28168,7 @@ jdouble Java_dev_ludovic_netlib_lapack_JNILAPACK_dlamchK(JNIEnv *env, UNUSED job
   jboolean __failed = FALSE;
   const char *__ncmach = NULL;
   if (!(__ncmach = (*env)->GetStringUTFChars(env, cmach, NULL))) { __failed = TRUE; goto done; }
-  __ret = dlamch_(__ncmach);
+  __ret = dlamch_(__ncmach, (*env)->GetStringUTFLength(env, cmach));
 done:
   if (__ncmach) (*env)->ReleaseStringUTFChars(env, cmach, __ncmach);
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
@@ -28113,7 +28227,7 @@ done:
   return __ret;
 }
 
-static int (*lsame_)(const char *ca, const char *cb);
+static int (*lsame_)(const char *ca, const char *cb, int len_ca, int len_cb);
 
 jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_lsameK(JNIEnv *env, UNUSED jobject obj, jstring ca, jstring cb) {
   if (!lsame_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -28123,7 +28237,7 @@ jboolean Java_dev_ludovic_netlib_lapack_JNILAPACK_lsameK(JNIEnv *env, UNUSED job
   const char *__ncb = NULL;
   if (!(__nca = (*env)->GetStringUTFChars(env, ca, NULL))) { __failed = TRUE; goto done; }
   if (!(__ncb = (*env)->GetStringUTFChars(env, cb, NULL))) { __failed = TRUE; goto done; }
-  __ret = lsame_(__nca, __ncb);
+  __ret = lsame_(__nca, __ncb, (*env)->GetStringUTFLength(env, ca), (*env)->GetStringUTFLength(env, cb));
 done:
   if (__ncb) (*env)->ReleaseStringUTFChars(env, cb, __ncb);
   if (__nca) (*env)->ReleaseStringUTFChars(env, ca, __nca);
@@ -28131,7 +28245,11 @@ done:
   return __ret;
 }
 
+#ifdef __APPLE__
+static double (*second_)();
+#else
 static float (*second_)();
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_secondK(JNIEnv *env, UNUSED jobject obj) {
   if (!second_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -28143,7 +28261,11 @@ done:
   return __ret;
 }
 
-static float (*slamch_)(const char *cmach);
+#ifdef __APPLE__
+static double (*slamch_)(const char *cmach, int len_cmach);
+#else
+static float (*slamch_)(const char *cmach, int len_cmach);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slamchK(JNIEnv *env, UNUSED jobject obj, jstring cmach) {
   if (!slamch_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -28151,7 +28273,7 @@ jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slamchK(JNIEnv *env, UNUSED jobj
   jboolean __failed = FALSE;
   const char *__ncmach = NULL;
   if (!(__ncmach = (*env)->GetStringUTFChars(env, cmach, NULL))) { __failed = TRUE; goto done; }
-  __ret = slamch_(__ncmach);
+  __ret = slamch_(__ncmach, (*env)->GetStringUTFLength(env, cmach));
 done:
   if (__ncmach) (*env)->ReleaseStringUTFChars(env, cmach, __ncmach);
   if (__failed) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/OutOfMemoryError"), "Failed to copy from heap to native memory");
@@ -28170,7 +28292,11 @@ void Java_dev_ludovic_netlib_lapack_JNILAPACK_slamc2K(JNIEnv *env, UNUSED jobjec
   (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "not implemented");
 }
 
+#ifdef __APPLE__
+static double (*slamc3_)(float *a, float *b);
+#else
 static float (*slamc3_)(float *a, float *b);
+#endif
 
 jfloat Java_dev_ludovic_netlib_lapack_JNILAPACK_slamc3K(JNIEnv *env, UNUSED jobject obj, jfloat a, jfloat b) {
   if (!slamc3_) (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/UnsupportedOperationException"), "symbol isn't available in native library");
@@ -28211,9 +28337,9 @@ jboolean get_system_property(JNIEnv *env, jstring key, jstring def, jstring *res
   return TRUE;
 }
 
-jboolean load_symbols(void) {
+jboolean load_symbols(void *libhandle) {
 #define LOAD_SYMBOL(name) \
-  name = dlsym(RTLD_DEFAULT, #name);
+  name = dlsym(libhandle, #name);
 
   LOAD_SYMBOL(dbdsdc_);
   LOAD_SYMBOL(dbdsqr_);
@@ -29038,13 +29164,13 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
     return -1;
   }
 
-  libhandle = dlopen(name, RTLD_LAZY | RTLD_GLOBAL);
+  libhandle = dlopen(name, RTLD_LAZY | RTLD_LOCAL);
   if (!libhandle) {
     fprintf(stderr, "netlib-lapack: JNI_OnLoad: dlopen(%s) failed: %s\n", name, dlerror());
     return -1;
   }
 
-  if (!load_symbols()) {
+  if (!load_symbols(libhandle)) {
     fprintf(stderr, "netlib-lapack: JNI_OnLoad: load_symbols failed\n");
     return -1;
   }

@@ -29,12 +29,55 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DpbtrsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create a banded positive definite matrix with 2 superdiagonals
+        int kd = 2;
+        int ldab = kd + 1;
+        double[] ab_expected = new double[ldab * N];
+        double[] ab_actual = new double[ldab * N];
+
+        // Fill banded storage for positive definite matrix
+        for (int j = 0; j < N; j++) {
+            for (int i = Math.max(0, j - kd); i <= j; i++) {
+                int row = kd + i - j;
+                double value = (i == j) ? (N + 1.0) : (1.0 / (i + j + 2.0));
+                ab_expected[row + j * ldab] = value;
+                ab_actual[row + j * ldab] = value;
+            }
+        }
+
+        // First, factor using dpbtrf
+        intW info = new intW(0);
+        f2j.dpbtrf("U", N, kd, ab_expected, 0, ldab, info);
+        assertEquals(0, info.val, "Reference factorization should succeed");
+
+        info.val = 0;
+        lapack.dpbtrf("U", N, kd, ab_actual, 0, ldab, info);
+        assertEquals(0, info.val, "Factorization should succeed");
+
+        // Create right-hand side B
+        double[] b_expected = generateDoubleArray(N, 1.0);
+        double[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        info.val = 0;
+        f2j.dpbtrs("U", N, kd, 1, ab_expected, 0, ldab, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.dpbtrs("U", N, kd, 1, ab_actual, 0, ldab, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(b_expected, b_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(b_expected))));
     }
 }

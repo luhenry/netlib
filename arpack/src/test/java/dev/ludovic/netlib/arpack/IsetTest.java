@@ -30,11 +30,33 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class IsetTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int[] expected, actual;
+
+        // Test setting array to value 0 with increment 1
+        f2j.iset(N, 0, expected = intArray1.clone(), 1);
+        arpack.iset(N, 0, actual = intArray1.clone(), 1);
+        assertArrayEquals(expected, actual);
+
+        // Test setting array to value 42 with increment 1
+        f2j.iset(N, 42, expected = intArray2.clone(), 1);
+        arpack.iset(N, 42, actual = intArray2.clone(), 1);
+        assertArrayEquals(expected, actual);
+
+        // Test setting array to value -5 with increment 1
+        f2j.iset(N, -5, expected = intArray3.clone(), 1);
+        arpack.iset(N, -5, actual = intArray3.clone(), 1);
+        assertArrayEquals(expected, actual);
+
+        // Test with increment 2 (every other element)
+        f2j.iset(N / 2, 99, expected = intArray1.clone(), 2);
+        arpack.iset(N / 2, 99, actual = intArray1.clone(), 2);
+        assertArrayEquals(expected, actual);
     }
 }

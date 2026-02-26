@@ -30,11 +30,41 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlantpTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Packed triangular matrix (upper triangular storage)
+        float[] ap = new float[(N * (N + 1)) / 2];
+        int idx = 0;
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[idx++] = sMatrix[i + j * N];
+            }
+        }
+        float[] work = new float[N];
+
+        // Test 1-norm (upper, non-unit diagonal)
+        float expected = f2j.slantp("1", "U", "N", N, ap, 0, work, 0);
+        float actual = lapack.slantp("1", "U", "N", N, ap, 0, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Inf-norm
+        expected = f2j.slantp("I", "U", "N", N, ap, 0, work, 0);
+        actual = lapack.slantp("I", "U", "N", N, ap, 0, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Frobenius norm (unit diagonal)
+        expected = f2j.slantp("F", "U", "U", N, ap, 0, work, 0);
+        actual = lapack.slantp("F", "U", "U", N, ap, 0, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Max norm
+        expected = f2j.slantp("M", "U", "N", N, ap, 0, work, 0);
+        actual = lapack.slantp("M", "U", "N", N, ap, 0, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
     }
 }

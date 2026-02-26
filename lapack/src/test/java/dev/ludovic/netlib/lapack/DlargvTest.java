@@ -30,11 +30,28 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlargvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 10;
+        double[] x_expected = generateDoubleArray(n, 1.0);
+        double[] y_expected = generateDoubleArray(n, 2.0);
+        double[] c_expected = new double[n];
+        double[] s_expected = new double[n];
+        f2j.dlargv(n, x_expected, 0, 1, y_expected, 0, 1, c_expected, 0, 1);
+
+        double[] x_actual = generateDoubleArray(n, 1.0);
+        double[] y_actual = generateDoubleArray(n, 2.0);
+        double[] c_actual = new double[n];
+        double[] s_actual = new double[n];
+        lapack.dlargv(n, x_actual, 0, 1, y_actual, 0, 1, c_actual, 0, 1);
+
+        assertArrayEquals(x_expected, x_actual, depsilon);
+        assertArrayEquals(c_expected, c_actual, depsilon);
+        assertArrayEquals(s_expected, s_actual, depsilon);
     }
 }
