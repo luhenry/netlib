@@ -96,4 +96,36 @@ public class StpmvTest extends BLASTest {
         blas.stpmv("L", "T", "U", M, sgeAL, sXcopy = sX.clone(), 1);
         assertArrayEquals(expected, sXcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sXcopy;
+
+        f2j.stpmv("U", "N", "N", M, sgeAU, expected = sX.clone(), -1);
+        blas.stpmv("U", "N", "N", M, sgeAU, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        f2j.stpmv("L", "N", "N", M, sgeAL, expected = sX.clone(), -1);
+        blas.stpmv("L", "N", "N", M, sgeAL, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        f2j.stpmv("U", "T", "N", M, sgeAU, expected = sX.clone(), -1);
+        blas.stpmv("U", "T", "N", M, sgeAU, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        f2j.stpmv("L", "T", "N", M, sgeAL, expected = sX.clone(), -1);
+        blas.stpmv("L", "T", "N", M, sgeAL, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.stpmv("X", "N", "N", M, sgeAU, sX.clone(), 1); }); // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> { blas.stpmv("U", "X", "N", M, sgeAU, sX.clone(), 1); }); // invalid trans
+        assertThrows(IllegalArgumentException.class, () -> { blas.stpmv("U", "N", "X", M, sgeAU, sX.clone(), 1); }); // invalid diag
+        assertThrows(IllegalArgumentException.class, () -> { blas.stpmv("U", "N", "N", -1, sgeAU, sX.clone(), 1); }); // negative n
+        assertThrows(IllegalArgumentException.class, () -> { blas.stpmv("U", "N", "N", M, sgeAU, sX.clone(), 0); }); // incx == 0
+    }
 }

@@ -183,4 +183,41 @@ public class DtrmmTest extends BLASTest {
         blas.dtrmm("L", "U", "N", "N", M, N, -1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
         assertArrayEquals(expected, dgeBcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        // invalid side
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dtrmm("X", "U", "N", "N", M, N, 1.0, dsyA, M, dgeB.clone(), M);
+        });
+        // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dtrmm("L", "X", "N", "N", M, N, 1.0, dsyA, M, dgeB.clone(), M);
+        });
+        // invalid transa
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dtrmm("L", "U", "X", "N", M, N, 1.0, dsyA, M, dgeB.clone(), M);
+        });
+        // invalid diag
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dtrmm("L", "U", "N", "X", M, N, 1.0, dsyA, M, dgeB.clone(), M);
+        });
+        // negative m
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dtrmm("L", "U", "N", "N", -1, N, 1.0, dsyA, M, dgeB.clone(), M);
+        });
+        // negative n
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dtrmm("L", "U", "N", "N", M, -1, 1.0, dsyA, M, dgeB.clone(), M);
+        });
+        // lda too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dtrmm("L", "U", "N", "N", M, N, 1.0, dsyA, M - 1, dgeB.clone(), M);
+        });
+        // ldb too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dtrmm("L", "U", "N", "N", M, N, 1.0, dsyA, M, dgeB.clone(), M - 1);
+        });
+    }
 }

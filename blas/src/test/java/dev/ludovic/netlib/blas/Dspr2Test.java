@@ -62,4 +62,58 @@ public class Dspr2Test extends BLASTest {
         blas.dspr2("L", M, 0.0, dX, 1, dY, 1, dgeAcopy = dgeAL.clone());
         assertArrayEquals(expected, dgeAcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        double[] expected, dgeAcopy;
+        int smallN = M / 2;
+
+        f2j.dspr2("U", smallN, 2.0, dX, 2, dY, 2, expected = dgeAU.clone());
+        blas.dspr2("U", smallN, 2.0, dX, 2, dY, 2, dgeAcopy = dgeAU.clone());
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+
+        f2j.dspr2("L", smallN, 2.0, dX, 2, dY, 2, expected = dgeAL.clone());
+        blas.dspr2("L", smallN, 2.0, dX, 2, dY, 2, dgeAcopy = dgeAL.clone());
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dgeAcopy;
+
+        f2j.dspr2("U", M, 2.0, dX, -1, dY, -1, expected = dgeAU.clone());
+        blas.dspr2("U", M, 2.0, dX, -1, dY, -1, dgeAcopy = dgeAU.clone());
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+
+        f2j.dspr2("L", M, 2.0, dX, -1, dY, -1, expected = dgeAL.clone());
+        blas.dspr2("L", M, 2.0, dX, -1, dY, -1, dgeAcopy = dgeAL.clone());
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+
+        f2j.dspr2("U", M, 2.0, dX, -1, dY, 1, expected = dgeAU.clone());
+        blas.dspr2("U", M, 2.0, dX, -1, dY, 1, dgeAcopy = dgeAU.clone());
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidUplo(BLAS blas) {
+        // invalid uplo
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dspr2("X", M, 2.0, dX, 1, dY, 1, dgeAU.clone());
+        });
+        // negative n
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dspr2("U", -1, 2.0, dX, 1, dY, 1, dgeAU.clone());
+        });
+        // incx == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dspr2("U", M, 2.0, dX, 0, dY, 1, dgeAU.clone());
+        });
+        // incy == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dspr2("U", M, 2.0, dX, 1, dY, 0, dgeAU.clone());
+        });
+    }
 }

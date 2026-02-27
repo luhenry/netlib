@@ -39,4 +39,30 @@ public class SdsdotTest extends BLASTest {
     void testSanity(BLAS blas) {
         assertEquals(f2j.sdsdot(M, 3.0f, sX, 1, sY, 1), blas.sdsdot(M, 3.0f, sX, 1, sY, 1));
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        int n = M / 2;
+        assertEquals(f2j.sdsdot(n, 3.0f, sX, 2, sY, 2), blas.sdsdot(n, 3.0f, sX, 2, sY, 2));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        assertEquals(f2j.sdsdot(M, 3.0f, sX, -1, sY, -1), blas.sdsdot(M, 3.0f, sX, -1, sY, -1));
+
+        assertEquals(f2j.sdsdot(M, 3.0f, sX, -1, sY, 1), blas.sdsdot(M, 3.0f, sX, -1, sY, 1));
+
+        int n = M / 2;
+        assertEquals(f2j.sdsdot(n, 3.0f, sX, -2, sY, -2), blas.sdsdot(n, 3.0f, sX, -2, sY, -2));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.sdsdot(M + 1, 3.0f, sX, 1, sY, 1);
+        });
+    }
 }

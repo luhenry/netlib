@@ -96,4 +96,38 @@ public class StbmvTest extends BLASTest {
         blas.stbmv("L", "T", "U", M, KU, stbAL, KU + 1, sXcopy = sX.clone(), 1);
         assertArrayEquals(expected, sXcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sXcopy;
+
+        f2j.stbmv("U", "N", "N", M, KU, stbAU, KU + 1, expected = sX.clone(), -1);
+        blas.stbmv("U", "N", "N", M, KU, stbAU, KU + 1, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        f2j.stbmv("L", "N", "N", M, KU, stbAL, KU + 1, expected = sX.clone(), -1);
+        blas.stbmv("L", "N", "N", M, KU, stbAL, KU + 1, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        f2j.stbmv("U", "T", "N", M, KU, stbAU, KU + 1, expected = sX.clone(), -1);
+        blas.stbmv("U", "T", "N", M, KU, stbAU, KU + 1, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        f2j.stbmv("L", "T", "N", M, KU, stbAL, KU + 1, expected = sX.clone(), -1);
+        blas.stbmv("L", "T", "N", M, KU, stbAL, KU + 1, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.stbmv("X", "N", "N", M, KU, stbAU, KU + 1, sX.clone(), 1); }); // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> { blas.stbmv("U", "X", "N", M, KU, stbAU, KU + 1, sX.clone(), 1); }); // invalid trans
+        assertThrows(IllegalArgumentException.class, () -> { blas.stbmv("U", "N", "X", M, KU, stbAU, KU + 1, sX.clone(), 1); }); // invalid diag
+        assertThrows(IllegalArgumentException.class, () -> { blas.stbmv("U", "N", "N", -1, KU, stbAU, KU + 1, sX.clone(), 1); }); // negative n
+        assertThrows(IllegalArgumentException.class, () -> { blas.stbmv("U", "N", "N", M, -1, stbAU, KU + 1, sX.clone(), 1); }); // negative k
+        assertThrows(IllegalArgumentException.class, () -> { blas.stbmv("U", "N", "N", M, KU, stbAU, KU, sX.clone(), 1); }); // lda too small
+        assertThrows(IllegalArgumentException.class, () -> { blas.stbmv("U", "N", "N", M, KU, stbAU, KU + 1, sX.clone(), 0); }); // incx == 0
+    }
 }

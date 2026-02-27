@@ -51,4 +51,77 @@ public class DaxpyTest extends BLASTest {
         blas.daxpy(M, -1.0, dX, 1, dYcopy = dY.clone(), 1);
         assertArrayEquals(expected, dYcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        double[] expected, dYcopy;
+        int n = M / 2;
+
+        f2j.daxpy(n, 2.0, dX, 2, expected = dY.clone(), 2);
+        blas.daxpy(n, 2.0, dX, 2, dYcopy = dY.clone(), 2);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dYcopy;
+
+        // incx=-1, incy=-1
+        f2j.daxpy(M, 2.0, dX, -1, expected = dY.clone(), -1);
+        blas.daxpy(M, 2.0, dX, -1, dYcopy = dY.clone(), -1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // incx=-1, incy=1 (mixed)
+        f2j.daxpy(M, 2.0, dX, -1, expected = dY.clone(), 1);
+        blas.daxpy(M, 2.0, dX, -1, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // non-unit negative stride
+        int n = M / 2;
+        f2j.daxpy(n, 2.0, dX, -2, expected = dY.clone(), -2);
+        blas.daxpy(n, 2.0, dX, -2, dYcopy = dY.clone(), -2);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroN(BLAS blas) {
+        double[] expected = dY.clone();
+        double[] dYcopy = dY.clone();
+
+        blas.daxpy(0, 2.0, dX, 1, dYcopy, 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset(BLAS blas) {
+        double[] expected, dYcopy;
+        int n = M / 2;
+
+        f2j.daxpy(n, 2.0, dX, 2, 1, expected = dY.clone(), 3, 1);
+        blas.daxpy(n, 2.0, dX, 2, 1, dYcopy = dY.clone(), 3, 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.daxpy(M + 1, 2.0, dX, 1, dY.clone(), 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.daxpy(M, 2.0, null, 1, dY.clone(), 1);
+        });
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.daxpy(M, 2.0, dX, 1, null, 1);
+        });
+    }
 }

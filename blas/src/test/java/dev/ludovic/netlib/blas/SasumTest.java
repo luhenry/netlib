@@ -39,4 +39,39 @@ public class SasumTest extends BLASTest {
     void testSanity(BLAS blas) {
         assertEquals(f2j.sasum(M, sX, 1), blas.sasum(M, sX, 1), sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        int n = M / 2;
+        assertEquals(f2j.sasum(n, sX, 2), blas.sasum(n, sX, 2), sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroN(BLAS blas) {
+        assertEquals(0.0f, blas.sasum(0, sX, 1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testSingleElement(BLAS blas) {
+        assertEquals(f2j.sasum(1, sX, 1), blas.sasum(1, sX, 1), sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.sasum(M + 1, sX, 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.sasum(M, null, 1);
+        });
+    }
 }

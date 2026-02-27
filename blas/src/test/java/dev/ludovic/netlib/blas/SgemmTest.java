@@ -186,6 +186,88 @@ public class SgemmTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaZero(BLAS blas) {
+        float[] expected, sgeCcopy;
+
+        f2j.sgemm("N", "N", M, N, K, 0.0f, sgeA, M, sgeB, K, 0.0f, expected = sgeC.clone(), M);
+        blas.sgemm("N", "N", M, N, K, 0.0f, sgeA, M, sgeB, K, 0.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testSmallDimensions(BLAS blas) {
+        float[] expected, sgeCcopy;
+        int sm = 10, sn = 10, sk = 10;
+
+        f2j.sgemm("N", "N", sm, sn, sk, 1.0f, sgeA, M, sgeB, K, 2.0f, expected = sgeC.clone(), M);
+        blas.sgemm("N", "N", sm, sn, sk, 1.0f, sgeA, M, sgeB, K, 2.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
+
+        f2j.sgemm("N", "T", sm, sn, sk, 1.0f, sgeA, M, sgeBT, N, 2.0f, expected = sgeC.clone(), M);
+        blas.sgemm("N", "T", sm, sn, sk, 1.0f, sgeA, M, sgeBT, N, 2.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
+
+        f2j.sgemm("T", "N", sm, sn, sk, 1.0f, sgeAT, K, sgeB, K, 2.0f, expected = sgeC.clone(), M);
+        blas.sgemm("T", "N", sm, sn, sk, 1.0f, sgeAT, K, sgeB, K, 2.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
+
+        f2j.sgemm("T", "T", sm, sn, sk, 1.0f, sgeAT, K, sgeBT, N, 2.0f, expected = sgeC.clone(), M);
+        blas.sgemm("T", "T", sm, sn, sk, 1.0f, sgeAT, K, sgeBT, N, 2.0f, sgeCcopy = sgeC.clone(), M);
+        assertArrayEquals(expected, sgeCcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaScaling(BLAS blas) {
+        float[] expected, sgeCcopy;
+
+        f2j.sgemm("N", "N", M, N, K, 2.0f, sgeA, M, sgeB, K, 1.0f, expected = sgeC.clone(), M);
+        blas.sgemm("N", "N", M, N, K, 2.0f, sgeA, M, sgeB, K, 1.0f, sgeCcopy = sgeC.clone(), M);
+        assertRelArrayEquals(expected, sgeCcopy, sepsilon);
+
+        f2j.sgemm("T", "T", M, N, K, -1.0f, sgeAT, K, sgeBT, N, 1.0f, expected = sgeC.clone(), M);
+        blas.sgemm("T", "T", M, N, K, -1.0f, sgeAT, K, sgeBT, N, 1.0f, sgeCcopy = sgeC.clone(), M);
+        assertRelArrayEquals(expected, sgeCcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidTrans(BLAS blas) {
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgemm("X", "N", M, N, K, 1.0f, sgeA, M, sgeB, K, 2.0f, sgeC.clone(), M);
+        });
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgemm("N", "X", M, N, K, 1.0f, sgeA, M, sgeB, K, 2.0f, sgeC.clone(), M);
+        });
+        // negative m
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.sgemm("N", "N", -1, N, K, 1.0f, sgeA, M, sgeB, K, 1.0f, sgeC.clone(), M);
+        });
+        // negative n
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.sgemm("N", "N", M, -1, K, 1.0f, sgeA, M, sgeB, K, 1.0f, sgeC.clone(), M);
+        });
+        // negative k
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.sgemm("N", "N", M, N, -1, 1.0f, sgeA, M, sgeB, K, 1.0f, sgeC.clone(), M);
+        });
+        // lda too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.sgemm("N", "N", M, N, K, 1.0f, sgeA, M - 1, sgeB, K, 1.0f, sgeC.clone(), M);
+        });
+        // ldb too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.sgemm("N", "N", M, N, K, 1.0f, sgeA, M, sgeB, K - 1, 1.0f, sgeC.clone(), M);
+        });
+        // ldc too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.sgemm("N", "N", M, N, K, 1.0f, sgeA, M, sgeB, K, 1.0f, sgeC.clone(), M - 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
     void testOffset1BoundsChecking(BLAS blas) {
         // Test case that reproduces the original bounds checking issue for sgemm
         // Matrix A (2x3) with offset=1, stored in array of length 9

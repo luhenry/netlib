@@ -98,6 +98,80 @@ public class SgemvTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        float[] expected, sYcopy;
+        int smallDim = M / 2;
+
+        // trans=N, incx=2, incy=2
+        f2j.sgemv("N", smallDim, smallDim, 1.0f, sgeA, M, sX, 2, 1.0f, expected = sY.clone(), 2);
+        blas.sgemv("N", smallDim, smallDim, 1.0f, sgeA, M, sX, 2, 1.0f, sYcopy = sY.clone(), 2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans=T, incx=2, incy=2
+        f2j.sgemv("T", smallDim, smallDim, 1.0f, sgeA, M, sX, 2, 1.0f, expected = sY.clone(), 2);
+        blas.sgemv("T", smallDim, smallDim, 1.0f, sgeA, M, sX, 2, 1.0f, sYcopy = sY.clone(), 2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sYcopy;
+
+        // trans="N", incx=-1, incy=-1
+        f2j.sgemv("N", M, N, 2.0f, sgeA, M, sX, -1, 2.0f, expected = sY.clone(), -1);
+        blas.sgemv("N", M, N, 2.0f, sgeA, M, sX, -1, 2.0f, sYcopy = sY.clone(), -1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans="N", incx=-1, incy=1 (mixed)
+        f2j.sgemv("N", M, N, 2.0f, sgeA, M, sX, -1, 2.0f, expected = sY.clone(), 1);
+        blas.sgemv("N", M, N, 2.0f, sgeA, M, sX, -1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // trans="T", incx=-1, incy=-1
+        f2j.sgemv("T", M, N, 2.0f, sgeA, M, sX, -1, 2.0f, expected = sY.clone(), -1);
+        blas.sgemv("T", M, N, 2.0f, sgeA, M, sX, -1, 2.0f, sYcopy = sY.clone(), -1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidTrans(BLAS blas) {
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgemv("X", M, N, 1.0f, sgeA, M, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // negative m
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgemv("N", -1, N, 1.0f, sgeA, M, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // negative n
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgemv("N", M, -1, 1.0f, sgeA, M, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // lda too small
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgemv("N", M, N, 1.0f, sgeA, M - 1, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // incx == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgemv("N", M, N, 1.0f, sgeA, M, sX, 0, 1.0f, sY.clone(), 1);
+        });
+        // incy == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 1.0f, sY.clone(), 0);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.sgemv("N", M, N, 1.0f, sgeA, M, sX, 1, 1.0f, new float[M - 1], 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
     void testOffset1BoundsChecking(BLAS blas) {
         // Test case that reproduces the original bounds checking issue for sgemv
         // Matrix A (2x3) with offset=1, stored in array of length 9

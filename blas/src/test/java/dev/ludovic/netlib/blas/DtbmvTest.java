@@ -96,4 +96,38 @@ public class DtbmvTest extends BLASTest {
         blas.dtbmv("L", "T", "U", M, KU, dtbAL, KU + 1, dXcopy = dX.clone(), 1);
         assertArrayEquals(expected, dXcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dXcopy;
+
+        f2j.dtbmv("U", "N", "N", M, KU, dtbAU, KU + 1, expected = dX.clone(), -1);
+        blas.dtbmv("U", "N", "N", M, KU, dtbAU, KU + 1, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        f2j.dtbmv("L", "N", "N", M, KU, dtbAL, KU + 1, expected = dX.clone(), -1);
+        blas.dtbmv("L", "N", "N", M, KU, dtbAL, KU + 1, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        f2j.dtbmv("U", "T", "N", M, KU, dtbAU, KU + 1, expected = dX.clone(), -1);
+        blas.dtbmv("U", "T", "N", M, KU, dtbAU, KU + 1, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        f2j.dtbmv("L", "T", "N", M, KU, dtbAL, KU + 1, expected = dX.clone(), -1);
+        blas.dtbmv("L", "T", "N", M, KU, dtbAL, KU + 1, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbmv("X", "N", "N", M, KU, dtbAU, KU + 1, dX.clone(), 1); }); // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbmv("U", "X", "N", M, KU, dtbAU, KU + 1, dX.clone(), 1); }); // invalid trans
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbmv("U", "N", "X", M, KU, dtbAU, KU + 1, dX.clone(), 1); }); // invalid diag
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbmv("U", "N", "N", -1, KU, dtbAU, KU + 1, dX.clone(), 1); }); // negative n
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbmv("U", "N", "N", M, -1, dtbAU, KU + 1, dX.clone(), 1); }); // negative k
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbmv("U", "N", "N", M, KU, dtbAU, KU, dX.clone(), 1); }); // lda too small
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbmv("U", "N", "N", M, KU, dtbAU, KU + 1, dX.clone(), 0); }); // incx == 0
+    }
 }

@@ -161,5 +161,43 @@ public class DtrsmTest extends BLASTest {
         f2j.dtrsm("L", "U", "N", "N", M, N, -1.0, dsyA, M, expected = dgeB.clone(), M);
         blas.dtrsm("L", "U", "N", "N", M, N, -1.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
         assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // alpha=2.0: side=R, uplo=U, transa=N, diag=N
+        f2j.dtrsm("R", "U", "N", "N", M, N, 2.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "U", "N", "N", M, N, 2.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+
+        // alpha=2.0: side=R, uplo=L, transa=N, diag=N
+        f2j.dtrsm("R", "L", "N", "N", M, N, 2.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "L", "N", "N", M, N, 2.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertRelArrayEquals(expected, dgeBcopy, dsolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZero(BLAS blas) {
+        double[] expected, dgeBcopy;
+
+        // alpha=0 should zero out B
+        f2j.dtrsm("L", "U", "N", "N", M, N, 0.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("L", "U", "N", "N", M, N, 0.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertArrayEquals(expected, dgeBcopy, depsilon);
+
+        f2j.dtrsm("R", "L", "T", "U", M, N, 0.0, dsyA, M, expected = dgeB.clone(), M);
+        blas.dtrsm("R", "L", "T", "U", M, N, 0.0, dsyA, M, dgeBcopy = dgeB.clone(), M);
+        assertArrayEquals(expected, dgeBcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsm("X", "U", "N", "N", M, N, 1.0, dsyA, M, dgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsm("L", "X", "N", "N", M, N, 1.0, dsyA, M, dgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsm("L", "U", "X", "N", M, N, 1.0, dsyA, M, dgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsm("L", "U", "N", "X", M, N, 1.0, dsyA, M, dgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsm("L", "U", "N", "N", -1, N, 1.0, dsyA, M, dgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsm("L", "U", "N", "N", M, -1, 1.0, dsyA, M, dgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsm("L", "U", "N", "N", M, N, 1.0, dsyA, M - 1, dgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsm("L", "U", "N", "N", M, N, 1.0, dsyA, M, dgeB.clone(), M - 1); });
     }
 }

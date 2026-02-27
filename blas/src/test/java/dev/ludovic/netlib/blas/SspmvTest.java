@@ -63,4 +63,68 @@ public class SspmvTest extends BLASTest {
         blas.sspmv("L", M, 0.0f, sgeAL, sX, 1, 2.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        float[] expected, sYcopy;
+        int smallN = M / 2;
+
+        f2j.sspmv("U", smallN, 2.0f, sgeAU, sX, 2, 1.0f, expected = sY.clone(), 2);
+        blas.sspmv("U", smallN, 2.0f, sgeAU, sX, 2, 1.0f, sYcopy = sY.clone(), 2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sspmv("L", smallN, 2.0f, sgeAL, sX, 2, 1.0f, expected = sY.clone(), 2);
+        blas.sspmv("L", smallN, 2.0f, sgeAL, sX, 2, 1.0f, sYcopy = sY.clone(), 2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaZero(BLAS blas) {
+        float[] expected, sYcopy;
+
+        f2j.sspmv("U", M, 0.0f, sgeAU, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.sspmv("U", M, 0.0f, sgeAU, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sYcopy;
+
+        f2j.sspmv("U", M, 2.0f, sgeAU, sX, -1, 2.0f, expected = sY.clone(), -1);
+        blas.sspmv("U", M, 2.0f, sgeAU, sX, -1, 2.0f, sYcopy = sY.clone(), -1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sspmv("L", M, 2.0f, sgeAL, sX, -1, 2.0f, expected = sY.clone(), -1);
+        blas.sspmv("L", M, 2.0f, sgeAL, sX, -1, 2.0f, sYcopy = sY.clone(), -1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sspmv("U", M, 2.0f, sgeAU, sX, -1, 2.0f, expected = sY.clone(), 1);
+        blas.sspmv("U", M, 2.0f, sgeAU, sX, -1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidUplo(BLAS blas) {
+        // invalid uplo
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sspmv("X", M, 2.0f, sgeAU, sX, 1, 2.0f, sY.clone(), 1);
+        });
+        // negative n
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sspmv("U", -1, 2.0f, sgeAU, sX, 1, 2.0f, sY.clone(), 1);
+        });
+        // incx == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sspmv("U", M, 2.0f, sgeAU, sX, 0, 2.0f, sY.clone(), 1);
+        });
+        // incy == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sspmv("U", M, 2.0f, sgeAU, sX, 1, 2.0f, sY.clone(), 0);
+        });
+    }
 }

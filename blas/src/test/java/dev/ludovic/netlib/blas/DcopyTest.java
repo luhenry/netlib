@@ -32,63 +32,95 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import static dev.ludovic.netlib.test.TestHelpers.*;
 
-public class SscalTest extends BLASTest {
+public class DcopyTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
-        float[] expected, sXcopy;
+        double[] expected = new double[M];
+        double[] actual = new double[M];
 
-        f2j.sscal(M, 2.0f, expected = sX.clone(), 1);
-        blas.sscal(M, 2.0f, sXcopy = sX.clone(), 1);
-        assertArrayEquals(expected, sXcopy, sepsilon);
-
-        f2j.sscal(M, 1.0f, expected = sX.clone(), 1);
-        blas.sscal(M, 1.0f, sXcopy = sX.clone(), 1);
-        assertArrayEquals(expected, sXcopy, sepsilon);
-
-        f2j.sscal(M, 0.0f, expected = sX.clone(), 1);
-        blas.sscal(M, 0.0f, sXcopy = sX.clone(), 1);
-        assertArrayEquals(expected, sXcopy, sepsilon);
+        f2j.dcopy(M, dX, 1, expected, 1);
+        blas.dcopy(M, dX, 1, actual, 1);
+        assertArrayEquals(expected, actual, depsilon);
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testNonUnitStride(BLAS blas) {
-        float[] expected, sXcopy;
         int n = M / 2;
+        double[] expected, actual;
 
-        f2j.sscal(n, 2.0f, expected = sX.clone(), 2);
-        blas.sscal(n, 2.0f, sXcopy = sX.clone(), 2);
-        assertArrayEquals(expected, sXcopy, sepsilon);
+        // incx=2, incy=2
+        expected = new double[M];
+        actual = new double[M];
+        f2j.dcopy(n, dX, 2, expected, 2);
+        blas.dcopy(n, dX, 2, actual, 2);
+        assertArrayEquals(expected, actual, depsilon);
+
+        // incx=1, incy=2
+        expected = new double[M];
+        actual = new double[M];
+        f2j.dcopy(n, dX, 1, expected, 2);
+        blas.dcopy(n, dX, 1, actual, 2);
+        assertArrayEquals(expected, actual, depsilon);
+
+        // incx=2, incy=1
+        expected = new double[M];
+        actual = new double[M];
+        f2j.dcopy(n, dX, 2, expected, 1);
+        blas.dcopy(n, dX, 2, actual, 1);
+        assertArrayEquals(expected, actual, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, actual;
+
+        // incx=-1, incy=-1
+        expected = new double[M];
+        actual = new double[M];
+        f2j.dcopy(M, dX, -1, expected, -1);
+        blas.dcopy(M, dX, -1, actual, -1);
+        assertArrayEquals(expected, actual, depsilon);
+
+        // incx=-1, incy=1 (mixed)
+        expected = new double[M];
+        actual = new double[M];
+        f2j.dcopy(M, dX, -1, expected, 1);
+        blas.dcopy(M, dX, -1, actual, 1);
+        assertArrayEquals(expected, actual, depsilon);
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testZeroN(BLAS blas) {
-        float[] expected = sX.clone();
-        float[] sXcopy = sX.clone();
+        double[] expected = dY.clone();
+        double[] actual = dY.clone();
 
-        blas.sscal(0, 2.0f, sXcopy, 1);
-        assertArrayEquals(expected, sXcopy, sepsilon);
+        f2j.dcopy(0, dX, 1, expected, 1);
+        blas.dcopy(0, dX, 1, actual, 1);
+        assertArrayEquals(expected, actual, depsilon);
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOffset(BLAS blas) {
-        float[] expected, sXcopy;
+        double[] expected = new double[M + 5];
+        double[] actual = new double[M + 5];
         int n = M / 2;
 
-        f2j.sscal(n, 2.0f, expected = sX.clone(), 5, 1);
-        blas.sscal(n, 2.0f, sXcopy = sX.clone(), 5, 1);
-        assertArrayEquals(expected, sXcopy, sepsilon);
+        f2j.dcopy(n, dX, 2, 1, expected, 3, 1);
+        blas.dcopy(n, dX, 2, 1, actual, 3, 1);
+        assertArrayEquals(expected, actual, depsilon);
     }
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
     void testOutOfBound(BLAS blas) {
         assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
-            blas.sscal(M + 1, 2.0f, sX.clone(), 1);
+            blas.dcopy(M + 1, dX, 1, new double[M], 1);
         });
     }
 
@@ -96,7 +128,10 @@ public class SscalTest extends BLASTest {
     @MethodSource("BLASImplementations")
     void testNullArray(BLAS blas) {
         assertThrows(java.lang.NullPointerException.class, () -> {
-            blas.sscal(M, 2.0f, null, 1);
+            blas.dcopy(M, null, 1, new double[M], 1);
+        });
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.dcopy(M, dX, 1, null, 1);
         });
     }
 }

@@ -40,4 +40,39 @@ public class Snrm2Test extends BLASTest {
         assertEquals(f2j.snrm2(M / 1, sX, 1), blas.snrm2(M / 1, sX, 1), sepsilon);
         assertEquals(f2j.snrm2(M / 2, sX, 2), blas.snrm2(M / 2, sX, 2), sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        int n = M / 3;
+        assertEquals(f2j.snrm2(n, sX, 3), blas.snrm2(n, sX, 3), sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroN(BLAS blas) {
+        assertEquals(0.0f, blas.snrm2(0, sX, 1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testSingleElement(BLAS blas) {
+        assertEquals(f2j.snrm2(1, sX, 1), blas.snrm2(1, sX, 1), sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.snrm2(M + 1, sX, 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.snrm2(M, null, 1);
+        });
+    }
 }

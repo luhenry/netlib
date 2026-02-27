@@ -101,4 +101,60 @@ public class Dsyr2kTest extends BLASTest {
         blas.dsyr2k("L", "T", M, K, 0.0, dgeAT, K, dgeBT, K, 2.0, dsyAcopy = dsyA.clone(), M);
         assertArrayEquals(expected, dsyAcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaZero(BLAS blas) {
+        double[] expected, dsyAcopy;
+
+        f2j.dsyr2k("U", "N", M, K, 0.0, dgeA, M, dgeB, M, 0.0, expected = dsyA.clone(), M);
+        blas.dsyr2k("U", "N", M, K, 0.0, dgeA, M, dgeB, M, 0.0, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaScaling(BLAS blas) {
+        double[] expected, dsyAcopy;
+
+        f2j.dsyr2k("U", "N", M, K, 2.0, dgeA, M, dgeB, M, 0.5, expected = dsyA.clone(), M);
+        blas.dsyr2k("U", "N", M, K, 2.0, dgeA, M, dgeB, M, 0.5, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2k("L", "T", M, K, 2.0, dgeAT, K, dgeBT, K, 0.5, expected = dsyA.clone(), M);
+        blas.dsyr2k("L", "T", M, K, 2.0, dgeAT, K, dgeBT, K, 0.5, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidUplo(BLAS blas) {
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dsyr2k("X", "N", M, K, 1.0, dgeA, M, dgeB, M, 2.0, dsyA.clone(), M);
+        });
+        // invalid trans
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2k("U", "X", N, K, 1.0, dgeA, M, dgeB, M, 1.0, dgeC.clone(), M);
+        });
+        // negative n
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2k("U", "N", -1, K, 1.0, dgeA, M, dgeB, M, 1.0, dgeC.clone(), M);
+        });
+        // negative k
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2k("U", "N", N, -1, 1.0, dgeA, M, dgeB, M, 1.0, dgeC.clone(), M);
+        });
+        // lda too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2k("U", "N", N, K, 1.0, dgeA, N - 1, dgeB, M, 1.0, dgeC.clone(), M);
+        });
+        // ldb too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2k("U", "N", N, K, 1.0, dgeA, M, dgeB, N - 1, 1.0, dgeC.clone(), M);
+        });
+        // ldc too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2k("U", "N", N, K, 1.0, dgeA, M, dgeB, M, 1.0, dgeC.clone(), N - 1);
+        });
+    }
 }

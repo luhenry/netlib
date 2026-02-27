@@ -51,4 +51,74 @@ public class SaxpyTest extends BLASTest {
         blas.saxpy(M, -1.0f, sX, 1, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        float[] expected, sYcopy;
+        int n = M / 2;
+
+        f2j.saxpy(n, 2.0f, sX, 2, expected = sY.clone(), 2);
+        blas.saxpy(n, 2.0f, sX, 2, sYcopy = sY.clone(), 2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sYcopy;
+
+        f2j.saxpy(M, 2.0f, sX, -1, expected = sY.clone(), -1);
+        blas.saxpy(M, 2.0f, sX, -1, sYcopy = sY.clone(), -1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.saxpy(M, 2.0f, sX, -1, expected = sY.clone(), 1);
+        blas.saxpy(M, 2.0f, sX, -1, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        int n = M / 2;
+        f2j.saxpy(n, 2.0f, sX, -2, expected = sY.clone(), -2);
+        blas.saxpy(n, 2.0f, sX, -2, sYcopy = sY.clone(), -2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroN(BLAS blas) {
+        float[] expected = sY.clone();
+        float[] sYcopy = sY.clone();
+
+        blas.saxpy(0, 2.0f, sX, 1, sYcopy, 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset(BLAS blas) {
+        float[] expected, sYcopy;
+        int n = M / 2;
+
+        f2j.saxpy(n, 2.0f, sX, 2, 1, expected = sY.clone(), 3, 1);
+        blas.saxpy(n, 2.0f, sX, 2, 1, sYcopy = sY.clone(), 3, 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.saxpy(M + 1, 2.0f, sX, 1, sY.clone(), 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.saxpy(M, 2.0f, null, 1, sY.clone(), 1);
+        });
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.saxpy(M, 2.0f, sX, 1, null, 1);
+        });
+    }
 }

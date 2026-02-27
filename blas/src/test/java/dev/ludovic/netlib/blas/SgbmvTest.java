@@ -117,4 +117,66 @@ public class SgbmvTest extends BLASTest {
         blas.sgbmv("T", smallDim, smallDim, KL, KU, 1.0f, sgbA, lda, sX, 2, 1.0f, sYcopy = sY.clone(), 2);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaZero(BLAS blas) {
+        float[] expected, sYcopy;
+        int lda = KL + KU + 1;
+
+        f2j.sgbmv("N", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.sgbmv("N", M, N, KL, KU, 0.0f, sgbA, lda, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sYcopy;
+
+        f2j.sgbmv("N", M, N, KL, KU, 2.0f, sgbA, KL + KU + 1, sX, -1, 2.0f, expected = sY.clone(), -1);
+        blas.sgbmv("N", M, N, KL, KU, 2.0f, sgbA, KL + KU + 1, sX, -1, 2.0f, sYcopy = sY.clone(), -1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.sgbmv("T", M, N, KL, KU, 2.0f, sgbA, KL + KU + 1, sX, -1, 2.0f, expected = sY.clone(), -1);
+        blas.sgbmv("T", M, N, KL, KU, 2.0f, sgbA, KL + KU + 1, sX, -1, 2.0f, sYcopy = sY.clone(), -1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidTrans(BLAS blas) {
+        int lda = KL + KU + 1;
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgbmv("X", M, N, KL, KU, 1.0f, sgbA, lda, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // negative m
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgbmv("N", -1, N, KL, KU, 1.0f, sgbA, KL + KU + 1, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // negative n
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgbmv("N", M, -1, KL, KU, 1.0f, sgbA, KL + KU + 1, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // negative kl
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgbmv("N", M, N, -1, KU, 1.0f, sgbA, KL + KU + 1, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // negative ku
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgbmv("N", M, N, KL, -1, 1.0f, sgbA, KL + KU + 1, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // lda too small
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, KL + KU, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // incx == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, KL + KU + 1, sX, 0, 1.0f, sY.clone(), 1);
+        });
+        // incy == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sgbmv("N", M, N, KL, KU, 1.0f, sgbA, KL + KU + 1, sX, 1, 1.0f, sY.clone(), 0);
+        });
+    }
 }

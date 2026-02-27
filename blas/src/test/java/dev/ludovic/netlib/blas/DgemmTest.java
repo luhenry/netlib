@@ -190,6 +190,90 @@ public class DgemmTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaZero(BLAS blas) {
+        double[] expected, dgeCcopy;
+
+        f2j.dgemm("N", "N", M, N, K, 0.0, dgeA, M, dgeB, K, 0.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "N", M, N, K, 0.0, dgeA, M, dgeB, K, 0.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testSmallDimensions(BLAS blas) {
+        // Small dimensions hit the non-blocking path (m*n*k < 100^3)
+        // in Java8BLAS.dgemmK, exercising dgemmNN/dgemmNT/dgemmTN/dgemmTT
+        double[] expected, dgeCcopy;
+        int sm = 10, sn = 10, sk = 10;
+
+        f2j.dgemm("N", "N", sm, sn, sk, 1.0, dgeA, M, dgeB, K, 2.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "N", sm, sn, sk, 1.0, dgeA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dgemm("N", "T", sm, sn, sk, 1.0, dgeA, M, dgeBT, N, 2.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "T", sm, sn, sk, 1.0, dgeA, M, dgeBT, N, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dgemm("T", "N", sm, sn, sk, 1.0, dgeAT, K, dgeB, K, 2.0, expected = dgeC.clone(), M);
+        blas.dgemm("T", "N", sm, sn, sk, 1.0, dgeAT, K, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dgemm("T", "T", sm, sn, sk, 1.0, dgeAT, K, dgeBT, N, 2.0, expected = dgeC.clone(), M);
+        blas.dgemm("T", "T", sm, sn, sk, 1.0, dgeAT, K, dgeBT, N, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaScaling(BLAS blas) {
+        double[] expected, dgeCcopy;
+
+        f2j.dgemm("N", "N", M, N, K, 2.0, dgeA, M, dgeB, K, 1.0, expected = dgeC.clone(), M);
+        blas.dgemm("N", "N", M, N, K, 2.0, dgeA, M, dgeB, K, 1.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dgemm("T", "T", M, N, K, -1.0, dgeAT, K, dgeBT, N, 1.0, expected = dgeC.clone(), M);
+        blas.dgemm("T", "T", M, N, K, -1.0, dgeAT, K, dgeBT, N, 1.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidTrans(BLAS blas) {
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dgemm("X", "N", M, N, K, 1.0, dgeA, M, dgeB, K, 2.0, dgeC.clone(), M);
+        });
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dgemm("N", "X", M, N, K, 1.0, dgeA, M, dgeB, K, 2.0, dgeC.clone(), M);
+        });
+        // negative m
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dgemm("N", "N", -1, N, K, 1.0, dgeA, M, dgeB, K, 1.0, dgeC.clone(), M);
+        });
+        // negative n
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dgemm("N", "N", M, -1, K, 1.0, dgeA, M, dgeB, K, 1.0, dgeC.clone(), M);
+        });
+        // negative k
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dgemm("N", "N", M, N, -1, 1.0, dgeA, M, dgeB, K, 1.0, dgeC.clone(), M);
+        });
+        // lda too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dgemm("N", "N", M, N, K, 1.0, dgeA, M - 1, dgeB, K, 1.0, dgeC.clone(), M);
+        });
+        // ldb too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dgemm("N", "N", M, N, K, 1.0, dgeA, M, dgeB, K - 1, 1.0, dgeC.clone(), M);
+        });
+        // ldc too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dgemm("N", "N", M, N, K, 1.0, dgeA, M, dgeB, K, 1.0, dgeC.clone(), M - 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
     void testOffset1BoundsChecking(BLAS blas) {
         // Test case that reproduces the original bounds checking issue
         // Matrix A (2x3) with offset=1, stored in array of length 9

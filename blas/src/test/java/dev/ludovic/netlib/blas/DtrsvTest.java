@@ -96,4 +96,37 @@ public class DtrsvTest extends BLASTest {
         blas.dtrsv("L", "T", "U", M, dsyA, M, dXcopy = dX.clone(), 1);
         assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dXcopy;
+
+        f2j.dtrsv("U", "N", "N", M, dsyA, M, expected = dX.clone(), -1);
+        blas.dtrsv("U", "N", "N", M, dsyA, M, dXcopy = dX.clone(), -1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        f2j.dtrsv("L", "N", "N", M, dsyA, M, expected = dX.clone(), -1);
+        blas.dtrsv("L", "N", "N", M, dsyA, M, dXcopy = dX.clone(), -1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        f2j.dtrsv("U", "T", "N", M, dsyA, M, expected = dX.clone(), -1);
+        blas.dtrsv("U", "T", "N", M, dsyA, M, dXcopy = dX.clone(), -1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        f2j.dtrsv("L", "T", "N", M, dsyA, M, expected = dX.clone(), -1);
+        blas.dtrsv("L", "T", "N", M, dsyA, M, dXcopy = dX.clone(), -1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsv("X", "N", "N", M, dsyA, M, dX.clone(), 1); }); // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsv("U", "X", "N", M, dsyA, M, dX.clone(), 1); }); // invalid trans
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsv("U", "N", "X", M, dsyA, M, dX.clone(), 1); }); // invalid diag
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsv("U", "N", "N", -1, dsyA, M, dX.clone(), 1); }); // negative n
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsv("U", "N", "N", M, dsyA, M - 1, dX.clone(), 1); }); // lda too small
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrsv("U", "N", "N", M, dsyA, M, dX.clone(), 0); }); // incx == 0
+    }
 }

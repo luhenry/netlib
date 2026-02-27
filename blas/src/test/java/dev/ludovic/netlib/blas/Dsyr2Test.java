@@ -77,4 +77,47 @@ public class Dsyr2Test extends BLASTest {
         blas.dsyr2("L", M, -1.0, dX, 1, dY, 1, dsyAcopy = dsyA.clone(), M);
         assertArrayEquals(expected, dsyAcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dsyAcopy;
+
+        f2j.dsyr2("U", M, 2.0, dX, -1, dY, -1, expected = dsyA.clone(), M);
+        blas.dsyr2("U", M, 2.0, dX, -1, dY, -1, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2("L", M, 2.0, dX, -1, dY, -1, expected = dsyA.clone(), M);
+        blas.dsyr2("L", M, 2.0, dX, -1, dY, -1, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr2("U", M, 2.0, dX, -1, dY, 1, expected = dsyA.clone(), M);
+        blas.dsyr2("U", M, 2.0, dX, -1, dY, 1, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2("X", M, 2.0, dX, 1, dY, 1, dsyA.clone(), M);
+        });
+        // negative n
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2("U", -1, 2.0, dX, 1, dY, 1, dsyA.clone(), M);
+        });
+        // incx == 0
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2("U", M, 2.0, dX, 0, dY, 1, dsyA.clone(), M);
+        });
+        // incy == 0
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2("U", M, 2.0, dX, 1, dY, 0, dsyA.clone(), M);
+        });
+        // lda too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr2("U", M, 2.0, dX, 1, dY, 1, dsyA.clone(), M - 1);
+        });
+    }
 }

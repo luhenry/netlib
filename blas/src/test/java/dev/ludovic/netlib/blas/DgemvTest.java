@@ -133,6 +133,80 @@ public class DgemvTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        double[] expected, dYcopy;
+        int smallDim = M / 2;
+
+        // trans=N, incx=2, incy=2
+        f2j.dgemv("N", smallDim, smallDim, 1.0, dgeA, M, dX, 2, 1.0, expected = dY.clone(), 2);
+        blas.dgemv("N", smallDim, smallDim, 1.0, dgeA, M, dX, 2, 1.0, dYcopy = dY.clone(), 2);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans=T, incx=2, incy=2
+        f2j.dgemv("T", smallDim, smallDim, 1.0, dgeA, M, dX, 2, 1.0, expected = dY.clone(), 2);
+        blas.dgemv("T", smallDim, smallDim, 1.0, dgeA, M, dX, 2, 1.0, dYcopy = dY.clone(), 2);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dYcopy;
+
+        // trans="N", incx=-1, incy=-1
+        f2j.dgemv("N", M, N, 2.0, dgeA, M, dX, -1, 2.0, expected = dY.clone(), -1);
+        blas.dgemv("N", M, N, 2.0, dgeA, M, dX, -1, 2.0, dYcopy = dY.clone(), -1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans="N", incx=-1, incy=1 (mixed)
+        f2j.dgemv("N", M, N, 2.0, dgeA, M, dX, -1, 2.0, expected = dY.clone(), 1);
+        blas.dgemv("N", M, N, 2.0, dgeA, M, dX, -1, 2.0, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+
+        // trans="T", incx=-1, incy=-1
+        f2j.dgemv("T", M, N, 2.0, dgeA, M, dX, -1, 2.0, expected = dY.clone(), -1);
+        blas.dgemv("T", M, N, 2.0, dgeA, M, dX, -1, 2.0, dYcopy = dY.clone(), -1);
+        assertArrayEquals(expected, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidTrans(BLAS blas) {
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dgemv("X", M, N, 1.0, dgeA, M, dX, 1, 1.0, dY.clone(), 1);
+        });
+        // negative m
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dgemv("N", -1, N, 1.0, dgeA, M, dX, 1, 1.0, dY.clone(), 1);
+        });
+        // negative n
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dgemv("N", M, -1, 1.0, dgeA, M, dX, 1, 1.0, dY.clone(), 1);
+        });
+        // lda too small
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dgemv("N", M, N, 1.0, dgeA, M - 1, dX, 1, 1.0, dY.clone(), 1);
+        });
+        // incx == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dgemv("N", M, N, 1.0, dgeA, M, dX, 0, 1.0, dY.clone(), 1);
+        });
+        // incy == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dgemv("N", M, N, 1.0, dgeA, M, dX, 1, 1.0, dY.clone(), 0);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.dgemv("N", M, N, 1.0, dgeA, M, dX, 1, 1.0, new double[M - 1], 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
     void testOffset1BoundsChecking(BLAS blas) {
         // Test case that reproduces the original bounds checking issue for dgemv
         // Matrix A (2x3) with offset=1, stored in array of length 9
