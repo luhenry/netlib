@@ -51,4 +51,67 @@ public class SgerTest extends BLASTest {
         blas.sger(M, N, -1.0f, sX, 1, sY, 1, sgeAcopy = sgeA.clone(), M);
         assertArrayEquals(expected, sgeAcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        float[] expected, sgeAcopy;
+        int smallM = M / 2;
+        int smallN = N / 2;
+
+        f2j.sger(smallM, smallN, 2.0f, sX, 2, sY, 2, expected = sgeA.clone(), M);
+        blas.sger(smallM, smallN, 2.0f, sX, 2, sY, 2, sgeAcopy = sgeA.clone(), M);
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset(BLAS blas) {
+        float[] expected, sgeAcopy;
+        int smallM = M / 2;
+        int smallN = N / 2;
+
+        f2j.sger(smallM, smallN, 2.0f, sX, 1, 1, sY, 1, 1, expected = sgeA.clone(), 0, M);
+        blas.sger(smallM, smallN, 2.0f, sX, 1, 1, sY, 1, 1, sgeAcopy = sgeA.clone(), 0, M);
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sgeAcopy;
+
+        f2j.sger(M, N, 2.0f, sX, -1, sY, -1, expected = sgeA.clone(), M);
+        blas.sger(M, N, 2.0f, sX, -1, sY, -1, sgeAcopy = sgeA.clone(), M);
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+
+        f2j.sger(M, N, 2.0f, sX, -1, sY, 1, expected = sgeA.clone(), M);
+        blas.sger(M, N, 2.0f, sX, -1, sY, 1, sgeAcopy = sgeA.clone(), M);
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArgument(BLAS blas) {
+        // negative m
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sger(-1, N, 2.0f, sX, 1, sY, 1, sgeA.clone(), M);
+        });
+        // negative n
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sger(M, -1, 2.0f, sX, 1, sY, 1, sgeA.clone(), M);
+        });
+        // incx == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sger(M, N, 2.0f, sX, 0, sY, 1, sgeA.clone(), M);
+        });
+        // incy == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sger(M, N, 2.0f, sX, 1, sY, 0, sgeA.clone(), M);
+        });
+        // lda too small
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sger(M, N, 2.0f, sX, 1, sY, 1, sgeA.clone(), M - 1);
+        });
+    }
 }

@@ -36,6 +36,20 @@ public class StrsmTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
+    void testAlphaZero(BLAS blas) {
+        float[] expected, sgeBcopy;
+
+        f2j.strsm("L", "U", "N", "N", M, N, 0.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strsm("L", "U", "N", "N", M, N, 0.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertArrayEquals(expected, sgeBcopy, sepsilon);
+
+        f2j.strsm("R", "L", "T", "U", M, N, 0.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strsm("R", "L", "T", "U", M, N, 0.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertArrayEquals(expected, sgeBcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
     void testSanity(BLAS blas) {
         float[] expected, sgeBcopy;
 
@@ -161,5 +175,28 @@ public class StrsmTest extends BLASTest {
         f2j.strsm("L", "U", "N", "N", M, N, -1.0f, ssyA, M, expected = sgeB.clone(), M);
         blas.strsm("L", "U", "N", "N", M, N, -1.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
         assertRelArrayEquals(expected, sgeBcopy, ssolveEpsilon);
+
+        // alpha=2.0: side=R, uplo=U, transa=N, diag=N
+        f2j.strsm("R", "U", "N", "N", M, N, 2.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strsm("R", "U", "N", "N", M, N, 2.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertRelArrayEquals(expected, sgeBcopy, ssolveEpsilon);
+
+        // alpha=2.0: side=R, uplo=L, transa=N, diag=N
+        f2j.strsm("R", "L", "N", "N", M, N, 2.0f, ssyA, M, expected = sgeB.clone(), M);
+        blas.strsm("R", "L", "N", "N", M, N, 2.0f, ssyA, M, sgeBcopy = sgeB.clone(), M);
+        assertRelArrayEquals(expected, sgeBcopy, ssolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsm("X", "U", "N", "N", M, N, 1.0f, ssyA, M, sgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsm("L", "X", "N", "N", M, N, 1.0f, ssyA, M, sgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsm("L", "U", "X", "N", M, N, 1.0f, ssyA, M, sgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsm("L", "U", "N", "X", M, N, 1.0f, ssyA, M, sgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsm("L", "U", "N", "N", -1, N, 1.0f, ssyA, M, sgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsm("L", "U", "N", "N", M, -1, 1.0f, ssyA, M, sgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsm("L", "U", "N", "N", M, N, 1.0f, ssyA, M - 1, sgeB.clone(), M); });
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsm("L", "U", "N", "N", M, N, 1.0f, ssyA, M, sgeB.clone(), M - 1); });
     }
 }

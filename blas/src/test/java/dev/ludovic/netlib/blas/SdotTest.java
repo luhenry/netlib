@@ -66,6 +66,17 @@ public class SdotTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        assertEquals(f2j.sdot(M, sX, -1, sY, -1), blas.sdot(M, sX, -1, sY, -1), sepsilon);
+
+        assertEquals(f2j.sdot(M, sX, -1, sY, 1), blas.sdot(M, sX, -1, sY, 1), sepsilon);
+
+        int n = M / 2;
+        assertEquals(f2j.sdot(n, sX, -2, sY, -2), blas.sdot(n, sX, -2, sY, -2), sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
     void testXAndYAreNullAndNIsZero(BLAS blas) {
         assertEquals(0.0f, blas.sdot(0, null, 1, null, 1));
     }
@@ -76,5 +87,14 @@ public class SdotTest extends BLASTest {
         assertThrows(java.lang.NullPointerException.class, () -> {
             blas.sdot(1, null, 1, null, 1);
         });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        int n = M / 2;
+        assertEquals(f2j.sdot(n, sX, 2, sY, 2), blas.sdot(n, sX, 2, sY, 2), sepsilon);
+
+        assertEquals(f2j.sdot(n, sX, 1, sY, 2), blas.sdot(n, sX, 1, sY, 2), sepsilon);
     }
 }

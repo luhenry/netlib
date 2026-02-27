@@ -62,4 +62,58 @@ public class Sspr2Test extends BLASTest {
         blas.sspr2("L", M, 0.0f, sX, 1, sY, 1, sgeAcopy = sgeAL.clone());
         assertArrayEquals(expected, sgeAcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        float[] expected, sgeAcopy;
+        int smallN = M / 2;
+
+        f2j.sspr2("U", smallN, 2.0f, sX, 2, sY, 2, expected = sgeAU.clone());
+        blas.sspr2("U", smallN, 2.0f, sX, 2, sY, 2, sgeAcopy = sgeAU.clone());
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+
+        f2j.sspr2("L", smallN, 2.0f, sX, 2, sY, 2, expected = sgeAL.clone());
+        blas.sspr2("L", smallN, 2.0f, sX, 2, sY, 2, sgeAcopy = sgeAL.clone());
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sgeAcopy;
+
+        f2j.sspr2("U", M, 2.0f, sX, -1, sY, -1, expected = sgeAU.clone());
+        blas.sspr2("U", M, 2.0f, sX, -1, sY, -1, sgeAcopy = sgeAU.clone());
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+
+        f2j.sspr2("L", M, 2.0f, sX, -1, sY, -1, expected = sgeAL.clone());
+        blas.sspr2("L", M, 2.0f, sX, -1, sY, -1, sgeAcopy = sgeAL.clone());
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+
+        f2j.sspr2("U", M, 2.0f, sX, -1, sY, 1, expected = sgeAU.clone());
+        blas.sspr2("U", M, 2.0f, sX, -1, sY, 1, sgeAcopy = sgeAU.clone());
+        assertArrayEquals(expected, sgeAcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidUplo(BLAS blas) {
+        // invalid uplo
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sspr2("X", M, 2.0f, sX, 1, sY, 1, sgeAU.clone());
+        });
+        // negative n
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sspr2("U", -1, 2.0f, sX, 1, sY, 1, sgeAU.clone());
+        });
+        // incx == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sspr2("U", M, 2.0f, sX, 0, sY, 1, sgeAU.clone());
+        });
+        // incy == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.sspr2("U", M, 2.0f, sX, 1, sY, 0, sgeAU.clone());
+        });
+    }
 }

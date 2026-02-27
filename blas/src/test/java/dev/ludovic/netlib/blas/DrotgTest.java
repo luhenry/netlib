@@ -65,4 +65,86 @@ public class DrotgTest extends BLASTest {
         assertEquals(1.0, c.val);
         assertEquals(0.0, s.val);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testLargeValues(BLAS blas) {
+        doubleW da = new doubleW(1e15);
+        doubleW db = new doubleW(1e15);
+        doubleW c = new doubleW(0.0);
+        doubleW s = new doubleW(0.0);
+
+        doubleW daRef = new doubleW(1e15);
+        doubleW dbRef = new doubleW(1e15);
+        doubleW cRef = new doubleW(0.0);
+        doubleW sRef = new doubleW(0.0);
+
+        f2j.drotg(daRef, dbRef, cRef, sRef);
+        blas.drotg(da, db, c, s);
+        assertEquals(daRef.val, da.val, depsilon);
+        assertEquals(dbRef.val, db.val, depsilon);
+        assertEquals(cRef.val, c.val, depsilon);
+        assertEquals(sRef.val, s.val, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeValues(BLAS blas) {
+        doubleW da = new doubleW(-3.0);
+        doubleW db = new doubleW(-4.0);
+        doubleW c = new doubleW(0.0);
+        doubleW s = new doubleW(0.0);
+
+        doubleW daRef = new doubleW(-3.0);
+        doubleW dbRef = new doubleW(-4.0);
+        doubleW cRef = new doubleW(0.0);
+        doubleW sRef = new doubleW(0.0);
+
+        f2j.drotg(daRef, dbRef, cRef, sRef);
+        blas.drotg(da, db, c, s);
+        assertEquals(daRef.val, da.val, depsilon);
+        assertEquals(dbRef.val, db.val, depsilon);
+        assertEquals(cRef.val, c.val, depsilon);
+        assertEquals(sRef.val, s.val, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOneZero(BLAS blas) {
+        // a=0, b!=0
+        doubleW da = new doubleW(0.0);
+        doubleW db = new doubleW(5.0);
+        doubleW c = new doubleW(0.0);
+        doubleW s = new doubleW(0.0);
+
+        doubleW daRef = new doubleW(0.0);
+        doubleW dbRef = new doubleW(5.0);
+        doubleW cRef = new doubleW(0.0);
+        doubleW sRef = new doubleW(0.0);
+
+        f2j.drotg(daRef, dbRef, cRef, sRef);
+        blas.drotg(da, db, c, s);
+        assertEquals(daRef.val, da.val, depsilon);
+        assertEquals(dbRef.val, db.val, depsilon);
+        assertEquals(cRef.val, c.val, depsilon);
+        assertEquals(sRef.val, s.val, depsilon);
+
+        // a!=0, b=0
+        da = new doubleW(5.0);
+        db = new doubleW(0.0);
+        c = new doubleW(0.0);
+        s = new doubleW(0.0);
+
+        daRef = new doubleW(5.0);
+        dbRef = new doubleW(0.0);
+        cRef = new doubleW(0.0);
+        sRef = new doubleW(0.0);
+
+        f2j.drotg(daRef, dbRef, cRef, sRef);
+        blas.drotg(da, db, c, s);
+        assertEquals(daRef.val, da.val, depsilon);
+        assertEquals(dbRef.val, db.val, depsilon);
+        assertEquals(cRef.val, c.val, depsilon);
+        assertEquals(sRef.val, s.val, depsilon);
+    }
 }

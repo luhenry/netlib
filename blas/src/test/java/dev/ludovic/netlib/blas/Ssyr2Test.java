@@ -77,4 +77,47 @@ public class Ssyr2Test extends BLASTest {
         blas.ssyr2("L", M, -1.0f, sX, 1, sY, 1, ssyAcopy = ssyA.clone(), M);
         assertArrayEquals(expected, ssyAcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, ssyAcopy;
+
+        f2j.ssyr2("U", M, 2.0f, sX, -1, sY, -1, expected = ssyA.clone(), M);
+        blas.ssyr2("U", M, 2.0f, sX, -1, sY, -1, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        f2j.ssyr2("L", M, 2.0f, sX, -1, sY, -1, expected = ssyA.clone(), M);
+        blas.ssyr2("L", M, 2.0f, sX, -1, sY, -1, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+
+        f2j.ssyr2("U", M, 2.0f, sX, -1, sY, 1, expected = ssyA.clone(), M);
+        blas.ssyr2("U", M, 2.0f, sX, -1, sY, 1, ssyAcopy = ssyA.clone(), M);
+        assertArrayEquals(expected, ssyAcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.ssyr2("X", M, 2.0f, sX, 1, sY, 1, ssyA.clone(), M);
+        });
+        // negative n
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.ssyr2("U", -1, 2.0f, sX, 1, sY, 1, ssyA.clone(), M);
+        });
+        // incx == 0
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.ssyr2("U", M, 2.0f, sX, 0, sY, 1, ssyA.clone(), M);
+        });
+        // incy == 0
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.ssyr2("U", M, 2.0f, sX, 1, sY, 0, ssyA.clone(), M);
+        });
+        // lda too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.ssyr2("U", M, 2.0f, sX, 1, sY, 1, ssyA.clone(), M - 1);
+        });
+    }
 }

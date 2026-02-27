@@ -77,4 +77,39 @@ public class DsyrTest extends BLASTest {
         blas.dsyr("L", M, -1.0, dX, 1, dsyAcopy = dsyA.clone(), M);
         assertArrayEquals(expected, dsyAcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dsyAcopy;
+
+        f2j.dsyr("U", M, 2.0, dX, -1, expected = dsyA.clone(), M);
+        blas.dsyr("U", M, 2.0, dX, -1, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+
+        f2j.dsyr("L", M, 2.0, dX, -1, expected = dsyA.clone(), M);
+        blas.dsyr("L", M, 2.0, dX, -1, dsyAcopy = dsyA.clone(), M);
+        assertArrayEquals(expected, dsyAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr("X", M, 2.0, dX, 1, dsyA.clone(), M);
+        });
+        // negative n
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr("U", -1, 2.0, dX, 1, dsyA.clone(), M);
+        });
+        // incx == 0
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr("U", M, 2.0, dX, 0, dsyA.clone(), M);
+        });
+        // lda too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsyr("U", M, 2.0, dX, 1, dsyA.clone(), M - 1);
+        });
+    }
 }

@@ -44,4 +44,78 @@ public class DswapTest extends BLASTest {
         assertArrayEquals(expectedX, dXcopy, depsilon);
         assertArrayEquals(expectedY, dYcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        double[] expectedX, expectedY, dXcopy, dYcopy;
+        int n = M / 2;
+
+        f2j.dswap(n, expectedX = dX.clone(), 2, expectedY = dY.clone(), 2);
+        blas.dswap(n, dXcopy = dX.clone(), 2, dYcopy = dY.clone(), 2);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expectedX, expectedY, dXcopy, dYcopy;
+
+        // incx=-1, incy=-1
+        f2j.dswap(M, expectedX = dX.clone(), -1, expectedY = dY.clone(), -1);
+        blas.dswap(M, dXcopy = dX.clone(), -1, dYcopy = dY.clone(), -1);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+
+        // incx=-1, incy=1 (mixed)
+        f2j.dswap(M, expectedX = dX.clone(), -1, expectedY = dY.clone(), 1);
+        blas.dswap(M, dXcopy = dX.clone(), -1, dYcopy = dY.clone(), 1);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroN(BLAS blas) {
+        double[] expectedX = dX.clone();
+        double[] expectedY = dY.clone();
+        double[] dXcopy = dX.clone();
+        double[] dYcopy = dY.clone();
+
+        blas.dswap(0, dXcopy, 1, dYcopy, 1);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset(BLAS blas) {
+        double[] expectedX, expectedY, dXcopy, dYcopy;
+        int n = M / 2;
+
+        f2j.dswap(n, expectedX = dX.clone(), 2, 1, expectedY = dY.clone(), 3, 1);
+        blas.dswap(n, dXcopy = dX.clone(), 2, 1, dYcopy = dY.clone(), 3, 1);
+        assertArrayEquals(expectedX, dXcopy, depsilon);
+        assertArrayEquals(expectedY, dYcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.dswap(M + 1, dX.clone(), 1, dY.clone(), 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.dswap(M, null, 1, dY.clone(), 1);
+        });
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.dswap(M, dX.clone(), 1, null, 1);
+        });
+    }
 }

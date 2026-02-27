@@ -40,4 +40,39 @@ public class Dnrm2Test extends BLASTest {
         assertEquals(f2j.dnrm2(M / 1, dX, 1), blas.dnrm2(M / 1, dX, 1), depsilon);
         assertEquals(f2j.dnrm2(M / 2, dX, 2), blas.dnrm2(M / 2, dX, 2), depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        int n = M / 3;
+        assertEquals(f2j.dnrm2(n, dX, 3), blas.dnrm2(n, dX, 3), depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroN(BLAS blas) {
+        assertEquals(0.0, blas.dnrm2(0, dX, 1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testSingleElement(BLAS blas) {
+        assertEquals(f2j.dnrm2(1, dX, 1), blas.dnrm2(1, dX, 1), depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.dnrm2(M + 1, dX, 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.dnrm2(M, null, 1);
+        });
+    }
 }

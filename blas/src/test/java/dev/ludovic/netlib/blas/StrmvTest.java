@@ -96,4 +96,37 @@ public class StrmvTest extends BLASTest {
         blas.strmv("L", "T", "U", M, ssyA, M, sXcopy = sX.clone(), 1);
         assertArrayEquals(expected, sXcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sXcopy;
+
+        f2j.strmv("U", "N", "N", M, ssyA, M, expected = sX.clone(), -1);
+        blas.strmv("U", "N", "N", M, ssyA, M, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        f2j.strmv("L", "N", "N", M, ssyA, M, expected = sX.clone(), -1);
+        blas.strmv("L", "N", "N", M, ssyA, M, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        f2j.strmv("U", "T", "N", M, ssyA, M, expected = sX.clone(), -1);
+        blas.strmv("U", "T", "N", M, ssyA, M, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+
+        f2j.strmv("L", "T", "N", M, ssyA, M, expected = sX.clone(), -1);
+        blas.strmv("L", "T", "N", M, ssyA, M, sXcopy = sX.clone(), -1);
+        assertArrayEquals(expected, sXcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.strmv("X", "N", "N", M, ssyA, M, sX.clone(), 1); }); // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> { blas.strmv("U", "X", "N", M, ssyA, M, sX.clone(), 1); }); // invalid trans
+        assertThrows(IllegalArgumentException.class, () -> { blas.strmv("U", "N", "X", M, ssyA, M, sX.clone(), 1); }); // invalid diag
+        assertThrows(IllegalArgumentException.class, () -> { blas.strmv("U", "N", "N", -1, ssyA, M, sX.clone(), 1); }); // negative n
+        assertThrows(IllegalArgumentException.class, () -> { blas.strmv("U", "N", "N", M, ssyA, M - 1, sX.clone(), 1); }); // lda too small
+        assertThrows(IllegalArgumentException.class, () -> { blas.strmv("U", "N", "N", M, ssyA, M, sX.clone(), 0); }); // incx == 0
+    }
 }

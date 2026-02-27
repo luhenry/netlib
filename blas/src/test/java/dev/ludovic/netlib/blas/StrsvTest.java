@@ -96,4 +96,37 @@ public class StrsvTest extends BLASTest {
         blas.strsv("L", "T", "U", M, ssyA, M, sXcopy = sX.clone(), 1);
         assertRelArrayEquals(expected, sXcopy, ssolveEpsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sXcopy;
+
+        f2j.strsv("U", "N", "N", M, ssyA, M, expected = sX.clone(), -1);
+        blas.strsv("U", "N", "N", M, ssyA, M, sXcopy = sX.clone(), -1);
+        assertRelArrayEquals(expected, sXcopy, ssolveEpsilon);
+
+        f2j.strsv("L", "N", "N", M, ssyA, M, expected = sX.clone(), -1);
+        blas.strsv("L", "N", "N", M, ssyA, M, sXcopy = sX.clone(), -1);
+        assertRelArrayEquals(expected, sXcopy, ssolveEpsilon);
+
+        f2j.strsv("U", "T", "N", M, ssyA, M, expected = sX.clone(), -1);
+        blas.strsv("U", "T", "N", M, ssyA, M, sXcopy = sX.clone(), -1);
+        assertRelArrayEquals(expected, sXcopy, ssolveEpsilon);
+
+        f2j.strsv("L", "T", "N", M, ssyA, M, expected = sX.clone(), -1);
+        blas.strsv("L", "T", "N", M, ssyA, M, sXcopy = sX.clone(), -1);
+        assertRelArrayEquals(expected, sXcopy, ssolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsv("X", "N", "N", M, ssyA, M, sX.clone(), 1); }); // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsv("U", "X", "N", M, ssyA, M, sX.clone(), 1); }); // invalid trans
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsv("U", "N", "X", M, ssyA, M, sX.clone(), 1); }); // invalid diag
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsv("U", "N", "N", -1, ssyA, M, sX.clone(), 1); }); // negative n
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsv("U", "N", "N", M, ssyA, M - 1, sX.clone(), 1); }); // lda too small
+        assertThrows(IllegalArgumentException.class, () -> { blas.strsv("U", "N", "N", M, ssyA, M, sX.clone(), 0); }); // incx == 0
+    }
 }

@@ -65,4 +65,86 @@ public class SrotgTest extends BLASTest {
         assertEquals(1.0f, c.val);
         assertEquals(0.0f, s.val);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testLargeValues(BLAS blas) {
+        floatW sa = new floatW(1e7f);
+        floatW sb = new floatW(1e7f);
+        floatW c = new floatW(0.0f);
+        floatW s = new floatW(0.0f);
+
+        floatW saRef = new floatW(1e7f);
+        floatW sbRef = new floatW(1e7f);
+        floatW cRef = new floatW(0.0f);
+        floatW sRef = new floatW(0.0f);
+
+        f2j.srotg(saRef, sbRef, cRef, sRef);
+        blas.srotg(sa, sb, c, s);
+        assertEquals(saRef.val, sa.val, sepsilon);
+        assertEquals(sbRef.val, sb.val, sepsilon);
+        assertEquals(cRef.val, c.val, sepsilon);
+        assertEquals(sRef.val, s.val, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeValues(BLAS blas) {
+        floatW sa = new floatW(-3.0f);
+        floatW sb = new floatW(-4.0f);
+        floatW c = new floatW(0.0f);
+        floatW s = new floatW(0.0f);
+
+        floatW saRef = new floatW(-3.0f);
+        floatW sbRef = new floatW(-4.0f);
+        floatW cRef = new floatW(0.0f);
+        floatW sRef = new floatW(0.0f);
+
+        f2j.srotg(saRef, sbRef, cRef, sRef);
+        blas.srotg(sa, sb, c, s);
+        assertEquals(saRef.val, sa.val, sepsilon);
+        assertEquals(sbRef.val, sb.val, sepsilon);
+        assertEquals(cRef.val, c.val, sepsilon);
+        assertEquals(sRef.val, s.val, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOneZero(BLAS blas) {
+        // a=0, b!=0
+        floatW sa = new floatW(0.0f);
+        floatW sb = new floatW(5.0f);
+        floatW c = new floatW(0.0f);
+        floatW s = new floatW(0.0f);
+
+        floatW saRef = new floatW(0.0f);
+        floatW sbRef = new floatW(5.0f);
+        floatW cRef = new floatW(0.0f);
+        floatW sRef = new floatW(0.0f);
+
+        f2j.srotg(saRef, sbRef, cRef, sRef);
+        blas.srotg(sa, sb, c, s);
+        assertEquals(saRef.val, sa.val, sepsilon);
+        assertEquals(sbRef.val, sb.val, sepsilon);
+        assertEquals(cRef.val, c.val, sepsilon);
+        assertEquals(sRef.val, s.val, sepsilon);
+
+        // a!=0, b=0
+        sa = new floatW(5.0f);
+        sb = new floatW(0.0f);
+        c = new floatW(0.0f);
+        s = new floatW(0.0f);
+
+        saRef = new floatW(5.0f);
+        sbRef = new floatW(0.0f);
+        cRef = new floatW(0.0f);
+        sRef = new floatW(0.0f);
+
+        f2j.srotg(saRef, sbRef, cRef, sRef);
+        blas.srotg(sa, sb, c, s);
+        assertEquals(saRef.val, sa.val, sepsilon);
+        assertEquals(sbRef.val, sb.val, sepsilon);
+        assertEquals(cRef.val, c.val, sepsilon);
+        assertEquals(sRef.val, s.val, sepsilon);
+    }
 }

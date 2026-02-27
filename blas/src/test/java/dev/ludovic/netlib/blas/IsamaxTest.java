@@ -61,4 +61,20 @@ public class IsamaxTest extends BLASTest {
         // n=0: should return -1
         assertEquals(f2j.isamax(0, sX, 1), blas.isamax(0, sX, 1));
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.isamax(M + 1, sX, 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.isamax(M, null, 1);
+        });
+    }
 }

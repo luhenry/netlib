@@ -105,6 +105,21 @@ public class DsymmTest extends BLASTest {
 
     @ParameterizedTest
     @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaNonZero(BLAS blas) {
+        double[] expected, dgeCcopy;
+
+        // alpha=0.0, beta=2.0: C := beta*C (exercises beta != 0.0 branch in alpha==0 path)
+        f2j.dsymm("L", "U", M, N, 0.0, dsyA, M, dgeB, K, 2.0, expected = dgeC.clone(), M);
+        blas.dsymm("L", "U", M, N, 0.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dsymm("R", "L", M, N, 0.0, dsyA, M, dgeB, K, 2.0, expected = dgeC.clone(), M);
+        blas.dsymm("R", "L", M, N, 0.0, dsyA, M, dgeB, K, 2.0, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
     void testAlphaTwoBetaHalf(BLAS blas) {
         double[] expected, dgeCcopy;
 
@@ -124,5 +139,59 @@ public class DsymmTest extends BLASTest {
         f2j.dsymm("R", "L", M, N, 2.0, dsyA, M, dgeB, K, 0.5, expected = dgeC.clone(), M);
         blas.dsymm("R", "L", M, N, 2.0, dsyA, M, dgeB, K, 0.5, dgeCcopy = dgeC.clone(), M);
         assertArrayEquals(expected, dgeCcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAllSideUploCombinations(BLAS blas) {
+        double[] expected, dgeCcopy;
+
+        // All 4 SIDE x UPLO combos with non-trivial alpha/beta
+        f2j.dsymm("L", "U", M, N, 1.5, dsyA, M, dgeB, K, 0.75, expected = dgeC.clone(), M);
+        blas.dsymm("L", "U", M, N, 1.5, dsyA, M, dgeB, K, 0.75, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dsymm("L", "L", M, N, 1.5, dsyA, M, dgeB, K, 0.75, expected = dgeC.clone(), M);
+        blas.dsymm("L", "L", M, N, 1.5, dsyA, M, dgeB, K, 0.75, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dsymm("R", "U", M, N, 1.5, dsyA, M, dgeB, K, 0.75, expected = dgeC.clone(), M);
+        blas.dsymm("R", "U", M, N, 1.5, dsyA, M, dgeB, K, 0.75, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+
+        f2j.dsymm("R", "L", M, N, 1.5, dsyA, M, dgeB, K, 0.75, expected = dgeC.clone(), M);
+        blas.dsymm("R", "L", M, N, 1.5, dsyA, M, dgeB, K, 0.75, dgeCcopy = dgeC.clone(), M);
+        assertArrayEquals(expected, dgeCcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidSideOrUplo(BLAS blas) {
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dsymm("X", "U", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeC.clone(), M);
+        });
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dsymm("L", "X", M, N, 1.0, dsyA, M, dgeB, K, 2.0, dgeC.clone(), M);
+        });
+        // negative m
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsymm("L", "U", -1, N, 1.0, dsyA, M, dgeB, M, 1.0, dgeC.clone(), M);
+        });
+        // negative n
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsymm("L", "U", M, -1, 1.0, dsyA, M, dgeB, M, 1.0, dgeC.clone(), M);
+        });
+        // lda too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsymm("L", "U", M, N, 1.0, dsyA, M - 1, dgeB, M, 1.0, dgeC.clone(), M);
+        });
+        // ldb too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsymm("L", "U", M, N, 1.0, dsyA, M, dgeB, M - 1, 1.0, dgeC.clone(), M);
+        });
+        // ldc too small
+        assertThrows(IllegalArgumentException.class, () -> {
+            blas.dsymm("L", "U", M, N, 1.0, dsyA, M, dgeB, M, 1.0, dgeC.clone(), M - 1);
+        });
     }
 }

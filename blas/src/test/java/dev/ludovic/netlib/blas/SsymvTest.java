@@ -95,4 +95,84 @@ public class SsymvTest extends BLASTest {
         blas.ssymv("L", M,  1.0f, ssyA, M, sX, 1,  0.0f, sYcopy = sY.clone(), 1);
         assertArrayEquals(expected, sYcopy, sepsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        float[] expected, sYcopy;
+        int smallN = M / 2;
+
+        f2j.ssymv("U", smallN, 1.0f, ssyA, M, sX, 2, 1.0f, expected = sY.clone(), 2);
+        blas.ssymv("U", smallN, 1.0f, ssyA, M, sX, 2, 1.0f, sYcopy = sY.clone(), 2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.ssymv("L", smallN, 1.0f, ssyA, M, sX, 2, 1.0f, expected = sY.clone(), 2);
+        blas.ssymv("L", smallN, 1.0f, ssyA, M, sX, 2, 1.0f, sYcopy = sY.clone(), 2);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testAlphaZeroBetaZero(BLAS blas) {
+        float[] expected, sYcopy;
+
+        f2j.ssymv("U", M, 0.0f, ssyA, M, sX, 1, 0.0f, expected = sY.clone(), 1);
+        blas.ssymv("U", M, 0.0f, ssyA, M, sX, 1, 0.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset(BLAS blas) {
+        float[] expected, sYcopy;
+        int smallN = M / 2;
+
+        f2j.ssymv("U", smallN, 1.0f, ssyA, 0, M, sX, 0, 1, 1.0f, expected = sY.clone(), 0, 1);
+        blas.ssymv("U", smallN, 1.0f, ssyA, 0, M, sX, 0, 1, 1.0f, sYcopy = sY.clone(), 0, 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        float[] expected, sYcopy;
+
+        f2j.ssymv("U", M, 2.0f, ssyA, M, sX, -1, 2.0f, expected = sY.clone(), -1);
+        blas.ssymv("U", M, 2.0f, ssyA, M, sX, -1, 2.0f, sYcopy = sY.clone(), -1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        f2j.ssymv("L", M, 2.0f, ssyA, M, sX, -1, 2.0f, expected = sY.clone(), -1);
+        blas.ssymv("L", M, 2.0f, ssyA, M, sX, -1, 2.0f, sYcopy = sY.clone(), -1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+
+        // mixed strides
+        f2j.ssymv("U", M, 2.0f, ssyA, M, sX, -1, 2.0f, expected = sY.clone(), 1);
+        blas.ssymv("U", M, 2.0f, ssyA, M, sX, -1, 2.0f, sYcopy = sY.clone(), 1);
+        assertArrayEquals(expected, sYcopy, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidUplo(BLAS blas) {
+        // invalid uplo
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.ssymv("X", M, 1.0f, ssyA, M, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // negative n
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.ssymv("U", -1, 1.0f, ssyA, M, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // lda too small
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.ssymv("U", M, 1.0f, ssyA, M - 1, sX, 1, 1.0f, sY.clone(), 1);
+        });
+        // incx == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.ssymv("U", M, 1.0f, ssyA, M, sX, 0, 1.0f, sY.clone(), 1);
+        });
+        // incy == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.ssymv("U", M, 1.0f, ssyA, M, sX, 1, 1.0f, sY.clone(), 0);
+        });
+    }
 }

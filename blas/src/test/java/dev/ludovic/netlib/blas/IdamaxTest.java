@@ -61,4 +61,20 @@ public class IdamaxTest extends BLASTest {
         // n=0: should return -1
         assertEquals(f2j.idamax(0, dX, 1), blas.idamax(0, dX, 1));
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.idamax(M + 1, dX, 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.idamax(M, null, 1);
+        });
+    }
 }

@@ -63,4 +63,52 @@ public class DscalTest extends BLASTest {
         blas.dscal(M, 0.0, dXcopy = dX.clone(), -1);
         assertArrayEquals(expected, dXcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        double[] expected, dXcopy;
+        int n = M / 2;
+
+        f2j.dscal(n, 2.0, expected = dX.clone(), 2);
+        blas.dscal(n, 2.0, dXcopy = dX.clone(), 2);
+        assertArrayEquals(expected, dXcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroN(BLAS blas) {
+        double[] expected = dX.clone();
+        double[] dXcopy = dX.clone();
+
+        blas.dscal(0, 2.0, dXcopy, 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset(BLAS blas) {
+        double[] expected, dXcopy;
+        int n = M / 2;
+
+        f2j.dscal(n, 2.0, expected = dX.clone(), 5, 1);
+        blas.dscal(n, 2.0, dXcopy = dX.clone(), 5, 1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.dscal(M + 1, 2.0, dX.clone(), 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.dscal(M, 2.0, null, 1);
+        });
+    }
 }

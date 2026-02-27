@@ -96,4 +96,38 @@ public class DtbsvTest extends BLASTest {
         blas.dtbsv("L", "T", "U", M, KU, dtbAL, KU + 1, dXcopy = dX.clone(), 1);
         assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dXcopy;
+
+        f2j.dtbsv("U", "N", "N", M, KU, dtbAU, KU + 1, expected = dX.clone(), -1);
+        blas.dtbsv("U", "N", "N", M, KU, dtbAU, KU + 1, dXcopy = dX.clone(), -1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        f2j.dtbsv("L", "N", "N", M, KU, dtbAL, KU + 1, expected = dX.clone(), -1);
+        blas.dtbsv("L", "N", "N", M, KU, dtbAL, KU + 1, dXcopy = dX.clone(), -1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        f2j.dtbsv("U", "T", "N", M, KU, dtbAU, KU + 1, expected = dX.clone(), -1);
+        blas.dtbsv("U", "T", "N", M, KU, dtbAU, KU + 1, dXcopy = dX.clone(), -1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+
+        f2j.dtbsv("L", "T", "N", M, KU, dtbAL, KU + 1, expected = dX.clone(), -1);
+        blas.dtbsv("L", "T", "N", M, KU, dtbAL, KU + 1, dXcopy = dX.clone(), -1);
+        assertRelArrayEquals(expected, dXcopy, dsolveEpsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbsv("X", "N", "N", M, KU, dtbAU, KU + 1, dX.clone(), 1); }); // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbsv("U", "X", "N", M, KU, dtbAU, KU + 1, dX.clone(), 1); }); // invalid trans
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbsv("U", "N", "X", M, KU, dtbAU, KU + 1, dX.clone(), 1); }); // invalid diag
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbsv("U", "N", "N", -1, KU, dtbAU, KU + 1, dX.clone(), 1); }); // negative n
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbsv("U", "N", "N", M, -1, dtbAU, KU + 1, dX.clone(), 1); }); // negative k
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbsv("U", "N", "N", M, KU, dtbAU, KU, dX.clone(), 1); }); // lda too small
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtbsv("U", "N", "N", M, KU, dtbAU, KU + 1, dX.clone(), 0); }); // incx == 0
+    }
 }

@@ -39,4 +39,39 @@ public class DasumTest extends BLASTest {
     void testSanity(BLAS blas) {
         assertEquals(f2j.dasum(M, dX, 1), blas.dasum(M, dX, 1), depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        int n = M / 2;
+        assertEquals(f2j.dasum(n, dX, 2), blas.dasum(n, dX, 2), depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testZeroN(BLAS blas) {
+        assertEquals(0.0, blas.dasum(0, dX, 1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testSingleElement(BLAS blas) {
+        assertEquals(f2j.dasum(1, dX, 1), blas.dasum(1, dX, 1), depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOutOfBound(BLAS blas) {
+        assertThrows(java.lang.IndexOutOfBoundsException.class, () -> {
+            blas.dasum(M + 1, dX, 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNullArray(BLAS blas) {
+        assertThrows(java.lang.NullPointerException.class, () -> {
+            blas.dasum(M, null, 1);
+        });
+    }
 }

@@ -96,4 +96,37 @@ public class DtrmvTest extends BLASTest {
         blas.dtrmv("L", "T", "U", M, dsyA, M, dXcopy = dX.clone(), 1);
         assertArrayEquals(expected, dXcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dXcopy;
+
+        f2j.dtrmv("U", "N", "N", M, dsyA, M, expected = dX.clone(), -1);
+        blas.dtrmv("U", "N", "N", M, dsyA, M, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        f2j.dtrmv("L", "N", "N", M, dsyA, M, expected = dX.clone(), -1);
+        blas.dtrmv("L", "N", "N", M, dsyA, M, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        f2j.dtrmv("U", "T", "N", M, dsyA, M, expected = dX.clone(), -1);
+        blas.dtrmv("U", "T", "N", M, dsyA, M, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+
+        f2j.dtrmv("L", "T", "N", M, dsyA, M, expected = dX.clone(), -1);
+        blas.dtrmv("L", "T", "N", M, dsyA, M, dXcopy = dX.clone(), -1);
+        assertArrayEquals(expected, dXcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArguments(BLAS blas) {
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrmv("X", "N", "N", M, dsyA, M, dX.clone(), 1); }); // invalid uplo
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrmv("U", "X", "N", M, dsyA, M, dX.clone(), 1); }); // invalid trans
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrmv("U", "N", "X", M, dsyA, M, dX.clone(), 1); }); // invalid diag
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrmv("U", "N", "N", -1, dsyA, M, dX.clone(), 1); }); // negative n
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrmv("U", "N", "N", M, dsyA, M - 1, dX.clone(), 1); }); // lda too small
+        assertThrows(IllegalArgumentException.class, () -> { blas.dtrmv("U", "N", "N", M, dsyA, M, dX.clone(), 0); }); // incx == 0
+    }
 }

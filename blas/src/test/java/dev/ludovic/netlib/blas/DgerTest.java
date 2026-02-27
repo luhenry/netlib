@@ -51,4 +51,67 @@ public class DgerTest extends BLASTest {
         blas.dger(M, N, -1.0, dX, 1, dY, 1, dgeAcopy = dgeA.clone(), M);
         assertArrayEquals(expected, dgeAcopy, depsilon);
     }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNonUnitStride(BLAS blas) {
+        double[] expected, dgeAcopy;
+        int smallM = M / 2;
+        int smallN = N / 2;
+
+        f2j.dger(smallM, smallN, 2.0, dX, 2, dY, 2, expected = dgeA.clone(), M);
+        blas.dger(smallM, smallN, 2.0, dX, 2, dY, 2, dgeAcopy = dgeA.clone(), M);
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testOffset(BLAS blas) {
+        double[] expected, dgeAcopy;
+        int smallM = M / 2;
+        int smallN = N / 2;
+
+        f2j.dger(smallM, smallN, 2.0, dX, 1, 1, dY, 1, 1, expected = dgeA.clone(), 0, M);
+        blas.dger(smallM, smallN, 2.0, dX, 1, 1, dY, 1, 1, dgeAcopy = dgeA.clone(), 0, M);
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testNegativeStride(BLAS blas) {
+        double[] expected, dgeAcopy;
+
+        f2j.dger(M, N, 2.0, dX, -1, dY, -1, expected = dgeA.clone(), M);
+        blas.dger(M, N, 2.0, dX, -1, dY, -1, dgeAcopy = dgeA.clone(), M);
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+
+        f2j.dger(M, N, 2.0, dX, -1, dY, 1, expected = dgeA.clone(), M);
+        blas.dger(M, N, 2.0, dX, -1, dY, 1, dgeAcopy = dgeA.clone(), M);
+        assertArrayEquals(expected, dgeAcopy, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("BLASImplementations")
+    void testInvalidArgument(BLAS blas) {
+        // negative m
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dger(-1, N, 2.0, dX, 1, dY, 1, dgeA.clone(), M);
+        });
+        // negative n
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dger(M, -1, 2.0, dX, 1, dY, 1, dgeA.clone(), M);
+        });
+        // incx == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dger(M, N, 2.0, dX, 0, dY, 1, dgeA.clone(), M);
+        });
+        // incy == 0
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dger(M, N, 2.0, dX, 1, dY, 0, dgeA.clone(), M);
+        });
+        // lda too small
+        assertThrows(java.lang.IllegalArgumentException.class, () -> {
+            blas.dger(M, N, 2.0, dX, 1, dY, 1, dgeA.clone(), M - 1);
+        });
+    }
 }

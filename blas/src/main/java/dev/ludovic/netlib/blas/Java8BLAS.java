@@ -3526,7 +3526,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
       double sumiy1 = 0.0;
       double sumiy2 = 0.0;
       double sumiy3 = 0.0;
-      int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
         double a0 = a[offseta + row + (col + 0) * ((col + 0) + 1) / 2];
         double a1 = a[offseta + row + (col + 1) * ((col + 1) + 1) / 2];
@@ -3587,7 +3587,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
     for (; col < n; col += 1, ix += incx, iy += incy) {
       double alphaxix = alpha * x[offsetx + ix];
       double sumiy = 0.0;
-      int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
         y[offsety + jy] += alphaxix * a[offseta + row + col * (col + 1) / 2];
         sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
@@ -3714,7 +3714,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
       float sumiy1 = 0.0f;
       float sumiy2 = 0.0f;
       float sumiy3 = 0.0f;
-      int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
         float a0 = a[offseta + row + (col + 0) * ((col + 0) + 1) / 2];
         float a1 = a[offseta + row + (col + 1) * ((col + 1) + 1) / 2];
@@ -3775,7 +3775,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
     for (; col < n; col += 1, ix += incx, iy += incy) {
       float alphaxix = alpha * x[offsetx + ix];
       float sumiy = 0.0f;
-      int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
         y[offsety + jy] += alphaxix * a[offseta + row + col * (col + 1) / 2];
         sumiy += x[offsetx + jx] * a[offseta + row + col * (col + 1) / 2];
@@ -5470,7 +5470,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
       double sumiy1 = 0.0;
       double sumiy2 = 0.0;
       double sumiy3 = 0.0;
-      int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
         double a0 = a[offseta + row + (col + 0) * lda];
         double a1 = a[offseta + row + (col + 1) * lda];
@@ -5528,7 +5528,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
     for (; col < n; col += 1, ix += incx, iy += incy) {
       double alphaxix = alpha * x[offsetx + ix];
       double sumiy = 0.0;
-      int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
         double a0 = a[offseta + row + col * lda];
         y[offsety + jy] += alphaxix * a0;
@@ -5656,7 +5656,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
       float sumiy1 = 0.0f;
       float sumiy2 = 0.0f;
       float sumiy3 = 0.0f;
-      int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
         y[offsety + jy] += alphaxix0 * a[offseta + row + (col + 0) * lda]
                         +  alphaxix1 * a[offseta + row + (col + 1) * lda]
@@ -5713,7 +5713,7 @@ class Java8BLAS extends AbstractBLAS implements JavaBLAS {
     for (; col < n; col += 1, ix += incx, iy += incy) {
       float alphaxix = alpha * x[offsetx + ix];
       float sumiy = 0.0f;
-      int row = 0, jx = incx < 0 ? (col - 1) * -incx : 0, jy = incy < 0 ? (col - 1) * -incy : 0;
+      int row = 0, jx = incx < 0 ? (n - 1) * -incx : 0, jy = incy < 0 ? (n - 1) * -incy : 0;
       for (; row < col; row += 1, jx += incx, jy += incy) {
         y[offsety + jy] += alphaxix * a[offseta + row + col * lda];
         sumiy += x[offsetx + jx] * a[offseta + row + col * lda];
