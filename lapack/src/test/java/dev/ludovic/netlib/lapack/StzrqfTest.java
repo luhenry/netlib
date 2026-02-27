@@ -29,12 +29,38 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class StzrqfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Deprecated RZ factorization of M-by-N upper trapezoidal matrix (N >= M)
+        int m = 3;
+        int n = 6;
+        float[] a_expected = {
+            1.0f, 0.0f, 0.0f,
+            2.0f, 3.0f, 0.0f,
+            4.0f, 5.0f, 6.0f,
+            0.5f, 0.3f, 0.7f,
+            0.2f, 0.4f, 0.6f,
+            0.1f, 0.8f, 0.9f
+        };
+        float[] a_actual = a_expected.clone();
+        float[] tau_expected = new float[m];
+        float[] tau_actual = new float[m];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.stzrqf(m, n, a_expected, m, tau_expected, info_expected);
+        lapack.stzrqf(m, n, a_actual, m, tau_actual, info_actual);
+
+        assertEquals(0, info_expected.val);
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(a_expected, a_actual, sepsilon);
+        assertArrayEquals(tau_expected, tau_actual, sepsilon);
     }
 }

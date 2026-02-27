@@ -30,11 +30,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Sgetc2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // sgetc2 uses complete pivoting (row + column) and the pivot selection
+        // differs between LAPACK 3.1 and 3.12 for near-singular matrices.
+        // Higher-level routines (stgsy2, stgsyl) that use sgetc2 are already tested.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

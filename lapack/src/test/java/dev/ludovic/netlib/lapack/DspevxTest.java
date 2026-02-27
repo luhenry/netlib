@@ -29,12 +29,45 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DspevxTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testAllEigenvalues(LAPACK lapack) {
+        int n = N_SMALL;
+
+        // Positive definite symmetric packed matrix (upper storage)
+        double[] ap = generatePackedSymmetricMatrix(n, n + 10.0);
+
+        double[] ap_expected = ap.clone();
+        double[] ap_actual = ap.clone();
+        intW m_expected = new intW(0);
+        intW m_actual = new intW(0);
+        double[] w_expected = new double[n];
+        double[] w_actual = new double[n];
+        double[] z_expected = new double[1];
+        double[] z_actual = new double[1];
+        double[] work_expected = new double[8 * n];
+        double[] work_actual = new double[8 * n];
+        int[] iwork_expected = new int[5 * n];
+        int[] iwork_actual = new int[5 * n];
+        int[] ifail_expected = new int[n];
+        int[] ifail_actual = new int[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dspevx("N", "A", "U", n, ap_expected, 0.0, 0.0, 0, 0, 0.0, m_expected, w_expected, z_expected, 1, work_expected, iwork_expected, ifail_expected, info_expected);
+        assertEquals(0, info_expected.val);
+        assertEquals(n, m_expected.val);
+
+        lapack.dspevx("N", "A", "U", n, ap_actual, 0.0, 0.0, 0, 0, 0.0, m_actual, w_actual, z_actual, 1, work_actual, iwork_actual, ifail_actual, info_actual);
+        assertEquals(0, info_actual.val);
+        assertEquals(n, m_actual.val);
+
+        assertArrayEquals(w_expected, w_actual, 1e-13);
     }
 }

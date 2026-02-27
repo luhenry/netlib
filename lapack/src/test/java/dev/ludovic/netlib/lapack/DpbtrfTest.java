@@ -29,12 +29,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DpbtrfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int kd = 5;
+        int ldab = kd + 1;
+        // Create a diagonal-dominant positive definite banded matrix
+        double[] ab = new double[ldab * N];
+        for (int j = 0; j < N; j++) {
+            for (int i = Math.max(0, j - kd); i <= j; i++) {
+                int k = kd + i - j;
+                if (i == j) {
+                    ab[k + j * ldab] = N + 1.0; // Diagonal elements
+                } else {
+                    ab[k + j * ldab] = 1.0; // Off-diagonal elements
+                }
+            }
+        }
+        intW info = new intW(0);
+        lapack.dpbtrf("U", N, kd, ab, 0, ldab, info);
+
+        assertEquals(0, info.val, "Cholesky factorization should succeed");
     }
 }

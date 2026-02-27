@@ -29,12 +29,40 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlagtfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // LU factorization of (T - lambda*I) for tridiagonal T
+        int n = 5;
+        double[] a_expected = { 4.0, 5.0, 6.0, 7.0, 8.0 }; // diagonal
+        double[] a_actual = a_expected.clone();
+        double lambda = 1.0;
+        double[] b_expected = { 1.0, 1.0, 1.0, 1.0 }; // super-diagonal (n-1)
+        double[] b_actual = b_expected.clone();
+        double[] c_expected = { 0.5, 0.5, 0.5, 0.5 }; // sub-diagonal (n-1)
+        double[] c_actual = c_expected.clone();
+        double tol = 0.0;
+        double[] d_expected = new double[n - 2];
+        double[] d_actual = new double[n - 2];
+        int[] in_expected = new int[n];
+        int[] in_actual = new int[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dlagtf(n, a_expected, lambda, b_expected, c_expected, tol, d_expected, in_expected, info_expected);
+        lapack.dlagtf(n, a_actual, lambda, b_actual, c_actual, tol, d_actual, in_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(a_expected, a_actual, depsilon);
+        assertArrayEquals(b_expected, b_actual, depsilon);
+        assertArrayEquals(c_expected, c_actual, depsilon);
+        assertArrayEquals(d_expected, d_actual, depsilon);
+        assertArrayEquals(in_expected, in_actual);
     }
 }

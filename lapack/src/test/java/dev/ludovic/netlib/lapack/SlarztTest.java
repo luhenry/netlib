@@ -30,11 +30,25 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlarztTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        int k = 5;
+        int ldv = k;
+        float[] v_expected = generateMatrixFloat(k, n, 1.0f);
+        float[] v_actual = v_expected.clone();
+        float[] tau = generateFloatArray(k, 0.5f);
+        float[] t_expected = new float[k * k];
+        float[] t_actual = new float[k * k];
+
+        f2j.slarzt("Backward", "Rowwise", n, k, v_expected, 0, ldv, tau, 0, t_expected, 0, k);
+        lapack.slarzt("Backward", "Rowwise", n, k, v_actual, 0, ldv, tau, 0, t_actual, 0, k);
+
+        assertArrayEquals(t_expected, t_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(t_expected))));
     }
 }

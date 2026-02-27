@@ -30,11 +30,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlatdfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // slatdf depends on sgetc2 LU factorization which differs between LAPACK versions.
+        // Higher-level routines (stgsy2, stgsyl) that use slatdf are already tested.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

@@ -38,6 +38,8 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import dev.ludovic.netlib.arpack.ARPACK;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class ARPACKTest {
 
   final static double depsilon = 1e-15d;
@@ -56,4 +58,32 @@ public class ARPACKTest {
 
     return instances;
   }
+
+  // Test data dimensions
+  protected final int N = 50;
+  protected final int NCV = 10;
+  protected final int NEV = 5;
+  protected final int LDV = N;
+  protected final int LDH = NCV;
+  protected final int LDQ = NCV;
+  protected final int LWORKL = 3 * NCV * NCV + 6 * NCV;
+
+  // Integer arrays for testing
+  protected final int[] intArray1 = generateIntRange(N, 1);
+  protected final int[] intArray2 = generateIntRange(N, 2);
+  protected final int[] intArray3 = generateIntRange(N, 0);
+
+  // Double arrays for testing
+  protected final double[] dArray1 = generateDoubleRange(N, 1.0);
+  protected final double[] dArray2 = generateDoubleRange(N, 2.0);
+  protected final double[] dArrayZero = new double[N];
+
+  // Float arrays for testing
+  protected final float[] sArray1 = generateFloatRange(N, 1.0f);
+  protected final float[] sArray2 = generateFloatRange(N, 2.0f);
+  protected final float[] sArrayZero = new float[N];
+
+  // Matrices for eigenvalue problems
+  protected final double[] dMatrix = generateHilbertMatrix(N);
+  protected final float[] sMatrix = convertToFloat(dMatrix);
 }

@@ -29,12 +29,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Sgehd2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N;
+        int ilo = 1;
+        int ihi = n;
+        float[] a = sMatrix.clone();
+        float[] tau = new float[n - 1];
+        float[] work = new float[n];
+        intW info = new intW(0);
+
+        lapack.sgehd2(n, ilo, ihi, a, 0, n, tau, 0, work, 0, info);
+
+        assertEquals(0, info.val, "sgehd2 should succeed");
     }
 }

@@ -30,11 +30,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlarrfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // slarrf finds a new RRR for MRRR eigenvector computation. Internal to sstemr.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

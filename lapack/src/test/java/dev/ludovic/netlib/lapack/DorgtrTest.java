@@ -29,12 +29,56 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DorgtrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // First, perform tridiagonal reduction
+        double[] a = dSymmetricMatrix.clone();
+        double[] d = new double[n];
+        double[] e = new double[n - 1];
+        double[] tau = new double[n - 1];
+        double[] work = new double[n];
+        intW info = new intW(0);
+
+        lapack.dsytrd("U", n, a, 0, n, d, 0, e, 0, tau, 0, work, 0, n, info);
+        assertEquals(0, info.val, "Tridiagonal reduction should succeed");
+
+        // Generate Q from tridiagonal reduction
+        double[] q = a.clone();
+        lapack.dorgtr("U", n, q, 0, n, tau, 0, work, 0, n, info);
+        assertEquals(0, info.val, "dorgtr should succeed");
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testCompareWithReference(LAPACK lapack) {
+        int n = N_SMALL;
+
+        double[] a = dSymmetricMatrix.clone();
+        double[] d = new double[n];
+        double[] e = new double[n - 1];
+        double[] tau = new double[n - 1];
+        double[] work = new double[n];
+        intW info = new intW(0);
+
+        lapack.dsytrd("U", n, a, 0, n, d, 0, e, 0, tau, 0, work, 0, n, info);
+
+        // Test implementation
+        double[] q_test = a.clone();
+        lapack.dorgtr("U", n, q_test, 0, n, tau, 0, work, 0, n, info);
+
+        // Reference implementation
+        double[] q_ref = a.clone();
+        f2j.dorgtr("U", n, q_ref, 0, n, tau, 0, work, 0, n, info);
+
+        assertArrayEquals(q_ref, q_test, Math.scalb(depsilon, Math.getExponent(getMaxValue(q_ref)) + 4));
     }
 }

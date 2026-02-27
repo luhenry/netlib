@@ -29,12 +29,45 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slaed9Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // slaed9 finds roots of the secular equation between indices kstart and kstop.
+        // Similar to slaed4 but for a range.
+        int k = 4;
+        int n = k;
+        int kstart = 1;
+        int kstop = k;
+        float rho = 1.0f;
+
+        float[] dlamda_expected = {1.0f, 2.0f, 3.0f, 4.0f};
+        float[] w_expected = {0.5f, 0.5f, 0.5f, 0.5f};
+        float[] d_expected = new float[n];
+        float[] q_expected = new float[n * n];
+        float[] s_expected = new float[k * k];
+        intW info_expected = new intW(0);
+
+        f2j.slaed9(k, kstart, kstop, n, d_expected, 0, q_expected, 0, n,
+            rho, dlamda_expected, 0, w_expected, 0, s_expected, 0, k, info_expected);
+
+        float[] dlamda_actual = {1.0f, 2.0f, 3.0f, 4.0f};
+        float[] w_actual = {0.5f, 0.5f, 0.5f, 0.5f};
+        float[] d_actual = new float[n];
+        float[] q_actual = new float[n * n];
+        float[] s_actual = new float[k * k];
+        intW info_actual = new intW(0);
+
+        lapack.slaed9(k, kstart, kstop, n, d_actual, 0, q_actual, 0, n,
+            rho, dlamda_actual, 0, w_actual, 0, s_actual, 0, k, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(d_expected))));
+        assertArrayEquals(s_expected, s_actual, Math.scalb(sepsilon, Math.getExponent(Math.max(getMaxValue(s_expected), 1.0f))));
     }
 }

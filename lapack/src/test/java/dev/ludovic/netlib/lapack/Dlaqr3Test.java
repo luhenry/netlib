@@ -30,11 +30,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Dlaqr3Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // dlaqr3 performs aggressive early deflation with workspace query. Internal to dlaqr0/dhseqr.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

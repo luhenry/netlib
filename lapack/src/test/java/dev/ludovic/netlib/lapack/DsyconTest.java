@@ -29,12 +29,54 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsyconTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        // DSYCON: estimate reciprocal condition number of symmetric indefinite matrix
+        int n = N_SMALL;
+
+        double[] a = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                double val = (i == j) ? (i % 2 == 0 ? 10.0 : -5.0) : 1.0 / (i + j + 1.0);
+                a[i + j * n] = val;
+                a[j + i * n] = val;
+            }
+        }
+
+        // Compute 1-norm before factoring
+        double[] work_norm = new double[n];
+        double anorm = f2j.dlansy("1", "U", n, a, n, work_norm);
+
+        // Factor with dsytrf
+        int[] ipiv = new int[n];
+        double[] work_f = new double[n * 64];
+        intW info = new intW(0);
+        f2j.dsytrf("U", n, a, n, ipiv, work_f, work_f.length, info);
+        assertEquals(0, info.val);
+
+        // Estimate condition number
+        double[] work_expected = new double[2 * n];
+        double[] work_actual = new double[2 * n];
+        int[] iwork_expected = new int[n];
+        int[] iwork_actual = new int[n];
+        doubleW rcond_expected = new doubleW(0);
+        doubleW rcond_actual = new doubleW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dsycon("U", n, a, n, ipiv, anorm, rcond_expected, work_expected, iwork_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dsycon("U", n, a, n, ipiv, anorm, rcond_actual, work_actual, iwork_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(rcond_expected.val, rcond_actual.val, depsilon);
     }
 }

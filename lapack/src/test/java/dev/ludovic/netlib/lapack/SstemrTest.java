@@ -29,12 +29,46 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SstemrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        // jobz = "N", range = "A": eigenvalues only, all eigenvalues
+        int lwork = 18 * n;
+        int liwork = 10 * n;
+        int nzc = n;
+        float[] d_expected = generateFloatArray(n, 1.0f);
+        float[] e_expected = generateFloatArray(n, 0.5f);
+        float[] w_expected = new float[n];
+        float[] z_expected = new float[n * nzc];
+        int[] isuppz_expected = new int[2 * n];
+        float[] work_expected = new float[lwork];
+        int[] iwork_expected = new int[liwork];
+        intW m_expected = new intW(0);
+        booleanW tryrac_expected = new booleanW(true);
+        intW info_expected = new intW(0);
+        f2j.sstemr("N", "A", n, d_expected, 0, e_expected, 0, 0.0f, 0.0f, 0, 0, m_expected, w_expected, 0, z_expected, 0, n, nzc, isuppz_expected, 0, tryrac_expected, work_expected, 0, lwork, iwork_expected, 0, liwork, info_expected);
+
+        float[] d_actual = generateFloatArray(n, 1.0f);
+        float[] e_actual = generateFloatArray(n, 0.5f);
+        float[] w_actual = new float[n];
+        float[] z_actual = new float[n * nzc];
+        int[] isuppz_actual = new int[2 * n];
+        float[] work_actual = new float[lwork];
+        int[] iwork_actual = new int[liwork];
+        intW m_actual = new intW(0);
+        booleanW tryrac_actual = new booleanW(true);
+        intW info_actual = new intW(0);
+        lapack.sstemr("N", "A", n, d_actual, 0, e_actual, 0, 0.0f, 0.0f, 0, 0, m_actual, w_actual, 0, z_actual, 0, n, nzc, isuppz_actual, 0, tryrac_actual, work_actual, 0, lwork, iwork_actual, 0, liwork, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(m_expected.val, m_actual.val);
+        assertArrayEquals(w_expected, w_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(w_expected))));
     }
 }

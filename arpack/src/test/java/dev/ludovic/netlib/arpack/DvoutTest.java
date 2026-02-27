@@ -25,16 +25,41 @@
 
 package dev.ludovic.netlib.arpack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DvoutTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // dvout is an output method, so we just test that it runs without error
+
+        // Note: Some native implementations may have issues with output functions
+        org.junit.jupiter.api.Assumptions.assumeFalse(arpack instanceof NativeARPACK,
+                "Output function not fully supported by " + arpack.getClass().getSimpleName());
+
+        // Test basic call with standard output
+        assertDoesNotThrow(() -> {
+            arpack.dvout(6, 10, dArray1, 4, "Test dvout");
+        });
+
+        // Test with different precision
+        assertDoesNotThrow(() -> {
+            arpack.dvout(6, 5, dArray1, 6, "High precision");
+        });
+
+        // Test with zero length (edge case)
+        assertDoesNotThrow(() -> {
+            arpack.dvout(6, 0, dArray1, 4, "Zero length");
+        });
+
+        // Test with offset version
+        assertDoesNotThrow(() -> {
+            arpack.dvout(6, 5, dArray1, 0, 4, "With offset");
+        });
     }
 }

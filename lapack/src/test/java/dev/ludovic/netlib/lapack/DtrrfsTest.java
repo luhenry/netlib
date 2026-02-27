@@ -29,12 +29,55 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DtrrfsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create an upper triangular matrix
+        double[] a = new double[N * N];
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i <= j; i++) {
+                a[i + j * N] = (i == j) ? (N + 1.0) : (1.0 / (i + j + 2.0));
+            }
+        }
+
+        double[] b = generateDoubleArray(N, 1.0);
+        double[] x_expected = b.clone();
+        double[] x_actual = b.clone();
+
+        intW info = new intW(0);
+        f2j.dtrtrs("U", "N", "N", N, 1, a, 0, N, x_expected, 0, N, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.dtrtrs("U", "N", "N", N, 1, a, 0, N, x_actual, 0, N, info);
+        assertEquals(0, info.val);
+
+        double[] ferr_expected = new double[1];
+        double[] ferr_actual = new double[1];
+        double[] berr_expected = new double[1];
+        double[] berr_actual = new double[1];
+        double[] work_expected = new double[3 * N];
+        double[] work_actual = new double[3 * N];
+        int[] iwork_expected = new int[N];
+        int[] iwork_actual = new int[N];
+
+        info.val = 0;
+        f2j.dtrrfs("U", "N", "N", N, 1, a, 0, N, b, 0, N, x_expected, 0, N, ferr_expected, 0, berr_expected, 0, work_expected, 0, iwork_expected, 0, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.dtrrfs("U", "N", "N", N, 1, a, 0, N, b, 0, N, x_actual, 0, N, ferr_actual, 0, berr_actual, 0, work_actual, 0, iwork_actual, 0, info);
+        assertEquals(0, info.val);
+
+        // Solution should match closely after refinement
+        assertArrayEquals(x_expected, x_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(x_expected)) + 1));
+        // FERR is an error estimate that can vary between implementations
+        assertArrayEquals(ferr_expected, ferr_actual, Math.max(depsilon, Math.abs(getMaxValue(ferr_expected)) * 5));
+        // BERR should be near machine epsilon, but can vary by small factors
+        assertArrayEquals(berr_expected, berr_actual, depsilon * 10);
     }
 }

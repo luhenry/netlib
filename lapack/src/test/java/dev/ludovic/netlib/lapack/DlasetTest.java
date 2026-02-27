@@ -30,11 +30,38 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlasetTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test setting full matrix with different diagonal and off-diagonal values
+        double[] expected = new double[N * N];
+        f2j.dlaset("A", N, N, 1.0, 2.0, expected, 0, N);
+
+        double[] actual = new double[N * N];
+        lapack.dlaset("A", N, N, 1.0, 2.0, actual, 0, N);
+
+        assertArrayEquals(expected, actual, depsilon);
+
+        // Test setting upper triangular part
+        double[] expected_upper = new double[N * N];
+        f2j.dlaset("U", N, N, 3.0, 4.0, expected_upper, 0, N);
+
+        double[] actual_upper = new double[N * N];
+        lapack.dlaset("U", N, N, 3.0, 4.0, actual_upper, 0, N);
+
+        assertArrayEquals(expected_upper, actual_upper, depsilon);
+
+        // Test setting lower triangular part
+        double[] expected_lower = new double[N * N];
+        f2j.dlaset("L", N, N, 5.0, 6.0, expected_lower, 0, N);
+
+        double[] actual_lower = new double[N * N];
+        lapack.dlaset("L", N, N, 5.0, 6.0, actual_lower, 0, N);
+
+        assertArrayEquals(expected_lower, actual_lower, depsilon);
     }
 }

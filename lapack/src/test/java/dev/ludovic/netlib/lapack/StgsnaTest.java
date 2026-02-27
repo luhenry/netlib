@@ -29,12 +29,49 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class StgsnaTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // A is upper triangular (generalized Schur form)
+        float[] a = generateUpperTriangularMatrixFloat(n, 1.0f, 1.0f, 0.5f);
+
+        // B is upper triangular (generalized Schur form)
+        float[] b = generateUpperTriangularMatrixFloat(n, n + 1.0f, 1.0f, 0.3f);
+
+        // JOB='V': compute separation (eigenvector condition) only
+        // HOWMNY='A': compute for all eigenvalues
+        boolean[] select = new boolean[n];
+        float[] vl = new float[1];
+        float[] vr = new float[1];
+        float[] s_expected = new float[n];
+        float[] s_actual = new float[n];
+        float[] dif_expected = new float[n];
+        float[] dif_actual = new float[n];
+        intW m_expected = new intW(0);
+        intW m_actual = new intW(0);
+        int lwork = 2 * n * (n + 2) + 16;
+        float[] work_expected = new float[lwork];
+        float[] work_actual = new float[lwork];
+        int[] iwork_expected = new int[n + 6];
+        int[] iwork_actual = new int[n + 6];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.stgsna("V", "A", select, n, a, n, b, n, vl, 1, vr, 1, s_expected, dif_expected, n, m_expected, work_expected, lwork, iwork_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.stgsna("V", "A", select, n, a, n, b, n, vl, 1, vr, 1, s_actual, dif_actual, n, m_actual, work_actual, lwork, iwork_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(m_expected.val, m_actual.val);
+        assertArrayEquals(dif_expected, dif_actual, sepsilon);
     }
 }

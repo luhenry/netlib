@@ -30,21 +30,39 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.netlib.util.intW;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgeevTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        int n = 2;
-        double[] a = {1.0, 0.75, 0.5, 1.0};
-        double[] wr = new double[2];
-        double[] wi = new double[2];
-        int lwork = 68; // optimal size from previous query
-        double[] work = new double[lwork];
-        intW info = new intW(2);
+        int n = N_SMALL;
+        double[] a_expected = generateMatrix(n, n, 1.0);
+        double[] a_actual = a_expected.clone();
+        double[] wr_expected = new double[n];
+        double[] wr_actual = new double[n];
+        double[] wi_expected = new double[n];
+        double[] wi_actual = new double[n];
+        int lwork = 4 * n;
+        double[] work_expected = new double[lwork];
+        double[] work_actual = new double[lwork];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
 
-        lapack.dgeev("N", "N", n, a, n, wr, wi, new double[1], 1, new double[1], 1, work, lwork, info);
+        f2j.dgeev("N", "N", n, a_expected, n, wr_expected, wi_expected,
+                  new double[1], 1, new double[1], 1, work_expected, lwork, info_expected);
+        assertEquals(0, info_expected.val, "Reference dgeev should succeed");
+
+        lapack.dgeev("N", "N", n, a_actual, n, wr_actual, wi_actual,
+                     new double[1], 1, new double[1], 1, work_actual, lwork, info_actual);
+        assertEquals(0, info_actual.val, "dgeev should succeed");
+
+        // Sort eigenvalues for comparison (ordering may differ between implementations)
+        java.util.Arrays.sort(wr_expected);
+        java.util.Arrays.sort(wr_actual);
+        assertArrayEquals(wr_expected, wr_actual, depsilon * 100);
     }
 }

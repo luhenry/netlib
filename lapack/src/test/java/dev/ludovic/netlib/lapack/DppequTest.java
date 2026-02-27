@@ -29,12 +29,81 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DppequTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        // DPPEQU computes row/column scalings for a symmetric positive definite
+        // matrix in packed format: S(i) = 1/sqrt(A(i,i))
+        int n = N_SMALL;
+        // Pack upper triangle of positive definite matrix: AP(i + j*(j-1)/2) for i<=j (0-based: i + j*(j+1)/2)
+        int ap_size = n * (n + 1) / 2;
+        double[] ap = new double[ap_size];
+        double[] pdm = generatePositiveDefiniteMatrix(n);
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[k++] = pdm[i + j * n];
+            }
+        }
+
+        double[] s_expected = new double[n];
+        double[] s_actual = new double[n];
+        doubleW scond_expected = new doubleW(0);
+        doubleW scond_actual = new doubleW(0);
+        doubleW amax_expected = new doubleW(0);
+        doubleW amax_actual = new doubleW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dppequ("U", n, ap, s_expected, scond_expected, amax_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dppequ("U", n, ap, s_actual, scond_actual, amax_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(s_expected, s_actual, depsilon);
+        assertEquals(scond_expected.val, scond_actual.val, depsilon);
+        assertEquals(amax_expected.val, amax_actual.val, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+        // Pack lower triangle: AP(i + (j-1)*(2n-j)/2) for j<=i (0-based)
+        int ap_size = n * (n + 1) / 2;
+        double[] ap = new double[ap_size];
+        double[] pdm = generatePositiveDefiniteMatrix(n);
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = j; i < n; i++) {
+                ap[k++] = pdm[i + j * n];
+            }
+        }
+
+        double[] s_expected = new double[n];
+        double[] s_actual = new double[n];
+        doubleW scond_expected = new doubleW(0);
+        doubleW scond_actual = new doubleW(0);
+        doubleW amax_expected = new doubleW(0);
+        doubleW amax_actual = new doubleW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dppequ("L", n, ap, s_expected, scond_expected, amax_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dppequ("L", n, ap, s_actual, scond_actual, amax_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(s_expected, s_actual, depsilon);
+        assertEquals(scond_expected.val, scond_actual.val, depsilon);
+        assertEquals(amax_expected.val, amax_actual.val, depsilon);
     }
 }

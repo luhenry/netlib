@@ -29,12 +29,42 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SpbequTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create a positive definite banded matrix
+        int kd = 3;
+        int ldab = kd + 1;
+        float[] ab = new float[ldab * N];
+
+        // Fill symmetric banded storage format (upper triangular)
+        for (int j = 0; j < N; j++) {
+            for (int i = Math.max(0, j - kd); i <= j; i++) {
+                ab[kd + i - j + j * ldab] = sPositiveDefiniteMatrix[i + j * N];
+            }
+        }
+
+        float[] s_expected = new float[N];
+        floatW scond_expected = new floatW(0.0f);
+        floatW amax_expected = new floatW(0.0f);
+        intW info_expected = new intW(0);
+        f2j.spbequ("U", N, kd, ab, 0, ldab, s_expected, 0, scond_expected, amax_expected, info_expected);
+
+        float[] s_actual = new float[N];
+        floatW scond_actual = new floatW(0.0f);
+        floatW amax_actual = new floatW(0.0f);
+        intW info_actual = new intW(0);
+        lapack.spbequ("U", N, kd, ab, 0, ldab, s_actual, 0, scond_actual, amax_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(s_expected, s_actual, sepsilon);
+        assertEquals(scond_expected.val, scond_actual.val, sepsilon);
+        assertEquals(amax_expected.val, amax_actual.val, sepsilon);
     }
 }

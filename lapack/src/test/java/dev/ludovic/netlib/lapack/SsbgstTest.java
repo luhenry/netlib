@@ -29,12 +29,44 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SsbgstTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testNoTransformMatrix(LAPACK lapack) {
+        int n = N_SMALL;
+        int ka = 2;
+        int kb = 1;
+        int ldab = ka + 1;
+        int ldbb = kb + 1;
+
+        float[] ab = generateBandedSymmetricMatrixFloat(n, ka, n + 10.0f, 0.5f);
+
+        float[] bb = generateBandedSymmetricMatrixFloat(n, kb, n + 5.0f, 0.3f);
+
+        intW info = new intW(0);
+        f2j.spbstf("U", n, kb, bb, ldbb, info);
+        assertEquals(0, info.val);
+
+        float[] ab_expected = ab.clone();
+        float[] ab_actual = ab.clone();
+        float[] x_expected = new float[1];
+        float[] x_actual = new float[1];
+        float[] work_expected = new float[2 * n];
+        float[] work_actual = new float[2 * n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ssbgst("N", "U", n, ka, kb, ab_expected, ldab, bb, ldbb, x_expected, 1, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ssbgst("N", "U", n, ka, kb, ab_actual, ldab, bb, ldbb, x_actual, 1, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ab_expected, ab_actual, sepsilon);
     }
 }

@@ -29,12 +29,31 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlamc4Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        intW emin_expected = new intW(0);
+        intW emin_actual = new intW(0);
+
+        // Test with base 2
+        f2j.dlamc4(emin_expected, 1.0, 2);
+        lapack.dlamc4(emin_actual, 1.0, 2);
+        assertEquals(emin_expected.val, emin_actual.val);
+
+        // Test with base 10
+        emin_expected.val = 0;
+        emin_actual.val = 0;
+        f2j.dlamc4(emin_expected, 1.0, 10);
+        lapack.dlamc4(emin_actual, 1.0, 10);
+        assertEquals(emin_expected.val, emin_actual.val);
     }
 }

@@ -30,11 +30,33 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlangeTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] work = new float[N];
+
+        // Test 1-norm
+        float expected = f2j.slange("1", N, N, sMatrix, 0, N, work, 0);
+        float actual = lapack.slange("1", N, N, sMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Inf-norm
+        expected = f2j.slange("I", N, N, sMatrix, 0, N, work, 0);
+        actual = lapack.slange("I", N, N, sMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Frobenius norm
+        expected = f2j.slange("F", N, N, sMatrix, 0, N, work, 0);
+        actual = lapack.slange("F", N, N, sMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Max norm
+        expected = f2j.slange("M", N, N, sMatrix, 0, N, work, 0);
+        actual = lapack.slange("M", N, N, sMatrix, 0, N, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
     }
 }

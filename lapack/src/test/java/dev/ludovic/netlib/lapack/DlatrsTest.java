@@ -29,12 +29,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlatrsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // Build an upper triangular matrix with positive diagonal
+        double[] a = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                a[i + j * n] = (i == j) ? (n + 1.0) : 1.0 / (i + j + 2.0);
+            }
+        }
+
+        double[] x_expected = generateDoubleArray(n, 1.0);
+        double[] cnorm_expected = new double[n];
+        doubleW scale_expected = new doubleW(0.0);
+        intW info_expected = new intW(0);
+        f2j.dlatrs("U", "N", "N", "N", n, a.clone(), 0, n, x_expected, 0, scale_expected, cnorm_expected, 0, info_expected);
+
+        double[] x_actual = generateDoubleArray(n, 1.0);
+        double[] cnorm_actual = new double[n];
+        doubleW scale_actual = new doubleW(0.0);
+        intW info_actual = new intW(0);
+        lapack.dlatrs("U", "N", "N", "N", n, a.clone(), 0, n, x_actual, 0, scale_actual, cnorm_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(scale_expected.val, scale_actual.val, depsilon);
+        assertArrayEquals(x_expected, x_actual, depsilon);
     }
 }

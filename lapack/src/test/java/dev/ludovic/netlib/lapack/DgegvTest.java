@@ -29,12 +29,83 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgegvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        double[] a_expected = generateMatrix(n, n, 1.0);
+        double[] b_expected = generatePositiveDefiniteMatrix(n);
+        double[] alphar_expected = new double[n];
+        double[] alphai_expected = new double[n];
+        double[] beta_expected = new double[n];
+        double[] vl_expected = new double[n * n];
+        double[] vr_expected = new double[n * n];
+        int lwork = Math.max(1, 8 * n);
+        double[] work_expected = new double[lwork];
+        intW info_expected = new intW(0);
+
+        f2j.dgegv("V", "V", n, a_expected, 0, n, b_expected, 0, n, alphar_expected, 0, alphai_expected, 0, beta_expected, 0, vl_expected, 0, n, vr_expected, 0, n, work_expected, 0, lwork, info_expected);
+        assertEquals(0, info_expected.val, "Reference dgegv should succeed");
+
+        double[] a_actual = generateMatrix(n, n, 1.0);
+        double[] b_actual = generatePositiveDefiniteMatrix(n);
+        double[] alphar_actual = new double[n];
+        double[] alphai_actual = new double[n];
+        double[] beta_actual = new double[n];
+        double[] vl_actual = new double[n * n];
+        double[] vr_actual = new double[n * n];
+        double[] work_actual = new double[lwork];
+        intW info_actual = new intW(0);
+
+        lapack.dgegv("V", "V", n, a_actual, 0, n, b_actual, 0, n, alphar_actual, 0, alphai_actual, 0, beta_actual, 0, vl_actual, 0, n, vr_actual, 0, n, work_actual, 0, lwork, info_actual);
+        assertEquals(0, info_actual.val, "dgegv should succeed");
+
+        assertArrayEquals(alphar_expected, alphar_actual, 1.0);
+        assertArrayEquals(alphai_expected, alphai_actual, 1.0);
+        assertArrayEquals(beta_expected, beta_actual, 1.0);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testNoVectors(LAPACK lapack) {
+        int n = N_SMALL;
+
+        double[] a_expected = generateMatrix(n, n, 1.0);
+        double[] b_expected = generatePositiveDefiniteMatrix(n);
+        double[] alphar_expected = new double[n];
+        double[] alphai_expected = new double[n];
+        double[] beta_expected = new double[n];
+        double[] vl_expected = new double[1];
+        double[] vr_expected = new double[1];
+        int lwork = Math.max(1, 8 * n);
+        double[] work_expected = new double[lwork];
+        intW info_expected = new intW(0);
+
+        f2j.dgegv("N", "N", n, a_expected, 0, n, b_expected, 0, n, alphar_expected, 0, alphai_expected, 0, beta_expected, 0, vl_expected, 0, 1, vr_expected, 0, 1, work_expected, 0, lwork, info_expected);
+        assertEquals(0, info_expected.val);
+
+        double[] a_actual = generateMatrix(n, n, 1.0);
+        double[] b_actual = generatePositiveDefiniteMatrix(n);
+        double[] alphar_actual = new double[n];
+        double[] alphai_actual = new double[n];
+        double[] beta_actual = new double[n];
+        double[] vl_actual = new double[1];
+        double[] vr_actual = new double[1];
+        double[] work_actual = new double[lwork];
+        intW info_actual = new intW(0);
+
+        lapack.dgegv("N", "N", n, a_actual, 0, n, b_actual, 0, n, alphar_actual, 0, alphai_actual, 0, beta_actual, 0, vl_actual, 0, 1, vr_actual, 0, 1, work_actual, 0, lwork, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(alphar_expected, alphar_actual, 1.0);
+        assertArrayEquals(alphai_expected, alphai_actual, 1.0);
+        assertArrayEquals(beta_expected, beta_actual, 1.0);
     }
 }

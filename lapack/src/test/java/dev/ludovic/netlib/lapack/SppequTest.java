@@ -29,12 +29,77 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SppequTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        int n = N_SMALL;
+        int ap_size = n * (n + 1) / 2;
+        float[] ap = new float[ap_size];
+        float[] pdm = generatePositiveDefiniteMatrixFloat(n);
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[k++] = pdm[i + j * n];
+            }
+        }
+
+        float[] s_expected = new float[n];
+        float[] s_actual = new float[n];
+        floatW scond_expected = new floatW(0);
+        floatW scond_actual = new floatW(0);
+        floatW amax_expected = new floatW(0);
+        floatW amax_actual = new floatW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sppequ("U", n, ap, s_expected, scond_expected, amax_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sppequ("U", n, ap, s_actual, scond_actual, amax_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(s_expected, s_actual, sepsilon);
+        assertEquals(scond_expected.val, scond_actual.val, sepsilon);
+        assertEquals(amax_expected.val, amax_actual.val, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+        int ap_size = n * (n + 1) / 2;
+        float[] ap = new float[ap_size];
+        float[] pdm = generatePositiveDefiniteMatrixFloat(n);
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = j; i < n; i++) {
+                ap[k++] = pdm[i + j * n];
+            }
+        }
+
+        float[] s_expected = new float[n];
+        float[] s_actual = new float[n];
+        floatW scond_expected = new floatW(0);
+        floatW scond_actual = new floatW(0);
+        floatW amax_expected = new floatW(0);
+        floatW amax_actual = new floatW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sppequ("L", n, ap, s_expected, scond_expected, amax_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sppequ("L", n, ap, s_actual, scond_actual, amax_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(s_expected, s_actual, sepsilon);
+        assertEquals(scond_expected.val, scond_actual.val, sepsilon);
+        assertEquals(amax_expected.val, amax_actual.val, sepsilon);
     }
 }

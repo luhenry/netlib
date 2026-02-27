@@ -29,12 +29,47 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SspgvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testEigenvaluesOnly(LAPACK lapack) {
+        int n = N_SMALL;
+        int ap_len = n * (n + 1) / 2;
+
+        float[] ap = generatePackedSymmetricMatrixFloat(n, n + 10.0f);
+
+        float[] bp = new float[ap_len];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                bp[k++] = (i == j) ? n + 5.0f : 0.3f / (i + j + 1.0f);
+            }
+        }
+
+        float[] ap_expected = ap.clone();
+        float[] ap_actual = ap.clone();
+        float[] bp_expected = bp.clone();
+        float[] bp_actual = bp.clone();
+        float[] w_expected = new float[n];
+        float[] w_actual = new float[n];
+        float[] z_expected = new float[1];
+        float[] z_actual = new float[1];
+        float[] work_expected = new float[3 * n];
+        float[] work_actual = new float[3 * n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sspgv(1, "N", "U", n, ap_expected, bp_expected, w_expected, z_expected, 1, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sspgv(1, "N", "U", n, ap_actual, bp_actual, w_actual, z_actual, 1, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(w_expected, w_actual, sepsilon);
     }
 }

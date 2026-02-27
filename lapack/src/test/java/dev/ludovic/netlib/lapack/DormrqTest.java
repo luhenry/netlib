@@ -29,12 +29,82 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DormrqTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N;
+        int n = N;
+        int k = Math.min(m, n);
+
+        // First, perform RQ factorization to get elementary reflectors
+        double[] a = dMatrix.clone();
+        double[] tau = new double[k];
+        double[] work = new double[n];
+        intW info = new intW(0);
+
+        lapack.dgerqf(m, n, a, 0, m, tau, 0, work, 0, n, info);
+        assertEquals(0, info.val, "RQ factorization should succeed");
+
+        // Create a matrix C to apply Q to
+        double[] c = generateMatrix(m, n, 2.0);
+        double[] c_copy = c.clone();
+
+        // Apply Q from the left: C := Q * C
+        lapack.dormrq("L", "N", m, n, k, a, 0, m, tau, 0, c, 0, m, work, 0, n, info);
+        assertEquals(0, info.val, "dormrq should succeed");
+
+        // Verify by generating explicit Q and multiplying
+        double[] q = a.clone();
+        lapack.dorgrq(m, n, k, q, 0, m, tau, 0, work, 0, n, info);
+
+        // Compute Q * C_copy manually
+        double[] expected = new double[m * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                double sum = 0.0;
+                for (int l = 0; l < n; l++) {
+                    sum += q[i + l * m] * c_copy[l + j * m];
+                }
+                expected[i + j * m] = sum;
+            }
+        }
+
+        // Compare results
+        assertArrayEquals(expected, c, depsilon * m * n * 10);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testCompareWithReference(LAPACK lapack) {
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int k = Math.min(m, n);
+
+        // Generate RQ factorization
+        double[] a = generateMatrix(m, n, 1.0);
+        double[] tau = new double[k];
+        double[] work = new double[n];
+        intW info = new intW(0);
+
+        lapack.dgerqf(m, n, a, 0, m, tau, 0, work, 0, n, info);
+
+        // Create matrix C
+        double[] c_test = generateMatrix(m, n, 2.0);
+        double[] c_ref = c_test.clone();
+
+        // Apply with test implementation
+        lapack.dormrq("L", "N", m, n, k, a, 0, m, tau, 0, c_test, 0, m, work, 0, n, info);
+
+        // Apply with reference implementation
+        f2j.dormrq("L", "N", m, n, k, a, 0, m, tau, 0, c_ref, 0, m, work, 0, n, info);
+
+        // Compare results
+        assertArrayEquals(c_ref, c_test, Math.scalb(depsilon, Math.getExponent(getMaxValue(c_ref)) + 4));
     }
 }

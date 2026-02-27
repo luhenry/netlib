@@ -29,12 +29,29 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlapllTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Measure linear dependency of two column vectors via smallest singular value
+        int n = 5;
+        double[] x_expected = { 1.0, 2.0, 3.0, 4.0, 5.0 };
+        double[] x_actual = x_expected.clone();
+        double[] y_expected = { 2.0, 1.0, 4.0, 3.0, 6.0 };
+        double[] y_actual = y_expected.clone();
+        doubleW ssmin_expected = new doubleW(0.0);
+        doubleW ssmin_actual = new doubleW(0.0);
+
+        f2j.dlapll(n, x_expected, 1, y_expected, 1, ssmin_expected);
+        lapack.dlapll(n, x_actual, 1, y_actual, 1, ssmin_actual);
+
+        assertArrayEquals(x_expected, x_actual, depsilon);
+        assertArrayEquals(y_expected, y_actual, depsilon);
+        assertEquals(ssmin_expected.val, ssmin_actual.val, depsilon);
     }
 }

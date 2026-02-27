@@ -29,12 +29,84 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SorgqrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N;
+        int n = N;
+        int k = Math.min(m, n);
+
+        // First, perform QR factorization to get elementary reflectors
+        float[] a = sMatrix.clone();
+        float[] tau = new float[k];
+        float[] work = new float[n];
+        intW info = new intW(0);
+
+        lapack.sgeqrf(m, n, a, 0, m, tau, 0, work, 0, n, info);
+        assertEquals(0, info.val, "QR factorization should succeed");
+
+        // Now generate explicit Q matrix using sorgqr
+        float[] q = a.clone();
+        int lwork = n;
+        work = new float[lwork];
+
+        lapack.sorgqr(m, n, k, q, 0, m, tau, 0, work, 0, lwork, info);
+        assertEquals(0, info.val, "sorgqr should succeed");
+
+        // Verify orthogonality: Q^T * Q should be identity
+        float[] qtq = new float[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                float sum = 0.0f;
+                for (int l = 0; l < m; l++) {
+                    sum += q[l + i * m] * q[l + j * m];
+                }
+                qtq[i + j * n] = sum;
+            }
+        }
+
+        // Check if QtQ is identity
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                float expected = (i == j) ? 1.0f : 0.0f;
+                assertEquals(expected, qtq[i + j * n], sepsilon * n * 100,
+                    "Q^T * Q should be identity at (" + i + "," + j + ")");
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testCompareWithReference(LAPACK lapack) {
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int k = Math.min(m, n);
+
+        // Generate QR factorization
+        float[] a = generateMatrixFloat(m, n, 1.0f);
+        float[] tau = new float[k];
+        float[] work = new float[n];
+        intW info = new intW(0);
+
+        lapack.sgeqrf(m, n, a, 0, m, tau, 0, work, 0, n, info);
+
+        // Generate Q with test implementation
+        float[] q_test = a.clone();
+        float[] tau_test = tau.clone();
+        lapack.sorgqr(m, n, k, q_test, 0, m, tau_test, 0, work, 0, n, info);
+
+        // Generate Q with reference implementation
+        float[] q_ref = a.clone();
+        float[] tau_ref = tau.clone();
+        f2j.sorgqr(m, n, k, q_ref, 0, m, tau_ref, 0, work, 0, n, info);
+
+        // Compare results
+        assertArrayEquals(q_ref, q_test, Math.scalb(sepsilon, Math.getExponent(getMaxValue(q_ref)) + 4));
     }
 }

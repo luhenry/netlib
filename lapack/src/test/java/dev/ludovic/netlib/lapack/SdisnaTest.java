@@ -29,12 +29,71 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SdisnaTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testEigenvectors(LAPACK lapack) {
+        int n = 5;
+        float[] d = {10.0f, 7.0f, 4.0f, 2.0f, 1.0f};
+
+        float[] sep_expected = new float[n];
+        float[] sep_actual = new float[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sdisna("E", n, n, d, sep_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sdisna("E", n, n, d, sep_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(sep_expected, sep_actual, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLeftSingularVectors(LAPACK lapack) {
+        int m = 6, n = 4;
+        int minmn = Math.min(m, n);
+        float[] d = {10.0f, 7.0f, 3.0f, 1.0f};
+
+        float[] sep_expected = new float[minmn];
+        float[] sep_actual = new float[minmn];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sdisna("L", m, n, d, sep_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sdisna("L", m, n, d, sep_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(sep_expected, sep_actual, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testRightSingularVectors(LAPACK lapack) {
+        int m = 4, n = 6;
+        int minmn = Math.min(m, n);
+        float[] d = {10.0f, 7.0f, 3.0f, 1.0f};
+
+        float[] sep_expected = new float[minmn];
+        float[] sep_actual = new float[minmn];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sdisna("R", m, n, d, sep_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sdisna("R", m, n, d, sep_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(sep_expected, sep_actual, sepsilon);
     }
 }

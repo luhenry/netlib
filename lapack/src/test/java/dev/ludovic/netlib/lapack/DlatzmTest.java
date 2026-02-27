@@ -30,11 +30,28 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlatzmTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Apply Householder matrix P from the left: P * [C1; C2]
+        // C1 and C2 are parts of the same m-by-n matrix C with leading dimension m
+        // C1 = C(1,:) starts at offset 0, C2 = C(2:m,:) starts at offset 1
+        int m = 5;
+        int n = 3;
+        double[] v = { 0.5, 0.3, 0.7, 0.2 }; // (m-1)-vector
+        double tau = 1.5;
+        double[] c_expected = generateMatrix(m, n, 1.0);
+        double[] c_actual = c_expected.clone();
+        double[] work_expected = new double[n];
+        double[] work_actual = new double[n];
+
+        f2j.dlatzm("L", m, n, v, 0, 1, tau, c_expected, 0, c_expected, 1, m, work_expected, 0);
+        lapack.dlatzm("L", m, n, v, 0, 1, tau, c_actual, 0, c_actual, 1, m, work_actual, 0);
+
+        assertArrayEquals(c_expected, c_actual, depsilon);
     }
 }

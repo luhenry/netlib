@@ -30,11 +30,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Dlazq3Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // dlazq3 is an internal dqds iteration step requiring carefully prepared intermediate
+        // state. Higher-level dlasq2 (which calls dlazq3) is already tested.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

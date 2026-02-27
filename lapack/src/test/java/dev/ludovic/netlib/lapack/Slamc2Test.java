@@ -29,12 +29,46 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slamc2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        intW beta_expected = new intW(0);
+        intW t_expected = new intW(0);
+        booleanW rnd_expected = new booleanW(false);
+        floatW eps_expected = new floatW(0.0f);
+        intW emin_expected = new intW(0);
+        floatW rmin_expected = new floatW(0.0f);
+        intW emax_expected = new intW(0);
+        floatW rmax_expected = new floatW(0.0f);
+
+        intW beta_actual = new intW(0);
+        intW t_actual = new intW(0);
+        booleanW rnd_actual = new booleanW(false);
+        floatW eps_actual = new floatW(0.0f);
+        intW emin_actual = new intW(0);
+        floatW rmin_actual = new floatW(0.0f);
+        intW emax_actual = new intW(0);
+        floatW rmax_actual = new floatW(0.0f);
+
+        f2j.slamc2(beta_expected, t_expected, rnd_expected, eps_expected, emin_expected, rmin_expected, emax_expected, rmax_expected);
+        lapack.slamc2(beta_actual, t_actual, rnd_actual, eps_actual, emin_actual, rmin_actual, emax_actual, rmax_actual);
+
+        assertEquals(beta_expected.val, beta_actual.val);
+        assertEquals(t_expected.val, t_actual.val);
+        assertEquals(rnd_expected.val, rnd_actual.val);
+        assertEquals(eps_expected.val, eps_actual.val, sepsilon);
+        assertEquals(emin_expected.val, emin_actual.val);
+        assertEquals(rmin_expected.val, rmin_actual.val, sepsilon);
+        assertEquals(emax_expected.val, emax_actual.val);
+        assertEquals(rmax_expected.val, rmax_actual.val, sepsilon);
     }
 }

@@ -29,12 +29,40 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlatpsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // Upper triangular packed storage
+        float[] ap = new float[n * (n + 1) / 2];
+        int idx = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[idx++] = (i == j) ? (n + 1.0f) : 1.0f / (i + j + 2.0f);
+            }
+        }
+
+        float[] x_expected = generateFloatArray(n, 1.0f);
+        float[] cnorm_expected = new float[n];
+        floatW scale_expected = new floatW(0.0f);
+        intW info_expected = new intW(0);
+        f2j.slatps("U", "N", "N", "N", n, ap.clone(), 0, x_expected, 0, scale_expected, cnorm_expected, 0, info_expected);
+
+        float[] x_actual = generateFloatArray(n, 1.0f);
+        float[] cnorm_actual = new float[n];
+        floatW scale_actual = new floatW(0.0f);
+        intW info_actual = new intW(0);
+        lapack.slatps("U", "N", "N", "N", n, ap.clone(), 0, x_actual, 0, scale_actual, cnorm_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(scale_expected.val, scale_actual.val, sepsilon);
+        assertArrayEquals(x_expected, x_actual, sepsilon);
     }
 }

@@ -159,7 +159,7 @@ class JStringW:
     self.java_type_and_name = [a.format(name=name) for a in ["jobject {name}"]]
     self.native_argument = "__n{name}".format(name=name)
     self.native_local = "char *__n{name} = NULL; jstring __j{name} = NULL;".format(name=name)
-    self.prolog = "__j{name} = (jstring)(*env)->GetObjectField(env, {name}, StringW_val_fieldID); if (!(__n{name} = (char*)(*env)->GetStringUTFChars(env, {name}, NULL))) {{ __failed = TRUE; goto done; }}".format(name=name)
+    self.prolog = "__j{name} = (jstring)(*env)->GetObjectField(env, {name}, StringW_val_fieldID); if (!(__n{name} = (char*)(*env)->GetStringUTFChars(env, __j{name}, NULL))) {{ __failed = TRUE; goto done; }}".format(name=name)
     self.epilog = "if (__n{name}) {{ (*env)->ReleaseStringUTFChars(env, __j{name}, (const char*)__n{name}); if (!__failed) (*env)->SetObjectField(env, {name}, StringW_val_fieldID, __j{name}); }}".format(name=name)
 
 class JBooleanArray:
@@ -216,23 +216,36 @@ class RoutineR:
     self.args = args
 
   def render(self, pkg):
+    # Collect JString/JStringW args for Fortran hidden string length parameters
+    string_args = [arg for arg in self.args if isinstance(arg, (JString, JStringW))]
+    hidden_len_decl = ", ".join(["int len_{name}".format(name=arg.name) for arg in string_args])
+    # For JString, use the parameter name directly; for JStringW, use the extracted __j{name}
+    hidden_len_call = ", ".join(["(*env)->GetStringUTFLength(env, {jname})".format(
+        jname=arg.name if isinstance(arg, JString) else "__j{name}".format(name=arg.name)
+    ) for arg in string_args])
+    args_decl = ", ".join([arg.native_type_and_name for arg in self.args])
+    if hidden_len_decl:
+      args_decl += ", " + hidden_len_decl
+    args_call = ", ".join([arg.native_argument for arg in self.args])
+    if hidden_len_call:
+      args_call += ", " + hidden_len_call
     # Print native function signature
-    if pkg == "blas" and isinstance(self.ret, JFloatR):
+    if pkg in ["blas", "lapack"] and isinstance(self.ret, JFloatR):
       # On macOS, the Accelerate framework returns a double rather than a float for these functions,
       # which causes a crash on arm64 as the single and double float registers are not the same,
       # leading to a mismatch in ABI. To work around this, we declare the native function pointer as
       # returning double and let the implicit cast of the result to float in the JNI function
       # implementation
       print("#ifdef __APPLE__")
-      print("static double (*{name}_)({args});".format(ret=self.ret.native_type, name=self.name, args=", ".join([arg.native_type_and_name for arg in self.args])))
+      print("static double (*{name}_)({args});".format(ret=self.ret.native_type, name=self.name, args=args_decl))
       print("#else")
-      print("static {ret} (*{name}_)({args});".format(ret=self.ret.native_type, name=self.name, args=", ".join([arg.native_type_and_name for arg in self.args])))
+      print("static {ret} (*{name}_)({args});".format(ret=self.ret.native_type, name=self.name, args=args_decl))
       print("#endif")
     else:
-      print("static {ret} (*{name}_)({args});".format(ret=self.ret.native_type, name=self.name, args=", ".join([arg.native_type_and_name for arg in self.args])))
+      print("static {ret} (*{name}_)({args});".format(ret=self.ret.native_type, name=self.name, args=args_decl))
     print()
     # Print JNI function implementation
-    print("{ret} Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(ret=self.ret.java_type, pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", " + a for arg in self.args for a in arg.java_type_and_name]))) 
+    print("{ret} Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(ret=self.ret.java_type, pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", " + a for arg in self.args for a in arg.java_type_and_name])))
     print("  if (!{name}_) (*env)->ThrowNew(env, (*env)->FindClass(env, \"java/lang/UnsupportedOperationException\"), \"symbol isn't available in native library\");".format(name=self.name))
     print("  {rettype} __ret = 0;".format(rettype=self.ret.java_type))
     print("  jboolean __failed = FALSE;")
@@ -240,7 +253,7 @@ class RoutineR:
       print("\n".join(["  " + a for a in [arg.native_local for arg in sorted(self.args, key=lambda a: a.idx)] if len(a) > 0]))
     if any(len(arg.prolog) > 0 for arg in sorted(self.args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.prolog for arg in sorted(self.args, key=lambda a: a.idx)] if len(a) > 0]))
-    print("  __ret = {name}_({args});".format(name=self.name, args=", ".join([arg.native_argument for arg in self.args])))
+    print("  __ret = {name}_({args});".format(name=self.name, args=args_call))
     print("done:")
     if any(len(arg.epilog) > 0 for arg in sorted(self.args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.epilog for arg in sorted(self.args, key=lambda a: a.idx)] if len(a) > 0][::-1]))
@@ -278,8 +291,21 @@ class Routine:
     self.args = args
 
   def render(self, pkg):
+    # Collect JString/JStringW args for Fortran hidden string length parameters
+    string_args = [arg for arg in self.args if isinstance(arg, (JString, JStringW))]
+    hidden_len_decl = ", ".join(["int len_{name}".format(name=arg.name) for arg in string_args])
+    # For JString, use the parameter name directly; for JStringW, use the extracted __j{name}
+    hidden_len_call = ", ".join(["(*env)->GetStringUTFLength(env, {jname})".format(
+        jname=arg.name if isinstance(arg, JString) else "__j{name}".format(name=arg.name)
+    ) for arg in string_args])
+    args_decl = ", ".join([arg.native_type_and_name for arg in self.args])
+    if hidden_len_decl:
+      args_decl += ", " + hidden_len_decl
+    args_call = ", ".join([arg.native_argument for arg in self.args])
+    if hidden_len_call:
+      args_call += ", " + hidden_len_call
     # Print native function signature
-    print("static void (*{name}_)({args});".format(name=self.name, args=", ".join([arg.native_type_and_name for arg in self.args])))
+    print("static void (*{name}_)({args});".format(name=self.name, args=args_decl))
     print()
     # Print JNI function implementation
     print("void Java_dev_ludovic_netlib_{pkg}_JNI{pkgupper}_{name}K(JNIEnv *env, UNUSED jobject obj{args}) {{".format(pkg=pkg, pkgupper=pkg.upper(), name=self.name, args="".join([", " + a for arg in self.args for a in arg.java_type_and_name])))
@@ -289,7 +315,7 @@ class Routine:
       print("\n".join(["  " + a for a in [arg.native_local for arg in sorted(self.args, key=lambda a: a.idx)] if len(a) > 0]))
     if any(len(arg.prolog) > 0 for arg in sorted(self.args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.prolog for arg in sorted(self.args, key=lambda a: a.idx)] if len(a) > 0]))
-    print("  {name}_({args});".format(name=self.name, args=", ".join([arg.native_argument for arg in self.args])))
+    print("  {name}_({args});".format(name=self.name, args=args_call))
     print("done:")
     if any(len(arg.epilog) > 0 for arg in sorted(self.args, key=lambda a: a.idx)):
       print("\n".join(["  " + a for a in [arg.epilog for arg in sorted(self.args, key=lambda a: a.idx)] if len(a) > 0][::-1]))
@@ -385,9 +411,9 @@ class Library:
     print("}")
     print()
     # Print symbols loading
-    print("jboolean load_symbols(void) {")
+    print("jboolean load_symbols(void *libhandle) {")
     print("#define LOAD_SYMBOL(name) \\")
-    print("  name = dlsym(RTLD_DEFAULT, #name);")
+    print("  name = dlsym(libhandle, #name);")
     print("")
     for routine in routines:
       routine.render_load_symbol()
@@ -501,13 +527,13 @@ class Library:
     print("    return -1;")
     print("  }")
     print("")
-    print("  libhandle = dlopen(name, RTLD_LAZY | RTLD_GLOBAL);")
+    print("  libhandle = dlopen(name, RTLD_LAZY | RTLD_LOCAL);")
     print("  if (!libhandle) {")
     print("    fprintf(stderr, \"netlib-{pkg}: JNI_OnLoad: dlopen(%s) failed: %s\\n\", name, dlerror());".format(pkg=pkg))
     print("    return -1;")
     print("  }")
     print("")
-    print("  if (!load_symbols()) {")
+    print("  if (!load_symbols(libhandle)) {")
     print("    fprintf(stderr, \"netlib-{pkg}: JNI_OnLoad: load_symbols failed\\n\");".format(pkg=pkg))
     print("    return -1;")
     print("  }")
@@ -799,9 +825,9 @@ if sys.argv[1] == "lapack":
       Routine   (             "dlaset",   JString("uplo"), JInt("m"), JInt("n"), JDouble("alpha"), JDouble("beta"), JDoubleArray("a"), JInt("lda")),
       Routine   (             "dlasq1",   JInt("n"), JDoubleArray("d"), JDoubleArray("e"), JDoubleArray("work"), JIntW("info")),
       Routine   (             "dlasq2",   JInt("n"), JDoubleArray("z"), JIntW("info")),
-      Routine   (             "dlasq3",   JInt("i0"), JIntW("n0"), JDoubleArray("z"), JInt("pp"), JDoubleW("dmin"), JDoubleW("sigma"), JDoubleW("desig"), JDoubleW("qmax"), JIntW("nfail"), JIntW("iter"), JIntW("ndiv"), JBoolean("ieee")),
-      Routine   (             "dlasq4",   JInt("i0"), JInt("n0"), JDoubleArray("z"), JInt("pp"), JInt("n0in"), JDouble("dmin"), JDouble("dmin1"), JDouble("dmin2"), JDouble("dn"), JDouble("dn1"), JDouble("dn2"), JDoubleW("tau"), JIntW("ttype")),
-      Routine   (             "dlasq5",   JInt("i0"), JInt("n0"), JDoubleArray("z"), JInt("pp"), JDouble("tau"), JDoubleW("dmin"), JDoubleW("dmin1"), JDoubleW("dmin2"), JDoubleW("dn"), JDoubleW("dnm1"), JDoubleW("dnm2"), JBoolean("ieee")),
+      Routine   (             "dlasq3",   JInt("i0"), JIntW("n0"), JDoubleArray("z"), JInt("pp"), JDoubleW("dmin"), JDoubleW("sigma"), JDoubleW("desig"), JDoubleW("qmax"), JIntW("nfail"), JIntW("iter"), JIntW("ndiv"), JBoolean("ieee"), JIntW("ttype"), JDoubleW("dmin1"), JDoubleW("dmin2"), JDoubleW("dn"), JDoubleW("dn1"), JDoubleW("dn2"), JDoubleW("g"), JDoubleW("tau")),
+      Routine   (             "dlasq4",   JInt("i0"), JInt("n0"), JDoubleArray("z"), JInt("pp"), JInt("n0in"), JDouble("dmin"), JDouble("dmin1"), JDouble("dmin2"), JDouble("dn"), JDouble("dn1"), JDouble("dn2"), JDoubleW("tau"), JIntW("ttype"), JDoubleW("g")),
+      Routine   (             "dlasq5",   JInt("i0"), JInt("n0"), JDoubleArray("z"), JInt("pp"), JDouble("tau"), JDouble("sigma"), JDoubleW("dmin"), JDoubleW("dmin1"), JDoubleW("dmin2"), JDoubleW("dn"), JDoubleW("dnm1"), JDoubleW("dnm2"), JBoolean("ieee"), JDouble("eps")),
       Routine   (             "dlasq6",   JInt("i0"), JInt("n0"), JDoubleArray("z"), JInt("pp"), JDoubleW("dmin"), JDoubleW("dmin1"), JDoubleW("dmin2"), JDoubleW("dn"), JDoubleW("dnm1"), JDoubleW("dnm2")),
       Routine   (             "dlasr",    JString("side"), JString("pivot"), JString("direct"), JInt("m"), JInt("n"), JDoubleArray("c"), JDoubleArray("s"), JDoubleArray("a"), JInt("lda")),
       Routine   (             "dlasrt",   JString("id"), JInt("n"), JDoubleArray("d"), JIntW("info")),
@@ -1156,9 +1182,9 @@ if sys.argv[1] == "lapack":
       Routine   (             "slaset",   JString("uplo"), JInt("m"), JInt("n"), JFloat("alpha"), JFloat("beta"), JFloatArray("a"), JInt("lda")),
       Routine   (             "slasq1",   JInt("n"), JFloatArray("d"), JFloatArray("e"), JFloatArray("work"), JIntW("info")),
       Routine   (             "slasq2",   JInt("n"), JFloatArray("z"), JIntW("info")),
-      Routine   (             "slasq3",   JInt("i0"), JIntW("n0"), JFloatArray("z"), JInt("pp"), JFloatW("dmin"), JFloatW("sigma"), JFloatW("desig"), JFloatW("qmax"), JIntW("nfail"), JIntW("iter"), JIntW("ndiv"), JBoolean("ieee")),
-      Routine   (             "slasq4",   JInt("i0"), JInt("n0"), JFloatArray("z"), JInt("pp"), JInt("n0in"), JFloat("dmin"), JFloat("dmin1"), JFloat("dmin2"), JFloat("dn"), JFloat("dn1"), JFloat("dn2"), JFloatW("tau"), JIntW("ttype")),
-      Routine   (             "slasq5",   JInt("i0"), JInt("n0"), JFloatArray("z"), JInt("pp"), JFloat("tau"), JFloatW("dmin"), JFloatW("dmin1"), JFloatW("dmin2"), JFloatW("dn"), JFloatW("dnm1"), JFloatW("dnm2"), JBoolean("ieee")),
+      Routine   (             "slasq3",   JInt("i0"), JIntW("n0"), JFloatArray("z"), JInt("pp"), JFloatW("dmin"), JFloatW("sigma"), JFloatW("desig"), JFloatW("qmax"), JIntW("nfail"), JIntW("iter"), JIntW("ndiv"), JBoolean("ieee"), JIntW("ttype"), JFloatW("dmin1"), JFloatW("dmin2"), JFloatW("dn"), JFloatW("dn1"), JFloatW("dn2"), JFloatW("g"), JFloatW("tau")),
+      Routine   (             "slasq4",   JInt("i0"), JInt("n0"), JFloatArray("z"), JInt("pp"), JInt("n0in"), JFloat("dmin"), JFloat("dmin1"), JFloat("dmin2"), JFloat("dn"), JFloat("dn1"), JFloat("dn2"), JFloatW("tau"), JIntW("ttype"), JFloatW("g")),
+      Routine   (             "slasq5",   JInt("i0"), JInt("n0"), JFloatArray("z"), JInt("pp"), JFloat("tau"), JFloat("sigma"), JFloatW("dmin"), JFloatW("dmin1"), JFloatW("dmin2"), JFloatW("dn"), JFloatW("dnm1"), JFloatW("dnm2"), JBoolean("ieee"), JFloat("eps")),
       Routine   (             "slasq6",   JInt("i0"), JInt("n0"), JFloatArray("z"), JInt("pp"), JFloatW("dmin"), JFloatW("dmin1"), JFloatW("dmin2"), JFloatW("dn"), JFloatW("dnm1"), JFloatW("dnm2")),
       Routine   (             "slasr",    JString("side"), JString("pivot"), JString("direct"), JInt("m"), JInt("n"), JFloatArray("c"), JFloatArray("s"), JFloatArray("a"), JInt("lda")),
       Routine   (             "slasrt",   JString("id"), JInt("n"), JFloatArray("d"), JIntW("info")),

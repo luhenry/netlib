@@ -29,12 +29,44 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SsbgvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testEigenvaluesOnly(LAPACK lapack) {
+        int n = N_SMALL;
+        int ka = 2;
+        int kb = 1;
+        int ldab = ka + 1;
+        int ldbb = kb + 1;
+
+        float[] ab = generateBandedSymmetricMatrixFloat(n, ka, n + 10.0f, 0.5f);
+
+        float[] bb = generateBandedSymmetricMatrixFloat(n, kb, n + 5.0f, 0.3f);
+
+        float[] ab_expected = ab.clone();
+        float[] ab_actual = ab.clone();
+        float[] bb_expected = bb.clone();
+        float[] bb_actual = bb.clone();
+        float[] w_expected = new float[n];
+        float[] w_actual = new float[n];
+        float[] z_expected = new float[1];
+        float[] z_actual = new float[1];
+        float[] work_expected = new float[3 * n];
+        float[] work_actual = new float[3 * n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ssbgv("N", "U", n, ka, kb, ab_expected, ldab, bb_expected, ldbb, w_expected, z_expected, 1, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ssbgv("N", "U", n, ka, kb, ab_actual, ldab, bb_actual, ldbb, w_actual, z_actual, 1, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(w_expected, w_actual, sepsilon);
     }
 }

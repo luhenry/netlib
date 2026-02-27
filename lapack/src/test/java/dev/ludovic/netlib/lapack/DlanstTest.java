@@ -30,11 +30,42 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlanstTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create symmetric tridiagonal matrix: d (diagonal), e (off-diagonal)
+        double[] d = new double[N];
+        double[] e = new double[N - 1];
+
+        for (int i = 0; i < N; i++) {
+            d[i] = (i + 1) * 2.0;
+        }
+        for (int i = 0; i < N - 1; i++) {
+            e[i] = (i + 1);
+        }
+
+        // Test 1-norm
+        double expected = f2j.dlanst("1", N, d, 0, e, 0);
+        double actual = lapack.dlanst("1", N, d, 0, e, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Inf-norm
+        expected = f2j.dlanst("I", N, d, 0, e, 0);
+        actual = lapack.dlanst("I", N, d, 0, e, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Frobenius norm
+        expected = f2j.dlanst("F", N, d, 0, e, 0);
+        actual = lapack.dlanst("F", N, d, 0, e, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
+
+        // Test Max norm
+        expected = f2j.dlanst("M", N, d, 0, e, 0);
+        actual = lapack.dlanst("M", N, d, 0, e, 0);
+        assertEquals(expected, actual, Math.scalb(depsilon, Math.getExponent(expected)));
     }
 }

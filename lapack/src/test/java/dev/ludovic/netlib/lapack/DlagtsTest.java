@@ -29,12 +29,40 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlagtsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // First factor with dlagtf, then solve with dlagts
+        int n = 5;
+        double[] a = { 4.0, 5.0, 6.0, 7.0, 8.0 };
+        double lambda = 1.0;
+        double[] b = { 1.0, 1.0, 1.0, 1.0 };
+        double[] c = { 0.5, 0.5, 0.5, 0.5 };
+        double[] d = new double[n - 2];
+        int[] in = new int[n];
+        intW info = new intW(0);
+
+        f2j.dlagtf(n, a, lambda, b, c, 0.0, d, in, info);
+        assertEquals(0, info.val);
+
+        // Solve (T - lambda*I)*x = y with JOB=1
+        double[] y_expected = { 1.0, 2.0, 3.0, 4.0, 5.0 };
+        double[] y_actual = y_expected.clone();
+        doubleW tol_expected = new doubleW(0.0);
+        doubleW tol_actual = new doubleW(0.0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dlagts(1, n, a, b, c, d, in, y_expected, tol_expected, info_expected);
+        lapack.dlagts(1, n, a, b, c, d, in, y_actual, tol_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(y_expected, y_actual, depsilon);
     }
 }

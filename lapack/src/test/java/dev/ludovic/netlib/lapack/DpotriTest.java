@@ -29,12 +29,38 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DpotriTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // First, factor the matrix using dpotrf
+        double[] a_expected = dPositiveDefiniteMatrix.clone();
+        double[] a_actual = dPositiveDefiniteMatrix.clone();
+
+        intW info = new intW(0);
+        f2j.dpotrf("U", N, a_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference factorization should succeed");
+
+        info.val = 0;
+        lapack.dpotrf("U", N, a_actual, 0, N, info);
+        assertEquals(0, info.val, "Factorization should succeed");
+
+        // Invert using reference implementation
+        info.val = 0;
+        f2j.dpotri("U", N, a_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference inversion should succeed");
+
+        // Invert using test implementation
+        info.val = 0;
+        lapack.dpotri("U", N, a_actual, 0, N, info);
+        assertEquals(0, info.val, "Inversion should succeed");
+
+        // Compare inverted matrices
+        assertArrayEquals(a_expected, a_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(a_expected))));
     }
 }

@@ -30,11 +30,84 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DsortrTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 10;  // Use smaller size for testing
+
+        // Test case 1: "LA" (largest algebraic) with apply=true
+        {
+            double[] expected_x1 = dArray1.clone();
+            double[] expected_x2 = dArray2.clone();
+            f2j.dsortr("LA", true, n, expected_x1, expected_x2);
+
+            double[] actual_x1 = dArray1.clone();
+            double[] actual_x2 = dArray2.clone();
+            arpack.dsortr("LA", true, n, actual_x1, actual_x2);
+
+            assertArrayEquals(expected_x1, actual_x1, depsilon);
+            assertArrayEquals(expected_x2, actual_x2, depsilon);
+        }
+
+        // Test case 2: "LA" (largest algebraic) with apply=false
+        {
+            double[] expected_x1 = dArray1.clone();
+            double[] expected_x2 = dArray2.clone();
+            f2j.dsortr("LA", false, n, expected_x1, expected_x2);
+
+            double[] actual_x1 = dArray1.clone();
+            double[] actual_x2 = dArray2.clone();
+            arpack.dsortr("LA", false, n, actual_x1, actual_x2);
+
+            assertArrayEquals(expected_x1, actual_x1, depsilon);
+            assertArrayEquals(expected_x2, actual_x2, depsilon);
+        }
+
+        // Test case 3: "SA" (smallest algebraic) with apply=true
+        {
+            double[] expected_x1 = dArray1.clone();
+            double[] expected_x2 = dArray2.clone();
+            f2j.dsortr("SA", true, n, expected_x1, expected_x2);
+
+            double[] actual_x1 = dArray1.clone();
+            double[] actual_x2 = dArray2.clone();
+            arpack.dsortr("SA", true, n, actual_x1, actual_x2);
+
+            assertArrayEquals(expected_x1, actual_x1, depsilon);
+            assertArrayEquals(expected_x2, actual_x2, depsilon);
+        }
+
+        // Test case 4: "SA" (smallest algebraic) with apply=false
+        {
+            double[] expected_x1 = dArray1.clone();
+            double[] expected_x2 = dArray2.clone();
+            f2j.dsortr("SA", false, n, expected_x1, expected_x2);
+
+            double[] actual_x1 = dArray1.clone();
+            double[] actual_x2 = dArray2.clone();
+            arpack.dsortr("SA", false, n, actual_x1, actual_x2);
+
+            assertArrayEquals(expected_x1, actual_x1, depsilon);
+            assertArrayEquals(expected_x2, actual_x2, depsilon);
+        }
+
+        // Test case 5: "LA" with larger size
+        {
+            int largerN = 25;
+            double[] expected_x1 = dArray1.clone();
+            double[] expected_x2 = dArray2.clone();
+            f2j.dsortr("LA", true, largerN, expected_x1, expected_x2);
+
+            double[] actual_x1 = dArray1.clone();
+            double[] actual_x2 = dArray2.clone();
+            arpack.dsortr("LA", true, largerN, actual_x1, actual_x2);
+
+            assertArrayEquals(expected_x1, actual_x1, depsilon);
+            assertArrayEquals(expected_x2, actual_x2, depsilon);
+        }
     }
 }

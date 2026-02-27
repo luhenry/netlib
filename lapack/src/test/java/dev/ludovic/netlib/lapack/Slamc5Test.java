@@ -29,12 +29,37 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slamc5Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        intW emax_expected = new intW(0);
+        floatW rmax_expected = new floatW(0.0f);
+        intW emax_actual = new intW(0);
+        floatW rmax_actual = new floatW(0.0f);
+
+        // Test with IEEE arithmetic
+        f2j.slamc5(2, 24, -125, true, emax_expected, rmax_expected);
+        lapack.slamc5(2, 24, -125, true, emax_actual, rmax_actual);
+        assertEquals(emax_expected.val, emax_actual.val);
+        assertEquals(rmax_expected.val, rmax_actual.val, sepsilon);
+
+        // Test without IEEE arithmetic
+        emax_expected.val = 0;
+        rmax_expected.val = 0.0f;
+        emax_actual.val = 0;
+        rmax_actual.val = 0.0f;
+        f2j.slamc5(2, 24, -125, false, emax_expected, rmax_expected);
+        lapack.slamc5(2, 24, -125, false, emax_actual, rmax_actual);
+        assertEquals(emax_expected.val, emax_actual.val);
+        assertEquals(rmax_expected.val, rmax_actual.val, sepsilon);
     }
 }

@@ -29,12 +29,75 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlaed3Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // dlaed3 finds roots of the secular equation and updates eigenvectors.
+        // It is internal to dlaed1. We test it indirectly through dlaed1
+        // with a larger problem to exercise the secular equation solver.
+        int n = 10;
+        int cutpnt = 5;
+
+        double[] d_expected = new double[n];
+        for (int i = 0; i < cutpnt; i++) {
+            d_expected[i] = (i + 1) * 1.5;
+        }
+        for (int i = cutpnt; i < n; i++) {
+            d_expected[i] = (i - cutpnt + 1) * 1.5 + 0.5;
+        }
+
+        double[] q_expected = generateIdentityMatrix(n);
+
+        int[] indxq_expected = new int[n];
+        for (int i = 0; i < cutpnt; i++) {
+            indxq_expected[i] = i + 1;
+        }
+        for (int i = cutpnt; i < n; i++) {
+            indxq_expected[i] = i - cutpnt + 1;
+        }
+
+        doubleW rho_expected = new doubleW(1.0);
+        double[] work_expected = new double[4 * n + n * n];
+        int[] iwork_expected = new int[4 * n];
+        intW info_expected = new intW(0);
+
+        f2j.dlaed1(n, d_expected, 0, q_expected, 0, n, indxq_expected, 0,
+            rho_expected, cutpnt, work_expected, 0, iwork_expected, 0, info_expected);
+
+        double[] d_actual = new double[n];
+        for (int i = 0; i < cutpnt; i++) {
+            d_actual[i] = (i + 1) * 1.5;
+        }
+        for (int i = cutpnt; i < n; i++) {
+            d_actual[i] = (i - cutpnt + 1) * 1.5 + 0.5;
+        }
+
+        double[] q_actual = generateIdentityMatrix(n);
+
+        int[] indxq_actual = new int[n];
+        for (int i = 0; i < cutpnt; i++) {
+            indxq_actual[i] = i + 1;
+        }
+        for (int i = cutpnt; i < n; i++) {
+            indxq_actual[i] = i - cutpnt + 1;
+        }
+
+        doubleW rho_actual = new doubleW(1.0);
+        double[] work_actual = new double[4 * n + n * n];
+        int[] iwork_actual = new int[4 * n];
+        intW info_actual = new intW(0);
+
+        lapack.dlaed1(n, d_actual, 0, q_actual, 0, n, indxq_actual, 0,
+            rho_actual, cutpnt, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(d_expected))));
+        assertArrayEquals(q_expected, q_actual, Math.scalb(depsilon, Math.getExponent(Math.max(getMaxValue(q_expected), 1.0))));
     }
 }

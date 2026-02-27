@@ -30,11 +30,36 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlatrzTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // RZ factorization of M-by-N upper trapezoidal matrix (N >= M)
+        int m = 3;
+        int n = 6;
+        int l = n - m; // = 3
+        // Upper trapezoidal: m-by-n matrix stored column-major with lda=m
+        double[] a_expected = {
+            1.0, 0.0, 0.0,  // col 1
+            2.0, 3.0, 0.0,  // col 2
+            4.0, 5.0, 6.0,  // col 3
+            0.5, 0.3, 0.7,  // col 4
+            0.2, 0.4, 0.6,  // col 5
+            0.1, 0.8, 0.9   // col 6
+        };
+        double[] a_actual = a_expected.clone();
+        double[] tau_expected = new double[m];
+        double[] tau_actual = new double[m];
+        double[] work_expected = new double[m];
+        double[] work_actual = new double[m];
+
+        f2j.dlatrz(m, n, l, a_expected, m, tau_expected, work_expected);
+        lapack.dlatrz(m, n, l, a_actual, m, tau_actual, work_actual);
+
+        assertArrayEquals(a_expected, a_actual, depsilon);
+        assertArrayEquals(tau_expected, tau_actual, depsilon);
     }
 }

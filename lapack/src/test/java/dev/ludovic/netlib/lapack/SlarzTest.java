@@ -30,11 +30,27 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlarzTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Apply elementary reflector H = I - tau * v * v^T from the left
+        int m = 5;
+        int n = 4;
+        int l = 3; // number of meaningful entries in v
+        float[] v = { 0.5f, 0.3f, 0.7f };
+        float tau = 1.5f;
+        float[] c_expected = generateMatrixFloat(m, n, 1.0f);
+        float[] c_actual = c_expected.clone();
+        float[] work_expected = new float[n];
+        float[] work_actual = new float[n];
+
+        f2j.slarz("L", m, n, l, v, 1, tau, c_expected, m, work_expected);
+        lapack.slarz("L", m, n, l, v, 1, tau, c_actual, m, work_actual);
+
+        assertArrayEquals(c_expected, c_actual, sepsilon);
     }
 }

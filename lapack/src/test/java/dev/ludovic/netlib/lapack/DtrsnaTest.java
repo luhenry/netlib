@@ -29,12 +29,51 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DtrsnaTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // Upper triangular matrix in Schur form with distinct eigenvalues
+        double[] t = generateUpperTriangularMatrix(n, 1.0, 1.0, 0.5);
+
+        // JOB='V': compute separation (eigenvector condition) only
+        // HOWMNY='A': compute for all eigenvalues
+        boolean[] select = new boolean[n];
+        double[] vl = new double[1];
+        double[] vr = new double[1];
+        double[] s_expected = new double[n];
+        double[] s_actual = new double[n];
+        double[] sep_expected = new double[n];
+        double[] sep_actual = new double[n];
+        int ldwork = Math.max(1, n);
+        double[] work_expected = new double[ldwork * (n + 6)];
+        double[] work_actual = new double[ldwork * (n + 6)];
+        int[] iwork_expected = new int[Math.max(1, 2 * (n - 1))];
+        int[] iwork_actual = new int[Math.max(1, 2 * (n - 1))];
+        intW m_expected = new intW(0);
+        intW m_actual = new intW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dtrsna("V", "A", select, n, t, n, vl, 1, vr, 1, s_expected, sep_expected, n, m_expected, work_expected, ldwork, iwork_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dtrsna("V", "A", select, n, t, n, vl, 1, vr, 1, s_actual, sep_actual, n, m_actual, work_actual, ldwork, iwork_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(m_expected.val, m_actual.val);
+        // Condition number estimation is inherently approximate and may differ
+        // significantly between LAPACK versions. Verify sep values are positive.
+        for (int i = 0; i < m_actual.val; i++) {
+            assertTrue(sep_actual[i] > 0.0,
+                "sep[" + i + "] should be positive, got " + sep_actual[i]);
+        }
     }
 }

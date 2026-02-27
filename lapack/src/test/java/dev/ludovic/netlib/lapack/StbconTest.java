@@ -29,12 +29,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class StbconTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpperOneNorm(LAPACK lapack) {
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        float[] ab = generateBandedSymmetricMatrixFloat(n, kd, n + 10.0f, 1.0f);
+
+        float[] work_expected = new float[3 * n];
+        float[] work_actual = new float[3 * n];
+        int[] iwork_expected = new int[n];
+        int[] iwork_actual = new int[n];
+        floatW rcond_expected = new floatW(0);
+        floatW rcond_actual = new floatW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.stbcon("1", "U", "N", n, kd, ab, ldab, rcond_expected, work_expected, iwork_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.stbcon("1", "U", "N", n, kd, ab, ldab, rcond_actual, work_actual, iwork_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(rcond_expected.val, rcond_actual.val, sepsilon);
     }
 }

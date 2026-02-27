@@ -29,12 +29,62 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DpbstfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        // DPBSTF: split Cholesky factorization of positive definite banded matrix
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        // Create positive definite banded matrix (upper storage)
+        double[] ab_expected = generateBandedSymmetricMatrix(n, kd, n + 10.0, 0.5);
+        double[] ab_actual = ab_expected.clone();
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dpbstf("U", n, kd, ab_expected, ldab, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dpbstf("U", n, kd, ab_actual, ldab, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ab_expected, ab_actual, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        // Create positive definite banded matrix (lower storage)
+        double[] ab_expected = new double[ldab * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = j; i <= Math.min(n - 1, j + kd); i++) {
+                int k = i - j;
+                ab_expected[k + j * ldab] = (i == j) ? n + 10.0 : 0.5 / (Math.abs(i - j) + 1.0);
+            }
+        }
+        double[] ab_actual = ab_expected.clone();
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dpbstf("L", n, kd, ab_expected, ldab, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dpbstf("L", n, kd, ab_actual, ldab, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ab_expected, ab_actual, depsilon);
     }
 }

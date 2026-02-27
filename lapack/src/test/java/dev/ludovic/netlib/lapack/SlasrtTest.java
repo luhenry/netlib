@@ -29,12 +29,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlasrtTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // Test ascending sort
+        float[] d_expected = new float[]{5.0f, 3.0f, 8.0f, 1.0f, 9.0f, 2.0f, 7.0f, 4.0f, 6.0f, 10.0f};
+        intW info_expected = new intW(0);
+        f2j.slasrt("I", n, d_expected, 0, info_expected);
+
+        float[] d_actual = new float[]{5.0f, 3.0f, 8.0f, 1.0f, 9.0f, 2.0f, 7.0f, 4.0f, 6.0f, 10.0f};
+        intW info_actual = new intW(0);
+        lapack.slasrt("I", n, d_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, sepsilon);
+
+        // Test descending sort
+        float[] d2_expected = new float[]{5.0f, 3.0f, 8.0f, 1.0f, 9.0f, 2.0f, 7.0f, 4.0f, 6.0f, 10.0f};
+        info_expected.val = 0;
+        f2j.slasrt("D", n, d2_expected, 0, info_expected);
+
+        float[] d2_actual = new float[]{5.0f, 3.0f, 8.0f, 1.0f, 9.0f, 2.0f, 7.0f, 4.0f, 6.0f, 10.0f};
+        info_actual.val = 0;
+        lapack.slasrt("D", n, d2_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d2_expected, d2_actual, sepsilon);
     }
 }

@@ -30,11 +30,99 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DsortcTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 10;  // Use smaller size for testing
+
+        // Test case 1: "LA" (largest algebraic) with apply=true
+        {
+            double[] expected_xreal = dArray1.clone();
+            double[] expected_ximag = dArray2.clone();
+            double[] expected_y = dArrayZero.clone();
+            f2j.dsortc("LA", true, n, expected_xreal, expected_ximag, expected_y);
+
+            double[] actual_xreal = dArray1.clone();
+            double[] actual_ximag = dArray2.clone();
+            double[] actual_y = dArrayZero.clone();
+            arpack.dsortc("LA", true, n, actual_xreal, actual_ximag, actual_y);
+
+            assertArrayEquals(expected_xreal, actual_xreal, depsilon);
+            assertArrayEquals(expected_ximag, actual_ximag, depsilon);
+            assertArrayEquals(expected_y, actual_y, depsilon);
+        }
+
+        // Test case 2: "LA" (largest algebraic) with apply=false
+        {
+            double[] expected_xreal = dArray1.clone();
+            double[] expected_ximag = dArray2.clone();
+            double[] expected_y = dArrayZero.clone();
+            f2j.dsortc("LA", false, n, expected_xreal, expected_ximag, expected_y);
+
+            double[] actual_xreal = dArray1.clone();
+            double[] actual_ximag = dArray2.clone();
+            double[] actual_y = dArrayZero.clone();
+            arpack.dsortc("LA", false, n, actual_xreal, actual_ximag, actual_y);
+
+            assertArrayEquals(expected_xreal, actual_xreal, depsilon);
+            assertArrayEquals(expected_ximag, actual_ximag, depsilon);
+            assertArrayEquals(expected_y, actual_y, depsilon);
+        }
+
+        // Test case 3: "SA" (smallest algebraic) with apply=true
+        {
+            double[] expected_xreal = dArray1.clone();
+            double[] expected_ximag = dArray2.clone();
+            double[] expected_y = dArrayZero.clone();
+            f2j.dsortc("SA", true, n, expected_xreal, expected_ximag, expected_y);
+
+            double[] actual_xreal = dArray1.clone();
+            double[] actual_ximag = dArray2.clone();
+            double[] actual_y = dArrayZero.clone();
+            arpack.dsortc("SA", true, n, actual_xreal, actual_ximag, actual_y);
+
+            assertArrayEquals(expected_xreal, actual_xreal, depsilon);
+            assertArrayEquals(expected_ximag, actual_ximag, depsilon);
+            assertArrayEquals(expected_y, actual_y, depsilon);
+        }
+
+        // Test case 4: "SA" (smallest algebraic) with apply=false
+        {
+            double[] expected_xreal = dArray1.clone();
+            double[] expected_ximag = dArray2.clone();
+            double[] expected_y = dArrayZero.clone();
+            f2j.dsortc("SA", false, n, expected_xreal, expected_ximag, expected_y);
+
+            double[] actual_xreal = dArray1.clone();
+            double[] actual_ximag = dArray2.clone();
+            double[] actual_y = dArrayZero.clone();
+            arpack.dsortc("SA", false, n, actual_xreal, actual_ximag, actual_y);
+
+            assertArrayEquals(expected_xreal, actual_xreal, depsilon);
+            assertArrayEquals(expected_ximag, actual_ximag, depsilon);
+            assertArrayEquals(expected_y, actual_y, depsilon);
+        }
+
+        // Test case 5: "LA" with larger size
+        {
+            int largerN = 25;
+            double[] expected_xreal = dArray1.clone();
+            double[] expected_ximag = dArray2.clone();
+            double[] expected_y = dArrayZero.clone();
+            f2j.dsortc("LA", true, largerN, expected_xreal, expected_ximag, expected_y);
+
+            double[] actual_xreal = dArray1.clone();
+            double[] actual_ximag = dArray2.clone();
+            double[] actual_y = dArrayZero.clone();
+            arpack.dsortc("LA", true, largerN, actual_xreal, actual_ximag, actual_y);
+
+            assertArrayEquals(expected_xreal, actual_xreal, depsilon);
+            assertArrayEquals(expected_ximag, actual_ximag, depsilon);
+            assertArrayEquals(expected_y, actual_y, depsilon);
+        }
     }
 }

@@ -29,12 +29,99 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SggsvdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int p = N_SMALL;
+
+        float[] a_expected = generateMatrixFloat(m, n, 1.0f);
+        float[] b_expected = generateMatrixFloat(p, n, 2.0f);
+        float[] alpha_expected = new float[n];
+        float[] beta_expected = new float[n];
+        float[] u_expected = new float[m * m];
+        float[] v_expected = new float[p * p];
+        float[] q_expected = new float[n * n];
+        float[] work_expected = new float[Math.max(Math.max(3 * n, m), p) + n];
+        int[] iwork_expected = new int[n];
+        intW k_expected = new intW(0);
+        intW l_expected = new intW(0);
+        intW info_expected = new intW(0);
+
+        f2j.sggsvd("U", "V", "Q", m, n, p, k_expected, l_expected, a_expected, 0, m, b_expected, 0, p, alpha_expected, 0, beta_expected, 0, u_expected, 0, m, v_expected, 0, p, q_expected, 0, n, work_expected, 0, iwork_expected, 0, info_expected);
+        assertEquals(0, info_expected.val, "Reference sggsvd should succeed");
+
+        float[] a_actual = generateMatrixFloat(m, n, 1.0f);
+        float[] b_actual = generateMatrixFloat(p, n, 2.0f);
+        float[] alpha_actual = new float[n];
+        float[] beta_actual = new float[n];
+        float[] u_actual = new float[m * m];
+        float[] v_actual = new float[p * p];
+        float[] q_actual = new float[n * n];
+        float[] work_actual = new float[Math.max(Math.max(3 * n, m), p) + n];
+        int[] iwork_actual = new int[n];
+        intW k_actual = new intW(0);
+        intW l_actual = new intW(0);
+        intW info_actual = new intW(0);
+
+        lapack.sggsvd("U", "V", "Q", m, n, p, k_actual, l_actual, a_actual, 0, m, b_actual, 0, p, alpha_actual, 0, beta_actual, 0, u_actual, 0, m, v_actual, 0, p, q_actual, 0, n, work_actual, 0, iwork_actual, 0, info_actual);
+        assertEquals(0, info_actual.val, "sggsvd should succeed");
+
+        assertEquals(k_expected.val, k_actual.val);
+        assertEquals(l_expected.val, l_actual.val);
+        assertArrayEquals(alpha_expected, alpha_actual, sepsilon);
+        assertArrayEquals(beta_expected, beta_actual, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testNoVectors(LAPACK lapack) {
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int p = N_SMALL;
+
+        float[] a_expected = generateMatrixFloat(m, n, 1.0f);
+        float[] b_expected = generateMatrixFloat(p, n, 2.0f);
+        float[] alpha_expected = new float[n];
+        float[] beta_expected = new float[n];
+        float[] u_expected = new float[1];
+        float[] v_expected = new float[1];
+        float[] q_expected = new float[1];
+        float[] work_expected = new float[Math.max(Math.max(3 * n, m), p) + n];
+        int[] iwork_expected = new int[n];
+        intW k_expected = new intW(0);
+        intW l_expected = new intW(0);
+        intW info_expected = new intW(0);
+
+        f2j.sggsvd("N", "N", "N", m, n, p, k_expected, l_expected, a_expected, 0, m, b_expected, 0, p, alpha_expected, 0, beta_expected, 0, u_expected, 0, 1, v_expected, 0, 1, q_expected, 0, 1, work_expected, 0, iwork_expected, 0, info_expected);
+        assertEquals(0, info_expected.val);
+
+        float[] a_actual = generateMatrixFloat(m, n, 1.0f);
+        float[] b_actual = generateMatrixFloat(p, n, 2.0f);
+        float[] alpha_actual = new float[n];
+        float[] beta_actual = new float[n];
+        float[] u_actual = new float[1];
+        float[] v_actual = new float[1];
+        float[] q_actual = new float[1];
+        float[] work_actual = new float[Math.max(Math.max(3 * n, m), p) + n];
+        int[] iwork_actual = new int[n];
+        intW k_actual = new intW(0);
+        intW l_actual = new intW(0);
+        intW info_actual = new intW(0);
+
+        lapack.sggsvd("N", "N", "N", m, n, p, k_actual, l_actual, a_actual, 0, m, b_actual, 0, p, alpha_actual, 0, beta_actual, 0, u_actual, 0, 1, v_actual, 0, 1, q_actual, 0, 1, work_actual, 0, iwork_actual, 0, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(k_expected.val, k_actual.val);
+        assertEquals(l_expected.val, l_actual.val);
+        assertArrayEquals(alpha_expected, alpha_actual, sepsilon);
+        assertArrayEquals(beta_expected, beta_actual, sepsilon);
     }
 }

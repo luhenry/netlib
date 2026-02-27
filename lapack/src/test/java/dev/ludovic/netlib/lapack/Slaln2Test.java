@@ -29,12 +29,41 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slaln2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Solve (ca*A - wr*D)*X = scale*B with 2x2 real system
+        int na = 2;
+        int nw = 1;
+        float smin = 1e-5f;
+        float ca = 1.0f;
+        float[] a = { 4.0f, 0.5f, 0.3f, 3.0f }; // 2x2 column-major
+        float d1 = 1.0f;
+        float d2 = 1.0f;
+        float[] b = { 1.0f, 2.0f }; // 2x1 RHS
+        float wr = 0.5f;
+        float wi = 0.0f;
+
+        float[] x_expected = new float[2];
+        float[] x_actual = new float[2];
+        floatW scale_expected = new floatW(0.0f);
+        floatW scale_actual = new floatW(0.0f);
+        floatW xnorm_expected = new floatW(0.0f);
+        floatW xnorm_actual = new floatW(0.0f);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.slaln2(false, na, nw, smin, ca, a, 2, d1, d2, b, 2, wr, wi, x_expected, 2, scale_expected, xnorm_expected, info_expected);
+        lapack.slaln2(false, na, nw, smin, ca, a, 2, d1, d2, b, 2, wr, wi, x_actual, 2, scale_actual, xnorm_actual, info_actual);
+
+        assertEquals(scale_expected.val, scale_actual.val, sepsilon);
+        assertArrayEquals(x_expected, x_actual, sepsilon);
+        assertEquals(xnorm_expected.val, xnorm_actual.val, sepsilon);
     }
 }

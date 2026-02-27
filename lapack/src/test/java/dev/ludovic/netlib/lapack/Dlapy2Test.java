@@ -30,11 +30,36 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Dlapy2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test basic Pythagorean triple
+        double expected = f2j.dlapy2(3.0, 4.0);
+        double actual = lapack.dlapy2(3.0, 4.0);
+        assertEquals(expected, actual, depsilon);
+
+        // Test with large values to ensure no overflow
+        expected = f2j.dlapy2(1e150, 1e150);
+        actual = lapack.dlapy2(1e150, 1e150);
+        assertEquals(expected, actual, expected * depsilon);
+
+        // Test with small values to ensure no underflow
+        expected = f2j.dlapy2(1e-150, 1e-150);
+        actual = lapack.dlapy2(1e-150, 1e-150);
+        assertEquals(expected, actual, expected * depsilon);
+
+        // Test with zero
+        expected = f2j.dlapy2(0.0, 5.0);
+        actual = lapack.dlapy2(0.0, 5.0);
+        assertEquals(expected, actual, depsilon);
+
+        // Test with negative values
+        expected = f2j.dlapy2(-3.0, -4.0);
+        actual = lapack.dlapy2(-3.0, -4.0);
+        assertEquals(expected, actual, depsilon);
     }
 }

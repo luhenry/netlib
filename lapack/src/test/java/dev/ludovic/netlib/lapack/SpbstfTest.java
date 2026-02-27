@@ -29,12 +29,59 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SpbstfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        float[] ab_expected = generateBandedSymmetricMatrixFloat(n, kd, n + 10.0f, 0.5f);
+        float[] ab_actual = ab_expected.clone();
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.spbstf("U", n, kd, ab_expected, ldab, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.spbstf("U", n, kd, ab_actual, ldab, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ab_expected, ab_actual, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        float[] ab_expected = new float[ldab * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = j; i <= Math.min(n - 1, j + kd); i++) {
+                int k = i - j;
+                ab_expected[k + j * ldab] = (i == j) ? n + 10.0f : 0.5f / (Math.abs(i - j) + 1.0f);
+            }
+        }
+        float[] ab_actual = ab_expected.clone();
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.spbstf("L", n, kd, ab_expected, ldab, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.spbstf("L", n, kd, ab_actual, ldab, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ab_expected, ab_actual, sepsilon);
     }
 }

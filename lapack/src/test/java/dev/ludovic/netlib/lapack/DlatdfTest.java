@@ -30,11 +30,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlatdfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // dlatdf depends on dgetc2 LU factorization which differs between LAPACK versions.
+        // Higher-level routines (dtgsy2, dtgsyl) that use dlatdf are already tested.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

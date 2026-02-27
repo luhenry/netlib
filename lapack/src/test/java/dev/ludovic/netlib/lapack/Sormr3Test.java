@@ -29,12 +29,60 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Sormr3Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int k = Math.min(m, n);
+        int l = k;
+
+        // First, perform RZ factorization
+        float[] a = generateMatrixFloat(m, n, 1.0f);
+        float[] tau = new float[k];
+        float[] work = new float[m];
+        intW info = new intW(0);
+
+        lapack.stzrzf(m, n, a, 0, m, tau, 0, work, 0, m, info);
+        assertEquals(0, info.val, "RZ factorization should succeed");
+
+        // Create a matrix C to apply Q to
+        float[] c = generateMatrixFloat(m, n, 2.0f);
+
+        // Apply Q from the left
+        lapack.sormr3("L", "N", m, n, k, l, a, 0, m, tau, 0, c, 0, m, work, 0, info);
+        assertEquals(0, info.val, "sormr3 should succeed");
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testCompareWithReference(LAPACK lapack) {
+        int m = N_SMALL;
+        int n = N_SMALL;
+        int k = Math.min(m, n);
+        int l = k;
+
+        float[] a = generateMatrixFloat(m, n, 1.0f);
+        float[] tau = new float[k];
+        float[] work = new float[m];
+        intW info = new intW(0);
+
+        lapack.stzrzf(m, n, a, 0, m, tau, 0, work, 0, m, info);
+
+        // Test implementation
+        float[] c_test = generateMatrixFloat(m, n, 2.0f);
+        lapack.sormr3("L", "N", m, n, k, l, a, 0, m, tau, 0, c_test, 0, m, work, 0, info);
+
+        // Reference implementation
+        float[] c_ref = generateMatrixFloat(m, n, 2.0f);
+        f2j.sormr3("L", "N", m, n, k, l, a, 0, m, tau, 0, c_ref, 0, m, work, 0, info);
+
+        assertArrayEquals(c_ref, c_test, Math.scalb(sepsilon, Math.getExponent(getMaxValue(c_ref)) + 4));
     }
 }

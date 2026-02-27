@@ -29,12 +29,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dgebd2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N;
+        int n = N;
+        int minmn = Math.min(m, n);
+        double[] a = dMatrix.clone();
+        double[] d = new double[minmn];
+        double[] e = new double[minmn - 1];
+        double[] tauq = new double[minmn];
+        double[] taup = new double[minmn];
+        double[] work = new double[Math.max(m, n)];
+        intW info = new intW(0);
+
+        lapack.dgebd2(m, n, a, 0, m, d, 0, e, 0, tauq, 0, taup, 0, work, 0, info);
+
+        assertEquals(0, info.val, "dgebd2 should succeed");
     }
 }

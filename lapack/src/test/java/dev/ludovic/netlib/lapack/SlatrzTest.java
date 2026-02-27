@@ -30,11 +30,36 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlatrzTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // RZ factorization of M-by-N upper trapezoidal matrix (N >= M)
+        int m = 3;
+        int n = 6;
+        int l = n - m; // = 3
+        // Upper trapezoidal: m-by-n matrix stored column-major with lda=m
+        float[] a_expected = {
+            1.0f, 0.0f, 0.0f,  // col 1
+            2.0f, 3.0f, 0.0f,  // col 2
+            4.0f, 5.0f, 6.0f,  // col 3
+            0.5f, 0.3f, 0.7f,  // col 4
+            0.2f, 0.4f, 0.6f,  // col 5
+            0.1f, 0.8f, 0.9f   // col 6
+        };
+        float[] a_actual = a_expected.clone();
+        float[] tau_expected = new float[m];
+        float[] tau_actual = new float[m];
+        float[] work_expected = new float[m];
+        float[] work_actual = new float[m];
+
+        f2j.slatrz(m, n, l, a_expected, m, tau_expected, work_expected);
+        lapack.slatrz(m, n, l, a_actual, m, tau_actual, work_actual);
+
+        assertArrayEquals(a_expected, a_actual, sepsilon);
+        assertArrayEquals(tau_expected, tau_actual, sepsilon);
     }
 }

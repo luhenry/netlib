@@ -32,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.netlib.util.floatW;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SrotgTest extends BLASTest {
 
     @ParameterizedTest

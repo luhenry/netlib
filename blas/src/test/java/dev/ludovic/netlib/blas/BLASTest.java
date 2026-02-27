@@ -35,6 +35,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
+import static org.junit.jupiter.api.Assertions.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class BLASTest {
 
@@ -142,14 +145,6 @@ public class BLASTest {
     return result;
   }
 
-  protected static final float[] convertToFloat(double[] src) {
-    float[] result = new float[src.length];
-    for (int i = 0; i < src.length; i += 1) {
-      result[i] = (float)src[i];
-    }
-    return result;
-  }
-
   protected static final double[] extractBand(double[] ge, int m, int n, int kl, int ku, int ldge) {
     int ldab = kl + ku + 1;
     double[] ab = new double[ldab * n];
@@ -178,20 +173,6 @@ public class BLASTest {
       }
     }
     return ab;
-  }
-
-  protected static void assertRelArrayEquals(double[] expected, double[] actual, double relEpsilon) {
-    org.junit.jupiter.api.Assertions.assertEquals(expected.length, actual.length);
-    for (int i = 0; i < expected.length; i++) {
-      org.junit.jupiter.api.Assertions.assertEquals(expected[i], actual[i], Math.max(Math.abs(expected[i]) * relEpsilon, depsilon));
-    }
-  }
-
-  protected static void assertRelArrayEquals(float[] expected, float[] actual, float relEpsilon) {
-    org.junit.jupiter.api.Assertions.assertEquals(expected.length, actual.length);
-    for (int i = 0; i < expected.length; i++) {
-      org.junit.jupiter.api.Assertions.assertEquals(expected[i], actual[i], Math.max(Math.abs(expected[i]) * relEpsilon, sepsilon));
-    }
   }
 
   protected final int M = 103;

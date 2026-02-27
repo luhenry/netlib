@@ -30,11 +30,28 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlanhsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testOneNorm(LAPACK lapack) {
+        int n = N_SMALL;
+
+        // Create upper Hessenberg matrix (nonzero on and above first subdiagonal)
+        double[] a = new double[n * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= Math.min(j + 1, n - 1); i++) {
+                a[i + j * n] = 1.0 / (i + j + 1.0);
+            }
+        }
+
+        double[] work = new double[n];
+
+        double expected = f2j.dlanhs("1", n, a, n, work);
+        double actual = lapack.dlanhs("1", n, a, n, work);
+
+        assertEquals(expected, actual, depsilon);
     }
 }

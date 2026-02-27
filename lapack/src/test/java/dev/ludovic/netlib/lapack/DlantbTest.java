@@ -30,11 +30,25 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlantbTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testOneNorm(LAPACK lapack) {
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        // Upper triangular banded matrix
+        double[] ab = generateBandedSymmetricMatrix(n, kd, n + 10.0, 1.0);
+
+        double[] work = new double[n];
+
+        double expected = f2j.dlantb("1", "U", "N", n, kd, ab, ldab, work);
+        double actual = lapack.dlantb("1", "U", "N", n, kd, ab, ldab, work);
+
+        assertEquals(expected, actual, depsilon);
     }
 }

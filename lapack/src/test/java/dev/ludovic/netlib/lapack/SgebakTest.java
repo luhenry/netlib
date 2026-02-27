@@ -29,12 +29,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SgebakTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        // First balance the matrix
+        float[] a = generateMatrixFloat(n, n, 1.0f);
+        intW ilo = new intW(0);
+        intW ihi = new intW(0);
+        float[] scale = new float[n];
+        intW info = new intW(0);
+
+        f2j.sgebal("B", n, a, 0, n, ilo, ihi, scale, 0, info);
+        assertEquals(0, info.val, "sgebal should succeed");
+
+        // Create eigenvector matrix (identity as placeholder)
+        int m = n;
+        float[] v_expected = new float[n * m];
+        for (int i = 0; i < n; i++) v_expected[i + i * n] = 1.0f;
+        float[] v_actual = v_expected.clone();
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sgebak("B", "R", n, ilo.val, ihi.val, scale, 0, m,
+                    v_expected, 0, n, info_expected);
+        assertEquals(0, info_expected.val, "Reference sgebak should succeed");
+
+        lapack.sgebak("B", "R", n, ilo.val, ihi.val, scale, 0, m,
+                      v_actual, 0, n, info_actual);
+        assertEquals(0, info_actual.val, "sgebak should succeed");
+
+        assertArrayEquals(v_expected, v_actual, sepsilon);
     }
 }

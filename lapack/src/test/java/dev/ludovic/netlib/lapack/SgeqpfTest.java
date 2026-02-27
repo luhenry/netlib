@@ -30,11 +30,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SgeqpfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // sgeqpf is deprecated (replaced by sgeqp3). Column pivoting selection
+        // differs between LAPACK 3.1 and 3.12 when column norms are similar.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

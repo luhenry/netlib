@@ -30,11 +30,39 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class IcnteqTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int expected, actual;
+
+        // Test counting specific values in array
+        // intArray1 = [1, 2, 3, ..., 50], so count of value 1 should be 1
+        expected = f2j.icnteq(N, intArray1, 1);
+        actual = arpack.icnteq(N, intArray1, 1);
+        assertEquals(expected, actual);
+
+        // Count value that appears once (first element)
+        expected = f2j.icnteq(N, intArray1, 1);
+        actual = arpack.icnteq(N, intArray1, 1);
+        assertEquals(expected, actual);
+
+        // Count value that doesn't exist
+        expected = f2j.icnteq(N, intArray1, 999);
+        actual = arpack.icnteq(N, intArray1, 999);
+        assertEquals(expected, actual);
+
+        // Count in intArray3 (all zeros)
+        expected = f2j.icnteq(N, intArray3, 0);
+        actual = arpack.icnteq(N, intArray3, 0);
+        assertEquals(expected, actual);
+
+        // Count non-zero in array of zeros
+        expected = f2j.icnteq(N, intArray3, 1);
+        actual = arpack.icnteq(N, intArray3, 1);
+        assertEquals(expected, actual);
     }
 }

@@ -29,12 +29,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class StgevcTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        float[] s = generateUpperTriangularMatrixFloat(n, 1.0f, 1.0f, 0.5f);
+
+        float[] p = generateUpperTriangularMatrixFloat(n, n + 1.0f, 1.0f, 0.3f);
+
+        boolean[] select = new boolean[n];
+        float[] vl = new float[1];
+        float[] vr_expected = new float[n * n];
+        float[] vr_actual = new float[n * n];
+        float[] work_expected = new float[6 * n];
+        float[] work_actual = new float[6 * n];
+        intW m_expected = new intW(0);
+        intW m_actual = new intW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.stgevc("R", "A", select, n, s, n, p, n, vl, 1, vr_expected, n, n, m_expected, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.stgevc("R", "A", select, n, s, n, p, n, vl, 1, vr_actual, n, n, m_actual, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(m_expected.val, m_actual.val);
+        assertArrayEquals(vr_expected, vr_actual, sepsilon);
     }
 }

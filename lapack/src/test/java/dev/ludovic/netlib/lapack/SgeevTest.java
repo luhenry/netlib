@@ -30,21 +30,39 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.netlib.util.intW;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SgeevTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        int n = 2;
-        float[] a = {1.0f, 0.75f, 0.5f, 1.0f};
-        float[] wr = new float[2];
-        float[] wi = new float[2];
-        int lwork = 68; // optimal size from previous query
-        float[] work = new float[lwork];
-        intW info = new intW(2);
+        int n = N_SMALL;
+        float[] a_expected = generateMatrixFloat(n, n, 1.0f);
+        float[] a_actual = a_expected.clone();
+        float[] wr_expected = new float[n];
+        float[] wr_actual = new float[n];
+        float[] wi_expected = new float[n];
+        float[] wi_actual = new float[n];
+        int lwork = 4 * n;
+        float[] work_expected = new float[lwork];
+        float[] work_actual = new float[lwork];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
 
-        lapack.sgeev("N", "N", n, a, n, wr, wi, new float[1], 1, new float[1], 1, work, lwork, info);
+        f2j.sgeev("N", "N", n, a_expected, n, wr_expected, wi_expected,
+                  new float[1], 1, new float[1], 1, work_expected, lwork, info_expected);
+        assertEquals(0, info_expected.val, "Reference sgeev should succeed");
+
+        lapack.sgeev("N", "N", n, a_actual, n, wr_actual, wi_actual,
+                     new float[1], 1, new float[1], 1, work_actual, lwork, info_actual);
+        assertEquals(0, info_actual.val, "sgeev should succeed");
+
+        // Sort eigenvalues for comparison (ordering may differ between implementations)
+        java.util.Arrays.sort(wr_expected);
+        java.util.Arrays.sort(wr_actual);
+        assertArrayEquals(wr_expected, wr_actual, sepsilon * 100);
     }
 }

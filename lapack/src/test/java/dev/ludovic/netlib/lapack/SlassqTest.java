@@ -29,12 +29,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlassqTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        floatW scale_expected = new floatW(1.0f);
+        floatW sumsq_expected = new floatW(0.0f);
+        f2j.slassq(N, sArray1, 0, 1, scale_expected, sumsq_expected);
+
+        floatW scale_actual = new floatW(1.0f);
+        floatW sumsq_actual = new floatW(0.0f);
+        lapack.slassq(N, sArray1, 0, 1, scale_actual, sumsq_actual);
+
+        assertRelEquals(Math.pow(scale_expected.val, 2) * sumsq_expected.val, Math.pow(scale_actual.val, 2) * sumsq_actual.val, sepsilon);
+
+        // Test with non-unit increment
+        scale_expected.val = 1.0f;
+        sumsq_expected.val = 0.0f;
+        f2j.slassq(N / 2, sArray1, 0, 2, scale_expected, sumsq_expected);
+
+        scale_actual.val = 1.0f;
+        sumsq_actual.val = 0.0f;
+        lapack.slassq(N / 2, sArray1, 0, 2, scale_actual, sumsq_actual);
+
+        assertRelEquals(Math.pow(scale_expected.val, 2) * sumsq_expected.val, Math.pow(scale_actual.val, 2) * sumsq_actual.val, sepsilon);
     }
 }

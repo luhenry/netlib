@@ -29,12 +29,47 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlaqtrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        // Upper triangular matrix with distinct diagonal entries
+        float[] t = generateUpperTriangularMatrixFloat(n, 1.0f, 1.0f, 0.5f);
+
+        // LREAL=true: solve T*x = scale*c (real quasi-triangular system)
+        // B is not referenced when LREAL=true
+        float[] b = new float[n];
+        float w = 0.0f;
+
+        // RHS vector in X (size 2*n, but only first n used for LREAL=true)
+        float[] x = new float[2 * n];
+        for (int i = 0; i < n; i++) {
+            x[i] = 1.0f / (i + 1.0f);
+        }
+
+        float[] x_expected = x.clone();
+        float[] x_actual = x.clone();
+        float[] work_expected = new float[n];
+        float[] work_actual = new float[n];
+        floatW scale_expected = new floatW(0.0f);
+        floatW scale_actual = new floatW(0.0f);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.slaqtr(false, true, n, t, n, b, w, scale_expected, x_expected, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.slaqtr(false, true, n, t, n, b, w, scale_actual, x_actual, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(scale_expected.val, scale_actual.val, sepsilon);
+        assertArrayEquals(x_expected, x_actual, sepsilon);
     }
 }

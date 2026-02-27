@@ -29,12 +29,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SopmtrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testLeftNoTranspose(LAPACK lapack) {
+        int n = N_SMALL;
+        float[] ap = generatePackedSymmetricMatrixFloat(n, n + 10.0f);
+
+        float[] d = new float[n];
+        float[] e = new float[n - 1];
+        float[] tau = new float[n - 1];
+        intW info = new intW(0);
+        f2j.ssptrd("U", n, ap, d, e, tau, info);
+        assertEquals(0, info.val);
+
+        float[] c_expected = generateIdentityMatrixFloat(n);
+        float[] c_actual = generateIdentityMatrixFloat(n);
+
+        float[] work_expected = new float[n];
+        float[] work_actual = new float[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sopmtr("L", "U", "N", n, n, ap, tau, c_expected, n, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sopmtr("L", "U", "N", n, n, ap, tau, c_actual, n, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(c_expected, c_actual, sepsilon);
     }
 }

@@ -29,12 +29,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SsterfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        float[] d_expected = generateFloatArray(n, 1.0f);
+        float[] e_expected = generateFloatArray(n - 1, 0.5f);
+        intW info_expected = new intW(0);
+        f2j.ssterf(n, d_expected, 0, e_expected, 0, info_expected);
+
+        float[] d_actual = generateFloatArray(n, 1.0f);
+        float[] e_actual = generateFloatArray(n - 1, 0.5f);
+        intW info_actual = new intW(0);
+        lapack.ssterf(n, d_actual, 0, e_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(d_expected))));
+        assertArrayEquals(e_expected, e_actual, Math.scalb(sepsilon, Math.getExponent(Math.max(getMaxValue(e_expected), 1.0f))));
     }
 }

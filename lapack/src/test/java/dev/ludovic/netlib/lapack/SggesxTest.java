@@ -30,11 +30,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SggesxTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
+        // sggesx requires a SELCTG callback (java.lang.Object) that causes NPE when null.
         org.junit.jupiter.api.Assumptions.assumeTrue(false);
     }
 }

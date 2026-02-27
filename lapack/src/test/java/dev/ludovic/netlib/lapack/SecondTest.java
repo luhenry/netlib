@@ -29,12 +29,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SecondTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // second() crashes the JVM on macOS
+        assumeFalse(lapack instanceof NativeLAPACK && System.getProperty("os.name", "").toLowerCase().contains("mac"),
+            "second() crashes on macOS");
+
+        float t1 = lapack.second();
+        assertTrue(t1 >= 0.0f, "second should return non-negative time");
+
+        float t2 = lapack.second();
+        assertTrue(t2 >= t1, "second should be monotonically non-decreasing");
     }
 }

@@ -29,12 +29,70 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SgghrdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        int ilo = 1;
+        int ihi = n;
+
+        float[] a_expected = generateMatrixFloat(n, n, 1.0f);
+        float[] b_expected = generatePositiveDefiniteMatrixFloat(n);
+        // Initialize Q and Z as identity matrices for compq="I", compz="I"
+        float[] q_expected = generateIdentityMatrixFloat(n);
+        float[] z_expected = generateIdentityMatrixFloat(n);
+        intW info_expected = new intW(0);
+
+        f2j.sgghrd("I", "I", n, ilo, ihi, a_expected, 0, n, b_expected, 0, n, q_expected, 0, n, z_expected, 0, n, info_expected);
+        assertEquals(0, info_expected.val, "Reference sgghrd should succeed");
+
+        float[] a_actual = generateMatrixFloat(n, n, 1.0f);
+        float[] b_actual = generatePositiveDefiniteMatrixFloat(n);
+        float[] q_actual = generateIdentityMatrixFloat(n);
+        float[] z_actual = generateIdentityMatrixFloat(n);
+        intW info_actual = new intW(0);
+
+        lapack.sgghrd("I", "I", n, ilo, ihi, a_actual, 0, n, b_actual, 0, n, q_actual, 0, n, z_actual, 0, n, info_actual);
+        assertEquals(0, info_actual.val, "sgghrd should succeed");
+
+        assertRelArrayEquals(a_expected, a_actual, 1000.0f);
+        assertRelArrayEquals(b_expected, b_actual, 1000.0f);
+        assertRelArrayEquals(q_expected, q_actual, 1000.0f);
+        assertRelArrayEquals(z_expected, z_actual, 1000.0f);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testNoAccumulation(LAPACK lapack) {
+        int n = N_SMALL;
+        int ilo = 1;
+        int ihi = n;
+
+        float[] a_expected = generateMatrixFloat(n, n, 1.0f);
+        float[] b_expected = generatePositiveDefiniteMatrixFloat(n);
+        float[] q_expected = new float[1];
+        float[] z_expected = new float[1];
+        intW info_expected = new intW(0);
+
+        f2j.sgghrd("N", "N", n, ilo, ihi, a_expected, 0, n, b_expected, 0, n, q_expected, 0, 1, z_expected, 0, 1, info_expected);
+        assertEquals(0, info_expected.val);
+
+        float[] a_actual = generateMatrixFloat(n, n, 1.0f);
+        float[] b_actual = generatePositiveDefiniteMatrixFloat(n);
+        float[] q_actual = new float[1];
+        float[] z_actual = new float[1];
+        intW info_actual = new intW(0);
+
+        lapack.sgghrd("N", "N", n, ilo, ihi, a_actual, 0, n, b_actual, 0, n, q_actual, 0, 1, z_actual, 0, 1, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertRelArrayEquals(a_expected, a_actual, 1000.0f);
+        assertRelArrayEquals(b_expected, b_actual, 1000.0f);
     }
 }

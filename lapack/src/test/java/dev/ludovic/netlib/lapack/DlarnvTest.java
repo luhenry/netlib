@@ -30,11 +30,58 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlarnvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUniform01(LAPACK lapack) {
+        // DLARNV generates random numbers; idist=1 is uniform (0,1)
+        int n = 20;
+        int[] iseed_expected = {1, 2, 3, 5}; // iseed(4) must be odd
+        int[] iseed_actual = iseed_expected.clone();
+        double[] x_expected = new double[n];
+        double[] x_actual = new double[n];
+
+        f2j.dlarnv(1, iseed_expected, n, x_expected);
+        lapack.dlarnv(1, iseed_actual, n, x_actual);
+
+        assertArrayEquals(x_expected, x_actual, depsilon);
+        assertArrayEquals(iseed_expected, iseed_actual);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testUniformSymmetric(LAPACK lapack) {
+        // idist=2 is uniform (-1,1)
+        int n = 20;
+        int[] iseed_expected = {7, 11, 13, 17};
+        int[] iseed_actual = iseed_expected.clone();
+        double[] x_expected = new double[n];
+        double[] x_actual = new double[n];
+
+        f2j.dlarnv(2, iseed_expected, n, x_expected);
+        lapack.dlarnv(2, iseed_actual, n, x_actual);
+
+        assertArrayEquals(x_expected, x_actual, depsilon);
+        assertArrayEquals(iseed_expected, iseed_actual);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testNormal(LAPACK lapack) {
+        // idist=3 is normal (0,1)
+        int n = 20;
+        int[] iseed_expected = {100, 200, 300, 401};
+        int[] iseed_actual = iseed_expected.clone();
+        double[] x_expected = new double[n];
+        double[] x_actual = new double[n];
+
+        f2j.dlarnv(3, iseed_expected, n, x_expected);
+        lapack.dlarnv(3, iseed_actual, n, x_actual);
+
+        assertArrayEquals(x_expected, x_actual, depsilon);
+        assertArrayEquals(iseed_expected, iseed_actual);
     }
 }

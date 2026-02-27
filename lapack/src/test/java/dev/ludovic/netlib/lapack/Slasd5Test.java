@@ -29,12 +29,53 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slasd5Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] d = {1.0f, 3.0f};
+        float[] z = {0.5f, 0.5f};
+        float rho = 1.0f;
+
+        // Test i=1
+        float[] delta_expected = new float[2];
+        float[] work_expected = new float[2];
+        floatW dsigma_expected = new floatW(0.0f);
+
+        f2j.slasd5(1, d.clone(), 0, z.clone(), 0, delta_expected, 0, rho, dsigma_expected, work_expected, 0);
+
+        float[] delta_actual = new float[2];
+        float[] work_actual = new float[2];
+        floatW dsigma_actual = new floatW(0.0f);
+
+        lapack.slasd5(1, d.clone(), 0, z.clone(), 0, delta_actual, 0, rho, dsigma_actual, work_actual, 0);
+
+        assertEquals(dsigma_expected.val, dsigma_actual.val,
+            Math.scalb(sepsilon, Math.getExponent(Math.max(Math.abs(dsigma_expected.val), 1.0f))));
+        assertArrayEquals(delta_expected, delta_actual,
+            Math.scalb(sepsilon, Math.getExponent(Math.max(getMaxValue(delta_expected), 1.0f))));
+
+        // Test i=2
+        float[] delta2_expected = new float[2];
+        float[] work2_expected = new float[2];
+        floatW dsigma2_expected = new floatW(0.0f);
+
+        f2j.slasd5(2, d.clone(), 0, z.clone(), 0, delta2_expected, 0, rho, dsigma2_expected, work2_expected, 0);
+
+        float[] delta2_actual = new float[2];
+        float[] work2_actual = new float[2];
+        floatW dsigma2_actual = new floatW(0.0f);
+
+        lapack.slasd5(2, d.clone(), 0, z.clone(), 0, delta2_actual, 0, rho, dsigma2_actual, work2_actual, 0);
+
+        assertEquals(dsigma2_expected.val, dsigma2_actual.val,
+            Math.scalb(sepsilon, Math.getExponent(Math.max(Math.abs(dsigma2_expected.val), 1.0f))));
+        assertArrayEquals(delta2_expected, delta2_actual,
+            Math.scalb(sepsilon, Math.getExponent(Math.max(getMaxValue(delta2_expected), 1.0f))));
     }
 }

@@ -29,12 +29,57 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slasq6Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 4;
+        float[] d = {10.0f, 8.0f, 6.0f, 4.0f};
+        float[] e = {0.5f, 0.4f, 0.3f};
+
+        float[] z_expected = new float[4 * n];
+        for (int i = 0; i < n; i++) {
+            z_expected[4 * i] = d[i] * d[i];
+            z_expected[4 * i + 1] = (i < n - 1) ? e[i] * e[i] : 0.0f;
+            z_expected[4 * i + 2] = z_expected[4 * i];
+            z_expected[4 * i + 3] = z_expected[4 * i + 1];
+        }
+
+        floatW dmin_expected = new floatW(0.0f);
+        floatW dmin1_expected = new floatW(0.0f);
+        floatW dmin2_expected = new floatW(0.0f);
+        floatW dn_expected = new floatW(0.0f);
+        floatW dnm1_expected = new floatW(0.0f);
+        floatW dnm2_expected = new floatW(0.0f);
+
+        f2j.slasq6(1, n, z_expected, 0, 0, dmin_expected, dmin1_expected,
+            dmin2_expected, dn_expected, dnm1_expected, dnm2_expected);
+
+        float[] z_actual = new float[4 * n];
+        for (int i = 0; i < n; i++) {
+            z_actual[4 * i] = d[i] * d[i];
+            z_actual[4 * i + 1] = (i < n - 1) ? e[i] * e[i] : 0.0f;
+            z_actual[4 * i + 2] = z_actual[4 * i];
+            z_actual[4 * i + 3] = z_actual[4 * i + 1];
+        }
+
+        floatW dmin_actual = new floatW(0.0f);
+        floatW dmin1_actual = new floatW(0.0f);
+        floatW dmin2_actual = new floatW(0.0f);
+        floatW dn_actual = new floatW(0.0f);
+        floatW dnm1_actual = new floatW(0.0f);
+        floatW dnm2_actual = new floatW(0.0f);
+
+        lapack.slasq6(1, n, z_actual, 0, 0, dmin_actual, dmin1_actual,
+            dmin2_actual, dn_actual, dnm1_actual, dnm2_actual);
+
+        assertArrayEquals(z_expected, z_actual, Math.scalb(sepsilon, Math.getExponent(Math.max(getMaxValue(z_expected), 1.0f))));
+        assertEquals(dmin_expected.val, dmin_actual.val, Math.scalb(sepsilon, Math.getExponent(Math.max(Math.abs(dmin_expected.val), 1.0f))));
+        assertEquals(dn_expected.val, dn_actual.val, Math.scalb(sepsilon, Math.getExponent(Math.max(Math.abs(dn_expected.val), 1.0f))));
     }
 }

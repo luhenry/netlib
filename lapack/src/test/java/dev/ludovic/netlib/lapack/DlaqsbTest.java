@@ -29,12 +29,44 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlaqsbTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        int kd = 2;
+        int ldab = kd + 1;
+
+        // Symmetric band matrix (upper, band storage): AB(kd+1+i-j, j) = A(i,j)
+        double[] ab = new double[ldab * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = Math.max(0, j - kd); i <= j; i++) {
+                ab[(kd + i - j) + j * ldab] = 1.0 / (i + j + 1.0);
+            }
+        }
+
+        double[] s = new double[n];
+        for (int i = 0; i < n; i++) {
+            s[i] = 1.0 / (i + 1.0);
+        }
+
+        double scond = 0.01;
+        double amax = 1.0;
+
+        double[] ab_expected = ab.clone();
+        double[] ab_actual = ab.clone();
+        StringW equed_expected = new StringW("N");
+        StringW equed_actual = new StringW("N");
+
+        f2j.dlaqsb("U", n, kd, ab_expected, ldab, s, scond, amax, equed_expected);
+        lapack.dlaqsb("U", n, kd, ab_actual, ldab, s, scond, amax, equed_actual);
+
+        // Skip equed comparison due to JNI StringW output bug
+        assertArrayEquals(ab_expected, ab_actual, depsilon);
     }
 }

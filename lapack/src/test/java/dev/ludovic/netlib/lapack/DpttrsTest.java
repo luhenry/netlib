@@ -29,12 +29,55 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DpttrsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create tridiagonal positive definite matrix
+        double[] d_expected = new double[N];
+        double[] d_actual = new double[N];
+        double[] e_expected = new double[N - 1];
+        double[] e_actual = new double[N - 1];
+
+        // Fill diagonal and off-diagonal
+        for (int i = 0; i < N; i++) {
+            d_expected[i] = N + 1.0;
+            d_actual[i] = N + 1.0;
+        }
+        for (int i = 0; i < N - 1; i++) {
+            e_expected[i] = 0.5;
+            e_actual[i] = 0.5;
+        }
+
+        // First, factor using dpttrf
+        intW info = new intW(0);
+        f2j.dpttrf(N, d_expected, 0, e_expected, 0, info);
+        assertEquals(0, info.val, "Reference factorization should succeed");
+
+        info.val = 0;
+        lapack.dpttrf(N, d_actual, 0, e_actual, 0, info);
+        assertEquals(0, info.val, "Factorization should succeed");
+
+        // Create right-hand side B
+        double[] b_expected = generateDoubleArray(N, 1.0);
+        double[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        info.val = 0;
+        f2j.dpttrs(N, 1, d_expected, 0, e_expected, 0, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.dpttrs(N, 1, d_actual, 0, e_actual, 0, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(b_expected, b_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(b_expected))));
     }
 }

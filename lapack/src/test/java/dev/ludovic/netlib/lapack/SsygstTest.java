@@ -29,12 +29,41 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SsygstTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        float[] b = new float[n * n];
+        for (int j = 0; j < n; j++)
+            for (int i = 0; i < n; i++)
+                b[i + j * n] = sPositiveDefiniteMatrix[i + j * N];
+        intW info = new intW(0);
+        f2j.spotrf("U", n, b, 0, n, info);
+        assertEquals(0, info.val);
+
+        float[] a_expected = new float[n * n];
+        float[] a_actual = new float[n * n];
+        for (int j = 0; j < n; j++)
+            for (int i = 0; i < n; i++) {
+                a_expected[i + j * n] = sSymmetricMatrix[i + j * N];
+                a_actual[i + j * n] = sSymmetricMatrix[i + j * N];
+            }
+
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.ssygst(1, "U", n, a_expected, 0, n, b, 0, n, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.ssygst(1, "U", n, a_actual, 0, n, b, 0, n, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(a_expected, a_actual, sepsilon);
     }
 }

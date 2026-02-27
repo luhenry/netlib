@@ -29,12 +29,70 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class StgsylTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = N_SMALL;
+
+        // A is m x m upper triangular (quasi-triangular Schur form)
+        float[] a = generateUpperTriangularMatrixFloat(m, 1.0f, 1.0f, 0.5f);
+
+        // B is n x n upper triangular (quasi-triangular Schur form)
+        float[] b = generateUpperTriangularMatrixFloat(n, m + 1.0f, 1.0f, 0.3f);
+
+        // D is m x m upper triangular
+        float[] d = generateUpperTriangularMatrixFloat(m, 2 * m + 1.0f, 1.0f, 0.2f);
+
+        // E is n x n upper triangular
+        float[] e = generateUpperTriangularMatrixFloat(n, 2 * m + n + 1.0f, 1.0f, 0.1f);
+
+        // C is m x n general RHS matrix (overwritten with solution R)
+        float[] c = new float[m * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                c[i + j * m] = 1.0f / (i + j + 1.0f);
+            }
+        }
+
+        // F is m x n general RHS matrix (overwritten with solution L)
+        float[] f = new float[m * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                f[i + j * m] = 1.0f / (i + j + 2.0f);
+            }
+        }
+
+        float[] c_expected = c.clone();
+        float[] c_actual = c.clone();
+        float[] f_expected = f.clone();
+        float[] f_actual = f.clone();
+        floatW scale_expected = new floatW(0.0f);
+        floatW scale_actual = new floatW(0.0f);
+        floatW dif_expected = new floatW(0.0f);
+        floatW dif_actual = new floatW(0.0f);
+        int lwork = 1;
+        float[] work_expected = new float[lwork];
+        float[] work_actual = new float[lwork];
+        int[] iwork_expected = new int[m + n + 6];
+        int[] iwork_actual = new int[m + n + 6];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.stgsyl("N", 0, m, n, a, m, b, n, c_expected, m, d, m, e, n, f_expected, m, scale_expected, dif_expected, work_expected, lwork, iwork_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.stgsyl("N", 0, m, n, a, m, b, n, c_actual, m, d, m, e, n, f_actual, m, scale_actual, dif_actual, work_actual, lwork, iwork_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(scale_expected.val, scale_actual.val, sepsilon);
+        assertArrayEquals(c_expected, c_actual, sepsilon);
+        assertArrayEquals(f_expected, f_actual, sepsilon);
     }
 }

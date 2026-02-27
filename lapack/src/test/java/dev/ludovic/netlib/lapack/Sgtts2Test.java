@@ -29,12 +29,69 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Sgtts2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testNoTranspose(LAPACK lapack) {
+        int n = N_SMALL;
+        float[] dl = new float[n - 1];
+        float[] d = new float[n];
+        float[] du = new float[n - 1];
+        float[] du2 = new float[n - 2];
+        for (int i = 0; i < n; i++) {
+            d[i] = 10.0f;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            dl[i] = 1.0f;
+            du[i] = 1.0f;
+        }
+
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.sgttrf(n, dl, d, du, du2, ipiv, info);
+        assertEquals(0, info.val);
+
+        float[] b_expected = generateFloatArray(n, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        f2j.sgtts2(0, n, 1, dl, d, du, du2, ipiv, b_expected, n);
+        lapack.sgtts2(0, n, 1, dl, d, du, du2, ipiv, b_actual, n);
+
+        assertArrayEquals(b_expected, b_actual, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testTranspose(LAPACK lapack) {
+        int n = N_SMALL;
+        float[] dl = new float[n - 1];
+        float[] d = new float[n];
+        float[] du = new float[n - 1];
+        float[] du2 = new float[n - 2];
+        for (int i = 0; i < n; i++) {
+            d[i] = 10.0f;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            dl[i] = 1.0f;
+            du[i] = 1.0f;
+        }
+
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.sgttrf(n, dl, d, du, du2, ipiv, info);
+        assertEquals(0, info.val);
+
+        float[] b_expected = generateFloatArray(n, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        f2j.sgtts2(1, n, 1, dl, d, du, du2, ipiv, b_expected, n);
+        lapack.sgtts2(1, n, 1, dl, d, du, du2, ipiv, b_actual, n);
+
+        assertArrayEquals(b_expected, b_actual, sepsilon);
     }
 }

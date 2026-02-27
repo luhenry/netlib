@@ -30,11 +30,38 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlaswpTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Verify that applying a permutation forward (incx=1) then backward (incx=-1)
+        // gives back the original matrix.
+        // Use ipiv = {2, 3, 3} (1-based) with k1=1, k2=3:
+        //   Forward: swap row 1<->2, then row 2<->3, then row 3<->3
+        //   Result: rows cycle [orig2, orig3, orig1, ...]
+        int n = 5;
+        int[] ipiv = new int[]{2, 3, 3};
+
+        double[] a_orig = generateMatrix(n, n, 1.0);
+        double[] a = a_orig.clone();
+
+        // Apply forward permutation
+        lapack.dlaswp(n, a, 0, n, 1, 3, ipiv, 0, 1);
+
+        // Verify the matrix actually changed
+        boolean changed = false;
+        for (int i = 0; i < n * n; i++) {
+            if (a[i] != a_orig[i]) { changed = true; break; }
+        }
+        assertTrue(changed, "dlaswp should modify the matrix");
+
+        // Apply backward permutation (incx = -1) to undo
+        lapack.dlaswp(n, a, 0, n, 1, 3, ipiv, 0, -1);
+
+        // Should get back the original
+        assertArrayEquals(a_orig, a, depsilon);
     }
 }

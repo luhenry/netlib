@@ -30,11 +30,29 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class IlaenvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // ilaenv returns implementation-specific tuning parameters (block sizes).
+        // Native LAPACK may return different values than F2j (e.g., 32 vs 64).
+        // Verify the return values are positive and reasonable.
+
+        // ispec=1: optimal block size for DGETRF
+        int nb = lapack.ilaenv(1, "DGETRF", " ", 100, 100, -1, -1);
+        assertTrue(nb > 0, "Block size for DGETRF should be positive, got " + nb);
+        assertTrue(nb <= 256, "Block size for DGETRF should be <= 256, got " + nb);
+
+        // ispec=1: optimal block size for DGEQRF
+        nb = lapack.ilaenv(1, "DGEQRF", " ", 100, 100, -1, -1);
+        assertTrue(nb > 0, "Block size for DGEQRF should be positive, got " + nb);
+        assertTrue(nb <= 256, "Block size for DGEQRF should be <= 256, got " + nb);
+
+        // ispec=2: minimum block size
+        int nbmin = lapack.ilaenv(2, "DGETRF", " ", 100, 100, -1, -1);
+        assertTrue(nbmin >= 1, "Min block size should be >= 1, got " + nbmin);
     }
 }

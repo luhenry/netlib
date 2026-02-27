@@ -29,12 +29,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SspevxTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testAllEigenvalues(LAPACK lapack) {
+        int n = N_SMALL;
+        float[] ap = generatePackedSymmetricMatrixFloat(n, n + 10.0f);
+
+        float[] ap_expected = ap.clone();
+        float[] ap_actual = ap.clone();
+        intW m_expected = new intW(0);
+        intW m_actual = new intW(0);
+        float[] w_expected = new float[n];
+        float[] w_actual = new float[n];
+        float[] z_expected = new float[1];
+        float[] z_actual = new float[1];
+        float[] work_expected = new float[8 * n];
+        float[] work_actual = new float[8 * n];
+        int[] iwork_expected = new int[5 * n];
+        int[] iwork_actual = new int[5 * n];
+        int[] ifail_expected = new int[n];
+        int[] ifail_actual = new int[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sspevx("N", "A", "U", n, ap_expected, 0.0f, 0.0f, 0, 0, 0.0f, m_expected, w_expected, z_expected, 1, work_expected, iwork_expected, ifail_expected, info_expected);
+        assertEquals(0, info_expected.val);
+        assertEquals(n, m_expected.val);
+
+        lapack.sspevx("N", "A", "U", n, ap_actual, 0.0f, 0.0f, 0, 0, 0.0f, m_actual, w_actual, z_actual, 1, work_actual, iwork_actual, ifail_actual, info_actual);
+        assertEquals(0, info_actual.val);
+        assertEquals(n, m_actual.val);
+
+        assertRelArrayEquals(w_expected, w_actual, sepsilon);
     }
 }

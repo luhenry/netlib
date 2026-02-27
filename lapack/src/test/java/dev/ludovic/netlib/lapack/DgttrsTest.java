@@ -29,12 +29,51 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgttrsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create tridiagonal matrix
+        double[] dl_expected = generateDoubleArray(N - 1, 0.5);
+        double[] dl_actual = dl_expected.clone();
+        double[] d_expected = generateDoubleArray(N, 2.0);
+        double[] d_actual = d_expected.clone();
+        double[] du_expected = generateDoubleArray(N - 1, 0.5);
+        double[] du_actual = du_expected.clone();
+        double[] du2_expected = new double[N - 2];
+        double[] du2_actual = new double[N - 2];
+        int[] ipiv_expected = new int[N];
+        int[] ipiv_actual = new int[N];
+
+        // First, factor using dgttrf
+        intW info = new intW(0);
+        f2j.dgttrf(N, dl_expected, 0, d_expected, 0, du_expected, 0, du2_expected, 0, ipiv_expected, 0, info);
+        assertEquals(0, info.val, "Reference factorization should succeed");
+
+        info.val = 0;
+        lapack.dgttrf(N, dl_actual, 0, d_actual, 0, du_actual, 0, du2_actual, 0, ipiv_actual, 0, info);
+        assertEquals(0, info.val, "Factorization should succeed");
+
+        // Create right-hand side B
+        double[] b_expected = generateDoubleArray(N, 1.0);
+        double[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        info.val = 0;
+        f2j.dgttrs("N", N, 1, dl_expected, 0, d_expected, 0, du_expected, 0, du2_expected, 0, ipiv_expected, 0, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.dgttrs("N", N, 1, dl_actual, 0, d_actual, 0, du_actual, 0, du2_actual, 0, ipiv_actual, 0, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(b_expected, b_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(b_expected))));
     }
 }

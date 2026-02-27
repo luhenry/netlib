@@ -29,12 +29,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlarrrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test relative representation
+        double[] d = generateDoubleArray(N_SMALL, 1.0);
+        double[] e = generateDoubleArray(N_SMALL - 1, 0.1);
+
+        intW info_expected = new intW(0);
+        f2j.dlarrr(N_SMALL, d, 0, e, 0, info_expected);
+
+        intW info_actual = new intW(0);
+        lapack.dlarrr(N_SMALL, d, 0, e, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
     }
 }

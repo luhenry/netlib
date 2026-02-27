@@ -30,11 +30,25 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class LsameTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test same uppercase letters
+        assertEquals(f2j.lsame("A", "A"), lapack.lsame("A", "A"));
+        assertEquals(f2j.lsame("Z", "Z"), lapack.lsame("Z", "Z"));
+
+        // Test case-insensitive comparison
+        assertEquals(f2j.lsame("A", "a"), lapack.lsame("A", "a"));
+        assertEquals(f2j.lsame("a", "A"), lapack.lsame("a", "A"));
+        assertEquals(f2j.lsame("N", "n"), lapack.lsame("N", "n"));
+
+        // Test different letters
+        assertEquals(f2j.lsame("A", "B"), lapack.lsame("A", "B"));
+        assertEquals(f2j.lsame("X", "Y"), lapack.lsame("X", "Y"));
+        assertEquals(f2j.lsame("a", "b"), lapack.lsame("a", "b"));
     }
 }

@@ -29,12 +29,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SpotrfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        intW info = new intW(0);
+        float[] a = sPositiveDefiniteMatrix.clone();
+        lapack.spotrf("U", N, a, 0, N, info);
+
+        assertEquals(0, info.val, "Cholesky factorization should succeed");
     }
 }

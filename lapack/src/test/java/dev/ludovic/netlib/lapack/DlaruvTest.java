@@ -30,11 +30,41 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class DlaruvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // DLARUV returns n (<=128) uniform (0,1) random numbers
+        int n = 100;
+        int[] iseed_expected = {3, 17, 42, 99}; // iseed(4) must be odd
+        int[] iseed_actual = iseed_expected.clone();
+        double[] x_expected = new double[n];
+        double[] x_actual = new double[n];
+
+        f2j.dlaruv(iseed_expected, n, x_expected);
+        lapack.dlaruv(iseed_actual, n, x_actual);
+
+        assertArrayEquals(x_expected, x_actual, depsilon);
+        assertArrayEquals(iseed_expected, iseed_actual);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testMaxSize(LAPACK lapack) {
+        // Test with max n=128
+        int n = 128;
+        int[] iseed_expected = {1000, 2000, 3000, 4001};
+        int[] iseed_actual = iseed_expected.clone();
+        double[] x_expected = new double[n];
+        double[] x_actual = new double[n];
+
+        f2j.dlaruv(iseed_expected, n, x_expected);
+        lapack.dlaruv(iseed_actual, n, x_actual);
+
+        assertArrayEquals(x_expected, x_actual, depsilon);
+        assertArrayEquals(iseed_expected, iseed_actual);
     }
 }

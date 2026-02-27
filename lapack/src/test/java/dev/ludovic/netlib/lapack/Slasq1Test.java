@@ -29,12 +29,48 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slasq1Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+
+        float[] d_expected = new float[n];
+        float[] e_expected = new float[n];
+        for (int i = 0; i < n; i++) {
+            d_expected[i] = (i + 1) * 2.0f;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            e_expected[i] = 0.5f;
+        }
+        e_expected[n - 1] = 0.0f;
+
+        float[] work_expected = new float[4 * n];
+        intW info_expected = new intW(0);
+
+        f2j.slasq1(n, d_expected, 0, e_expected, 0, work_expected, 0, info_expected);
+
+        float[] d_actual = new float[n];
+        float[] e_actual = new float[n];
+        for (int i = 0; i < n; i++) {
+            d_actual[i] = (i + 1) * 2.0f;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            e_actual[i] = 0.5f;
+        }
+        e_actual[n - 1] = 0.0f;
+
+        float[] work_actual = new float[4 * n];
+        intW info_actual = new intW(0);
+
+        lapack.slasq1(n, d_actual, 0, e_actual, 0, work_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(d_expected))));
     }
 }

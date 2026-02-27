@@ -29,12 +29,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SgesvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // SGESV solves A*X = B using LU factorization
+        float[] a_expected = sPositiveDefiniteMatrix.clone();
+        float[] a_actual = sPositiveDefiniteMatrix.clone();
+        int[] ipiv_expected = new int[N];
+        int[] ipiv_actual = new int[N];
+
+        // Create right-hand side B and solution X
+        float[] b_expected = generateFloatArray(N, 1.0f);
+        float[] b_actual = b_expected.clone();
+
+        // Solve using reference implementation
+        intW info = new intW(0);
+        f2j.sgesv(N, 1, a_expected, 0, N, ipiv_expected, 0, b_expected, 0, N, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.sgesv(N, 1, a_actual, 0, N, ipiv_actual, 0, b_actual, 0, N, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions
+        assertArrayEquals(b_expected, b_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(b_expected)) + 2));
     }
 }

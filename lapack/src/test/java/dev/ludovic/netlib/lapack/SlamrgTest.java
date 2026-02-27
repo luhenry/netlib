@@ -30,11 +30,34 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlamrgTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test merging two sorted lists
+        // slamrg expects both lists concatenated in a single array
+        float[] a = new float[]{1.0f, 3.0f, 5.0f, 7.0f, 9.0f, 2.0f, 4.0f, 6.0f, 8.0f};
+
+        int[] index_expected = new int[9];
+        f2j.slamrg(5, 4, a.clone(), 0, 1, 1, index_expected, 0);
+
+        int[] index_actual = new int[9];
+        lapack.slamrg(5, 4, a.clone(), 0, 1, 1, index_actual, 0);
+
+        assertArrayEquals(index_expected, index_actual);
+
+        // Test with descending order
+        float[] a2 = new float[]{9.0f, 7.0f, 5.0f, 3.0f, 1.0f, 8.0f, 6.0f, 4.0f, 2.0f};
+
+        int[] index_expected2 = new int[9];
+        f2j.slamrg(5, 4, a2.clone(), 0, -1, -1, index_expected2, 0);
+
+        int[] index_actual2 = new int[9];
+        lapack.slamrg(5, 4, a2.clone(), 0, -1, -1, index_actual2, 0);
+
+        assertArrayEquals(index_expected2, index_actual2);
     }
 }

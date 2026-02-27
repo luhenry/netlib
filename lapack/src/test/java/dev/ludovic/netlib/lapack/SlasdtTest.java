@@ -29,12 +29,38 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SlasdtTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        int msub = 3;
+
+        intW lvl_expected = new intW(0);
+        intW nd_expected = new intW(0);
+        int[] inode_expected = new int[n];
+        int[] ndiml_expected = new int[n];
+        int[] ndimr_expected = new int[n];
+
+        f2j.slasdt(n, lvl_expected, nd_expected, inode_expected, 0, ndiml_expected, 0, ndimr_expected, 0, msub);
+
+        intW lvl_actual = new intW(0);
+        intW nd_actual = new intW(0);
+        int[] inode_actual = new int[n];
+        int[] ndiml_actual = new int[n];
+        int[] ndimr_actual = new int[n];
+
+        lapack.slasdt(n, lvl_actual, nd_actual, inode_actual, 0, ndiml_actual, 0, ndimr_actual, 0, msub);
+
+        assertEquals(lvl_expected.val, lvl_actual.val);
+        assertEquals(nd_expected.val, nd_actual.val);
+        assertArrayEquals(inode_expected, inode_actual);
+        assertArrayEquals(ndiml_expected, ndiml_actual);
+        assertArrayEquals(ndimr_expected, ndimr_actual);
     }
 }

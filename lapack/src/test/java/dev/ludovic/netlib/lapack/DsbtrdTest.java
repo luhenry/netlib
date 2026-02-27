@@ -29,12 +29,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsbtrdTest extends LAPACKTest {
+
+    // Pack a symmetric positive definite matrix into upper banded storage
+    private double[] packUpperBanded(double[] matrix, int n, int kd) {
+        int ldab = kd + 1;
+        double[] ab = new double[ldab * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = Math.max(0, j - kd); i <= j; i++) {
+                ab[(kd + i - j) + j * ldab] = matrix[i + j * n];
+            }
+        }
+        return ab;
+    }
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N;
+        int kd = 3;
+        int ldab = kd + 1;
+        double[] ab = packUpperBanded(dPositiveDefiniteMatrix, n, kd);
+        double[] d = new double[n];
+        double[] e = new double[n - 1];
+        double[] q = new double[n * n];
+        double[] work = new double[n];
+        intW info = new intW(0);
+
+        lapack.dsbtrd("N", "U", n, kd, ab, 0, ldab, d, 0, e, 0, q, 0, n, work, 0, info);
+
+        assertEquals(0, info.val, "dsbtrd should succeed");
     }
 }

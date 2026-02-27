@@ -30,11 +30,26 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class Slamc3Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test basic addition
+        float expected = f2j.slamc3(1.0f, 2.0f);
+        float actual = lapack.slamc3(1.0f, 2.0f);
+        assertEquals(expected, actual, sepsilon);
+
+        // Test with small values
+        expected = f2j.slamc3(1e-5f, 1e-6f);
+        actual = lapack.slamc3(1e-5f, 1e-6f);
+        assertEquals(expected, actual, sepsilon);
+
+        // Test with larger values
+        expected = f2j.slamc3(100.0f, 200.0f);
+        actual = lapack.slamc3(100.0f, 200.0f);
+        assertEquals(expected, actual, sepsilon);
     }
 }

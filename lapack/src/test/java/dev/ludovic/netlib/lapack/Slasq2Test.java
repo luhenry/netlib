@@ -29,12 +29,44 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slasq2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 5;
+        float[] z_expected = new float[4 * n];
+        float[] d = {10.0f, 8.0f, 6.0f, 4.0f, 2.0f};
+        float[] e = {0.5f, 0.4f, 0.3f, 0.2f};
+        for (int i = 0; i < n; i++) {
+            z_expected[4 * i] = d[i] * d[i];
+            z_expected[4 * i + 1] = (i < n - 1) ? e[i] * e[i] : 0.0f;
+            z_expected[4 * i + 2] = z_expected[4 * i];
+            z_expected[4 * i + 3] = z_expected[4 * i + 1];
+        }
+        intW info_expected = new intW(0);
+        f2j.slasq2(n, z_expected, 0, info_expected);
+
+        float[] z_actual = new float[4 * n];
+        for (int i = 0; i < n; i++) {
+            z_actual[4 * i] = d[i] * d[i];
+            z_actual[4 * i + 1] = (i < n - 1) ? e[i] * e[i] : 0.0f;
+            z_actual[4 * i + 2] = z_actual[4 * i];
+            z_actual[4 * i + 3] = z_actual[4 * i + 1];
+        }
+        intW info_actual = new intW(0);
+        lapack.slasq2(n, z_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        // Only compare eigenvalues Z(0:n-1), not iteration counts and diagnostics
+        float[] eigenvalues_expected = new float[n];
+        float[] eigenvalues_actual = new float[n];
+        System.arraycopy(z_expected, 0, eigenvalues_expected, 0, n);
+        System.arraycopy(z_actual, 0, eigenvalues_actual, 0, n);
+        assertArrayEquals(eigenvalues_expected, eigenvalues_actual, Math.scalb(sepsilon, Math.getExponent(Math.max(getMaxValue(eigenvalues_expected), 1.0f))));
     }
 }

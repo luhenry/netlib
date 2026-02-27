@@ -29,12 +29,62 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SorgbrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = N_SMALL;
+
+        // First, perform bidiagonal reduction
+        float[] a = generateMatrixFloat(m, n, 1.0f);
+        float[] d = new float[Math.min(m, n)];
+        float[] e = new float[Math.min(m, n) - 1];
+        float[] tauq = new float[Math.min(m, n)];
+        float[] taup = new float[Math.min(m, n)];
+        float[] work = new float[Math.max(m, n)];
+        intW info = new intW(0);
+
+        lapack.sgebrd(m, n, a, 0, m, d, 0, e, 0, tauq, 0, taup, 0, work, 0, Math.max(m, n), info);
+        assertEquals(0, info.val, "Bidiagonal reduction should succeed");
+
+        // Generate Q from bidiagonal reduction
+        float[] q = a.clone();
+        int k = Math.min(m, n);
+        lapack.sorgbr("Q", m, k, n, q, 0, m, tauq, 0, work, 0, Math.max(m, n), info);
+        assertEquals(0, info.val, "sorgbr should succeed");
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testCompareWithReference(LAPACK lapack) {
+        int m = N_SMALL;
+        int n = N_SMALL;
+
+        float[] a = generateMatrixFloat(m, n, 1.0f);
+        float[] d = new float[Math.min(m, n)];
+        float[] e = new float[Math.min(m, n) - 1];
+        float[] tauq = new float[Math.min(m, n)];
+        float[] taup = new float[Math.min(m, n)];
+        float[] work = new float[Math.max(m, n)];
+        intW info = new intW(0);
+
+        lapack.sgebrd(m, n, a, 0, m, d, 0, e, 0, tauq, 0, taup, 0, work, 0, Math.max(m, n), info);
+
+        // Test implementation
+        float[] q_test = a.clone();
+        int k = Math.min(m, n);
+        lapack.sorgbr("Q", m, k, n, q_test, 0, m, tauq, 0, work, 0, Math.max(m, n), info);
+
+        // Reference implementation
+        float[] q_ref = a.clone();
+        f2j.sorgbr("Q", m, k, n, q_ref, 0, m, tauq, 0, work, 0, Math.max(m, n), info);
+
+        assertArrayEquals(q_ref, q_test, Math.scalb(sepsilon, Math.getExponent(getMaxValue(q_ref)) + 4));
     }
 }

@@ -29,12 +29,66 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SgerfsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Create matrix and factor it
+        float[] a_orig = sPositiveDefiniteMatrix.clone();
+        float[] af_expected = sPositiveDefiniteMatrix.clone();
+        float[] af_actual = sPositiveDefiniteMatrix.clone();
+        int[] ipiv_expected = new int[N];
+        int[] ipiv_actual = new int[N];
+
+        intW info = new intW(0);
+        f2j.sgetrf(N, N, af_expected, 0, N, ipiv_expected, 0, info);
+        assertEquals(0, info.val);
+
+        info.val = 0;
+        lapack.sgetrf(N, N, af_actual, 0, N, ipiv_actual, 0, info);
+        assertEquals(0, info.val);
+
+        // Create RHS and solve
+        float[] b = generateFloatArray(N, 1.0f);
+        float[] x_expected = b.clone();
+        float[] x_actual = b.clone();
+
+        info.val = 0;
+        f2j.sgetrs("N", N, 1, af_expected, 0, N, ipiv_expected, 0, x_expected, 0, N, info);
+        assertEquals(0, info.val);
+
+        info.val = 0;
+        lapack.sgetrs("N", N, 1, af_actual, 0, N, ipiv_actual, 0, x_actual, 0, N, info);
+        assertEquals(0, info.val);
+
+        // Refine the solution
+        float[] ferr_expected = new float[1];
+        float[] ferr_actual = new float[1];
+        float[] berr_expected = new float[1];
+        float[] berr_actual = new float[1];
+        float[] work_expected = new float[3 * N];
+        float[] work_actual = new float[3 * N];
+        int[] iwork_expected = new int[N];
+        int[] iwork_actual = new int[N];
+
+        info.val = 0;
+        f2j.sgerfs("N", N, 1, a_orig, 0, N, af_expected, 0, N, ipiv_expected, 0, b, 0, N, x_expected, 0, N, ferr_expected, 0, berr_expected, 0, work_expected, 0, iwork_expected, 0, info);
+        assertEquals(0, info.val);
+
+        info.val = 0;
+        lapack.sgerfs("N", N, 1, a_orig, 0, N, af_actual, 0, N, ipiv_actual, 0, b, 0, N, x_actual, 0, N, ferr_actual, 0, berr_actual, 0, work_actual, 0, iwork_actual, 0, info);
+        assertEquals(0, info.val);
+
+        // Compare refined solutions and error bounds
+        assertArrayEquals(x_expected, x_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(x_expected))));
+        // FERR is an error estimate that can vary between implementations
+        assertArrayEquals(ferr_expected, ferr_actual, Math.max(sepsilon, Math.abs(getMaxValue(ferr_expected)) * 5));
+        // BERR should be near machine epsilon, but implementations can vary by small factors
+        assertArrayEquals(berr_expected, berr_actual, sepsilon * 10);
     }
 }

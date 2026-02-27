@@ -29,12 +29,48 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsgesvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // DSGESV uses single precision internally, then refines to double precision
+        double[] a_expected = dPositiveDefiniteMatrix.clone();
+        double[] a_actual = dPositiveDefiniteMatrix.clone();
+        int[] ipiv_expected = new int[N];
+        int[] ipiv_actual = new int[N];
+
+        // Create right-hand side B and solution X
+        double[] b_expected = generateDoubleArray(N, 1.0);
+        double[] b_actual = b_expected.clone();
+        double[] x_expected = new double[N];
+        double[] x_actual = new double[N];
+
+        // Work arrays
+        double[] work_expected = new double[N * 1];
+        double[] work_actual = new double[N * 1];
+        float[] swork_expected = new float[N * (N + 1)];
+        float[] swork_actual = new float[N * (N + 1)];
+        intW iter_expected = new intW(0);
+        intW iter_actual = new intW(0);
+
+        // Solve using reference implementation
+        intW info = new intW(0);
+        f2j.dsgesv(N, 1, a_expected, 0, N, ipiv_expected, 0, b_expected, 0, N,
+                   x_expected, 0, N, work_expected, 0, swork_expected, 0, iter_expected, info);
+        assertEquals(0, info.val, "Reference solve should succeed");
+
+        // Solve using test implementation
+        info.val = 0;
+        lapack.dsgesv(N, 1, a_actual, 0, N, ipiv_actual, 0, b_actual, 0, N,
+                      x_actual, 0, N, work_actual, 0, swork_actual, 0, iter_actual, info);
+        assertEquals(0, info.val, "Solve should succeed");
+
+        // Compare solutions - should have double precision accuracy despite using single internally
+        assertArrayEquals(x_expected, x_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(x_expected)) + 3));
     }
 }

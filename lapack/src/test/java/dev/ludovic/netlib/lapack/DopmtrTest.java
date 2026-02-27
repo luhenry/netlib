@@ -29,12 +29,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DopmtrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testLeftNoTranspose(LAPACK lapack) {
+        // DOPMTR: multiply matrix by orthogonal Q from DSPTRD
+        int n = N_SMALL;
+
+        // Create and reduce symmetric packed matrix
+        double[] ap = generatePackedSymmetricMatrix(n, n + 10.0);
+
+        double[] d = new double[n];
+        double[] e = new double[n - 1];
+        double[] tau = new double[n - 1];
+        intW info = new intW(0);
+        f2j.dsptrd("U", n, ap, d, e, tau, info);
+        assertEquals(0, info.val);
+
+        // Create identity-like matrix to multiply
+        double[] c_expected = generateIdentityMatrix(n);
+        double[] c_actual = generateIdentityMatrix(n);
+
+        double[] work_expected = new double[n];
+        double[] work_actual = new double[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dopmtr("L", "U", "N", n, n, ap, tau, c_expected, n, work_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dopmtr("L", "U", "N", n, n, ap, tau, c_actual, n, work_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(c_expected, c_actual, depsilon);
     }
 }

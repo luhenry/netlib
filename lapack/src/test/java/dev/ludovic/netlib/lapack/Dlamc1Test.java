@@ -29,12 +29,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlamc1Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        org.junit.jupiter.api.Assumptions.assumeFalse(lapack instanceof NativeLAPACK,
+                "Internal routine not exposed by " + lapack.getClass().getSimpleName());
+
+        intW beta_expected = new intW(0);
+        intW t_expected = new intW(0);
+        booleanW rnd_expected = new booleanW(false);
+        booleanW ieee1_expected = new booleanW(false);
+
+        intW beta_actual = new intW(0);
+        intW t_actual = new intW(0);
+        booleanW rnd_actual = new booleanW(false);
+        booleanW ieee1_actual = new booleanW(false);
+
+        f2j.dlamc1(beta_expected, t_expected, rnd_expected, ieee1_expected);
+        lapack.dlamc1(beta_actual, t_actual, rnd_actual, ieee1_actual);
+
+        assertEquals(beta_expected.val, beta_actual.val);
+        assertEquals(t_expected.val, t_actual.val);
+        assertEquals(rnd_expected.val, rnd_actual.val);
+        assertEquals(ieee1_expected.val, ieee1_actual.val);
     }
 }

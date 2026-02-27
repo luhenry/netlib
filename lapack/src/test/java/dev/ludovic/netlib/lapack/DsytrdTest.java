@@ -29,12 +29,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsytrdTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N;
+        double[] a = dPositiveDefiniteMatrix.clone();
+        double[] d = new double[n];
+        double[] e = new double[n - 1];
+        double[] tau = new double[n - 1];
+        double[] work = new double[n];
+        intW info = new intW(0);
+
+        lapack.dsytrd("U", n, a, 0, n, d, 0, e, 0, tau, 0, work, 0, n, info);
+
+        assertEquals(0, info.val, "dsytrd should succeed");
     }
 }

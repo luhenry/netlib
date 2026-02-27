@@ -25,16 +25,26 @@
 
 package dev.ludovic.netlib.lapack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DgttrfTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        double[] dl = generateDoubleArray(N - 1, 1.0);
+        double[] d = generateDoubleArray(N, 2.0);
+        double[] du = generateDoubleArray(N - 1, 1.0);
+        double[] du2 = new double[N - 2];
+        int[] ipiv = new int[N];
+        intW info = new intW(0);
+        lapack.dgttrf(N, dl, 0, d, 0, du, 0, du2, 0, ipiv, 0, info);
+
+        assertEquals(0, info.val, "LU factorization should succeed");
     }
 }

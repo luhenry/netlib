@@ -29,12 +29,51 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SporfsTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        float[] a_orig = sPositiveDefiniteMatrix.clone();
+        float[] af_expected = sPositiveDefiniteMatrix.clone();
+        float[] af_actual = sPositiveDefiniteMatrix.clone();
+        intW info = new intW(0);
+        f2j.spotrf("U", N, af_expected, 0, N, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.spotrf("U", N, af_actual, 0, N, info);
+        assertEquals(0, info.val);
+        float[] b = generateFloatArray(N, 1.0f);
+        float[] x_expected = b.clone();
+        float[] x_actual = b.clone();
+        info.val = 0;
+        f2j.spotrs("U", N, 1, af_expected, 0, N, x_expected, 0, N, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.spotrs("U", N, 1, af_actual, 0, N, x_actual, 0, N, info);
+        assertEquals(0, info.val);
+        float[] ferr_expected = new float[1];
+        float[] ferr_actual = new float[1];
+        float[] berr_expected = new float[1];
+        float[] berr_actual = new float[1];
+        float[] work_expected = new float[3 * N];
+        float[] work_actual = new float[3 * N];
+        int[] iwork_expected = new int[N];
+        int[] iwork_actual = new int[N];
+        info.val = 0;
+        f2j.sporfs("U", N, 1, a_orig, 0, N, af_expected, 0, N, b, 0, N, x_expected, 0, N, ferr_expected, 0, berr_expected, 0, work_expected, 0, iwork_expected, 0, info);
+        assertEquals(0, info.val);
+        info.val = 0;
+        lapack.sporfs("U", N, 1, a_orig, 0, N, af_actual, 0, N, b, 0, N, x_actual, 0, N, ferr_actual, 0, berr_actual, 0, work_actual, 0, iwork_actual, 0, info);
+        assertEquals(0, info.val);
+        assertArrayEquals(x_expected, x_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(x_expected))));
+        // FERR is an error estimate that can vary between implementations
+        assertArrayEquals(ferr_expected, ferr_actual, Math.max(sepsilon, Math.abs(getMaxValue(ferr_expected)) * 5));
+        // BERR should be near machine epsilon, but implementations can vary by small factors
+        assertArrayEquals(berr_expected, berr_actual, sepsilon * 10);
     }
 }

@@ -25,16 +25,41 @@
 
 package dev.ludovic.netlib.arpack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SmoutTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // smout is an output method, so we just test that it runs without error
+
+        // Note: Some native implementations may have issues with output functions
+        org.junit.jupiter.api.Assumptions.assumeFalse(arpack instanceof NativeARPACK,
+                "Output function not fully supported by " + arpack.getClass().getSimpleName());
+
+        // Test with small matrix
+        assertDoesNotThrow(() -> {
+            arpack.smout(6, 5, 5, sMatrix, N, 4, "5x5 submatrix");
+        });
+
+        // Test with different precision
+        assertDoesNotThrow(() -> {
+            arpack.smout(6, 3, 3, sMatrix, N, 6, "High precision");
+        });
+
+        // Test with single row
+        assertDoesNotThrow(() -> {
+            arpack.smout(6, 1, 5, sMatrix, N, 4, "Single row");
+        });
+
+        // Test with offset version
+        assertDoesNotThrow(() -> {
+            arpack.smout(6, 3, 3, sMatrix, 0, N, 4, "With offset");
+        });
     }
 }

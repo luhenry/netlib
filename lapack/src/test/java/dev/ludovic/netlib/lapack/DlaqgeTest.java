@@ -29,12 +29,47 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlaqgeTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int m = N_SMALL;
+        int n = N_SMALL;
+
+        double[] a = new double[m * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                a[i + j * m] = 1.0 / (i + j + 1.0);
+            }
+        }
+
+        double[] r = new double[m];
+        for (int i = 0; i < m; i++) {
+            r[i] = 1.0 / (i + 1.0);
+        }
+
+        double[] c = new double[n];
+        for (int j = 0; j < n; j++) {
+            c[j] = 1.0 / (j + 1.0);
+        }
+
+        double rowcnd = 0.01;
+        double colcnd = 0.01;
+        double amax = 1.0;
+
+        double[] a_expected = a.clone();
+        double[] a_actual = a.clone();
+        StringW equed_expected = new StringW("N");
+        StringW equed_actual = new StringW("N");
+
+        f2j.dlaqge(m, n, a_expected, m, r, c, rowcnd, colcnd, amax, equed_expected);
+        lapack.dlaqge(m, n, a_actual, m, r, c, rowcnd, colcnd, amax, equed_actual);
+
+        assertArrayEquals(a_expected, a_actual, depsilon);
     }
 }

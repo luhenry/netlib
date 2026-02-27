@@ -29,12 +29,45 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlaeinTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Compute right eigenvector of upper Hessenberg matrix by inverse iteration
+        int n = 4;
+        // Upper Hessenberg matrix (upper triangular + one sub-diagonal)
+        double[] h = {
+            4.0, 1.0, 0.0, 0.0,
+            2.0, 3.0, 0.5, 0.0,
+            0.0, 1.0, 5.0, 0.3,
+            0.0, 0.0, 0.8, 2.0
+        };
+        // Use a diagonal element as approximate eigenvalue (real)
+        double wr = 4.0;
+        double wi = 0.0;
+        double[] vr_expected = new double[n];
+        double[] vr_actual = new double[n];
+        double[] vi_expected = new double[n];
+        double[] vi_actual = new double[n];
+        double[] b_expected = new double[(n + 1) * n];
+        double[] b_actual = new double[(n + 1) * n];
+        double[] work_expected = new double[n];
+        double[] work_actual = new double[n];
+        double eps3 = 1e-12;
+        double smlnum = Double.MIN_NORMAL;
+        double bignum = 1.0 / smlnum;
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dlaein(true, true, n, h, n, wr, wi, vr_expected, vi_expected, b_expected, n + 1, work_expected, eps3, smlnum, bignum, info_expected);
+        lapack.dlaein(true, true, n, h, n, wr, wi, vr_actual, vi_actual, b_actual, n + 1, work_actual, eps3, smlnum, bignum, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(vr_expected, vr_actual, depsilon);
     }
 }

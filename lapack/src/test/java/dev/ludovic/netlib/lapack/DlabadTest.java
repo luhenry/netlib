@@ -29,12 +29,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlabadTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test safe scaling bounds computation
+        doubleW small_expected = new doubleW(1e-10);
+        doubleW large_expected = new doubleW(1e10);
+        f2j.dlabad(small_expected, large_expected);
+
+        doubleW small_actual = new doubleW(1e-10);
+        doubleW large_actual = new doubleW(1e10);
+        lapack.dlabad(small_actual, large_actual);
+
+        assertEquals(small_expected.val, small_actual.val, depsilon);
+        assertEquals(large_expected.val, large_actual.val, depsilon);
     }
 }

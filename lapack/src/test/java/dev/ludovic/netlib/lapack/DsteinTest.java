@@ -29,12 +29,52 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsteinTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        // First compute eigenvalues using dstebz
+        double[] d = generateDoubleArray(n, 1.0);
+        double[] e = generateDoubleArray(n - 1, 0.5);
+        double[] w = new double[n];
+        int[] iblock = new int[n];
+        int[] isplit = new int[n];
+        double[] work_stebz = new double[4 * n];
+        int[] iwork_stebz = new int[3 * n];
+        intW m = new intW(0);
+        intW nsplit = new intW(0);
+        intW info_stebz = new intW(0);
+        f2j.dstebz("A", "B", n, 0.0, 0.0, 0, 0, 0.0, d, 0, e, 0, m, nsplit, w, 0, iblock, 0, isplit, 0, work_stebz, 0, iwork_stebz, 0, info_stebz);
+        assertEquals(0, info_stebz.val);
+
+        int mval = m.val;
+        // Now test dstein with the computed eigenvalues
+        double[] d_orig = generateDoubleArray(n, 1.0);
+        double[] e_orig = generateDoubleArray(n - 1, 0.5);
+
+        double[] z_expected = new double[n * mval];
+        double[] work_expected = new double[5 * n];
+        int[] iwork_expected = new int[n];
+        int[] ifail_expected = new int[mval];
+        intW info_expected = new intW(0);
+        f2j.dstein(n, d_orig, 0, e_orig, 0, mval, w, 0, iblock, 0, isplit, 0, z_expected, 0, n, work_expected, 0, iwork_expected, 0, ifail_expected, 0, info_expected);
+
+        double[] d_orig2 = generateDoubleArray(n, 1.0);
+        double[] e_orig2 = generateDoubleArray(n - 1, 0.5);
+
+        double[] z_actual = new double[n * mval];
+        double[] work_actual = new double[5 * n];
+        int[] iwork_actual = new int[n];
+        int[] ifail_actual = new int[mval];
+        intW info_actual = new intW(0);
+        lapack.dstein(n, d_orig2, 0, e_orig2, 0, mval, w, 0, iblock, 0, isplit, 0, z_actual, 0, n, work_actual, 0, iwork_actual, 0, ifail_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
     }
 }

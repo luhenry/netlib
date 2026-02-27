@@ -29,12 +29,47 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dpotf2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        // DPOTF2 computes Cholesky factorization A = U^T * U (unblocked)
+        int n = N_SMALL;
+        double[] a_expected = generatePositiveDefiniteMatrix(n);
+        double[] a_actual = a_expected.clone();
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dpotf2("U", n, a_expected, n, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dpotf2("U", n, a_actual, n, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(a_expected, a_actual, depsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testLower(LAPACK lapack) {
+        // DPOTF2 computes Cholesky factorization A = L * L^T (unblocked)
+        int n = N_SMALL;
+        double[] a_expected = generatePositiveDefiniteMatrix(n);
+        double[] a_actual = a_expected.clone();
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.dpotf2("L", n, a_expected, n, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.dpotf2("L", n, a_actual, n, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(a_expected, a_actual, depsilon);
     }
 }

@@ -29,12 +29,49 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class SspconTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
-    void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+    void testUpper(LAPACK lapack) {
+        int n = N_SMALL;
+        int ap_len = n * (n + 1) / 2;
+
+        float[] ap = new float[ap_len];
+        int k = 0;
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[k++] = (i == j) ? (i % 2 == 0 ? 10.0f : -5.0f) : 1.0f / (i + j + 1.0f);
+            }
+        }
+
+        float[] work_norm = new float[n];
+        float anorm = f2j.slansp("1", "U", n, ap, work_norm);
+
+        int[] ipiv = new int[n];
+        intW info = new intW(0);
+        f2j.ssptrf("U", n, ap, ipiv, info);
+        assertEquals(0, info.val);
+
+        float[] work_expected = new float[2 * n];
+        float[] work_actual = new float[2 * n];
+        int[] iwork_expected = new int[n];
+        int[] iwork_actual = new int[n];
+        floatW rcond_expected = new floatW(0);
+        floatW rcond_actual = new floatW(0);
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sspcon("U", n, ap, ipiv, anorm, rcond_expected, work_expected, iwork_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sspcon("U", n, ap, ipiv, anorm, rcond_actual, work_actual, iwork_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertEquals(rcond_expected.val, rcond_actual.val, sepsilon);
     }
 }

@@ -30,11 +30,22 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SrsclTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        float sa = 3.0f;
+
+        float[] sx_expected = generateFloatArray(n, 1.0f);
+        f2j.srscl(n, sa, sx_expected, 0, 1);
+
+        float[] sx_actual = generateFloatArray(n, 1.0f);
+        lapack.srscl(n, sa, sx_actual, 0, 1);
+
+        assertArrayEquals(sx_expected, sx_actual, sepsilon);
     }
 }

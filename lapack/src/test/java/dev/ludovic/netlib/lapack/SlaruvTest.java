@@ -30,11 +30,39 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlaruvTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = 100;
+        int[] iseed_expected = {3, 17, 42, 99};
+        int[] iseed_actual = iseed_expected.clone();
+        float[] x_expected = new float[n];
+        float[] x_actual = new float[n];
+
+        f2j.slaruv(iseed_expected, n, x_expected);
+        lapack.slaruv(iseed_actual, n, x_actual);
+
+        assertArrayEquals(x_expected, x_actual, sepsilon);
+        assertArrayEquals(iseed_expected, iseed_actual);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testMaxSize(LAPACK lapack) {
+        int n = 128;
+        int[] iseed_expected = {1000, 2000, 3000, 4001};
+        int[] iseed_actual = iseed_expected.clone();
+        float[] x_expected = new float[n];
+        float[] x_actual = new float[n];
+
+        f2j.slaruv(iseed_expected, n, x_expected);
+        lapack.slaruv(iseed_actual, n, x_actual);
+
+        assertArrayEquals(x_expected, x_actual, sepsilon);
+        assertArrayEquals(iseed_expected, iseed_actual);
     }
 }

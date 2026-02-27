@@ -29,12 +29,54 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Sgetf2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        float[] a_expected = generatePositiveDefiniteMatrixFloat(n);
+        float[] a_actual = a_expected.clone();
+        int[] ipiv_expected = new int[n];
+        int[] ipiv_actual = new int[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sgetf2(n, n, a_expected, n, ipiv_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sgetf2(n, n, a_actual, n, ipiv_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(a_expected, a_actual, sepsilon);
+    }
+
+    @ParameterizedTest
+    @MethodSource("LAPACKImplementations")
+    void testRectangular(LAPACK lapack) {
+        int m = 8, n = 5;
+        float[] a_expected = generateMatrixFloat(m, n, 1.0f);
+        for (int i = 0; i < Math.min(m, n); i++) {
+            a_expected[i + i * m] += 10.0f;
+        }
+        float[] a_actual = a_expected.clone();
+        int[] ipiv_expected = new int[Math.min(m, n)];
+        int[] ipiv_actual = new int[Math.min(m, n)];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sgetf2(m, n, a_expected, m, ipiv_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sgetf2(m, n, a_actual, m, ipiv_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(a_expected, a_actual, sepsilon);
     }
 }

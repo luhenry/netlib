@@ -29,12 +29,41 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Dlaed6Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // dlaed6 computes the positive or negative root of a 3-term secular equation:
+        // f(x) = rho + z(1)/(d(1)-x) + z(2)/(d(2)-x) + z(3)/(d(3)-x)
+        // d must be strictly increasing, z must be all positive.
+        int kniter = 1;
+        boolean orgati = true; // root between d(2) and d(3)
+        double rho = 1.0;
+
+        double[] d_expected = {1.0, 2.0, 3.0};
+        double[] z_expected = {0.5, 0.5, 0.5};
+        // finit = f(0) = rho + z(1)/d(1) + z(2)/d(2) + z(3)/d(3)
+        double finit = rho + z_expected[0] / d_expected[0] + z_expected[1] / d_expected[1] + z_expected[2] / d_expected[2];
+
+        doubleW tau_expected = new doubleW(0.0);
+        intW info_expected = new intW(0);
+
+        f2j.dlaed6(kniter, orgati, rho, d_expected, 0, z_expected, 0, finit, tau_expected, info_expected);
+
+        double[] d_actual = {1.0, 2.0, 3.0};
+        double[] z_actual = {0.5, 0.5, 0.5};
+
+        doubleW tau_actual = new doubleW(0.0);
+        intW info_actual = new intW(0);
+
+        lapack.dlaed6(kniter, orgati, rho, d_actual, 0, z_actual, 0, finit, tau_actual, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertEquals(tau_expected.val, tau_actual.val, depsilon);
     }
 }

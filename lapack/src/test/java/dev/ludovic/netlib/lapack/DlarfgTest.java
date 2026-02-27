@@ -29,12 +29,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DlarfgTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Test Householder reflector generation
+        double[] x_expected = new double[N_SMALL];
+        for (int i = 0; i < N_SMALL; i++) {
+            x_expected[i] = (i + 1) * 1.0;
+        }
+        doubleW alpha_expected = new doubleW(2.5);
+        doubleW tau_expected = new doubleW(0.0);
+        f2j.dlarfg(N_SMALL, alpha_expected, x_expected, 0, 1, tau_expected);
+
+        double[] x_actual = new double[N_SMALL];
+        for (int i = 0; i < N_SMALL; i++) {
+            x_actual[i] = (i + 1) * 1.0;
+        }
+        doubleW alpha_actual = new doubleW(2.5);
+        doubleW tau_actual = new doubleW(0.0);
+        lapack.dlarfg(N_SMALL, alpha_actual, x_actual, 0, 1, tau_actual);
+
+        assertEquals(alpha_expected.val, alpha_actual.val, depsilon);
+        assertEquals(tau_expected.val, tau_actual.val, depsilon);
+        assertArrayEquals(x_expected, x_actual, depsilon);
     }
 }

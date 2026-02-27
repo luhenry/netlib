@@ -29,12 +29,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DsteqrTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        // compz = "N": eigenvalues only, z is not referenced
+        double[] d_expected = generateDoubleArray(n, 1.0);
+        double[] e_expected = generateDoubleArray(n - 1, 0.5);
+        double[] z_expected = new double[n * n];
+        double[] work_expected = new double[Math.max(1, 2 * (n - 1))];
+        intW info_expected = new intW(0);
+        f2j.dsteqr("N", n, d_expected, 0, e_expected, 0, z_expected, 0, n, work_expected, 0, info_expected);
+
+        double[] d_actual = generateDoubleArray(n, 1.0);
+        double[] e_actual = generateDoubleArray(n - 1, 0.5);
+        double[] z_actual = new double[n * n];
+        double[] work_actual = new double[Math.max(1, 2 * (n - 1))];
+        intW info_actual = new intW(0);
+        lapack.dsteqr("N", n, d_actual, 0, e_actual, 0, z_actual, 0, n, work_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, Math.scalb(depsilon, Math.getExponent(getMaxValue(d_expected))));
     }
 }

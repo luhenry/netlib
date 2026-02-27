@@ -29,12 +29,75 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Slaed2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // slaed2 merges two sets of eigenvalues and attempts deflation.
+        // It is internal to slaed1. We test it indirectly through slaed1
+        // with a problem that exercises the merge and deflation logic.
+        int n = 8;
+        int cutpnt = 4;
+
+        float[] d_expected = new float[n];
+        for (int i = 0; i < cutpnt; i++) {
+            d_expected[i] = (i + 1) * 2.0f;
+        }
+        for (int i = cutpnt; i < n; i++) {
+            d_expected[i] = (i - cutpnt + 1) * 2.0f + 1.0f;
+        }
+
+        float[] q_expected = generateIdentityMatrixFloat(n);
+
+        int[] indxq_expected = new int[n];
+        for (int i = 0; i < cutpnt; i++) {
+            indxq_expected[i] = i + 1;
+        }
+        for (int i = cutpnt; i < n; i++) {
+            indxq_expected[i] = i - cutpnt + 1;
+        }
+
+        floatW rho_expected = new floatW(1.0f);
+        float[] work_expected = new float[4 * n + n * n];
+        int[] iwork_expected = new int[4 * n];
+        intW info_expected = new intW(0);
+
+        f2j.slaed1(n, d_expected, 0, q_expected, 0, n, indxq_expected, 0,
+            rho_expected, cutpnt, work_expected, 0, iwork_expected, 0, info_expected);
+
+        float[] d_actual = new float[n];
+        for (int i = 0; i < cutpnt; i++) {
+            d_actual[i] = (i + 1) * 2.0f;
+        }
+        for (int i = cutpnt; i < n; i++) {
+            d_actual[i] = (i - cutpnt + 1) * 2.0f + 1.0f;
+        }
+
+        float[] q_actual = generateIdentityMatrixFloat(n);
+
+        int[] indxq_actual = new int[n];
+        for (int i = 0; i < cutpnt; i++) {
+            indxq_actual[i] = i + 1;
+        }
+        for (int i = cutpnt; i < n; i++) {
+            indxq_actual[i] = i - cutpnt + 1;
+        }
+
+        floatW rho_actual = new floatW(1.0f);
+        float[] work_actual = new float[4 * n + n * n];
+        int[] iwork_actual = new int[4 * n];
+        intW info_actual = new intW(0);
+
+        lapack.slaed1(n, d_actual, 0, q_actual, 0, n, indxq_actual, 0,
+            rho_actual, cutpnt, work_actual, 0, iwork_actual, 0, info_actual);
+
+        assertEquals(info_expected.val, info_actual.val);
+        assertArrayEquals(d_expected, d_actual, Math.scalb(sepsilon, Math.getExponent(getMaxValue(d_expected))));
+        assertArrayEquals(q_expected, q_actual, Math.scalb(sepsilon, Math.getExponent(Math.max(getMaxValue(q_expected), 1.0f))));
     }
 }

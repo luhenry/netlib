@@ -30,11 +30,41 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static dev.ludovic.netlib.test.TestHelpers.*;
+
 public class SlanspTest extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // Packed symmetric matrix (upper triangular storage)
+        float[] ap = new float[(N * (N + 1)) / 2];
+        int idx = 0;
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i <= j; i++) {
+                ap[idx++] = sSymmetricMatrix[i + j * N];
+            }
+        }
+        float[] work = new float[N];
+
+        // Test 1-norm (upper triangular)
+        float expected = f2j.slansp("1", "U", N, ap, 0, work, 0);
+        float actual = lapack.slansp("1", "U", N, ap, 0, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Inf-norm
+        expected = f2j.slansp("I", "U", N, ap, 0, work, 0);
+        actual = lapack.slansp("I", "U", N, ap, 0, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Frobenius norm
+        expected = f2j.slansp("F", "U", N, ap, 0, work, 0);
+        actual = lapack.slansp("F", "U", N, ap, 0, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
+
+        // Test Max norm
+        expected = f2j.slansp("M", "U", N, ap, 0, work, 0);
+        actual = lapack.slansp("M", "U", N, ap, 0, work, 0);
+        assertEquals(expected, actual, Math.scalb(sepsilon, Math.getExponent(expected)));
     }
 }

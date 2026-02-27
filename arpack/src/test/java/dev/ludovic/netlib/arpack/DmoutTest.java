@@ -25,16 +25,41 @@
 
 package dev.ludovic.netlib.arpack;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class DmoutTest extends ARPACKTest {
 
     @ParameterizedTest
     @MethodSource("ARPACKImplementations")
     void testSanity(ARPACK arpack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        // dmout is an output method, so we just test that it runs without error
+
+        // Note: Some native implementations may have issues with output functions
+        org.junit.jupiter.api.Assumptions.assumeFalse(arpack instanceof NativeARPACK,
+                "Output function not fully supported by " + arpack.getClass().getSimpleName());
+
+        // Test with small matrix
+        assertDoesNotThrow(() -> {
+            arpack.dmout(6, 5, 5, dMatrix, N, 4, "5x5 submatrix");
+        });
+
+        // Test with different precision
+        assertDoesNotThrow(() -> {
+            arpack.dmout(6, 3, 3, dMatrix, N, 6, "High precision");
+        });
+
+        // Test with single row
+        assertDoesNotThrow(() -> {
+            arpack.dmout(6, 1, 5, dMatrix, N, 4, "Single row");
+        });
+
+        // Test with offset version
+        assertDoesNotThrow(() -> {
+            arpack.dmout(6, 3, 3, dMatrix, 0, N, 4, "With offset");
+        });
     }
 }

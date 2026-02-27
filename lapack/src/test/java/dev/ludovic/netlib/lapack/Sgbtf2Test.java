@@ -29,12 +29,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
+import org.netlib.util.*;
+
+import static dev.ludovic.netlib.test.TestHelpers.*;
 
 public class Sgbtf2Test extends LAPACKTest {
 
     @ParameterizedTest
     @MethodSource("LAPACKImplementations")
     void testSanity(LAPACK lapack) {
-        org.junit.jupiter.api.Assumptions.assumeTrue(false);
+        int n = N_SMALL;
+        int kl = 2, ku = 2;
+        int ldab = 2 * kl + ku + 1;
+
+        float[] ab_expected = new float[ldab * n];
+        for (int j = 0; j < n; j++) {
+            for (int i = Math.max(0, j - ku); i <= Math.min(n - 1, j + kl); i++) {
+                int k = kl + ku + i - j;
+                ab_expected[k + j * ldab] = (i == j) ? n + 10.0f : 1.0f / (Math.abs(i - j) + 1.0f);
+            }
+        }
+        float[] ab_actual = ab_expected.clone();
+        int[] ipiv_expected = new int[n];
+        int[] ipiv_actual = new int[n];
+        intW info_expected = new intW(0);
+        intW info_actual = new intW(0);
+
+        f2j.sgbtf2(n, n, kl, ku, ab_expected, ldab, ipiv_expected, info_expected);
+        assertEquals(0, info_expected.val);
+
+        lapack.sgbtf2(n, n, kl, ku, ab_actual, ldab, ipiv_actual, info_actual);
+        assertEquals(0, info_actual.val);
+
+        assertArrayEquals(ipiv_expected, ipiv_actual);
+        assertArrayEquals(ab_expected, ab_actual, sepsilon);
     }
 }
