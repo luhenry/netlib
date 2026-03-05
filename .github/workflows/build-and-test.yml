@@ -83,7 +83,13 @@ jobs:
     strategy:
       matrix:
         jdk: [8, 11, 17, 21, 25]
-        runs-on: [ubuntu-24.04, ubuntu-24.04-arm]
+        runs-on: [ubuntu-24.04, ubuntu-24.04-arm, ubuntu-24.04-riscv]
+        exclude:
+          # Java 8 and 11 are not available on RISC-V
+          - runs-on: ubuntu-24.04-riscv
+            jdk: 8
+          - runs-on: ubuntu-24.04-riscv
+            jdk: 11
     steps:
     - uses: actions/checkout@v4
     - name: Cache M2 local repository
