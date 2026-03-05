@@ -108,6 +108,37 @@ jobs:
     - name: Test
       run: mvn --batch-mode --no-transfer-progress --projects test-utils,blas,lapack,arpack test --fail-at-end -Dmaven.main.skip=true -Dmaven.antrun.skip=true
 
+  test-linux-riscv64:
+    name: "Test: runs-on: ${{ matrix.runs-on }}, jdk: ${{ matrix.jdk }}"
+    runs-on: [rise, ubuntu-24.04-riscv]
+    needs: [build-jar]
+    strategy:
+      matrix:
+        jdk: [8, 11, 17, 21, 25]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Cache M2 local repository
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: m2
+    - name: Install dependencies
+      run: |
+        sudo apt-get -y update
+        sudo apt-get -y install libopenblas-dev libarpack2-dev
+    - name: Download target folder
+      uses: actions/download-artifact@v4
+      with:
+        name: target-dir
+        path: .
+    - name: Set up JDK ${{ matrix.jdk }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ matrix.jdk }}
+        distribution: temurin
+    - name: Test
+      run: mvn --batch-mode --no-transfer-progress --projects test-utils,blas,lapack,arpack test --fail-at-end -Dmaven.main.skip=true -Dmaven.antrun.skip=true
+
   test-macos:
     name: "Test: runs-on: ${{ matrix.runs-on }}, jdk: ${{ matrix.jdk }}"
     runs-on: ${{ matrix.runs-on }}
