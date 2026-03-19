@@ -28,9 +28,11 @@ package dev.ludovic.netlib.arpack;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 
 final class JNIARPACK extends AbstractARPACK implements NativeARPACK {
@@ -42,8 +44,11 @@ final class JNIARPACK extends AbstractARPACK implements NativeARPACK {
     if (osName == null || osName.isEmpty()) {
         throw new RuntimeException("Unable to load native implementation");
     }
+    boolean isWindows = osName.startsWith("Windows");
     if (osName.equals("Mac OS X")) {
         osName = "macos";
+    } else if (isWindows) {
+        osName = "windows";
     }
     String osArch = System.getProperty("os.arch");
     if (osArch == null || osArch.isEmpty()) {
@@ -51,15 +56,19 @@ final class JNIARPACK extends AbstractARPACK implements NativeARPACK {
     }
 
     String libPrefix = "libnetlibarpackjni";
-    String libExtension = osName.equals("macos") ? ".dylib" : ".so";
+    String libExtension = osName.equals("macos") ? ".dylib" : isWindows ? ".dll" : ".so";
     String libName = libPrefix + libExtension;
+
+    FileAttribute<?>[] attrs = FileSystems.getDefault()
+        .supportedFileAttributeViews().contains("posix")
+        ? new FileAttribute<?>[]{ PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-x---")) }
+        : new FileAttribute<?>[0];
 
     Path temp;
     try (InputStream resource = this.getClass().getClassLoader().getResourceAsStream(
             String.format("resources/native/%s-%s/%s", osName, osArch, libName))) {
       assert resource != null;
-      Files.copy(resource, temp = Files.createTempFile(libPrefix, libExtension,
-                                    PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-x---"))),
+      Files.copy(resource, temp = Files.createTempFile(libPrefix, libExtension, attrs),
                   StandardCopyOption.REPLACE_EXISTING);
       temp.toFile().deleteOnExit();
     } catch (IOException e) {
