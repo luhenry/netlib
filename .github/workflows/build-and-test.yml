@@ -59,7 +59,7 @@ jobs:
           mingw-w64-ucrt-x86_64-gcc
           make
     - name: Generate JNI header
-      run: mvn --batch-mode --no-transfer-progress -pl blas -am compile -Dmaven.antrun.skip=true
+      run: mvn --batch-mode --no-transfer-progress -pl blas -am compile "-Dmaven.antrun.skip=true"
     - name: Build Windows DLL
       shell: msys2 {0}
       run: |
@@ -221,4 +221,4 @@ jobs:
         java-version: ${{ matrix.jdk }}
         distribution: temurin
     - name: Test
-      run: mvn --batch-mode --no-transfer-progress --projects test-utils,blas test --fail-at-end -Dmaven.main.skip=true -Dmaven.antrun.skip=true -Ddev.ludovic.netlib.blas.nativeLib=libopenblas.dll
+      run: mvn --batch-mode --no-transfer-progress --projects test-utils,blas test --fail-at-end "-Dmaven.main.skip=true" "-Dmaven.antrun.skip=true" "-Ddev.ludovic.netlib.blas.nativeLib=libopenblas.dll"
