@@ -211,6 +211,9 @@ jobs:
         msystem: UCRT64
         update: false
         install: mingw-w64-ucrt-x86_64-openblas
+    - name: Add MSYS2 ucrt64 bin to PATH
+      shell: msys2 {0}
+      run: echo "$(cygpath -w /ucrt64/bin)" >> $GITHUB_PATH
     - name: Download target folder
       uses: actions/download-artifact@v4
       with:
