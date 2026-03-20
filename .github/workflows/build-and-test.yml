@@ -57,6 +57,7 @@ jobs:
         update: false
         install: >-
           mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-dlfcn
           make
     - name: Generate JNI header
       run: mvn --batch-mode --no-transfer-progress -pl blas -am compile "-Dmaven.antrun.skip=true"
