@@ -59,22 +59,8 @@ jobs:
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-dlfcn
           make
-    - name: Generate JNI header
-      run: mvn --batch-mode --no-transfer-progress -pl blas -am compile "-Dmaven.antrun.skip=true"
-    - name: Build Windows DLL
-      shell: msys2 {0}
-      run: |
-        JAVA_INC="$(cygpath -u "$JAVA_HOME")/include"
-        mkdir -p blas/target/native/windows-amd64 blas/target/objs/windows-amd64
-        gcc -c -Werror -Wall -Wextra -Wno-unused-label -O2 \
-          -I blas/src/main/native \
-          -I blas/target/include \
-          -I "$JAVA_INC" -I "$JAVA_INC/win32" \
-          -o blas/target/objs/windows-amd64/jni.o \
-          blas/src/main/native/jni.c
-        gcc -shared -Wl,-Bstatic,-ldl,-Bdynamic \
-          -o blas/target/native/windows-amd64/libnetlibblasjni.dll \
-          blas/target/objs/windows-amd64/jni.o
+    - name: Build
+      run: mvn --batch-mode --no-transfer-progress compile
     - name: Upload Windows natives
       uses: actions/upload-artifact@v4
       with:
