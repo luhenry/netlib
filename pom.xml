@@ -217,9 +217,9 @@ information or have any questions.
                         <arg line="INPUTS='jni.c'"/>
                         <arg line="OUTPUT='${project.build.directory}/native/windows-amd64/libnetlib${project.artifactId}jni.dll'"/>
                         <arg line="OBJDIR='${project.build.directory}/objs/windows-amd64'"/>
-                        <arg line="CC='gcc'"/>
+                        <arg line="CC='C:/msys64/ucrt64/bin/gcc'"/>
                         <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/win32'"/>
-                        <arg line="LD='gcc'"/>
+                        <arg line="LD='C:/msys64/ucrt64/bin/gcc'"/>
                         <arg line="LDFLAGS='-shared -Wl,-Bstatic,-ldl,-Bdynamic'"/>
                         <arg line="all"/>
                       </exec>
