@@ -214,7 +214,6 @@ information or have any questions.
                   <configuration>
                     <target>
                       <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
-                        <env key="PATH" value="C:/msys64/ucrt64/bin;C:/msys64/usr/bin;${env.PATH}"/>
                         <arg line="INPUTS='jni.c'"/>
                         <arg line="OUTPUT='${project.build.directory}/native/windows-amd64/libnetlib${project.artifactId}jni.dll'"/>
                         <arg line="OBJDIR='${project.build.directory}/objs/windows-amd64'"/>

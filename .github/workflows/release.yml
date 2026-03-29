@@ -59,6 +59,9 @@ jobs:
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-dlfcn
           make
+    - name: Add MSYS2 UCRT64 to PATH
+      shell: msys2 {0}
+      run: echo "$(cygpath -w /ucrt64/bin)" >> $GITHUB_PATH
     - name: Build
       run: mvn --batch-mode --no-transfer-progress compile
     - name: Upload Windows natives
