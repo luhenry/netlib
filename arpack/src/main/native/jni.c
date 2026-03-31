@@ -2336,6 +2336,8 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
 #else
 #error Unsupported darwin architecture
 #endif
+#elif defined(_WIN32)
+  static const char *default_native_lib = "libarpack.dll";
 #else
   static const char *default_native_lib = "libarpack.so.2";
 #endif

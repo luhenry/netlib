@@ -29151,6 +29151,8 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
   jstring property_nativeLib;
 #ifdef __APPLE__
   static const char *default_native_lib = "/System/Library/Frameworks/Accelerate.framework/Accelerate";
+#elif defined(_WIN32)
+  static const char *default_native_lib = "libopenblas.dll";
 #else
   static const char *default_native_lib = "liblapack.so.3";
 #endif
