@@ -214,4 +214,4 @@ jobs:
         java-version: ${{ matrix.jdk }}
         distribution: temurin
     - name: Test
-      run: mvn --batch-mode --no-transfer-progress --projects test-utils,blas test --fail-at-end "-Dmaven.main.skip=true" "-Dmaven.antrun.skip=true" "-Ddev.ludovic.netlib.blas.nativeLib=libopenblas.dll"
+      run: mvn --batch-mode --no-transfer-progress --projects test-utils,blas test --fail-at-end "-Dmaven.main.skip=true" "-Dmaven.antrun.skip=true"
