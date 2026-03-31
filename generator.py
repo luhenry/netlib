@@ -345,7 +345,7 @@ class Routine_NI:
     print("  // LOAD_SYMBOL({name}_);".format(name=self.name))
 
 class Library:
-  def __init__(self, pkg, linux_libname, darwin_libname, routines):
+  def __init__(self, pkg, linux_libname, darwin_libname, win32_libname, routines):
     # Print copyright header
     print("/*")
     print(" * Copyright 2020, 2021, Ludovic Henry")
@@ -376,7 +376,17 @@ class Library:
     print("#include <stdio.h>")
     print("#include <stdlib.h>")
     print("#include <string.h>")
-    print("#include <dlfcn.h>")
+    print("#ifdef _WIN32")
+    print("#  include <windows.h>")
+    print("#  define dlopen(name, flags)  ((void*)LoadLibraryA(name))")
+    print("#  define dlsym(h, name)       ((void*)GetProcAddress((HMODULE)(h), name))")
+    print("#  define dlclose(h)           FreeLibrary((HMODULE)(h))")
+    print("#  define dlerror()            \"LoadLibrary failed\"")
+    print("#  define RTLD_LAZY   0")
+    print("#  define RTLD_LOCAL  0")
+    print("#else")
+    print("#  include <dlfcn.h>")
+    print("#endif")
     print()
     print("#include \"dev_ludovic_netlib_{pkg}_JNI{pkgupper}.h\"".format(pkg=pkg, pkgupper=pkg.upper()))
     print()
@@ -504,6 +514,8 @@ class Library:
       print("#endif")
     else:
       print("  static const char *default_native_lib = \"{libname}\";".format(libname=darwin_libname))
+    print("#elif defined(_WIN32)")
+    print("  static const char *default_native_lib = \"{libname}\";".format(libname=win32_libname))
     print("#else")
     print("  static const char *default_native_lib = \"{libname}\";".format(libname=linux_libname))
     print("#endif")
@@ -561,6 +573,7 @@ if sys.argv[1] == "blas":
   Library("blas",
     linux_libname="libblas.so.3",
     darwin_libname="/System/Library/Frameworks/Accelerate.framework/Accelerate",
+    win32_libname="libopenblas.dll",
     routines=(
       RoutineR  (JDoubleR(), "dasum", JInt("n"), JDoubleArray("x", "JNI_ABORT"), JInt("incx")),
       RoutineR  (JFloatR(),  "sasum", JInt("n"), JFloatArray("x", "JNI_ABORT"), JInt("incx")),
@@ -636,6 +649,7 @@ if sys.argv[1] == "lapack":
   Library("lapack",
     linux_libname="liblapack.so.3",
     darwin_libname="/System/Library/Frameworks/Accelerate.framework/Accelerate",
+    win32_libname="libopenblas.dll",
     routines=(
       Routine   (             "dbdsdc",   JString("uplo"), JString("compq"), JInt("n"), JDoubleArray("d"), JDoubleArray("e"), JDoubleArray("u"), JInt("ldu"), JDoubleArray("vt"), JInt("ldvt"), JDoubleArray("q"), JIntArray("iq"), JDoubleArray("work"), JIntArray("iwork"), JIntW("info")),
       Routine   (             "dbdsqr",   JString("uplo"), JInt("n"), JInt("ncvt"), JInt("nru"), JInt("ncc"), JDoubleArray("d"), JDoubleArray("e"), JDoubleArray("vt"), JInt("ldvt"), JDoubleArray("u"), JInt("ldu"), JDoubleArray("c"), JInt("Ldc"), JDoubleArray("work"), JIntW("info")),
@@ -1367,6 +1381,7 @@ if sys.argv[1] == "arpack":
   Library("arpack",
     linux_libname="libarpack.so.2",
     darwin_libname={"aarch64":"/opt/homebrew/lib/libarpack.dylib", "x86_64":"/usr/local/lib/libarpack.dylib"},
+    win32_libname="libarpack.dll",
     routines=(
       Routine   (         "dmout",  JInt("lout"), JInt("m"), JInt("n"), JDoubleArray("a"), JInt("lda"), JInt("idigit"), JString("ifmt")),
       Routine   (         "smout",  JInt("lout"), JInt("m"), JInt("n"), JFloatArray("a"), JInt("lda"), JInt("idigit"), JString("ifmt")),

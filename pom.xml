@@ -193,6 +193,45 @@ information or have any questions.
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+      <id>windows-native</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>compile</phase>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                  <configuration>
+                    <target>
+                      <exec executable="make" dir="${project.basedir}/src/main/native" failonerror="true">
+                        <arg line="INPUTS='jni.c'"/>
+                        <arg line="OUTPUT='${project.build.directory}/native/windows-amd64/libnetlib${project.artifactId}jni.dll'"/>
+                        <arg line="OBJDIR='${project.build.directory}/objs/windows-amd64'"/>
+                        <arg line="CC='gcc'"/>
+                        <arg line="CCFLAGS='-c -Werror -Wall -Wextra -Wno-unused-label -O2 -I${project.build.directory}/include -I${JAVA_HOME}/include -I${JAVA_HOME}/include/win32'"/>
+                        <arg line="LD='gcc'"/>
+                        <arg line="LDFLAGS='-shared -Wl,-Bstatic,-ldl,-Bdynamic'"/>
+                        <arg line="all"/>
+                      </exec>
+                    </target>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
   </profiles>
 
   <build>

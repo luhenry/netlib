@@ -26,7 +26,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dlfcn.h>
+#ifdef _WIN32
+#  include <windows.h>
+#  define dlopen(name, flags)  ((void*)LoadLibraryA(name))
+#  define dlsym(h, name)       ((void*)GetProcAddress((HMODULE)(h), name))
+#  define dlclose(h)           FreeLibrary((HMODULE)(h))
+#  define dlerror()            "LoadLibrary failed"
+#  define RTLD_LAZY   0
+#  define RTLD_LOCAL  0
+#else
+#  include <dlfcn.h>
+#endif
 
 #include "dev_ludovic_netlib_blas_JNIBLAS.h"
 
@@ -2206,6 +2216,8 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
   jstring property_nativeLib;
 #ifdef __APPLE__
   static const char *default_native_lib = "/System/Library/Frameworks/Accelerate.framework/Accelerate";
+#elif defined(_WIN32)
+  static const char *default_native_lib = "libopenblas.dll";
 #else
   static const char *default_native_lib = "libblas.so.3";
 #endif

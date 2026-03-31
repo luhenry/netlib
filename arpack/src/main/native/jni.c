@@ -26,7 +26,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dlfcn.h>
+#ifdef _WIN32
+#  include <windows.h>
+#  define dlopen(name, flags)  ((void*)LoadLibraryA(name))
+#  define dlsym(h, name)       ((void*)GetProcAddress((HMODULE)(h), name))
+#  define dlclose(h)           FreeLibrary((HMODULE)(h))
+#  define dlerror()            "LoadLibrary failed"
+#  define RTLD_LAZY   0
+#  define RTLD_LOCAL  0
+#else
+#  include <dlfcn.h>
+#endif
 
 #include "dev_ludovic_netlib_arpack_JNIARPACK.h"
 
@@ -2326,6 +2336,8 @@ jint JNI_OnLoad(JavaVM *vm, UNUSED void *reserved) {
 #else
 #error Unsupported darwin architecture
 #endif
+#elif defined(_WIN32)
+  static const char *default_native_lib = "libarpack.dll";
 #else
   static const char *default_native_lib = "libarpack.so.2";
 #endif
