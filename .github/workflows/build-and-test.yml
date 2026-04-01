@@ -61,6 +61,7 @@ jobs:
         install: >-
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-dlfcn
+          mingw-w64-cross-mingwarm64-gcc
           make
     - name: Add MSYS2 UCRT64 to PATH
       shell: msys2 {0}
@@ -190,12 +191,13 @@ jobs:
       run: mvn --batch-mode --no-transfer-progress --projects test-utils,blas,lapack,arpack test --fail-at-end -Dmaven.main.skip=true -Dmaven.antrun.skip=true
 
   test-windows:
-    name: "Test: runs-on: windows-latest, jdk: ${{ matrix.jdk }}"
-    runs-on: windows-latest
+    name: "Test: runs-on: ${{ matrix.runs-on }}, jdk: ${{ matrix.jdk }}"
+    runs-on: ${{ matrix.runs-on }}
     needs: [build-jar]
     strategy:
       matrix:
         jdk: [11, 17, 21, 25]
+        runs-on: [windows-latest]
     steps:
     - uses: actions/checkout@v4
     - name: Cache M2 local repository
