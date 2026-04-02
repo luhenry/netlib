@@ -310,6 +310,9 @@ information or have any questions.
           <publishingServerId>central</publishingServerId>
           <autoPublish>true</autoPublish>
           <waitUntil>published</waitUntil>
+          <excludeArtifacts>
+            <excludeArtifact>test-utils</excludeArtifact>
+          </excludeArtifacts>
         </configuration>
       </plugin>
     </plugins>

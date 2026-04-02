@@ -254,7 +254,7 @@ jobs:
         server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
     - name: Publish to Sonatype OSSRH
-      run: mvn --batch-mode --no-transfer-progress --projects !test-utils -DskipTests -Dmaven.main.skip=true -Dmaven.antrun.skip=true -Dmaven.install.skip deploy
+      run: mvn --batch-mode --no-transfer-progress -DskipTests -Dmaven.main.skip=true -Dmaven.antrun.skip=true -Dmaven.install.skip deploy
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
